@@ -1,9 +1,8 @@
 import attachCustomCommands from './attachCustomCommands';
 
-import createTestEnvFile from './createTestEnvFile';
 
 export {
-  createTestEnvFile
+  attachCustomCommands
 };
 
 export default attachCustomCommands;

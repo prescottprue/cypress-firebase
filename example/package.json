@@ -3,10 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "cross-env": "^5.2.0",
-    "eslint-plugin-cypress": "^2.0.1",
     "firebase": "^5.5.5",
-    "firebase-tools-extra": "0.0.0",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-redux": "^5.0.7",
@@ -33,6 +30,10 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "cypress": "^3.1.0"
+    "cross-env": "^5.2.0",
+    "cypress": "^3.1.0",
+    "eslint-plugin-cypress": "^2.0.1",
+    "firebase-admin": "^6.0.0",
+    "firebase-tools-extra": "0.0.1"
   }
 }
