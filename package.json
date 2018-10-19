@@ -1,0 +1,52 @@
+{
+  "name": "cypress-firebase",
+  "version": "0.0.0",
+  "description": "Utilities to help testing firebase projects with cypress.",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "jsnext:main": "es/index.js",
+  "scripts": {
+    "clean": "rimraf lib dist",
+    "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
+    "build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
+    "build": "npm run build:commonjs && npm run build:es",
+    "watch": "npm run build:commonjs -- --watch",
+    "lint": "eslint src test",
+    "lint:fix": "npm run lint -- --fix",
+    "postinstall": "npm run build",
+    "preversion": "npm run build",
+    "prepare": "npm run build"
+  },
+  "bin": {
+    "cypress-firebase": "./bin/cypress-firebase"
+  },
+  "keywords": [
+    "cypress",
+    "firebase"
+  ],
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.0.1",
+    "babel-loader": "^7.1.2",
+    "babel-plugin-add-module-exports": "^0.2.1",
+    "babel-plugin-lodash": "^3.3.4",
+    "babel-preset-env": "^1.7.0",
+    "cross-env": "^5.2.0",
+    "cypress": "^3.1.0",
+    "eslint": "^3.15.0",
+    "eslint-config-airbnb": "^14.1.0",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-jsx-a11y": "^3.0.2",
+    "eslint-plugin-react": "^6.9.0",
+    "rimraf": "^2.6.2"
+  },
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "firebase-admin": "^6.0.0",
+    "firebase-tools-extra": "0.0.0",
+    "lodash": "^4.17.11"
+  },
+  "peerDependencies": {
+    "firebase-admin": "^6.0.0"
+  }
+}

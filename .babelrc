@@ -1,0 +1,17 @@
+{
+  "presets": ["env"],
+  "plugins": [
+    "lodash",
+    "add-module-exports"
+  ],
+  "env": {
+    "es": {
+      "comments": false,
+      "minified": true
+    },
+    "commonjs": {
+      "comments": false,
+      "minified": true
+    }
+  }
+}
