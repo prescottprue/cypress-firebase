@@ -22,16 +22,8 @@ branches:
     - master
     - next
 
-install:
-  - npm i
-
 script:
   - npm run lint
-  - npm run test:cov
-
-addons:
-  code_climate:
-    repo_token: $CODE_CLIMATE
 
 deploy:
   - provider: npm
@@ -49,8 +41,3 @@ deploy:
     on:
       node: '10'
       branch: 'next'
-
-after_success:
-  - npm install -g codeclimate-test-reporter
-  - codeclimate-test-reporter < coverage/lcov.info
-  - npm run codecov

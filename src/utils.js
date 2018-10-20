@@ -43,7 +43,7 @@ export function parseFixturePath(unparsed) {
       return JSON.parse(unparsed);
     }
     catch (err) {
-      console.log('Error parsing fixture to JSON:', err);
+      console.log('Error parsing fixture to JSON:', err); // eslint-disable-line no-console
       return unparsed;
     }
   }

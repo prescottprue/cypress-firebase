@@ -32,9 +32,6 @@ export default function ({ Cypress, cy, firebase }) {
         firebase
           .auth()
           .signInWithCustomToken(Cypress.env('FIREBASE_AUTH_JWT'))
-          .then(() => {
-            console.debug('Login command successful');
-          })
           .catch(reject);
       });
     }
@@ -91,7 +88,7 @@ export default function ({ Cypress, cy, firebase }) {
             return JSON.parse(stdout);
           }
           catch (err) {
-            console.log('Error parsing data from callRtdb response', out);
+            console.log('Error parsing data from callRtdb response', out); // eslint-disable-line no-console
           }
         }
         return stdout;

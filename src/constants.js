@@ -7,6 +7,4 @@ export const DEFAULT_BASE_PATH = process.cwd();
 export const FIREBASE_TOOLS_BASE_COMMAND = 'npx firebase';
 // Path to Firebase Extra Command Line tool (wrapper for firebase-tools)
 export const FIREBASE_EXTRA_PATH = 'bin/firebase-tools-extra';
-// Argument used to automatically approve the firebase-tools action
-const FIREBASE_TOOLS_YES_ARGUMENT = '-y';
 

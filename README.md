@@ -1,6 +1,14 @@
 # cypress-firebase
 
-> Utilities to help testing firebase projects with cypress
+> Utilities and cli to help testing Firebase projects with Cypress
+
+## What?
+* Custom commands for auth and database interactions:
+  * `cy.login`
+  * `cy.logout`
+  * `cy.callRtdb` 
+  * `cy.callFirestore`
+* simple test environment config generation (including custom auth token) - `cypress-firebase createTestEnvFile`
 
 ## Installation
 
@@ -57,42 +65,13 @@ Note: Skip to #3 if you already have Cypress tests in your project
   }
   ```
 
+## Why?
 
-## Usage
+It isn't currenlty possible to use Firebase's `firebase-admin` SDK directly within Cypress due to dependencies not being able to be loaded into the Browser environment. Since `firebase-admin` is nessesary to generate custom token needed to login to Firebase, the usage of it happens outside of Cypress (through `cypress-firebase createTestEnvFile`) before booting up.
 
-*docs here*
+## Roadmap
+* Fix issue where auth token goes bad after test suite has been open a long time
 
-## Development
-
-Install dependencies:
-
-```
-$ npm install
-```
-
-Run the example app at [http://localhost:8080](http://localhost:8080):
-
-```
-$ npm start
-```
-
-Run tests and watch for code changes using [jest](https://github.com/facebook/jest):
-
-```
-$ npm test
-```
-
-Lint `src` and `test` files:
-
-```
-$ npm run lint
-```
-
-Generate UMD output in the `lib` folder (runs implicitly on `npm version`):
-
-```
-$ npm run build
-```
 
 ## License
 

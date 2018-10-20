@@ -5,3 +5,4 @@ es
 **/cypress/config.json
 **/cypress.env.json
 **/serviceAccount.json
+*.log*
