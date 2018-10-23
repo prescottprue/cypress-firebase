@@ -1,0 +1,15 @@
+bin
+examples
+test
+coverage
+.istanbul.yml
+.babelrc
+.eslintignore
+.eslintrc
+.github
+yarn.lock
+.travis.yml
+CHANGELOG.md
+.codeclimate.yml
+PATRONS.md
+src
