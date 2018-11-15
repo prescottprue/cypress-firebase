@@ -1,7 +1,4 @@
 import attachCustomCommands from './attachCustomCommands';
 
-export {
-  attachCustomCommands
-};
+export { attachCustomCommands }; // eslint-disable-line import/prefer-default-export
 
-export default attachCustomCommands;

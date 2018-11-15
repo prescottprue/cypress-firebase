@@ -3,7 +3,7 @@
   "version": "0.0.3",
   "description": "Utilities to help testing firebase projects with cypress.",
   "main": "lib/index.js",
-  "module": "es/index.js",
+  "module": "lib/index.js",
   "jsnext:main": "es/index.js",
   "scripts": {
     "clean": "rimraf lib dist",

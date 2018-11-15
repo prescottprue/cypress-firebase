@@ -15,6 +15,7 @@ import { FIREBASE_TOOLS_BASE_COMMAND, FIREBASE_EXTRA_PATH } from './constants';
  * @return {String} Command string to be used with cy.exec
  */
 export default function buildFirestoreCommand(
+  Cypress,
   action,
   actionPath,
   fixturePath,
@@ -22,22 +23,22 @@ export default function buildFirestoreCommand(
 ) {
   const options = isObject(fixturePath) ? fixturePath : opts;
   const { args = [] } = options;
-  const argsWithDefaults = addDefaultArgs(args);
+  const argsWithDefaults = addDefaultArgs(Cypress, args, { disableYes: true });
   switch (action) {
     case 'delete': {
-      // Add -r to args string (recursive) if recursive option is true
-      if (options.recursive) {
-        argsWithDefaults.push('-r');
-      }
-      return `${FIREBASE_TOOLS_BASE_COMMAND} firestore:${action} ${actionPath}${getArgsString(
-        argsWithDefaults
-      )}`;
+      const deleteArgsWithDefaults = addDefaultArgs(Cypress, args);
+      // Add -r to args string (recursive) if recursive option is true otherwise specify shallow
+      const finalDeleteArgs = deleteArgsWithDefaults.concat(
+        options.recursive ? '-r' : '--shallow'
+      );
+      const deleteArgsStr = getArgsString(finalDeleteArgs);
+      return `${FIREBASE_TOOLS_BASE_COMMAND} firestore:${action} ${actionPath}${deleteArgsStr}`;
     }
     case 'set': {
       // Add -m to argsWithDefaults string (meta) if withmeta option is true
-      return `${FIREBASE_EXTRA_PATH} firestore ${action} ${actionPath} ${fixturePath}${
-        options.withMeta ? ' -m' : ''
-        }`;
+      return `${FIREBASE_EXTRA_PATH} firestore ${action} ${actionPath} '${JSON.stringify(
+        fixturePath
+      )}'${options.withMeta ? ' -m' : ''}`;
     }
     default: {
       // Add -m to argsWithDefaults string (meta) if withmeta option is true

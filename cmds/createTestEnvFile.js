@@ -103,9 +103,17 @@ function createTestEnvFile() {
       // Create config object to be written into test env file
       const newCypressConfig = {
         TEST_UID: envVarBasedOnCIEnv('TEST_UID'),
+        FIREBASE_API_KEY: envVarBasedOnCIEnv('FIREBASE_API_KEY'),
         FIREBASE_PROJECT_ID,
         FIREBASE_AUTH_JWT: customToken
       };
+      const stageProjectId = envVarBasedOnCIEnv('STAGE_FIREBASE_PROJECT_ID');
+      const stageApiKey = envVarBasedOnCIEnv('STAGE_FIREBASE_API_KEY');
+
+      if (stageProjectId) {
+        newCypressConfig.STAGE_FIREBASE_PROJECT_ID = stageProjectId;
+        newCypressConfig.STAGE_FIREBASE_API_KEY = stageApiKey;
+      }
 
       // Write config file to cypress.env.json
       fs.writeFileSync(testEnvFileFullPath, JSON.stringify(newCypressConfig, null, 2));

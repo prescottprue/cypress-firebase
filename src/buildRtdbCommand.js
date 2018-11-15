@@ -14,6 +14,7 @@ import { FIREBASE_TOOLS_BASE_COMMAND } from './constants';
  * @return {String} Command string to be used with cy.exec
  */
 export default function buildRtdbCommand(
+  Cypress,
   action,
   actionPath,
   fixturePath,
@@ -21,13 +22,13 @@ export default function buildRtdbCommand(
 ) {
   const options = isObject(fixturePath) ? fixturePath : opts;
   const { args = [] } = options;
-  const argsWithDefaults = addDefaultArgs(args);
+  const argsWithDefaults = addDefaultArgs(Cypress, args);
   const argsStr = getArgsString(argsWithDefaults);
   switch (action) {
     case 'delete':
       return `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} ${actionPath}${argsStr}`;
     case 'get': {
-      const getDataArgsWithDefaults = addDefaultArgs(args, {
+      const getDataArgsWithDefaults = addDefaultArgs(Cypress, args, {
         disableYes: true
       });
       if (options.limitToLast) {

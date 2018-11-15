@@ -95,7 +95,7 @@ export default function ({ Cypress, cy, firebase }) {
     }
 
     // Build command to pass to firebase-tools-extra
-    const rtdbCommand = buildRtdbCommand(action, actionPath, dataToWrite, opts);
+    const rtdbCommand = buildRtdbCommand(Cypress, action, actionPath, dataToWrite, opts);
     cy.log(`Calling RTDB command:\n${rtdbCommand}`);
 
     // Call firebase-tools-extra command
@@ -113,7 +113,7 @@ export default function ({ Cypress, cy, firebase }) {
           return JSON.parse(stdout);
         }
         catch (err) {
-          console.log('Error parsing data from callRtdb response', out);
+          cy.log('Error parsing data from callRtdb response', out);
         }
       }
 
@@ -150,6 +150,7 @@ export default function ({ Cypress, cy, firebase }) {
     }
 
     const firestoreCommand = buildFirestoreCommand(
+      Cypress,
       action,
       actionPath,
       dataToWrite,
@@ -170,7 +171,7 @@ export default function ({ Cypress, cy, firebase }) {
           return JSON.parse(stdout);
         }
         catch (err) {
-          console.log('Error parsing data from callFirestore response', out);
+          cy.log('Error parsing data from callFirestore response', out);
         }
       }
       return stdout;
