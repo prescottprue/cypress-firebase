@@ -1,6 +1,5 @@
 import attachCustomCommands from './attachCustomCommands';
 
-
 export {
   attachCustomCommands
 };
