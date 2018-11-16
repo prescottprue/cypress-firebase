@@ -1,12 +1,22 @@
 {
-  "presets": ["env"],
+  "presets": [
+    [
+      "@babel/preset-env",
+      {
+        "targets": {
+          "node": "6"
+        }
+      }
+    ]
+  ],
   "plugins": [
-    "lodash"
+    "lodash",
+    "add-module-exports"
   ],
   "env": {
     "es": {
       "comments": false,
-      "minified": true
+      "minified": false
     },
     "commonjs": {
       "comments": false,
