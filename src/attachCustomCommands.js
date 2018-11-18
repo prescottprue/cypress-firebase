@@ -19,24 +19,23 @@ export default function ({ Cypress, cy, firebase }) {
       cy.log(
         'FIREBASE_AUTH_JWT must be set to cypress environment in order to login'
       );
-      return null;
     }
-    if (firebase.auth().currentUser) {
+    else if (firebase.auth().currentUser) {
       cy.log('Current user already exists, login complete.');
-      return firebase.auth().currentUser;
     }
-    return new Promise((resolve, reject) => {
-      // eslint-disable-line consistent-return
-      firebase.auth().onAuthStateChanged((auth) => {
-        if (auth) {
-          resolve(auth);
-        }
+    else {
+      return new Promise((resolve, reject) => { // eslint-disable-line consistent-return
+        firebase.auth().onAuthStateChanged((auth) => {
+          if (auth) {
+            resolve(auth);
+          }
+        });
+        firebase
+            .auth()
+            .signInWithCustomToken(Cypress.env('FIREBASE_AUTH_JWT'))
+            .catch(reject);
       });
-      firebase
-        .auth()
-        .signInWithCustomToken(Cypress.env('FIREBASE_AUTH_JWT'))
-        .catch(reject);
-    });
+    }
   });
 
   /**
@@ -49,10 +48,11 @@ export default function ({ Cypress, cy, firebase }) {
     cy.log('Confirming use is logged out...');
     if (!firebase.auth().currentUser) {
       cy.log('Current user already logged out.');
-      return null;
     }
-    cy.log('Current user exists, logging out...');
-    return firebase.auth().signOut();
+    else {
+      cy.log('Current user exists, logging out...');
+      return firebase.auth().signOut();
+    }
   });
 
   /**
@@ -163,6 +163,7 @@ export default function ({ Cypress, cy, firebase }) {
         dataToWrite,
         opts
       );
+
       cy.log(`Calling Firestore command:\n${firestoreCommand}`);
 
       cy.exec(firestoreCommand, { timeout: 100000 }).then((out) => {

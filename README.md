@@ -85,7 +85,7 @@ It isn't currenlty possible to use Firebase's `firebase-admin` SDK directly with
 
 ## Projects Using It
 
-[fireadmin.io][fireadmin-url] - A Firebase project management tool (here is the source)
+[fireadmin.io][fireadmin-url] - A Firebase project management tool ([here is the source][fireadmin-source])
 
 ## Roadmap
 
