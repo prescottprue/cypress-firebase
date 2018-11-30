@@ -8,34 +8,49 @@
 > Utilities and cli to help testing Firebase projects with Cypress
 
 ## What?
-
-* Custom commands for auth and database interactions:
-  * `cy.login`
-  * `cy.logout`
-  * `cy.callRtdb` 
-  * `cy.callFirestore`
 * simple test environment config generation (including custom auth token) - `cypress-firebase createTestEnvFile`
+* [Custom cypress commands](https://docs.cypress.io/api/cypress-api/custom-commands.html#Syntax) for auth and database interactions:
+  * [`cy.login`][1]
+  * [cy.logout][4]
+  * [cy.callRtdb][6]
+  * [cy.callFirestore][9]
+
+If you are intereted in what drove the need for this checkout [the why section](#why)
 
 ## Usage
 
 ### Pre-Setup
 
-Note: Skip to #3 if you already have Cypress tests in your project
+**Note**: Skip cypress install if it already exists within your project
 
+1. Log into your app for the first time
+1. Go to the Auth tab of Firebase and get your UID. This will be the account which you use to login while running tests (we will call this UID `TEST_UID`)
+1. Generate a service account -> save it as `serviceAccount.json`
 1. Install Cypress and add it to your package file: `npm i --save-dev cypress`
 1. Add cypress folder by calling `cypress open`
 
 ### Setup
 
-1. Install deps `npm i cypress-firebase firebase-tools-extra cross-env --save-dev`
+1. Install deps `npm i cypress-firebase firebase-tools-extra --save-dev`
 1. Add the following to the `scripts` section of your `package.json`:
 
     ```json
     "build:testConfig": "cypress-firebase createTestEnvFile",
-    "test": "npm run build:testConfig && cross-env CYPRESS_baseUrl=http://localhost:3000 cypress run",
-    "test:ui": "npm run build:testConfig && cross-env CYPRESS_baseUrl=http://localhost:3000 cypress open",
+    "test": "npm run build:testConfig cypress run",
+    "test:open": "npm run build:testConfig cypress open",
+    "test:stage": "npm run test -- --env envName=stage",
+    "test:open:stage": "npm run test:open -- --env envName=stage"
     ```
-1. Add the following to the custom commands file (`cypress/support/commands.js`):
+    Environment variables can be passed through `--env`. `envName` points to the firebase project within the projects section of `.firebaserc`.
+1. Add your config info to `cypress/config.json`
+  
+    ```js
+    {
+      "TEST_UID": "<- uid of the user you want to test as ->",
+      "FIREBASE_PROJECT_ID": "<- projectId of your project ->"
+    }
+    ```
+1. Add the following your custom commands file (`cypress/support/commands.js`):
 
     ```js
     import firebase from 'firebase/app';
@@ -52,6 +67,25 @@ Note: Skip to #3 if you already have Cypress tests in your project
 
     attachCustomCommands({ Cypress, cy, firebase })
     ```
+1. Setup plugin adding following your plugins file (`cypress/plugins/index.js`):
+    
+    ```js
+    const cypressFirebasePlugin = require('cypress-firebase').plugin
+
+    module.exports = (on, config) => {
+      // `on` is used to hook into various events Cypress emits
+      // `config` is the resolved Cypress config
+      
+      // Return extended config (with settings from .firebaserc)
+      return cypressFirebasePlugin(config)
+    }
+    ```
+    
+    The plugin sets `baseUrl` and loads config from `.firebaserc`
+
+### Running
+1. Start your local dev server (usually `npm start`) - for faster alternative checkout the [test built version section](#test-built-version)
+1. Open cypress test running by running `npm run test:open` in another terminal window
 
 #### Test Built Version
 
@@ -62,22 +96,130 @@ Tests will run faster locally if you tests against the build version of your app
     ```json
     "start:dist": "npm run build && firebase serve --only hosting -p 3000",
     ```
-1. Call `npm run start:dist` to build your app and serve it with firebase
-1. In another terminal window, run a test command such as `npm run test:ui`
+1. Run `npm run start:dist` to build your app and serve it with firebase
+1. In another terminal window, run a test command such as `npm run test:open`
 
-### Create Config
+## Docs
+### CLI Commands
 
-1. Log into your app for the first time
-1. Go to the Auth tab of Firebase and get your UID
-1. Generate a service account -> save it as `serviceAccount.json`
-1. Add your config info to `cypress/config.json`
-  
-    ```js
-    {
-      "TEST_UID": "<- uid of the user you want to test as ->",
-      "FIREBASE_PROJECT_ID": "<- projectId of your project ->"
-    }
-    ```
+### Custom Cypress Commands
+
+#### Table of Contents
+
+-   [cy.login][1]
+    -   [Examples][2]
+-   [currentUser][3]
+-   [cy.logout][4]
+    -   [Examples][5]
+-   [cy.callRtdb][6]
+    -   [Parameters][7]
+    -   [Examples][8]
+-   [cy.callFirestore][9]
+    -   [Parameters][10]
+    -   [Examples][11]
+
+### cy.login
+
+Login to Firebase auth using `FIREBASE_AUTH_JWT` environment variable
+which is generated using `firebase-admin` authenticated with serviceAccount
+during `build:testConfig` phase.
+
+#### Examples
+
+```javascript
+cy.login()
+```
+
+### cy.logout
+
+Log out of Firebase instance
+
+#### Examples
+
+```javascript
+cy.logout()
+```
+### cy.callRtdb
+
+Call Real Time Database path with some specified action. Authentication is through `FIREBASE_TOKEN` since firebase-tools is used (instead of firebaseExtra).
+
+### Parameters
+
+-   `action` **[String][11]** The action type to call with (set, push, update, remove)
+-   `actionPath` **[String][11]** Path within RTDB that action should be applied
+-   `opts` **[Object][12]** Options
+    -   `opts.args` **[Array][13]** Command line args to be passed
+
+### Examples
+*Set data*
+
+```javascript
+const fakeProject = { some: 'data' }
+cy.callRtdb('set', 'projects/ABC123', fakeProject)
+```
+
+*Set Data With Meta*
+
+```javascript
+const fakeProject = { some: 'data' }
+// Adds createdAt and createdBy (current user's uid) on data
+cy.callRtdb('set', 'projects/ABC123', fakeProject, { withMeta: true })
+```
+
+*Get/Verify Data*
+
+```javascript
+cy.callRtdb('get', 'projects/ABC123')
+  .then((project) => {
+    // Confirm new data has users uid
+    cy.wrap(project)
+      .its('createdBy')
+      .should('equal', Cypress.env('TEST_UID'))
+  })
+```
+*Other Args*
+
+```javascript
+const opts = { args: ['-d'] }
+const fakeProject = { some: 'data' }
+cy.callRtdb('update', 'project/test-project', fakeProject, opts)
+```
+
+### cy.callFirestore
+
+Call Firestore instance with some specified action. Authentication is through serviceAccount.json since it is at the base
+level. If using delete, auth is through FIREBASE_TOKEN since firebase-tools is used (instead of firebaseExtra).
+
+Type: Cypress.Command
+
+#### Parameters
+
+-   `action` **[String][11]** The action type to call with (set, push, update, remove)
+-   `actionPath` **[String][11]** Path within RTDB that action should be applied
+-   `opts` **[Object][12]** Options
+    -   `opts.args` **[Array][13]** Command line args to be passed
+
+#### Examples
+
+*Basic*
+
+```javascript
+cy.callFirestore('add', 'project/test-project', 'fakeProject.json')
+```
+
+*Recursive Delete*
+
+```javascript
+const opts = { recursive: true }
+cy.callFirestore('delete', 'project/test-project', opts)
+```
+
+*Other Args*
+
+```javascript
+const opts = { args: ['-r'] }
+cy.callFirestore('delete', 'project/test-project', opts)
+```
 
 ## Why?
 
@@ -90,6 +232,35 @@ It isn't currenlty possible to use Firebase's `firebase-admin` SDK directly with
 ## Roadmap
 
 * Fix issue where auth token goes bad after test suite has been open a long time
+
+[1]: #cylogin
+
+[2]: #examples
+
+[3]: #currentuser
+
+[4]: #cylogout
+
+[5]: #examples-1
+
+[6]: #cycallrtdb
+
+[7]: #parameters
+
+[8]: #examples-2
+
+[9]: #cycallfirestore
+
+[10]: #parameters-1
+
+[11]: #examples-3
+
+[12]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+
+[13]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+
+[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+
 
 [fireadmin-url]: https://fireadmin.io
 [fireadmin-source]: https://github.com/prescottprue/fireadmin

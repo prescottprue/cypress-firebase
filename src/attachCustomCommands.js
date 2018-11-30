@@ -8,9 +8,8 @@ export default function ({ Cypress, cy, firebase }) {
    * which is generated using firebase-admin authenticated with serviceAccount
    * during test:buildConfig phase.
    * @type {Cypress.Command}
-   * @memberOf Cypress.Chainable#
-   * @name login
-   * @example Basic
+   * @name cy.login
+   * @example
    * cy.login()
    */
   Cypress.Commands.add('login', () => {
@@ -41,8 +40,10 @@ export default function ({ Cypress, cy, firebase }) {
   /**
    * Log out of Firebase instance
    * @memberOf Cypress.Chainable#
-   * @name login
-   * @function
+   * @type {Cypress.Command}
+   * @name cy.logout
+   * @example
+   * cy.logout()
    */
   Cypress.Commands.add('logout', () => {
     cy.log('Confirming use is logged out...');
@@ -56,20 +57,21 @@ export default function ({ Cypress, cy, firebase }) {
   });
 
   /**
-   * Call Real Time Database path with some specified action. Authentication is through FIREBASE_TOKEN since firebase-tools
+   * Call Real Time Database path with some specified action. Authentication is through FIREBASE_TOKEN since firebase-tools is used (instead of firebaseExtra).
    * @param {String} action - The action type to call with (set, push, update, remove)
    * @param {String} actionPath - Path within RTDB that action should be applied
    * @param {Object} opts - Options
    * @param {Array} opts.args - Command line args to be passed
+   * @name cy.callRtdb
    * @type {Cypress.Command}
-   * @example Set Data
+   * @example <caption>Set Data</caption>
    * const fakeProject = { some: 'data' }
    * cy.callRtdb('set', 'projects/ABC123', fakeProject)
-   * @example Set Data With Meta
+   * @example <caption>Set Data With Meta</caption>
    * const fakeProject = { some: 'data' }
    * // Adds createdAt and createdBy (current user's uid) on data
    * cy.callRtdb('set', 'projects/ABC123', fakeProject, { withMeta: true })
-   * @example Get/Verify Data
+   * @example <caption>Get/Verify Data</caption>
    * cy.callRtdb('get', 'projects/ABC123')
    *   .then((project) => {
    *     // Confirm new data has users uid
@@ -77,7 +79,7 @@ export default function ({ Cypress, cy, firebase }) {
    *       .its('createdBy')
    *       .should('equal', Cypress.env('TEST_UID'))
    *   })
-   * @example Other Args
+   * @example <caption>Other Args</caption>
    * const opts = { args: ['-d'] }
    * const fakeProject = { some: 'data' }
    * cy.callRtdb('update', 'project/test-project', fakeProject, opts)
@@ -129,18 +131,19 @@ export default function ({ Cypress, cy, firebase }) {
 
   /**
    * Call Firestore instance with some specified action. Authentication is through serviceAccount.json since it is at the base
-   * level. If using delete, auth is through FIREBASE_TOKEN since firebase-tools is used (instead of firebaseExtra).
+   * level. If using delete, auth is through `FIREBASE_TOKEN` since firebase-tools is used (instead of firebaseExtra).
    * @param {String} action - The action type to call with (set, push, update, remove)
    * @param {String} actionPath - Path within RTDB that action should be applied
    * @param {Object} opts - Options
    * @param {Array} opts.args - Command line args to be passed
+   * @name cy.callFirestore
    * @type {Cypress.Command}
-   * @example Basic
+   * @example <caption>Basic</caption>
    * cy.callFirestore('add', 'project/test-project', 'fakeProject.json')
-   * @example Recursive Delete
+   * @example <caption>Recursive Delete</caption>
    * const opts = { recursive: true }
    * cy.callFirestore('delete', 'project/test-project', opts)
-   * @example Other Args
+   * @example <caption>Other Args</caption>
    * const opts = { args: ['-r'] }
    * cy.callFirestore('delete', 'project/test-project', opts)
    */
