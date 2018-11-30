@@ -5,6 +5,7 @@
 
 const chalk = require('chalk');
 const fs = require('fs');
+const fig = require('figures');
 const pickBy = require('lodash/pickBy');
 const size = require('lodash/size');
 const keys = require('lodash/keys');
@@ -46,7 +47,7 @@ function createTestEnvFile() {
 
   const FIREBASE_PROJECT_ID = envVarBasedOnCIEnv('FIREBASE_PROJECT_ID');
 
-  console.log(`Generating custom auth token for project: ${chalk.magenta(FIREBASE_PROJECT_ID)}`); // eslint-disable-line no-console
+  console.log(`Generating custom auth token for firebase project: ${chalk.cyan(FIREBASE_PROJECT_ID)}\n`); // eslint-disable-line no-console
 
   // Get service account from local file falling back to environment variables
   const serviceAccount = getServiceAccount();
@@ -71,7 +72,7 @@ function createTestEnvFile() {
   if (serviceAccount.project_id !== FIREBASE_PROJECT_ID && serviceAccount.project_id !== projectId) {
     /* eslint-disable no-console */
     console.log(
-      chalk.yellow(`Warning: project_id "${serviceAccount.project_id}" does not match env var: "${envVarBasedOnCIEnv('FIREBASE_PROJECT_ID')}"`)
+      chalk.yellow(`${fig('⚠')} Warning: project_id "${serviceAccount.project_id}" does not match env var: "${envVarBasedOnCIEnv('FIREBASE_PROJECT_ID')}"`)
     );
     /* eslint-enable no-console */
   }
@@ -94,7 +95,7 @@ function createTestEnvFile() {
     .then((customToken) => {
       /* eslint-disable no-console */
       console.log(
-        `Custom token generated successfully, writing to ${chalk.magenta(constants.DEFAULT_TEST_ENV_FILE_NAME)}`
+        `${chalk.green(fig('✔'))} Custom token generated successfully, writing to ${chalk.cyan(constants.DEFAULT_TEST_ENV_FILE_NAME)}`
       );
       /* eslint-enable no-console */
       // Remove firebase app
@@ -118,7 +119,7 @@ function createTestEnvFile() {
       // Write config file to cypress.env.json
       fs.writeFileSync(testEnvFileFullPath, JSON.stringify(newCypressConfig, null, 2));
 
-      console.log(`Success! ${chalk.magenta(constants.DEFAULT_TEST_ENV_FILE_NAME)} created successfully`); // eslint-disable-line no-console
+      console.log(`${chalk.green(fig('✔'))} ${chalk.cyan(constants.DEFAULT_TEST_ENV_FILE_NAME)} updated successfully`); // eslint-disable-line no-console
 
       // Create service account file if it does not already exist (for use in reporter)
       if (!fs.existsSync(serviceAccountPath)) {
@@ -128,7 +129,7 @@ function createTestEnvFile() {
           JSON.stringify(serviceAccount, null, 2)
         );
 
-        console.log('Service account created successfully'); // eslint-disable-line no-console
+        console.log(`${chalk.green(fig('✔'))} ${chalk.cyan('serviceAccount.json')} created successfully`); // eslint-disable-line no-console
       }
       return customToken;
     })
