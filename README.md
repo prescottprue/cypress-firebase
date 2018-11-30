@@ -8,7 +8,9 @@
 > Utilities and cli to help testing Firebase projects with Cypress
 
 ## What?
-* simple test environment config generation (including custom auth token) - `cypress-firebase createTestEnvFile`
+* Test environment config generation (including custom auth token) with [`createTestEnvFile`](#createTestEnvFile):
+    
+    `cypress-firebase createTestEnvFile`
 * [Custom cypress commands](https://docs.cypress.io/api/cypress-api/custom-commands.html#Syntax) for auth and database interactions:
   * [`cy.login`][1]
   * [cy.logout][4]
@@ -100,7 +102,17 @@ Tests will run faster locally if you tests against the build version of your app
 1. In another terminal window, run a test command such as `npm run test:open`
 
 ## Docs
+
 ### CLI Commands
+
+#### createTestEnvFile {#createTestEnvFile}
+Create test environment file (`cypress.env.json`) which contains custom auth token generated using `firebase-admin` SDK and `serviceAccount.json`.
+
+##### Examples
+
+```bash
+cypress-firebase createTestEnvFile
+```
 
 ### Custom Cypress Commands
 
@@ -108,7 +120,6 @@ Tests will run faster locally if you tests against the build version of your app
 
 -   [cy.login][1]
     -   [Examples][2]
--   [currentUser][3]
 -   [cy.logout][4]
     -   [Examples][5]
 -   [cy.callRtdb][6]
@@ -118,39 +129,41 @@ Tests will run faster locally if you tests against the build version of your app
     -   [Parameters][10]
     -   [Examples][11]
 
-### cy.login
+#### cy.login
 
 Login to Firebase auth using `FIREBASE_AUTH_JWT` environment variable
 which is generated using `firebase-admin` authenticated with serviceAccount
 during `build:testConfig` phase.
 
-#### Examples
+##### Examples
 
 ```javascript
 cy.login()
 ```
 
-### cy.logout
+#### cy.logout
 
 Log out of Firebase instance
 
-#### Examples
+##### Examples
 
 ```javascript
 cy.logout()
 ```
-### cy.callRtdb
+
+#### cy.callRtdb
 
 Call Real Time Database path with some specified action. Authentication is through `FIREBASE_TOKEN` since firebase-tools is used (instead of firebaseExtra).
 
-### Parameters
+##### Parameters
 
 -   `action` **[String][11]** The action type to call with (set, push, update, remove)
 -   `actionPath` **[String][11]** Path within RTDB that action should be applied
 -   `opts` **[Object][12]** Options
     -   `opts.args` **[Array][13]** Command line args to be passed
 
-### Examples
+##### Examples
+
 *Set data*
 
 ```javascript
@@ -177,6 +190,7 @@ cy.callRtdb('get', 'projects/ABC123')
       .should('equal', Cypress.env('TEST_UID'))
   })
 ```
+
 *Other Args*
 
 ```javascript
@@ -185,21 +199,19 @@ const fakeProject = { some: 'data' }
 cy.callRtdb('update', 'project/test-project', fakeProject, opts)
 ```
 
-### cy.callFirestore
+#### cy.callFirestore
 
 Call Firestore instance with some specified action. Authentication is through serviceAccount.json since it is at the base
 level. If using delete, auth is through FIREBASE_TOKEN since firebase-tools is used (instead of firebaseExtra).
 
-Type: Cypress.Command
-
-#### Parameters
+##### Parameters
 
 -   `action` **[String][11]** The action type to call with (set, push, update, remove)
 -   `actionPath` **[String][11]** Path within RTDB that action should be applied
 -   `opts` **[Object][12]** Options
     -   `opts.args` **[Array][13]** Command line args to be passed
 
-#### Examples
+##### Examples
 
 *Basic*
 
