@@ -8,11 +8,10 @@
 > Utilities and cli to help testing Firebase projects with Cypress
 
 ## What?
-* Test environment config generation (including custom auth token) with [`createTestEnvFile`](#createTestEnvFile):
-    
-    `cypress-firebase createTestEnvFile`
+
+* Test environment config generation (including custom auth token) with [`createTestEnvFile`](#createTestEnvFile)
 * [Custom cypress commands](https://docs.cypress.io/api/cypress-api/custom-commands.html#Syntax) for auth and database interactions:
-  * [`cy.login`][1]
+  * [cy.login][1]
   * [cy.logout][4]
   * [cy.callRtdb][6]
   * [cy.callFirestore][9]
@@ -32,6 +31,8 @@ If you are intereted in what drove the need for this checkout [the why section](
 1. Add cypress folder by calling `cypress open`
 
 ### Setup
+
+**Note:** These instructions assume your tests are in the `cypress` folder (cypress' default). See the [folders section below](#folders) for more info about other supported folders.
 
 1. Make sure you have `firebase-tools` installed (globally or within project). It is used to call to database when using `cy.callRtdb` and `cy.callFirestore`.
 1. Install using `npm i cypress-firebase --save-dev`
@@ -53,6 +54,7 @@ If you are intereted in what drove the need for this checkout [the why section](
       "FIREBASE_PROJECT_ID": "<- projectId of your project ->"
     }
     ```
+
 1. Add the following your custom commands file (`cypress/support/commands.js`):
 
     ```js
@@ -91,11 +93,6 @@ If you are intereted in what drove the need for this checkout [the why section](
 1. Start your local dev server (usually `npm start`) - for faster alternative checkout the [test built version section](#test-built-version)
 1. Open cypress test running by running `npm run test:open` in another terminal window
 
-### CI
-
-1. Run `firebase login:ci` to generate a CI token for `firebase-tools` (this will give your `cy.callRtdb` and `cy.callFirestore` commands admin access to the DB)
-1. Set `FIREBASE_TOKEN` within CI environment variables
-
 #### Test Built Version
 
 Tests will run faster locally if you tests against the build version of your app instead of your dev version (with hot module reloading and other dev tools). You can do that by:
@@ -108,11 +105,26 @@ Tests will run faster locally if you tests against the build version of your app
 1. Run `npm run start:dist` to build your app and serve it with firebase
 1. In another terminal window, run a test command such as `npm run test:open`
 
+### CI
+
+1. Run `firebase login:ci` to generate a CI token for `firebase-tools` (this will give your `cy.callRtdb` and `cy.callFirestore` commands admin access to the DB)
+1. Set `FIREBASE_TOKEN` within CI environment variables
+
+### Folders
+
+`cypress` is the default folder where config is loaded from, but these other common folders are supported:
+
+  ```
+  test/ui
+  test/e2e
+  ```
+
 ## Docs
 
 ### CLI Commands
 
 #### createTestEnvFile {#createTestEnvFile}
+
 Create test environment file (`cypress.env.json`) which contains custom auth token generated using `firebase-admin` SDK and `serviceAccount.json`.
 
 ##### Examples
@@ -243,6 +255,8 @@ cy.callFirestore('delete', 'project/test-project', opts)
 ## Why?
 
 It isn't currenlty possible to use Firebase's `firebase-admin` SDK directly within Cypress due to dependencies not being able to be loaded into the Browser environment. Since `firebase-admin` is nessesary to generate custom token needed to login to Firebase, the usage of it happens outside of Cypress (through `cypress-firebase createTestEnvFile`) before booting up.
+
+Instead of a cli tool, the plugin that is include could maybe use `firebase-admin` (since cypress plugins is a node environment) - when investigating this, I found it frustrating to get the values back into the test. That said, always open to better ways of solving this, so please reach out with your ideas!
 
 ## Projects Using It
 
