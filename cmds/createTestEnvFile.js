@@ -10,11 +10,12 @@ const pickBy = require('lodash/pickBy');
 const size = require('lodash/size');
 const keys = require('lodash/keys');
 const isUndefined = require('lodash/isUndefined');
+const path = require('path');
 const envVarBasedOnCIEnv = require('../lib/utils').envVarBasedOnCIEnv;
 const getServiceAccount = require('../lib/utils').getServiceAccount;
 const getEnvPrefix = require('../lib/utils').getEnvPrefix;
 const constants = require('../lib/constants');
-const path = require('path');
+const logger = require('../lib/logger');
 
 const {
   DEFAULT_BASE_PATH,
@@ -40,14 +41,14 @@ function createTestEnvFile() {
   if (!uid) {
     return Promise.reject(new Error(
       `${envPrefix}TEST_UID is missing from environment. Confirm that ${
-      constants.DEFAULT_TEST_FOLDER_PATH
+        constants.DEFAULT_TEST_FOLDER_PATH
       }/config.json contains either ${envPrefix}TEST_UID or TEST_UID.`
     ));
   }
 
   const FIREBASE_PROJECT_ID = envVarBasedOnCIEnv('FIREBASE_PROJECT_ID');
 
-  console.log(`Generating custom auth token for firebase project: ${chalk.cyan(FIREBASE_PROJECT_ID)}\n`); // eslint-disable-line no-console
+  logger.info(`Generating custom auth token for Firebase project with projectId: ${chalk.cyan(FIREBASE_PROJECT_ID)}`);
 
   // Get service account from local file falling back to environment variables
   const serviceAccount = getServiceAccount();
@@ -62,8 +63,7 @@ function createTestEnvFile() {
   }
 
   // Get project ID from environment variable
-  const projectId =
-    process.env.GCLOUD_PROJECT || envVarBasedOnCIEnv('FIREBASE_PROJECT_ID');
+  const projectId = process.env.GCLOUD_PROJECT || envVarBasedOnCIEnv('FIREBASE_PROJECT_ID');
 
   // Remove firebase- prefix
   const cleanedProjectId = projectId.replace('firebase-', '');
@@ -71,9 +71,7 @@ function createTestEnvFile() {
   // Handle service account not matching settings in config.json (local)
   if (serviceAccount.project_id !== FIREBASE_PROJECT_ID && serviceAccount.project_id !== projectId) {
     /* eslint-disable no-console */
-    console.log(
-      chalk.yellow(`${fig('⚠')} Warning: project_id "${serviceAccount.project_id}" does not match env var: "${envVarBasedOnCIEnv('FIREBASE_PROJECT_ID')}"`)
-    );
+    logger.warn(`project_id "${chalk.cyan(serviceAccount.project_id)}" does not match env var: "${chalk.cyan(envVarBasedOnCIEnv('FIREBASE_PROJECT_ID'))}"`);
     /* eslint-enable no-console */
   }
 
@@ -94,8 +92,8 @@ function createTestEnvFile() {
     .createCustomToken(uid, { isTesting: true })
     .then((customToken) => {
       /* eslint-disable no-console */
-      console.log(
-        `${chalk.green(fig('✔'))} Custom token generated successfully, writing to ${chalk.cyan(constants.DEFAULT_TEST_ENV_FILE_NAME)}`
+      logger.success(
+        `Custom token generated successfully, writing to ${chalk.cyan(constants.DEFAULT_TEST_ENV_FILE_NAME)}`
       );
       /* eslint-enable no-console */
       // Remove firebase app
@@ -119,7 +117,7 @@ function createTestEnvFile() {
       // Write config file to cypress.env.json
       fs.writeFileSync(testEnvFileFullPath, JSON.stringify(newCypressConfig, null, 2));
 
-      console.log(`${chalk.green(fig('✔'))} ${chalk.cyan(constants.DEFAULT_TEST_ENV_FILE_NAME)} updated successfully`); // eslint-disable-line no-console
+      logger.success(`${chalk.cyan(constants.DEFAULT_TEST_ENV_FILE_NAME)} updated successfully`);
 
       // Create service account file if it does not already exist (for use in reporter)
       if (!fs.existsSync(serviceAccountPath)) {
@@ -129,14 +127,14 @@ function createTestEnvFile() {
           JSON.stringify(serviceAccount, null, 2)
         );
 
-        console.log(`${chalk.green(fig('✔'))} ${chalk.cyan('serviceAccount.json')} created successfully`); // eslint-disable-line no-console
+        logger.success(`${chalk.cyan('serviceAccount.json')} created successfully`);
       }
       return customToken;
     })
     .catch((err) => {
       /* eslint-disable no-console */
-      console.error(
-        `Error generating custom token for uid: ${uid}`,
+      logger.error(
+        `Custom token could not be generated for uid: ${chalk.cyan(uid)}`,
         err.message || err
       );
       /* eslint-enable no-console */
@@ -162,7 +160,7 @@ module.exports = function (program) {
     .action((directory, options) => createTestEnvFile(options)
       .then(() => process.exit(0))
       .catch((err) => {
-        console.log(chalk.red(`Error creating test env file:\n${err.message}`)); // eslint-disable-line no-console
+        logger.error(`Test env file could not be created:\n${err.message}`);
         process.exit(1);
         return Promise.reject(err);
       }));

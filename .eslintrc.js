@@ -1,11 +1,11 @@
-{
-  "parser": "babel-eslint",
+module.exports = {
+  parser: "babel-eslint",
   "extends": "airbnb",
-  "env": {
-    "browser": true,
-    "node": true
+  env: {
+    browser: true,
+    node: true
   },
-  "rules": {
+  rules: {
     "comma-dangle": [2, "never"],
     "no-shadow": 0,
     "consistent-return": 0,
@@ -14,7 +14,7 @@
     "max-len": 0,
     "brace-style": [2, "stroustrup"]
   },
-  "plugins": [
+  plugins: [
     "react"
   ]
 }

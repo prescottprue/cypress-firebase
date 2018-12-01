@@ -43,10 +43,9 @@ function getFirebaseProjectIdFromConfig(config) {
   const firbaseRcConfig = loadFirebaseRc();
   const envName = getEnvNameFromConfig(config);
   const projectsConfig = get(firbaseRcConfig, 'projects');
-  const firebaseProjectId =
-    projectsConfig[envName] ||
-    projectsConfig.master ||
-    projectsConfig.default;
+  const firebaseProjectId = projectsConfig[envName]
+    || projectsConfig.master
+    || projectsConfig.default;
   return firebaseProjectId;
 }
 

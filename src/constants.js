@@ -8,4 +8,3 @@ export const FIREBASE_TOOLS_BASE_COMMAND = 'npx firebase';
 export const FIREBASE_EXTRA_PATH = '$(npm bin)/firebase-extra';
 export const FIREBASE_TOOLS_YES_ARGUMENT = '-y';
 export const DEFAULT_BASE_PATH = process.cwd();
-
