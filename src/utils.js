@@ -5,7 +5,8 @@ import {
   DEFAULT_BASE_PATH,
   DEFAULT_TEST_FOLDER_PATH,
   FIREBASE_TOOLS_YES_ARGUMENT,
-  FALLBACK_TEST_FOLDER_PATH
+  FALLBACK_TEST_FOLDER_PATH,
+  SECOND_FALLBACK_TEST_FOLDER_PATH
 } from './constants';
 
 /**
@@ -74,24 +75,42 @@ export function envVarBasedOnCIEnv(varNameRoot) {
   const prefix = getEnvPrefix();
   const combined = `${prefix}${varNameRoot}`;
 
-  // Config file used for environment (local, containers)
+  // Config file used for environment (local, containers) from main test path (cypress/config.json)
   const localTestConfigPath = path.join(
-    process.cwd(),
+    DEFAULT_BASE_PATH,
     DEFAULT_TEST_FOLDER_PATH,
     'config.json'
   );
+
+  // Load test config from main test path (cypress/config.json)
   if (fs.existsSync(localTestConfigPath)) {
     const configObj = require(localTestConfigPath); // eslint-disable-line global-require, import/no-dynamic-require
     return configObj[combined] || configObj[varNameRoot];
   }
+
+  // Fallback Attempt for Config file (test/ui)
   const fallbackConfigPath = path.join(
-    process.cwd(),
+    DEFAULT_BASE_PATH,
     FALLBACK_TEST_FOLDER_PATH,
     'config.json'
   );
 
+  // Load config from the fallback path if it exists (test/ui)
   if (fs.existsSync(fallbackConfigPath)) {
     const configObj = require(fallbackConfigPath); // eslint-disable-line global-require, import/no-dynamic-require
+    return configObj[combined] || configObj[varNameRoot];
+  }
+
+  // Second Fallback Attempt for Config file (test/e2e)
+  const fallback2ConfigPath = path.join(
+    DEFAULT_BASE_PATH,
+    SECOND_FALLBACK_TEST_FOLDER_PATH,
+    'config.json'
+  );
+
+  // Load config from the fallback path if it exists (test/e2e)
+  if (fs.existsSync(fallback2ConfigPath)) {
+    const configObj = require(fallback2ConfigPath); // eslint-disable-line global-require, import/no-dynamic-require
     return configObj[combined] || configObj[varNameRoot];
   }
 
@@ -217,7 +236,9 @@ export function addDefaultArgs(Cypress, args, opts = {}) {
   // TODO: Load this in a way that understands environment. Currently this will
   // go to the first project id that is defined, not which one should be used
   // for the specified environment
-  const projectId = Cypress.env('firebaseProjectId') || Cypress.env('FIREBASE_PROJECT_ID') || Cypress.env('STAGE_FIREBASE_PROJECT_ID');
+  const projectId = Cypress.env('firebaseProjectId')
+    || Cypress.env('FIREBASE_PROJECT_ID')
+    || Cypress.env('STAGE_FIREBASE_PROJECT_ID');
   // Include project id command so command runs on the current project
   if (!newArgs.includes('-P') || !newArgs.includes(projectId)) {
     newArgs.push('-P');
