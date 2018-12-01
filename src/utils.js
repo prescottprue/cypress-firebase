@@ -1,13 +1,13 @@
-import { isString } from "lodash";
-import path from "path";
-import fs from "fs";
+import { isString } from 'lodash';
+import path from 'path';
+import fs from 'fs';
 import {
   DEFAULT_BASE_PATH,
   DEFAULT_TEST_FOLDER_PATH,
   FIREBASE_TOOLS_YES_ARGUMENT,
   FALLBACK_TEST_FOLDER_PATH,
   SECOND_FALLBACK_TEST_FOLDER_PATH
-} from "./constants";
+} from './constants';
 
 /**
  * Create data object with values for each document with keys being doc.id.
@@ -19,8 +19,9 @@ export function dataArrayFromSnap(snap) {
   const data = [];
   if (snap.data && snap.exists) {
     data.push({ id: snap.id, data: snap.data() });
-  } else if (snap.forEach) {
-    snap.forEach(doc => {
+  }
+  else if (snap.forEach) {
+    snap.forEach((doc) => {
       data.push({ id: doc.id, data: doc.data() || doc });
     });
   }
@@ -35,8 +36,9 @@ export function parseFixturePath(unparsed) {
   if (isString(unparsed)) {
     try {
       return JSON.parse(unparsed);
-    } catch (err) {
-      console.log("Error parsing fixture to JSON:", err); // eslint-disable-line no-console
+    }
+    catch (err) {
+      console.log('Error parsing fixture to JSON:', err); // eslint-disable-line no-console
       return unparsed;
     }
   }
@@ -44,7 +46,7 @@ export function parseFixturePath(unparsed) {
 }
 
 function getEnvironmentSlug() {
-  return process.env.CI_ENVIRONMENT_SLUG || "stage";
+  return process.env.CI_ENVIRONMENT_SLUG || 'stage';
 }
 
 /**
@@ -58,7 +60,7 @@ export function getEnvPrefix() {
 }
 
 function getServiceAccountPath() {
-  return path.join(DEFAULT_BASE_PATH, "serviceAccount.json");
+  return path.join(DEFAULT_BASE_PATH, 'serviceAccount.json');
 }
 
 /**
@@ -77,7 +79,7 @@ export function envVarBasedOnCIEnv(varNameRoot) {
   const localTestConfigPath = path.join(
     DEFAULT_BASE_PATH,
     DEFAULT_TEST_FOLDER_PATH,
-    "config.json"
+    'config.json'
   );
 
   // Load test config from main test path (cypress/config.json)
@@ -90,7 +92,7 @@ export function envVarBasedOnCIEnv(varNameRoot) {
   const fallbackConfigPath = path.join(
     DEFAULT_BASE_PATH,
     FALLBACK_TEST_FOLDER_PATH,
-    "config.json"
+    'config.json'
   );
 
   // Load config from the fallback path if it exists (test/ui)
@@ -100,15 +102,15 @@ export function envVarBasedOnCIEnv(varNameRoot) {
   }
 
   // Second Fallback Attempt for Config file (test/e2e)
-  const fallbackConfigPath = path.join(
+  const fallback2ConfigPath = path.join(
     DEFAULT_BASE_PATH,
     SECOND_FALLBACK_TEST_FOLDER_PATH,
-    "config.json"
+    'config.json'
   );
 
   // Load config from the fallback path if it exists (test/e2e)
-  if (fs.existsSync(fallbackConfigPath)) {
-    const configObj = require(fallbackConfigPath); // eslint-disable-line global-require, import/no-dynamic-require
+  if (fs.existsSync(fallback2ConfigPath)) {
+    const configObj = require(fallback2ConfigPath); // eslint-disable-line global-require, import/no-dynamic-require
     return configObj[combined] || configObj[varNameRoot];
   }
 
@@ -141,7 +143,8 @@ function getParsedEnvVar(varNameRoot) {
       return JSON.parse(val);
     }
     return val;
-  } catch (err) {
+  }
+  catch (err) {
     /* eslint-disable no-console */
     console.error(`Error parsing ${combinedVar}`);
     /* eslint-enable no-console */
@@ -162,16 +165,16 @@ export function getServiceAccount() {
   }
   // Use environment variables (CI)
   return {
-    type: "service_account",
-    project_id: envVarBasedOnCIEnv("FIREBASE_PROJECT_ID"),
-    private_key_id: envVarBasedOnCIEnv("FIREBASE_PRIVATE_KEY_ID"),
-    private_key: getParsedEnvVar("FIREBASE_PRIVATE_KEY"),
-    client_email: envVarBasedOnCIEnv("FIREBASE_CLIENT_EMAIL"),
-    client_id: envVarBasedOnCIEnv("FIREBASE_CLIENT_ID"),
-    auth_uri: "https://accounts.google.com/o/oauth2/auth",
-    token_uri: "https://accounts.google.com/o/oauth2/token",
-    auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-    client_x509_cert_url: envVarBasedOnCIEnv("FIREBASE_CERT_URL")
+    type: 'service_account',
+    project_id: envVarBasedOnCIEnv('FIREBASE_PROJECT_ID'),
+    private_key_id: envVarBasedOnCIEnv('FIREBASE_PRIVATE_KEY_ID'),
+    private_key: getParsedEnvVar('FIREBASE_PRIVATE_KEY'),
+    client_email: envVarBasedOnCIEnv('FIREBASE_CLIENT_EMAIL'),
+    client_id: envVarBasedOnCIEnv('FIREBASE_CLIENT_ID'),
+    auth_uri: 'https://accounts.google.com/o/oauth2/auth',
+    token_uri: 'https://accounts.google.com/o/oauth2/token',
+    auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
+    client_x509_cert_url: envVarBasedOnCIEnv('FIREBASE_CERT_URL')
   };
 }
 
@@ -188,19 +191,21 @@ export function slashPathToFirestoreRef(
   options = {}
 ) {
   let ref = firestoreInstance;
-  const srcPathArr = slashPath.split("/");
-  srcPathArr.forEach(pathSegment => {
+  const srcPathArr = slashPath.split('/');
+  srcPathArr.forEach((pathSegment) => {
     if (ref.collection) {
       ref = ref.collection(pathSegment);
-    } else if (ref.doc) {
+    }
+    else if (ref.doc) {
       ref = ref.doc(pathSegment);
-    } else {
+    }
+    else {
       throw new Error(`Invalid slash path: ${slashPath}`);
     }
   });
 
   // Apply limit to query if it exists
-  if (options.limit && typeof ref.limit === "function") {
+  if (options.limit && typeof ref.limit === 'function') {
     ref = ref.limit(options.limit);
   }
 
@@ -215,7 +220,7 @@ export function slashPathToFirestoreRef(
  * @return {String} Arguments section of command string
  */
 export function getArgsString(args) {
-  return args && args.length ? ` ${args.join(" ")}` : "";
+  return args && args.length ? ` ${args.join(' ')}` : '';
 }
 
 /**
@@ -231,13 +236,12 @@ export function addDefaultArgs(Cypress, args, opts = {}) {
   // TODO: Load this in a way that understands environment. Currently this will
   // go to the first project id that is defined, not which one should be used
   // for the specified environment
-  const projectId =
-    Cypress.env("firebaseProjectId") ||
-    Cypress.env("FIREBASE_PROJECT_ID") ||
-    Cypress.env("STAGE_FIREBASE_PROJECT_ID");
+  const projectId = Cypress.env('firebaseProjectId')
+    || Cypress.env('FIREBASE_PROJECT_ID')
+    || Cypress.env('STAGE_FIREBASE_PROJECT_ID');
   // Include project id command so command runs on the current project
-  if (!newArgs.includes("-P") || !newArgs.includes(projectId)) {
-    newArgs.push("-P");
+  if (!newArgs.includes('-P') || !newArgs.includes(projectId)) {
+    newArgs.push('-P');
     newArgs.push(projectId);
   }
   // Add Firebase's automatic approval argument if it is not already in newArgs
