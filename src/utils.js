@@ -217,8 +217,7 @@ export function addDefaultArgs(Cypress, args, opts = {}) {
   // TODO: Load this in a way that understands environment. Currently this will
   // go to the first project id that is defined, not which one should be used
   // for the specified environment
-  const projectId =
-    Cypress.env('firebaseProjectId') || Cypress.env('FIREBASE_PROJECT_ID') || Cypress.env('STAGE_FIREBASE_PROJECT_ID');
+  const projectId = Cypress.env('firebaseProjectId') || Cypress.env('FIREBASE_PROJECT_ID') || Cypress.env('STAGE_FIREBASE_PROJECT_ID');
   // Include project id command so command runs on the current project
   if (!newArgs.includes('-P') || !newArgs.includes(projectId)) {
     newArgs.push('-P');

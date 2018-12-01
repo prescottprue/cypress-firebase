@@ -33,7 +33,8 @@ If you are intereted in what drove the need for this checkout [the why section](
 
 ### Setup
 
-1. Install deps `npm i cypress-firebase firebase-tools-extra --save-dev`
+1. Make sure you have `firebase-tools` installed (globally or within project). It is used to call to database when using `cy.callRtdb` and `cy.callFirestore`.
+1. Install using `npm i cypress-firebase --save-dev`
 1. Add the following to the `scripts` section of your `package.json`:
 
     ```json
@@ -70,24 +71,30 @@ If you are intereted in what drove the need for this checkout [the why section](
     attachCustomCommands({ Cypress, cy, firebase })
     ```
 1. Setup plugin adding following your plugins file (`cypress/plugins/index.js`):
-    
+
     ```js
     const cypressFirebasePlugin = require('cypress-firebase').plugin
 
     module.exports = (on, config) => {
       // `on` is used to hook into various events Cypress emits
       // `config` is the resolved Cypress config
-      
+
       // Return extended config (with settings from .firebaserc)
       return cypressFirebasePlugin(config)
     }
     ```
-    
+
     The plugin sets `baseUrl` and loads config from `.firebaserc`
 
 ### Running
+
 1. Start your local dev server (usually `npm start`) - for faster alternative checkout the [test built version section](#test-built-version)
 1. Open cypress test running by running `npm run test:open` in another terminal window
+
+### CI
+
+1. Run `firebase login:ci` to generate a CI token for `firebase-tools` (this will give your `cy.callRtdb` and `cy.callFirestore` commands admin access to the DB)
+1. Set `FIREBASE_TOKEN` within CI environment variables
 
 #### Test Built Version
 

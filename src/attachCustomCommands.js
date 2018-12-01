@@ -30,9 +30,9 @@ export default function ({ Cypress, cy, firebase }) {
           }
         });
         firebase
-            .auth()
-            .signInWithCustomToken(Cypress.env('FIREBASE_AUTH_JWT'))
-            .catch(reject);
+          .auth()
+          .signInWithCustomToken(Cypress.env('FIREBASE_AUTH_JWT'))
+          .catch(reject);
       });
     }
   });
