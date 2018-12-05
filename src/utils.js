@@ -1,6 +1,11 @@
-import { isString } from 'lodash';
+import {
+  isString, drop, compact, isArray
+} from 'lodash';
 import path from 'path';
+import chalk from 'chalk';
 import fs from 'fs';
+/* eslint-disable no-console */
+import stream from 'stream';
 import {
   DEFAULT_BASE_PATH,
   DEFAULT_TEST_FOLDER_PATH,
@@ -8,6 +13,9 @@ import {
   FALLBACK_TEST_FOLDER_PATH,
   SECOND_FALLBACK_TEST_FOLDER_PATH
 } from './constants';
+import { info, error } from './logger';
+
+const { spawn } = require('child_process');
 
 /**
  * Create data object with values for each document with keys being doc.id.
@@ -54,12 +62,16 @@ function getEnvironmentSlug() {
  * within CI. Falls back to staging (i.e. STAGE)
  * @return {String} Environment prefix string
  */
-export function getEnvPrefix() {
-  const envSlug = getEnvironmentSlug();
+export function getEnvPrefix(envName) {
+  const envSlug = envName || getEnvironmentSlug();
   return `${envSlug.toUpperCase()}_`;
 }
 
-function getServiceAccountPath() {
+function getServiceAccountPath(envName = '') {
+  const withPrefix = path.join(DEFAULT_BASE_PATH, `serviceAccount-${envName}.json`);
+  if (fs.existsSync(withPrefix)) {
+    return withPrefix;
+  }
   return path.join(DEFAULT_BASE_PATH, 'serviceAccount.json');
 }
 
@@ -71,8 +83,8 @@ function getServiceAccountPath() {
  * envVarBasedOnCIEnv('FIREBASE_PROJECT_ID')
  * // => 'fireadmin-stage' (value of 'STAGE_FIREBASE_PROJECT_ID' environment var)
  */
-export function envVarBasedOnCIEnv(varNameRoot) {
-  const prefix = getEnvPrefix();
+export function envVarBasedOnCIEnv(varNameRoot, envName) {
+  const prefix = getEnvPrefix(envName);
   const combined = `${prefix}${varNameRoot}`;
 
   // Config file used for environment (local, containers) from main test path (cypress/config.json)
@@ -156,9 +168,8 @@ function getParsedEnvVar(varNameRoot) {
  * Get service account from either local file or environment variables
  * @return {Object} Service account object
  */
-export function getServiceAccount() {
-  const serviceAccountPath = getServiceAccountPath();
-
+export function getServiceAccount(envSlug) {
+  const serviceAccountPath = getServiceAccountPath(envSlug);
   // Check for local service account file (Local dev)
   if (fs.existsSync(serviceAccountPath)) {
     return require(serviceAccountPath); // eslint-disable-line global-require, import/no-dynamic-require
@@ -249,4 +260,130 @@ export function addDefaultArgs(Cypress, args, opts = {}) {
     newArgs.push(FIREBASE_TOOLS_YES_ARGUMENT);
   }
   return newArgs;
+}
+
+
+process.env.FORCE_COLOR = true;
+
+/**
+ * Check to see if the provided value is a promise object
+ * @param  {Any}  valToCheck - Value to be checked for Promise qualities
+ * @return {Boolean} Whether or not provided value is a promise
+ */
+export function isPromise(valToCheck) {
+  return valToCheck && typeof valToCheck.then === 'function';
+}
+
+/**
+ * @description Run a bash command using spawn pipeing the results to the main
+ * process
+ * @param {String} command - Command to be executed
+ * @private
+ */
+export function runCommand({
+  beforeMsg,
+  successMsg,
+  command,
+  errorMsg,
+  args,
+  pipeOutput = true
+}) {
+  if (beforeMsg) info(beforeMsg);
+  return new Promise((resolve, reject) => {
+    const child = spawn(
+      isArray(command) ? command[0] : command.split(' ')[0],
+      args || compact(drop(command.split(' ')))
+    );
+    let output;
+    let error;
+    const customStream = new stream.Writable();
+    const customErrorStream = new stream.Writable();
+    /* eslint-disable no-underscore-dangle */
+    customStream._write = (data, ...argv) => {
+      output += data;
+      if (pipeOutput) {
+        process.stdout._write(data, ...argv);
+      }
+    };
+    customErrorStream._write = (data, ...argv) => {
+      error += data;
+      if (pipeOutput) {
+        process.stderr._write(data, ...argv);
+      }
+    };
+    /* eslint-enable no-underscore-dangle */
+    // Pipe errors and console output to main process
+    child.stdout.pipe(customStream);
+    child.stderr.pipe(customErrorStream);
+    // When child exits resolve or reject based on code
+    child.on('exit', (code) => {
+      if (code !== 0) {
+        // Resolve for npm warnings
+        if (output && output.indexOf('npm WARN') !== -1) {
+          return resolve(successMsg || output);
+        }
+        if (errorMsg) {
+          console.log(errorMsg); // eslint-disable-line no-console
+        }
+        reject(error || output);
+      }
+      else {
+        // resolve(null, stdout)
+        if (successMsg) info(successMsg);
+        // Remove leading undefined from response
+        if (output && output.indexOf('undefined') === 0) {
+          resolve(successMsg || output.replace('undefined', ''));
+        }
+        else {
+          console.log('output: ', output); // eslint-disable-line no-console
+          resolve(successMsg || output);
+        }
+      }
+    });
+  });
+}
+
+/**
+ * Escape shell command arguments and join them to a single string
+ * @param  {Array} a - List of arguments to escape
+ * @return {String} Command string with arguments escaped
+ */
+export function shellescape(a) {
+  const ret = [];
+
+  a.forEach((s) => {
+    if (/[^A-Za-z0-9_/:=-]/.test(s)) {
+      // eslint-disable-line no-useless-escape
+      s = `'${s.replace(/'/g, "'\\''")}'`; // eslint-disable-line no-param-reassign
+      s = s // eslint-disable-line no-param-reassign
+        .replace(/^(?:'')+/g, '') // unduplicate single-quote at the beginning
+        .replace(/\\'''/g, "\\'"); // remove non-escaped single-quote if there are enclosed between 2 escaped
+    }
+    ret.push(s);
+  });
+
+  return ret.join(' ');
+}
+
+/**
+ * Get settings from firebaserc file
+ * @return {Object} Firebase settings object
+ */
+export function getFile(filePath) {
+  const localPath = path.join(process.cwd(), filePath);
+  if (!fs.existsSync(localPath)) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(fs.readFileSync(localPath, 'utf8'));
+  }
+  catch (err) {
+    /* eslint-disable no-console */
+    error(
+      `Unable to parse ${chalk.cyan(filePath)} - JSON is most likley not valid`
+    );
+    /* eslint-enable no-console */
+    return {};
+  }
 }

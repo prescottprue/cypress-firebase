@@ -5,15 +5,15 @@
 
 const chalk = require('chalk');
 const fs = require('fs');
-const fig = require('figures');
 const pickBy = require('lodash/pickBy');
+const get = require('lodash/get');
 const size = require('lodash/size');
 const keys = require('lodash/keys');
 const isUndefined = require('lodash/isUndefined');
 const path = require('path');
-const envVarBasedOnCIEnv = require('../lib/utils').envVarBasedOnCIEnv;
-const getServiceAccount = require('../lib/utils').getServiceAccount;
-const getEnvPrefix = require('../lib/utils').getEnvPrefix;
+const {
+  envVarBasedOnCIEnv, getServiceAccount, getEnvPrefix, getFile
+} = require('../lib/utils');
 const constants = require('../lib/constants');
 const logger = require('../lib/logger');
 
@@ -31,8 +31,8 @@ const serviceAccountPath = path.join(DEFAULT_BASE_PATH, DEFAULT_SERVICE_ACCOUNT_
  * @param {functions.Context} context - Functions context
  * @return {Promise}
  */
-function createTestEnvFile() {
-  const envPrefix = getEnvPrefix();
+function createTestEnvFile(envName) {
+  const envPrefix = getEnvPrefix(envName);
 
   // Get UID from environment (falls back to test/e2e/config.json for local)
   const uid = envVarBasedOnCIEnv('TEST_UID');
@@ -46,12 +46,13 @@ function createTestEnvFile() {
     ));
   }
 
-  const FIREBASE_PROJECT_ID = envVarBasedOnCIEnv('FIREBASE_PROJECT_ID');
+  const firebaserc = getFile('.firebaserc');
+  const FIREBASE_PROJECT_ID = envVarBasedOnCIEnv(`${envPrefix}FIREBASE_PROJECT_ID`) || get(firebaserc, `projects.${envName}`, get(firebaserc, 'projects.default', ''));
 
   logger.info(`Generating custom auth token for Firebase project with projectId: ${chalk.cyan(FIREBASE_PROJECT_ID)}`);
 
   // Get service account from local file falling back to environment variables
-  const serviceAccount = getServiceAccount();
+  const serviceAccount = getServiceAccount(envName);
 
   // Confirm service account has all parameters
   const serviceAccountMissingParams = pickBy(serviceAccount, isUndefined);
@@ -62,16 +63,13 @@ function createTestEnvFile() {
     return Promise.reject(new Error(errMsg));
   }
 
-  // Get project ID from environment variable
-  const projectId = process.env.GCLOUD_PROJECT || envVarBasedOnCIEnv('FIREBASE_PROJECT_ID');
-
   // Remove firebase- prefix
-  const cleanedProjectId = projectId.replace('firebase-', '');
+  const cleanedProjectId = FIREBASE_PROJECT_ID.replace('firebase-', '');
 
   // Handle service account not matching settings in config.json (local)
-  if (serviceAccount.project_id !== FIREBASE_PROJECT_ID && serviceAccount.project_id !== projectId) {
+  if (serviceAccount.project_id !== FIREBASE_PROJECT_ID) {
     /* eslint-disable no-console */
-    logger.warn(`project_id "${chalk.cyan(serviceAccount.project_id)}" does not match env var: "${chalk.cyan(envVarBasedOnCIEnv('FIREBASE_PROJECT_ID'))}"`);
+    logger.warn(`project_id ${chalk.cyan(serviceAccount.project_id)} does not match env var: ${chalk.cyan(FIREBASE_PROJECT_ID)}`);
     /* eslint-enable no-console */
   }
 
@@ -151,17 +149,20 @@ function createTestEnvFile() {
  * # make sure you serviceAccount.json exists
  * cypress-firebase createEnv
  */
-module.exports = function (program) {
+module.exports = function runCreateTestEnvFile(program) {
   program
-    .command('createTestEnvFile')
+    .command('createTestEnvFile [envName]')
     .description(
       'Build configuration file containing a token for authorizing a firebase instance'
     )
-    .action((directory, options) => createTestEnvFile(options)
-      .then(() => process.exit(0))
-      .catch((err) => {
-        logger.error(`Test env file could not be created:\n${err.message}`);
-        process.exit(1);
-        return Promise.reject(err);
-      }));
+    .action((envArg) => {
+      const envName = typeof envArg === 'string' ? envArg : 'local';
+      return createTestEnvFile(envName)
+        .then(() => process.exit(0))
+        .catch((err) => {
+          logger.error(`Test env file could not be created:\n${err.message}`);
+          process.exit(1);
+          return Promise.reject(err);
+        });
+    });
 };

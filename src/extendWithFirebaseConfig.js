@@ -35,7 +35,7 @@ function getEnvNameFromConfig(cypressConfig) {
  * loaded from .firebaserc
  * @param {Object} config - Cypress config object
  */
-function getFirebaseProjectIdFromConfig(config) {
+export function getFirebaseProjectIdFromConfig(config) {
   const projectIdFromConfig = get(config, 'env.firebaseProjectId');
   if (projectIdFromConfig) {
     return projectIdFromConfig;

@@ -31,7 +31,7 @@ function logType(type, message, other) {
   const icon = iconMapping[type];
   const prefix = prefixMapping[type];
   const colorLog = colorLogger(type);
-  console.log(`${icon ? colorLog(fig(icon)) : ''}${prefix ? colorLog(prefix) : ' '}${message}`); // eslint-disable-line no-console
+  console.log(`${icon ? colorLog(fig(icon)) : ''} ${prefix ? colorLog(prefix) : ''}${message}`); // eslint-disable-line no-console
   if (other) {
     console.log('\n', other); // eslint-disable-line no-console
   }
