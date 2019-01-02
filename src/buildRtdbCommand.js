@@ -18,7 +18,7 @@ export default function buildRtdbCommand(
   action,
   actionPath,
   fixturePath,
-  opts = {}
+  opts = {},
 ) {
   const options = isObject(fixturePath) ? fixturePath : opts;
   const { args = [] } = options;
@@ -29,7 +29,7 @@ export default function buildRtdbCommand(
       return `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} ${actionPath}${argsStr}`;
     case 'get': {
       const getDataArgsWithDefaults = addDefaultArgs(Cypress, args, {
-        disableYes: true
+        disableYes: true,
       });
       if (options.limitToLast) {
         const lastCount = isBoolean(options.limitToLast)
@@ -37,14 +37,13 @@ export default function buildRtdbCommand(
           : options.limitToLast;
         if (!options.orderByChild) {
           getDataArgsWithDefaults.push(
-            `--order-by-key --limit-to-last ${lastCount}`
+            `--order-by-key --limit-to-last ${lastCount}`,
           );
-        }
-        else {
+        } else {
           getDataArgsWithDefaults.push(
             `--order-by-child ${
               options.orderByChild
-            } --limit-to-last ${lastCount}`
+            } --limit-to-last ${lastCount}`,
           );
         }
       }

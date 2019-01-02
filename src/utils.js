@@ -1,21 +1,45 @@
-import {
-  isString, drop, compact, isArray
-} from 'lodash';
+import { isString, drop, compact, isArray, get, dropRight } from 'lodash';
 import path from 'path';
 import chalk from 'chalk';
 import fs from 'fs';
 /* eslint-disable no-console */
 import stream from 'stream';
 import {
+  TEST_CONFIG_FILE_PATH,
+  LOCAL_CONFIG_FILE_PATH,
+  TEST_ENV_FILE_PATH,
+} from './filePaths';
+import {
   DEFAULT_BASE_PATH,
   DEFAULT_TEST_FOLDER_PATH,
   FIREBASE_TOOLS_YES_ARGUMENT,
-  FALLBACK_TEST_FOLDER_PATH,
-  SECOND_FALLBACK_TEST_FOLDER_PATH
 } from './constants';
 import { info, error } from './logger';
 
 const { spawn } = require('child_process');
+
+/**
+ * Get settings from firebaserc file
+ * @return {Object} Firebase settings object
+ */
+export function readJsonFile(filePath) {
+  if (!fs.existsSync(filePath)) {
+    return {};
+  }
+
+  try {
+    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  } catch (err) {
+    /* eslint-disable no-console */
+    error(
+      `Unable to parse ${chalk.cyan(
+        filePath.replace(DEFAULT_BASE_PATH, ''),
+      )} - JSON is most likley not valid`,
+    );
+    /* eslint-enable no-console */
+    return {};
+  }
+}
 
 /**
  * Create data object with values for each document with keys being doc.id.
@@ -27,9 +51,8 @@ export function dataArrayFromSnap(snap) {
   const data = [];
   if (snap.data && snap.exists) {
     data.push({ id: snap.id, data: snap.data() });
-  }
-  else if (snap.forEach) {
-    snap.forEach((doc) => {
+  } else if (snap.forEach) {
+    snap.forEach(doc => {
       data.push({ id: doc.id, data: doc.data() || doc });
     });
   }
@@ -44,8 +67,7 @@ export function parseFixturePath(unparsed) {
   if (isString(unparsed)) {
     try {
       return JSON.parse(unparsed);
-    }
-    catch (err) {
+    } catch (err) {
       console.log('Error parsing fixture to JSON:', err); // eslint-disable-line no-console
       return unparsed;
     }
@@ -68,11 +90,27 @@ export function getEnvPrefix(envName) {
 }
 
 function getServiceAccountPath(envName = '') {
-  const withPrefix = path.join(DEFAULT_BASE_PATH, `serviceAccount-${envName}.json`);
+  const withPrefix = path.join(
+    DEFAULT_BASE_PATH,
+    `serviceAccount-${envName}.json`,
+  );
   if (fs.existsSync(withPrefix)) {
     return withPrefix;
   }
   return path.join(DEFAULT_BASE_PATH, 'serviceAccount.json');
+}
+
+/**
+ * Get cypress folder path from cypress.json config file or fallback to
+ * default folder path ('cypress')
+ * @return {String} Path of folder containing cypress folders like "integration"
+ */
+export function getCypressFolderPath() {
+  const cypressConfig = readJsonFile(TEST_CONFIG_FILE_PATH); // eslint-disable-line no-use-before-define
+  const integrationTestsFolderPath = get(cypressConfig, 'integrationFolder');
+  return integrationTestsFolderPath
+    ? dropRight(integrationTestsFolderPath.split('/')).join('/')
+    : DEFAULT_TEST_FOLDER_PATH;
 }
 
 /**
@@ -86,43 +124,15 @@ function getServiceAccountPath(envName = '') {
 export function envVarBasedOnCIEnv(varNameRoot, envName) {
   const prefix = getEnvPrefix(envName);
   const combined = `${prefix}${varNameRoot}`;
-
   // Config file used for environment (local, containers) from main test path (cypress/config.json)
-  const localTestConfigPath = path.join(
-    DEFAULT_BASE_PATH,
-    DEFAULT_TEST_FOLDER_PATH,
-    'config.json'
-  );
-
-  // Load test config from main test path (cypress/config.json)
-  if (fs.existsSync(localTestConfigPath)) {
-    const configObj = require(localTestConfigPath); // eslint-disable-line global-require, import/no-dynamic-require
+  if (fs.existsSync(LOCAL_CONFIG_FILE_PATH)) {
+    const configObj = readJsonFile(LOCAL_CONFIG_FILE_PATH);
     return configObj[combined] || configObj[varNameRoot];
   }
 
-  // Fallback Attempt for Config file (test/ui)
-  const fallbackConfigPath = path.join(
-    DEFAULT_BASE_PATH,
-    FALLBACK_TEST_FOLDER_PATH,
-    'config.json'
-  );
-
-  // Load config from the fallback path if it exists (test/ui)
-  if (fs.existsSync(fallbackConfigPath)) {
-    const configObj = require(fallbackConfigPath); // eslint-disable-line global-require, import/no-dynamic-require
-    return configObj[combined] || configObj[varNameRoot];
-  }
-
-  // Second Fallback Attempt for Config file (test/e2e)
-  const fallback2ConfigPath = path.join(
-    DEFAULT_BASE_PATH,
-    SECOND_FALLBACK_TEST_FOLDER_PATH,
-    'config.json'
-  );
-
-  // Load config from the fallback path if it exists (test/e2e)
-  if (fs.existsSync(fallback2ConfigPath)) {
-    const configObj = require(fallback2ConfigPath); // eslint-disable-line global-require, import/no-dynamic-require
+  // Config file used for environment (local, containers) from main test path (cypress.env.json)
+  if (fs.existsSync(TEST_ENV_FILE_PATH)) {
+    const configObj = readJsonFile(TEST_ENV_FILE_PATH);
     return configObj[combined] || configObj[varNameRoot];
   }
 
@@ -144,22 +154,19 @@ function getParsedEnvVar(varNameRoot) {
   const prefix = getEnvPrefix();
   const combinedVar = `${prefix}${varNameRoot}`;
   if (!val) {
-    /* eslint-disable no-console */
-    console.error(
-      `${combinedVar} not found, make sure it is set within environment vars`
+    error(
+      `${chalk.cyan(
+        combinedVar,
+      )} not found, make sure it is set within environment variables.`,
     );
-    /* eslint-enable no-console */
   }
   try {
     if (isString(val)) {
       return JSON.parse(val);
     }
     return val;
-  }
-  catch (err) {
-    /* eslint-disable no-console */
-    console.error(`Error parsing ${combinedVar}`);
-    /* eslint-enable no-console */
+  } catch (err) {
+    error(`Error parsing ${combinedVar}`);
     return val;
   }
 }
@@ -172,8 +179,13 @@ export function getServiceAccount(envSlug) {
   const serviceAccountPath = getServiceAccountPath(envSlug);
   // Check for local service account file (Local dev)
   if (fs.existsSync(serviceAccountPath)) {
-    return require(serviceAccountPath); // eslint-disable-line global-require, import/no-dynamic-require
+    return readJsonFile(serviceAccountPath); // eslint-disable-line global-require, import/no-dynamic-require
   }
+  info(
+    `Service account does not exist at path: "${chalk.cyan(
+      serviceAccountPath.replace(`${DEFAULT_BASE_PATH}/`, ''),
+    )}" falling back to environment variables...`,
+  );
   // Use environment variables (CI)
   return {
     type: 'service_account',
@@ -185,7 +197,7 @@ export function getServiceAccount(envSlug) {
     auth_uri: 'https://accounts.google.com/o/oauth2/auth',
     token_uri: 'https://accounts.google.com/o/oauth2/token',
     auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
-    client_x509_cert_url: envVarBasedOnCIEnv('FIREBASE_CERT_URL')
+    client_x509_cert_url: envVarBasedOnCIEnv('FIREBASE_CERT_URL'),
   };
 }
 
@@ -199,18 +211,16 @@ export function getServiceAccount(envSlug) {
 export function slashPathToFirestoreRef(
   firestoreInstance,
   slashPath,
-  options = {}
+  options = {},
 ) {
   let ref = firestoreInstance;
   const srcPathArr = slashPath.split('/');
-  srcPathArr.forEach((pathSegment) => {
+  srcPathArr.forEach(pathSegment => {
     if (ref.collection) {
       ref = ref.collection(pathSegment);
-    }
-    else if (ref.doc) {
+    } else if (ref.doc) {
       ref = ref.doc(pathSegment);
-    }
-    else {
+    } else {
       throw new Error(`Invalid slash path: ${slashPath}`);
     }
   });
@@ -247,9 +257,10 @@ export function addDefaultArgs(Cypress, args, opts = {}) {
   // TODO: Load this in a way that understands environment. Currently this will
   // go to the first project id that is defined, not which one should be used
   // for the specified environment
-  const projectId = Cypress.env('firebaseProjectId')
-    || Cypress.env('FIREBASE_PROJECT_ID')
-    || Cypress.env('STAGE_FIREBASE_PROJECT_ID');
+  const projectId =
+    Cypress.env('firebaseProjectId') ||
+    Cypress.env('FIREBASE_PROJECT_ID') ||
+    Cypress.env('STAGE_FIREBASE_PROJECT_ID');
   // Include project id command so command runs on the current project
   if (!newArgs.includes('-P') || !newArgs.includes(projectId)) {
     newArgs.push('-P');
@@ -261,7 +272,6 @@ export function addDefaultArgs(Cypress, args, opts = {}) {
   }
   return newArgs;
 }
-
 
 process.env.FORCE_COLOR = true;
 
@@ -286,13 +296,13 @@ export function runCommand({
   command,
   errorMsg,
   args,
-  pipeOutput = true
+  pipeOutput = true,
 }) {
   if (beforeMsg) info(beforeMsg);
   return new Promise((resolve, reject) => {
     const child = spawn(
       isArray(command) ? command[0] : command.split(' ')[0],
-      args || compact(drop(command.split(' ')))
+      args || compact(drop(command.split(' '))),
     );
     let output;
     let error;
@@ -316,7 +326,7 @@ export function runCommand({
     child.stdout.pipe(customStream);
     child.stderr.pipe(customErrorStream);
     // When child exits resolve or reject based on code
-    child.on('exit', (code) => {
+    child.on('exit', code => {
       if (code !== 0) {
         // Resolve for npm warnings
         if (output && output.indexOf('npm WARN') !== -1) {
@@ -326,15 +336,13 @@ export function runCommand({
           console.log(errorMsg); // eslint-disable-line no-console
         }
         reject(error || output);
-      }
-      else {
+      } else {
         // resolve(null, stdout)
         if (successMsg) info(successMsg);
         // Remove leading undefined from response
         if (output && output.indexOf('undefined') === 0) {
           resolve(successMsg || output.replace('undefined', ''));
-        }
-        else {
+        } else {
           console.log('output: ', output); // eslint-disable-line no-console
           resolve(successMsg || output);
         }
@@ -351,7 +359,7 @@ export function runCommand({
 export function shellescape(a) {
   const ret = [];
 
-  a.forEach((s) => {
+  a.forEach(s => {
     if (/[^A-Za-z0-9_/:=-]/.test(s)) {
       // eslint-disable-line no-useless-escape
       s = `'${s.replace(/'/g, "'\\''")}'`; // eslint-disable-line no-param-reassign
@@ -363,27 +371,4 @@ export function shellescape(a) {
   });
 
   return ret.join(' ');
-}
-
-/**
- * Get settings from firebaserc file
- * @return {Object} Firebase settings object
- */
-export function getFile(filePath) {
-  const localPath = path.join(process.cwd(), filePath);
-  if (!fs.existsSync(localPath)) {
-    return {};
-  }
-
-  try {
-    return JSON.parse(fs.readFileSync(localPath, 'utf8'));
-  }
-  catch (err) {
-    /* eslint-disable no-console */
-    error(
-      `Unable to parse ${chalk.cyan(filePath)} - JSON is most likley not valid`
-    );
-    /* eslint-enable no-console */
-    return {};
-  }
 }

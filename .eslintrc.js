@@ -1,20 +1,44 @@
 module.exports = {
   parser: "babel-eslint",
-  "extends": "airbnb",
+  'extends': ['airbnb', 'prettier'],
+  root: true,
+  plugins: ['import', 'babel', 'prettier'],
+  settings: {
+    'import/resolver': {
+      node: {
+        moduleDirectory: ['node_modules', '/']
+      }
+    }
+  },
   env: {
     browser: true,
     node: true
   },
   rules: {
-    "comma-dangle": [2, "never"],
+    "import/prefer-default-export": 0,
     "no-shadow": 0,
     "consistent-return": 0,
     "no-new": 0,
     "new-cap": 0,
-    "max-len": 0,
-    "brace-style": [2, "stroustrup"]
+    "prettier/prettier": [
+      'error',
+      {
+        singleQuote: true, // airbnb
+        trailingComma: 'all', // airbnb
+      }
+    ]
   },
-  plugins: [
-    "react"
-  ]
+  overrides: {
+    files: ['cmds/**'],
+    rules: {
+      "comma-dangle": ["error", { "functions": "never" }],
+      "prettier/prettier": [
+        'error',
+        {
+          singleQuote: true, // airbnb
+          trailingComma: 'none', // airbnb
+        }
+      ]
+    }
+  }
 }

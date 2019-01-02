@@ -2,7 +2,7 @@ import { isObject } from 'lodash';
 import buildFirestoreCommand from './buildFirestoreCommand';
 import buildRtdbCommand from './buildRtdbCommand';
 
-export default function ({ Cypress, cy, firebase }) {
+export default function({ Cypress, cy, firebase }) {
   /**
    * Login to Firebase auth using FIREBASE_AUTH_JWT environment variable
    * which is generated using firebase-admin authenticated with serviceAccount
@@ -16,15 +16,14 @@ export default function ({ Cypress, cy, firebase }) {
     /** Log in using token * */
     if (!Cypress.env('FIREBASE_AUTH_JWT')) {
       cy.log(
-        'FIREBASE_AUTH_JWT must be set to cypress environment in order to login'
+        'FIREBASE_AUTH_JWT must be set to cypress environment in order to login',
       );
-    }
-    else if (firebase.auth().currentUser) {
+    } else if (firebase.auth().currentUser) {
       cy.log('Current user already exists, login complete.');
-    }
-    else {
-      return new Promise((resolve, reject) => { // eslint-disable-line consistent-return
-        firebase.auth().onAuthStateChanged((auth) => {
+    } else {
+      return new Promise((resolve, reject) => {
+        // eslint-disable-line consistent-return
+        firebase.auth().onAuthStateChanged(auth => {
           if (auth) {
             resolve(auth);
           }
@@ -49,8 +48,7 @@ export default function ({ Cypress, cy, firebase }) {
     cy.log('Confirming use is logged out...');
     if (!firebase.auth().currentUser) {
       cy.log('Current user already logged out.');
-    }
-    else {
+    } else {
       cy.log('Current user exists, logging out...');
       return firebase.auth().signOut();
     }
@@ -100,12 +98,12 @@ export default function ({ Cypress, cy, firebase }) {
       action,
       actionPath,
       dataToWrite,
-      opts
+      opts,
     );
     cy.log(`Calling RTDB command:\n${rtdbCommand}`);
 
     // Call firebase-tools-extra command
-    return cy.exec(rtdbCommand).then((out) => {
+    return cy.exec(rtdbCommand).then(out => {
       const { stdout, stderr } = out || {};
       // Reject with Error if error in rtdbCommand call
       if (stderr) {
@@ -117,8 +115,7 @@ export default function ({ Cypress, cy, firebase }) {
       if (action === 'get' && typeof stdout === 'string') {
         try {
           return JSON.parse(stdout);
-        }
-        catch (err) {
+        } catch (err) {
           cy.log('Error parsing data from callRtdb response', out);
           return Promise.reject(err);
         }
@@ -164,12 +161,12 @@ export default function ({ Cypress, cy, firebase }) {
         action,
         actionPath,
         dataToWrite,
-        opts
+        opts,
       );
 
       cy.log(`Calling Firestore command:\n${firestoreCommand}`);
 
-      cy.exec(firestoreCommand, { timeout: 100000 }).then((out) => {
+      cy.exec(firestoreCommand, { timeout: 100000 }).then(out => {
         const { stdout, stderr } = out || {};
         // Reject with Error if error in firestoreCommand call
         if (stderr) {
@@ -181,8 +178,7 @@ export default function ({ Cypress, cy, firebase }) {
         if (action === 'get' && typeof stdout === 'string') {
           try {
             return JSON.parse(stdout);
-          }
-          catch (err) {
+          } catch (err) {
             cy.log('Error parsing data from callFirestore response', out);
             return Promise.reject(err);
           }
@@ -191,6 +187,6 @@ export default function ({ Cypress, cy, firebase }) {
         // Otherwise return unparsed output
         return stdout;
       });
-    }
+    },
   );
 }

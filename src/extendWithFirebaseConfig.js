@@ -12,8 +12,7 @@ function loadFirebaseRc() {
   try {
     const fileStr = fs.readFileSync(rcFilePath);
     return JSON.parse(fileStr);
-  }
-  catch (err) {
+  } catch (err) {
     console.log('Error loading .firebaserc: ', err); // eslint-disable-line no-console
     throw err;
   }
@@ -43,9 +42,8 @@ export function getFirebaseProjectIdFromConfig(config) {
   const firbaseRcConfig = loadFirebaseRc();
   const envName = getEnvNameFromConfig(config);
   const projectsConfig = get(firbaseRcConfig, 'projects');
-  const firebaseProjectId = projectsConfig[envName]
-    || projectsConfig.master
-    || projectsConfig.default;
+  const firebaseProjectId =
+    projectsConfig[envName] || projectsConfig.master || projectsConfig.default;
   return firebaseProjectId;
 }
 
@@ -69,6 +67,6 @@ export default function extendWithFirebaseConfig(cypressConfig, settings = {}) {
     baseUrl:
       envName === 'local'
         ? localBaseUrl || `http://localhost:${localHostPort}`
-        : `https://${FIREBASE_PROJECT_ID}.firebaseapp.com`
+        : `https://${FIREBASE_PROJECT_ID}.firebaseapp.com`,
   };
 }
