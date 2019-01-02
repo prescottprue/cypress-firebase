@@ -2,7 +2,6 @@ import { isString, drop, compact, isArray, get, dropRight } from 'lodash';
 import path from 'path';
 import chalk from 'chalk';
 import fs from 'fs';
-/* eslint-disable no-console */
 import stream from 'stream';
 import {
   TEST_CONFIG_FILE_PATH,
@@ -30,49 +29,13 @@ export function readJsonFile(filePath) {
   try {
     return JSON.parse(fs.readFileSync(filePath, 'utf8'));
   } catch (err) {
-    /* eslint-disable no-console */
     error(
       `Unable to parse ${chalk.cyan(
         filePath.replace(DEFAULT_BASE_PATH, ''),
       )} - JSON is most likley not valid`,
     );
-    /* eslint-enable no-console */
     return {};
   }
-}
-
-/**
- * Create data object with values for each document with keys being doc.id.
- * @param  {firebase.database.DataSnapshot} snapshot - Data for which to create
- * an ordered array.
- * @return {Object|Null} Object documents from snapshot or null
- */
-export function dataArrayFromSnap(snap) {
-  const data = [];
-  if (snap.data && snap.exists) {
-    data.push({ id: snap.id, data: snap.data() });
-  } else if (snap.forEach) {
-    snap.forEach(doc => {
-      data.push({ id: doc.id, data: doc.data() || doc });
-    });
-  }
-  return data;
-}
-
-/**
- * Parse fixture path string into JSON with error handling
- * @param {String} unparsed - Unparsed string to be parsed into JSON
- */
-export function parseFixturePath(unparsed) {
-  if (isString(unparsed)) {
-    try {
-      return JSON.parse(unparsed);
-    } catch (err) {
-      console.log('Error parsing fixture to JSON:', err); // eslint-disable-line no-console
-      return unparsed;
-    }
-  }
-  return unparsed;
 }
 
 function getEnvironmentSlug() {
