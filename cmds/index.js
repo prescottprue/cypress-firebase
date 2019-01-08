@@ -6,6 +6,8 @@ module.exports = function setupCommands(client) {
   }
 
   client.createTestEnvFile = loadCommand('createTestEnvFile');
+  client.run = loadCommand('run');
+  client.open = loadCommand('open');
 
   return client;
 };

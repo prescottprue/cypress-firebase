@@ -112,12 +112,19 @@ Tests will run faster locally if you tests against the build version of your app
 
 ### Folders
 
-`cypress` is the default folder where config is loaded from, but these other common folders are supported:
+`cypress` is the default folder where config is loaded from, but you can use another folder by specifiying a different setting for the `integrationFolder` parameter in `cypress.json`:
 
-  ```
-  test/ui
-  test/e2e
-  ```
+```json
+{
+  "projectId": "<- your project id ->",
+  "fixturesFolder": "test/e2e/fixtures",
+  "integrationFolder": "test/e2e/integration",
+  "pluginsFile": "test/e2e/plugins/index.js",
+  "screenshotsFolder": "test/e2e/screenshots",
+  "videosFolder": "test/e2e/videos",
+  "supportFile": "test/e2e/support/index.js"
+}
+```
 
 ## Docs
 

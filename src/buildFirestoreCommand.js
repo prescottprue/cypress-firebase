@@ -19,7 +19,7 @@ export default function buildFirestoreCommand(
   action,
   actionPath,
   fixturePath,
-  opts = {}
+  opts = {},
 ) {
   const options = isObject(fixturePath) ? fixturePath : opts;
   const { args = [] } = options;
@@ -29,7 +29,7 @@ export default function buildFirestoreCommand(
       const deleteArgsWithDefaults = addDefaultArgs(Cypress, args);
       // Add -r to args string (recursive) if recursive option is true otherwise specify shallow
       const finalDeleteArgs = deleteArgsWithDefaults.concat(
-        options.recursive ? '-r' : '--shallow'
+        options.recursive ? '-r' : '--shallow',
       );
       const deleteArgsStr = getArgsString(finalDeleteArgs);
       return `${FIREBASE_TOOLS_BASE_COMMAND} firestore:${action} ${actionPath}${deleteArgsStr}`;
@@ -37,7 +37,7 @@ export default function buildFirestoreCommand(
     case 'set': {
       // Add -m to argsWithDefaults string (meta) if withmeta option is true
       return `${FIREBASE_EXTRA_PATH} firestore ${action} ${actionPath} '${JSON.stringify(
-        fixturePath
+        fixturePath,
       )}'${options.withMeta ? ' -m' : ''}`;
     }
     default: {
