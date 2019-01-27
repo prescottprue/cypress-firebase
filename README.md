@@ -238,11 +238,11 @@ level. If using delete, auth is through FIREBASE_TOKEN since firebase-tools is u
     -   `opts.args` **[Array][13]** Command line args to be passed
 
 ##### Examples
-
+ 
 *Basic*
 
 ```javascript
-cy.callFirestore('add', 'project/test-project', 'fakeProject.json')
+cy.callFirestore('set', 'project/test-project', 'fakeProject.json')
 ```
 
 *Recursive Delete*
