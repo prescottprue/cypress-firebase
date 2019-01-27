@@ -259,6 +259,38 @@ const opts = { args: ['-r'] }
 cy.callFirestore('delete', 'project/test-project', opts)
 ```
 
+*Full*
+
+```javascript
+
+describe('Test firestore', () => {
+  const TEST_UID = Cypress.env('TEST_UID');
+  const mockAge = 8;
+
+  beforeEach(() => {
+    cy.visit('http://localhost:4200');
+  });
+
+  it('read/write test', () => {
+    cy.log('Starting test');
+
+    cy.callFirestore('set', `testCollection/${TEST_UID}`, {
+      name: 'axa',
+      age: 8,
+    });
+    cy.callFirestore('get', `testCollection/${TEST_UID}`).then(r => {
+      cy.wrap(r[0])
+        .its('id')
+        .should('equal', TEST_UID);
+      cy.wrap(r[0])
+        .its('data.age')
+        .should('equal', mockAge);
+    });
+    cy.log('Ended test');
+  });
+});
+```
+
 ## Why?
 
 It isn't currenlty possible to use Firebase's `firebase-admin` SDK directly within Cypress due to dependencies not being able to be loaded into the Browser environment. Since `firebase-admin` is nessesary to generate custom token needed to login to Firebase, the usage of it happens outside of Cypress (through `cypress-firebase createTestEnvFile`) before booting up.
