@@ -45,7 +45,9 @@ export default function buildFirestoreCommand(
       if (options.withMeta) {
         argsWithDefaults.push('-m');
       }
-      return `${FIREBASE_EXTRA_PATH} firestore ${action} ${actionPath}`;
+      return `${FIREBASE_EXTRA_PATH} firestore ${action} ${actionPath} '${JSON.stringify(
+        fixturePath,
+      )}'`;
     }
   }
 }
