@@ -238,11 +238,11 @@ level. If using delete, auth is through FIREBASE_TOKEN since firebase-tools is u
     -   `opts.args` **[Array][13]** Command line args to be passed
 
 ##### Examples
-
+ 
 *Basic*
 
 ```javascript
-cy.callFirestore('add', 'project/test-project', 'fakeProject.json')
+cy.callFirestore('set', 'project/test-project', 'fakeProject.json')
 ```
 
 *Recursive Delete*
@@ -257,6 +257,38 @@ cy.callFirestore('delete', 'project/test-project', opts)
 ```javascript
 const opts = { args: ['-r'] }
 cy.callFirestore('delete', 'project/test-project', opts)
+```
+
+*Full*
+
+```javascript
+
+describe('Test firestore', () => {
+  const TEST_UID = Cypress.env('TEST_UID');
+  const mockAge = 8;
+
+  beforeEach(() => {
+    cy.visit('http://localhost:4200');
+  });
+
+  it('read/write test', () => {
+    cy.log('Starting test');
+
+    cy.callFirestore('set', `testCollection/${TEST_UID}`, {
+      name: 'axa',
+      age: 8,
+    });
+    cy.callFirestore('get', `testCollection/${TEST_UID}`).then(r => {
+      cy.wrap(r[0])
+        .its('id')
+        .should('equal', TEST_UID);
+      cy.wrap(r[0])
+        .its('data.age')
+        .should('equal', mockAge);
+    });
+    cy.log('Ended test');
+  });
+});
 ```
 
 ## Why?
