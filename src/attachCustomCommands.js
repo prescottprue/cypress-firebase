@@ -50,7 +50,7 @@ export default function({ Cypress, cy, firebase }) {
       cy.log('Current user already logged out.');
     } else {
       cy.log('Current user exists, logging out...');
-      return firebase.auth().signOut();
+      firebase.auth().signOut();
     }
   });
 
