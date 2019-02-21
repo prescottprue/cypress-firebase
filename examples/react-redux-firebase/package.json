@@ -1,17 +1,7 @@
 {
-  "name": "example",
+  "name": "cypress-firebase-basic-example",
   "version": "0.1.0",
   "private": true,
-  "dependencies": {
-    "firebase": "^5.5.5",
-    "react": "^16.5.2",
-    "react-dom": "^16.5.2",
-    "react-redux": "^5.0.7",
-    "react-redux-firebase": "^2.1.8",
-    "react-scripts": "2.0.5",
-    "recompose": "^0.30.0",
-    "redux": "^4.0.1"
-  },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -19,6 +9,23 @@
     "build:testConfig": "cypress-firebase createTestEnvFile",
     "test": "npm run build:testConfig && cross-env CYPRESS_baseUrl=http://localhost:3000 cypress run",
     "test:ui": "npm run build:testConfig && cross-env CYPRESS_baseUrl=http://localhost:3000 cypress open"
+  },
+  "dependencies": {
+    "firebase": "^5.8.3",
+    "react": "^16.8.2",
+    "react-dom": "^16.8.2",
+    "react-redux": "^5.0.7",
+    "react-redux-firebase": "^2.1.8",
+    "react-scripts": "2.0.5",
+    "recompose": "^0.30.0",
+    "redux": "^4.0.1"
+  },
+  "devDependencies": {
+    "cross-env": "^5.2.0",
+    "cypress": "^3.1.5",
+    "cypress-firebase": "*",
+    "eslint-plugin-cypress": "^2.0.1",
+    "firebase-tools": "^6.3.1"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -28,12 +35,5 @@
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ],
-  "devDependencies": {
-    "cross-env": "^5.2.0",
-    "cypress": "^3.1.0",
-    "eslint-plugin-cypress": "^2.0.1",
-    "firebase-admin": "^6.0.0",
-    "firebase-tools-extra": "0.0.1"
-  }
+  ]
 }
