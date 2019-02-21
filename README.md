@@ -51,7 +51,7 @@ If you are intereted in what drove the need for this checkout [the why section](
     ```js
     {
       "TEST_UID": "<- uid of the user you want to test as ->",
-      "FIREBASE_PROJECT_ID": "<- projectId of your project ->"
+      "FIREBASE_PROJECT_ID": "<- projectId of your project ->",
     }
     ```
 

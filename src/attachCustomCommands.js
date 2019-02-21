@@ -19,7 +19,7 @@ export default function({ Cypress, cy, firebase }) {
         'FIREBASE_AUTH_JWT must be set to cypress environment in order to login',
       );
     } else if (firebase.auth().currentUser) {
-      cy.log('Current user already exists, login complete.');
+      cy.log('Authed user already exists, login complete.');
     } else {
       return new Promise((resolve, reject) => {
         // eslint-disable-line consistent-return
@@ -45,7 +45,7 @@ export default function({ Cypress, cy, firebase }) {
    * cy.logout()
    */
   Cypress.Commands.add('logout', () => {
-    cy.log('Confirming use is logged out...');
+    cy.log('Confirming user is logged out...');
     if (!firebase.auth().currentUser) {
       cy.log('Current user already logged out.');
     } else {

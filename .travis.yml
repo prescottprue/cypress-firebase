@@ -12,10 +12,7 @@ notifications:
     on_failure: change
     on_success: change
 
-cache:
-  bundler: true
-  directories:
-    - $HOME/.npm
+cache: npm
 
 branches:
   only:
