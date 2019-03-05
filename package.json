@@ -28,7 +28,7 @@
     "commander": "^2.19.0",
     "figures": "^2.0.0",
     "firebase-admin": "^7.0.0",
-    "firebase-tools-extra": "^0.0.8",
+    "firebase-tools-extra": "^0.0.9",
     "lodash": "^4.17.11"
   },
   "devDependencies": {
