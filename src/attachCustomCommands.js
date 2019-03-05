@@ -152,8 +152,12 @@ export default function({ Cypress, cy, firebase }) {
 
       // Add metadata to dataToWrite if specified by options
       if (isObject(data) && opts.withMeta) {
-        dataToWrite.createdBy = Cypress.env('TEST_UID');
-        dataToWrite.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+        if (!dataToWrite.createdBy) {
+          dataToWrite.createdBy = Cypress.env('TEST_UID');
+        }
+        if (!dataToWrite.createdAt) {
+          dataToWrite.createdAt = new Date().toISOString();
+        }
       }
 
       const firestoreCommand = buildFirestoreCommand(
