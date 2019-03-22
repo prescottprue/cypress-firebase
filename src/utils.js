@@ -13,7 +13,7 @@ import {
   DEFAULT_TEST_FOLDER_PATH,
   FIREBASE_TOOLS_YES_ARGUMENT,
 } from './constants';
-import { info, error } from './logger';
+import { info, error, warn } from './logger';
 
 const { spawn } = require('child_process');
 
@@ -150,13 +150,32 @@ export function getServiceAccount(envSlug) {
     )}" falling back to environment variables...`,
   );
   // Use environment variables (CI)
+  const serviceAccountEnvVar = envVarBasedOnCIEnv('SERVICE_ACCOUNT');
+  if (serviceAccountEnvVar) {
+    if (typeof serviceAccountEnvVar === 'string') {
+      try {
+        return JSON.parse(serviceAccountEnvVar);
+      } catch (err) {
+        warn(
+          'Issue parsing SERVICE_ACCOUNT environment variable from string to object, returning string',
+        );
+      }
+    }
+    return serviceAccountEnvVar;
+  }
+  const clientId = envVarBasedOnCIEnv('FIREBASE_CLIENT_ID');
+  if (clientId) {
+    warn(
+      '"FIREBASE_CLIENT_ID" will override FIREBASE_TOKEN for auth when calling firebase-tools - this may cause unexepected behavior',
+    );
+  }
   return {
     type: 'service_account',
     project_id: envVarBasedOnCIEnv('FIREBASE_PROJECT_ID'),
     private_key_id: envVarBasedOnCIEnv('FIREBASE_PRIVATE_KEY_ID'),
     private_key: getParsedEnvVar('FIREBASE_PRIVATE_KEY'),
     client_email: envVarBasedOnCIEnv('FIREBASE_CLIENT_EMAIL'),
-    client_id: envVarBasedOnCIEnv('FIREBASE_CLIENT_ID'),
+    client_id: clientId,
     auth_uri: 'https://accounts.google.com/o/oauth2/auth',
     token_uri: 'https://accounts.google.com/o/oauth2/token',
     auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',

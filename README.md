@@ -26,7 +26,8 @@ If you are intereted in what drove the need for this checkout [the why section](
 
 1. Log into your app for the first time
 1. Go to the Auth tab of Firebase and get your UID. This will be the account which you use to login while running tests (we will call this UID `TEST_UID`)
-1. Generate a service account -> save it as `serviceAccount.json`
+1. Generate a service account -> save it as `serviceAccount.json` (for local dev)
+1. Set service account as the `SERVICE_ACCOUNT` environment variable within your CI (make sure to wrap it in `"`)
 1. Install Cypress and add it to your package file: `npm i --save-dev cypress`
 1. Add cypress folder by calling `cypress open`
 
@@ -52,6 +53,7 @@ If you are intereted in what drove the need for this checkout [the why section](
     {
       "TEST_UID": "<- uid of the user you want to test as ->",
       "FIREBASE_PROJECT_ID": "<- projectId of your project ->",
+      "FIREBASE_API_KEY": "<- browser apiKey of your project ->"
     }
     ```
 
@@ -68,10 +70,11 @@ If you are intereted in what drove the need for this checkout [the why section](
       // Your config from Firebase Console
     };
 
-    window.fbInstance = firebase.initializeApp(fbConfig);
+    firebase.initializeApp(fbConfig);
 
     attachCustomCommands({ Cypress, cy, firebase })
     ```
+
 1. Setup plugin adding following your plugins file (`cypress/plugins/index.js`):
 
     ```js
@@ -133,6 +136,10 @@ Tests will run faster locally if you tests against the build version of your app
 #### createTestEnvFile {#createTestEnvFile}
 
 Create test environment file (`cypress.env.json`) which contains custom auth token generated using `firebase-admin` SDK and `serviceAccount.json`.
+
+##### Requirements
+
+A service account must be provided. This can be done by setting `serviceAccount.json` in the root of the project (often used locally since service accounts should be in gitignore), or by setting the `SERVICE_ACCOUNT` enviroment variable. For different environmets you can prefix with the environment name such as `STAGE_SERVICE_ACCOUNT`.
 
 ##### Examples
 
