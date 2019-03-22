@@ -124,7 +124,6 @@ function createTestEnvFile(envName) {
       // Create config object to be written into test env file by combining with existing config
       const newCypressConfig = Object.assign({}, currentCypressEnvSettings, {
         TEST_UID: envVarBasedOnCIEnv('TEST_UID'),
-        FIREBASE_API_KEY: envVarBasedOnCIEnv('FIREBASE_API_KEY'),
         FIREBASE_PROJECT_ID,
         FIREBASE_AUTH_JWT: customToken
       });
