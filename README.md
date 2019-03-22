@@ -52,6 +52,8 @@ If you are intereted in what drove the need for this checkout [the why section](
     ```js
     {
       "TEST_UID": "<- uid of the user you want to test as ->",
+      "FIREBASE_PROJECT_ID": "<- projectId of your project ->",
+      "FIREBASE_API_KEY": "<- browser apiKey of your project ->"
     }
     ```
 
@@ -68,10 +70,11 @@ If you are intereted in what drove the need for this checkout [the why section](
       // Your config from Firebase Console
     };
 
-    window.fbInstance = firebase.initializeApp(fbConfig);
+    firebase.initializeApp(fbConfig);
 
     attachCustomCommands({ Cypress, cy, firebase })
     ```
+
 1. Setup plugin adding following your plugins file (`cypress/plugins/index.js`):
 
     ```js
