@@ -42,7 +42,11 @@ function createTestEnvFile(envName) {
   // Throw if UID is missing in environment
   if (!uid) {
     /* eslint-disable */
-    const errMsg = `${chalk.cyan(varName)} is missing from environment. Confirm that ${chalk.cyan(configPath)} contains either ${chalk.cyan(varName)} or ${chalk.cyan('TEST_UID')}.`;
+    const errMsg = `${chalk.cyan(
+      varName
+    )} is missing from environment. Confirm that ${chalk.cyan(
+      configPath
+    )} contains either ${chalk.cyan(varName)} or ${chalk.cyan('TEST_UID')}.`;
     /* eslint-enable */
     return Promise.reject(new Error(errMsg));
   }
@@ -125,8 +129,12 @@ function createTestEnvFile(envName) {
       const newCypressConfig = Object.assign({}, currentCypressEnvSettings, {
         TEST_UID: envVarBasedOnCIEnv('TEST_UID'),
         FIREBASE_PROJECT_ID,
+        FIREBASE_API_KEY:
+          envVarBasedOnCIEnv('FIREBASE_API_KEY') ||
+          get(firebaserc, `ci.createConfig.${envName}.firebase.apiKey`, ''),
         FIREBASE_AUTH_JWT: customToken
       });
+
       const stageProjectId = envVarBasedOnCIEnv('STAGE_FIREBASE_PROJECT_ID');
       const stageApiKey = envVarBasedOnCIEnv('STAGE_FIREBASE_API_KEY');
 
