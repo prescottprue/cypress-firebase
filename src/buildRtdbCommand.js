@@ -41,9 +41,7 @@ export default function buildRtdbCommand(
           );
         } else {
           getDataArgsWithDefaults.push(
-            `--order-by-child ${
-              options.orderByChild
-            } --limit-to-last ${lastCount}`,
+            `--order-by-child ${options.orderByChild} --limit-to-last ${lastCount}`,
           );
         }
       }
