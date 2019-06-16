@@ -53,7 +53,11 @@ function createTestEnvFile(envName) {
 
   // Get project from .firebaserc
   const firebaserc = readJsonFile(FIREBASE_CONFIG_FILE_PATH);
+
+  const currentCypressEnvSettings = readJsonFile(TEST_ENV_FILE_PATH);
+
   const FIREBASE_PROJECT_ID =
+    get(currentCypressEnvSettings, 'FIREBASE_PROJECT_ID') ||
     envVarBasedOnCIEnv(`${envPrefix}FIREBASE_PROJECT_ID`) ||
     get(
       firebaserc,
@@ -123,7 +127,6 @@ function createTestEnvFile(envName) {
       /* eslint-enable no-console */
       // Remove firebase app
       appFromSA.delete();
-      const currentCypressEnvSettings = readJsonFile(TEST_ENV_FILE_PATH);
 
       // Create config object to be written into test env file by combining with existing config
       const newCypressConfig = Object.assign({}, currentCypressEnvSettings, {

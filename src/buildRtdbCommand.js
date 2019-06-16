@@ -49,7 +49,9 @@ export default function buildRtdbCommand(
       return `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} /${actionPath}${getDataArgsStr}`;
     }
     default: {
-      return `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} /${actionPath} ${fixturePath}${argsStr}`;
+      return `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} /${actionPath} -d '${JSON.stringify(
+        options,
+      )}'${argsStr}`;
     }
   }
 }
