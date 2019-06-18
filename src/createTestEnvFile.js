@@ -1,8 +1,3 @@
-/**
- * createTestEnvFile commander component
- * To use add require('../cmds/deploy.js')(program) to your commander.js based node executable before program.parse
- */
-
 import chalk from 'chalk';
 import fs from 'fs';
 import { pickBy, get, size, keys, isUndefined } from 'lodash';
@@ -18,7 +13,7 @@ import {
   DEFAULT_TEST_ENV_FILE_NAME,
 } from './constants';
 import { FIREBASE_CONFIG_FILE_PATH, TEST_ENV_FILE_PATH } from './filePaths';
-import logger from '../lib/logger';
+import * as logger from './logger';
 
 /**
  * @param  {functions.Event} event - Function event
