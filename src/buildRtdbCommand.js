@@ -24,11 +24,15 @@ export default function buildRtdbCommand(
   const { args = [] } = options;
   const argsWithDefaults = addDefaultArgs(Cypress, args);
   const argsStr = getArgsString(argsWithDefaults);
+  // Add preceding slash if it doesn't already exist (required by firebase-tools)
+  const cleanActionPath = actionPath.startsWith('/')
+    ? actionPath
+    : `/${actionPath}`;
   switch (action) {
     case 'remove':
-      return `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} ${actionPath}${argsStr}`;
+      return `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} ${cleanActionPath}${argsStr}`;
     case 'delete':
-      return `${FIREBASE_TOOLS_BASE_COMMAND} database:remove ${actionPath}${argsStr}`;
+      return `${FIREBASE_TOOLS_BASE_COMMAND} database:remove ${cleanActionPath}${argsStr}`;
     case 'get': {
       const getDataArgsWithDefaults = addDefaultArgs(Cypress, args, {
         disableYes: true,
@@ -48,10 +52,10 @@ export default function buildRtdbCommand(
         }
       }
       const getDataArgsStr = getArgsString(getDataArgsWithDefaults);
-      return `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} /${actionPath}${getDataArgsStr}`;
+      return `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} ${cleanActionPath}${getDataArgsStr}`;
     }
     default: {
-      return `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} /${actionPath} -d '${JSON.stringify(
+      return `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} ${cleanActionPath} -d '${JSON.stringify(
         options,
       )}'${argsStr}`;
     }
