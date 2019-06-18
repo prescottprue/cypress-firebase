@@ -25,8 +25,10 @@ export default function buildRtdbCommand(
   const argsWithDefaults = addDefaultArgs(Cypress, args);
   const argsStr = getArgsString(argsWithDefaults);
   switch (action) {
-    case 'delete':
+    case 'remove':
       return `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} ${actionPath}${argsStr}`;
+    case 'delete':
+      return `${FIREBASE_TOOLS_BASE_COMMAND} database:remove ${actionPath}${argsStr}`;
     case 'get': {
       const getDataArgsWithDefaults = addDefaultArgs(Cypress, args, {
         disableYes: true,

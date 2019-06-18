@@ -184,8 +184,7 @@ module.exports = function runCreateTestEnvFile(program) {
       'Build configuration file containing a token for authorizing a firebase instance'
     )
     .action(envArg => {
-      const envName = typeof envArg === 'string' ? envArg : 'local';
-      return createTestEnvFile(envName)
+      return createTestEnvFile(envArg)
         .then(() => process.exit(0))
         .catch(err => {
           logger.error(`Test env file could not be created:\n${err.message}`);
