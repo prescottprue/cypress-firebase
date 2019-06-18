@@ -46,12 +46,17 @@ export default function({ Cypress, cy, firebase }) {
    */
   Cypress.Commands.add('logout', () => {
     cy.log('Confirming user is logged out...');
-    if (!firebase.auth().currentUser) {
-      cy.log('Current user already logged out.');
-    } else {
-      cy.log('Current user exists, logging out...');
-      firebase.auth().signOut();
-    }
+    return new Promise((resolve, reject) => {
+      firebase.auth().onAuthStateChanged(auth => {
+        if (!auth) {
+          resolve();
+        }
+      });
+      firebase
+        .auth()
+        .signOut()
+        .catch(reject);
+    });
   });
 
   /**
