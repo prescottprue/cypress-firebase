@@ -302,7 +302,7 @@ describe('Test firestore', () => {
 
 ## Why?
 
-It isn't currenlty possible to use Firebase's `firebase-admin` SDK directly within Cypress due to dependencies not being able to be loaded into the Browser environment. Since `firebase-admin` is nessesary to generate custom token needed to login to Firebase, the usage of it happens outside of Cypress (through `cypress-firebase createTestEnvFile`) before booting up.
+It isn't currently possible to use Firebase's `firebase-admin` SDK directly within Cypress due to dependencies not being able to be loaded into the Browser environment. Since `firebase-admin` is nessesary to generate custom token needed to login to Firebase, the usage of it happens outside of Cypress (through `cypress-firebase createTestEnvFile`) before booting up.
 
 Instead of a cli tool, the plugin that is include could maybe use `firebase-admin` (since cypress plugins is a node environment) - when investigating this, I found it frustrating to get the values back into the test. That said, always open to better ways of solving this, so please reach out with your ideas!
 
