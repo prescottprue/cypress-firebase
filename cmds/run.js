@@ -1,7 +1,7 @@
 const chalk = require('chalk');
 const { runCommand } = require('../lib/utils');
 const logger = require('../lib/logger');
-const createTestEnvFile = require('../lib/createTestEnvFile');
+const createTestEnvFile = require('../lib/createTestEnvFile').default;
 
 /**
  * @name run

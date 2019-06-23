@@ -3,9 +3,7 @@
  * To use add require('../cmds/deploy.js')(program) to your commander.js based node executable before program.parse
  */
 const logger = require('../lib/logger');
-const createTestEnvFile = require('../lib/createTestEnvFile');
-
-console.log('create test', typeof createTestEnvFile);
+const createTestEnvFile = require('../lib/createTestEnvFile').default;
 
 /**
  * @name createTestEnvFile
