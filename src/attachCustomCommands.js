@@ -45,7 +45,6 @@ export default function({ Cypress, cy, firebase }) {
    * cy.logout()
    */
   Cypress.Commands.add('logout', () => {
-    cy.log('Confirming user is logged out...');
     return new Promise((resolve, reject) => {
       firebase.auth().onAuthStateChanged(auth => {
         if (!auth) {
