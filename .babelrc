@@ -4,14 +4,13 @@
       "@babel/preset-env",
       {
         "targets": {
-          "node": "6"
+          "node": "8"
         }
       }
     ]
   ],
   "plugins": [
-    "lodash",
-    "add-module-exports"
+    "lodash"
   ],
   "env": {
     "es": {

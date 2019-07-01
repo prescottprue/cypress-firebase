@@ -1,0 +1,110 @@
+stages:
+  - build
+  - deploy
+
+# To cache both npm modules and Cypress binary we use environment variables
+# to point at the folders we can list as paths in "cache" job settings
+variables:
+  npm_config_cache: $CI_PROJECT_DIR/.npm
+
+# Shared Settings
+## Cache dependencies across jobs only pulling not uploading (upload to cache
+## happens in build stage)
+cache:
+  key: $CI_COMMIT_REF_SLUG
+  policy: pull # only pull cache, skip uploading
+  paths:
+    - .npm
+
+## Install dependencies for React App and Cloud Functions. Installing of
+## Cypress binary is skipped (done in E2E Testing Stage)
+## Script run before all stages unless otherwise overriden
+before_script:
+  - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
+  - npm ci
+
+# Build Stage
+## Installs dependencies, builds app, and saves results for later (artifacts).
+Build Node 8:
+  stage: build
+  image: node:8
+  when: always
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip-build/
+  # Override cache behavior set above since we want to both pull and push to
+  # the cache (no "policy" provided since pull-push is default)
+  cache:
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+      - .npm
+  artifacts:
+    name: $CI_JOB_STAGE-$CI_COMMIT_REF_SLUG
+    expire_in: 2 weeks
+    when: always
+    paths:
+      - lib
+      - es
+  script:
+    - npm run lint
+    - npm run build
+
+# Build Stage
+## Installs dependencies, builds app, and saves results for later (artifacts).
+Build Node 10:
+  stage: build
+  image: node:10
+  when: always
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip-build/
+  # Override cache behavior set above since we want to both pull and push to
+  # the cache (no "policy" provided since pull-push is default)
+  cache:
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+      - .npm
+  artifacts:
+    name: $CI_JOB_STAGE-$CI_COMMIT_REF_SLUG
+    expire_in: 2 weeks
+    when: always
+    paths:
+      - lib
+      - es
+  script:
+    - npm run lint
+    - npm run build
+
+# Deploy Latest Stage
+## Deploy Library to latest tag
+Deploy Latest:
+  stage: deploy
+  image: node:10
+  when: on_success
+  only:
+    - master
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip-deploy/
+      - $CI_COMMIT_MESSAGE =~ /skip-build/
+  dependencies:
+    - Build Node 10
+  script:
+    - npm publish
+
+# Deploy Next Stage
+## Deploy Library to next tag
+Deploy Next:
+  stage: deploy
+  image: node:10
+  when: on_success
+  only:
+    - next
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /skip-deploy/
+      - $CI_COMMIT_MESSAGE =~ /skip-build/
+  dependencies:
+    - Build Node 10
+  script:
+    - npm publish --tag next

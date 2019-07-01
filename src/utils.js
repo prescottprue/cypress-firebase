@@ -39,7 +39,9 @@ export function readJsonFile(filePath) {
 }
 
 function getEnvironmentSlug() {
-  return process.env.CI_ENVIRONMENT_SLUG || 'stage';
+  return (
+    process.env.CI_ENVIRONMENT_SLUG || process.env.CI_COMMIT_REF_SLUG || 'stage'
+  );
 }
 
 /**
