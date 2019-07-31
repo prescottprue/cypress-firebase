@@ -85,10 +85,16 @@ export default function createTestEnvFile(envName) {
     'withServiceAccount',
   );
 
+  // Read developer claims object from cypress/config.json
+  const developerClaims = envVarBasedOnCIEnv('DEVELOPER_CLAIMS');
+  // Check if object is empty. If not, return it, otherwise set developer claims as { isTesting: true }
+  const defaultDeveloperClaims =
+    keys(developerClaims).length > 0 ? developerClaims : { isTesting: true };
+
   // Create auth token
   return appFromSA
     .auth()
-    .createCustomToken(uid, { isTesting: true })
+    .createCustomToken(uid, defaultDeveloperClaims)
     .then(customToken => {
       /* eslint-disable no-console */
       logger.success(
