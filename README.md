@@ -176,6 +176,17 @@ during `build:testConfig` phase.
 cy.login()
 ```
 
+#### Get current UserId and aliases it for later usage.
+
+```javascript
+  //Assuming there's a uid property at the root level of the user object.
+  cy.login().then($auth => cy.wrap($auth).its('uid').as('uid'));
+  //Then, later somewhere in the test, use the uid like this,
+  cy.get('@uid').then((uid) => { 
+  //Your code here.
+  }
+```
+
 #### cy.logout
 
 Log out of Firebase instance
