@@ -140,6 +140,10 @@ export default function({ Cypress, cy, firebase }) {
    * @name cy.callFirestore
    * @type {Cypress.Command}
    * @example <caption>Basic</caption>
+   * cy.fixture('fakeProject.json').then((project) => {
+   *   cy.callFirestore('add', 'project/test-project', project)
+   * })
+   * @example <caption>Fixture Path</caption>
    * cy.callFirestore('add', 'project/test-project', 'fakeProject.json')
    * @example <caption>Recursive Delete</caption>
    * const opts = { recursive: true }

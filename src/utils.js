@@ -232,11 +232,12 @@ export function getArgsString(args) {
  * Add default Firebase arguments to arguments array.
  * @param {Array} args - arguments array
  * @param  {Object} [opts={}] - Options object
+ * @param {String} opts.token - Firebase CI token to pass as the token argument
  * @param {Boolean} [opts.disableYes=false] - Whether or not to disable the
  * yes argument
  */
 export function addDefaultArgs(Cypress, args, opts = {}) {
-  const { disableYes = false } = opts;
+  const { disableYes = false, token } = opts;
   const newArgs = [...args];
   // TODO: Load this in a way that understands environment. Currently this will
   // go to the first project id that is defined, not which one should be used
@@ -249,6 +250,12 @@ export function addDefaultArgs(Cypress, args, opts = {}) {
   if (!newArgs.includes('-P') || !newArgs.includes(projectId)) {
     newArgs.push('-P');
     newArgs.push(projectId);
+  }
+  const tokenFromEnv = Cypress.env('FIREBASE_TOKEN');
+  // Include token if it exists in environment
+  if (!newArgs.includes('--token') && (token || tokenFromEnv)) {
+    newArgs.push('--token');
+    newArgs.push(token || tokenFromEnv);
   }
   // Add Firebase's automatic approval argument if it is not already in newArgs
   if (!disableYes && !newArgs.includes(FIREBASE_TOOLS_YES_ARGUMENT)) {
