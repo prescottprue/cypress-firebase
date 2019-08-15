@@ -3,15 +3,12 @@ import path from 'path';
 import chalk from 'chalk';
 import fs from 'fs';
 import stream from 'stream';
-import {
-  TEST_CONFIG_FILE_PATH,
-  LOCAL_CONFIG_FILE_PATH,
-  TEST_ENV_FILE_PATH,
-} from './filePaths';
+import { TEST_CONFIG_FILE_PATH, TEST_ENV_FILE_PATH } from './filePaths';
 import {
   DEFAULT_BASE_PATH,
   DEFAULT_TEST_FOLDER_PATH,
   FIREBASE_TOOLS_YES_ARGUMENT,
+  DEFAULT_CONFIG_FILE_NAME,
 } from './constants';
 import { info, error, warn } from './logger';
 
@@ -32,7 +29,7 @@ export function readJsonFile(filePath) {
     error(
       `Unable to parse ${chalk.cyan(
         filePath.replace(DEFAULT_BASE_PATH, ''),
-      )} - JSON is most likley not valid`,
+      )} - JSON is most likely not valid`,
     );
     return {};
   }
@@ -78,6 +75,15 @@ export function getCypressFolderPath() {
     : DEFAULT_TEST_FOLDER_PATH;
 }
 
+export function getCypressConfigPath() {
+  const cypressFolderPath = getCypressFolderPath();
+  const cypressConfigFilePath = path.join(
+    cypressFolderPath,
+    DEFAULT_CONFIG_FILE_NAME,
+  );
+  return cypressConfigFilePath;
+}
+
 /**
  * Get environment variable based on the current CI environment
  * @param  {String} varNameRoot - variable name without the environment prefix
@@ -89,9 +95,11 @@ export function getCypressFolderPath() {
 export function envVarBasedOnCIEnv(varNameRoot, envName) {
   const prefix = getEnvPrefix(envName);
   const combined = `${prefix}${varNameRoot}`;
-  // Config file used for environment (local, containers) from main test path (cypress/config.json)
-  if (fs.existsSync(LOCAL_CONFIG_FILE_PATH)) {
-    const configObj = readJsonFile(LOCAL_CONFIG_FILE_PATH);
+  const localConfigFilePath = getCypressConfigPath();
+
+  // Config file used for environment (local, containers) from main test path ({integrationFolder}/config.json)
+  if (fs.existsSync(localConfigFilePath)) {
+    const configObj = readJsonFile(localConfigFilePath);
     return configObj[combined] || configObj[varNameRoot];
   }
 
@@ -232,11 +240,12 @@ export function getArgsString(args) {
  * Add default Firebase arguments to arguments array.
  * @param {Array} args - arguments array
  * @param  {Object} [opts={}] - Options object
+ * @param {String} opts.token - Firebase CI token to pass as the token argument
  * @param {Boolean} [opts.disableYes=false] - Whether or not to disable the
  * yes argument
  */
 export function addDefaultArgs(Cypress, args, opts = {}) {
-  const { disableYes = false } = opts;
+  const { disableYes = false, token } = opts;
   const newArgs = [...args];
   // TODO: Load this in a way that understands environment. Currently this will
   // go to the first project id that is defined, not which one should be used
@@ -249,6 +258,12 @@ export function addDefaultArgs(Cypress, args, opts = {}) {
   if (!newArgs.includes('-P') || !newArgs.includes(projectId)) {
     newArgs.push('-P');
     newArgs.push(projectId);
+  }
+  const tokenFromEnv = Cypress.env('FIREBASE_TOKEN');
+  // Include token if it exists in environment
+  if (!newArgs.includes('--token') && (token || tokenFromEnv)) {
+    newArgs.push('--token');
+    newArgs.push(token || tokenFromEnv);
   }
   // Add Firebase's automatic approval argument if it is not already in newArgs
   if (!disableYes && !newArgs.includes(FIREBASE_TOOLS_YES_ARGUMENT)) {

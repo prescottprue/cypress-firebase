@@ -12,6 +12,7 @@ import { FIREBASE_TOOLS_BASE_COMMAND, FIREBASE_EXTRA_PATH } from './constants';
  * it is used as options.
  * @param  {Object} [opts={}] - Options object
  * @param  {Object} opts.args - Extra arguments to be passed with command
+ * @param  {Object} opts.token - Firebase CI token to pass as the token argument
  * @return {String} Command string to be used with cy.exec
  */
 export default function buildFirestoreCommand(
@@ -23,7 +24,10 @@ export default function buildFirestoreCommand(
 ) {
   const options = isObject(fixturePath) ? fixturePath : opts;
   const { args = [] } = options;
-  const argsWithDefaults = addDefaultArgs(Cypress, args, { disableYes: true });
+  const argsWithDefaults = addDefaultArgs(Cypress, args, {
+    ...options,
+    disableYes: true,
+  });
   switch (action) {
     case 'delete': {
       const deleteArgsWithDefaults = addDefaultArgs(Cypress, args);

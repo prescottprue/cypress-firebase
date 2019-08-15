@@ -5,13 +5,10 @@ import {
   envVarBasedOnCIEnv,
   getServiceAccount,
   getEnvPrefix,
-  getCypressFolderPath,
   readJsonFile,
+  getCypressConfigPath,
 } from './utils';
-import {
-  DEFAULT_CONFIG_FILE_NAME,
-  DEFAULT_TEST_ENV_FILE_NAME,
-} from './constants';
+import { DEFAULT_TEST_ENV_FILE_NAME } from './constants';
 import { FIREBASE_CONFIG_FILE_PATH, TEST_ENV_FILE_PATH } from './filePaths';
 import * as logger from './logger';
 
@@ -25,15 +22,13 @@ export default function createTestEnvFile(envName) {
   // Get UID from environment (falls back to cypress/config.json for local)
   const uid = envVarBasedOnCIEnv('TEST_UID');
   const varName = `${envPrefix}TEST_UID`;
-  const testFolderPath = getCypressFolderPath();
-  const configPath = `${testFolderPath}/${DEFAULT_CONFIG_FILE_NAME}`;
   // Throw if UID is missing in environment
   if (!uid) {
     /* eslint-disable */
     const errMsg = `${chalk.cyan(
       varName,
     )} is missing from environment. Confirm that ${chalk.cyan(
-      configPath,
+      getCypressConfigPath(),
     )} contains either ${chalk.cyan(varName)} or ${chalk.cyan('TEST_UID')}.`;
     /* eslint-enable */
     return Promise.reject(new Error(errMsg));
