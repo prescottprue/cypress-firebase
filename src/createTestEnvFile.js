@@ -20,17 +20,15 @@ import * as logger from './logger';
 export default function createTestEnvFile(envName) {
   const envPrefix = getEnvPrefix(envName);
   // Get UID from environment (falls back to cypress/config.json for local)
-  const uid = envVarBasedOnCIEnv('TEST_UID');
+  const uid = envVarBasedOnCIEnv('TEST_UID', envName);
   const varName = `${envPrefix}TEST_UID`;
   // Throw if UID is missing in environment
   if (!uid) {
-    /* eslint-disable */
     const errMsg = `${chalk.cyan(
       varName,
     )} is missing from environment. Confirm that ${chalk.cyan(
       getCypressConfigPath(),
     )} contains either ${chalk.cyan(varName)} or ${chalk.cyan('TEST_UID')}.`;
-    /* eslint-enable */
     return Promise.reject(new Error(errMsg));
   }
 
@@ -41,7 +39,7 @@ export default function createTestEnvFile(envName) {
 
   const FIREBASE_PROJECT_ID =
     get(currentCypressEnvSettings, 'FIREBASE_PROJECT_ID') ||
-    envVarBasedOnCIEnv(`${envPrefix}FIREBASE_PROJECT_ID`) ||
+    envVarBasedOnCIEnv(`${envPrefix}FIREBASE_PROJECT_ID`, envName) ||
     get(
       firebaserc,
       `projects.${envName}`,
@@ -66,7 +64,7 @@ export default function createTestEnvFile(envName) {
     return Promise.reject(new Error(errMsg));
   }
 
-  // Remove firebase- prefix
+  // Remove firebase- prefix (was added to database names for a short period of time)
   const cleanedProjectId = FIREBASE_PROJECT_ID.replace('firebase-', '');
 
   const admin = require('firebase-admin'); // eslint-disable-line global-require
@@ -81,7 +79,7 @@ export default function createTestEnvFile(envName) {
   );
 
   // Read developer claims object from cypress/config.json
-  const developerClaims = envVarBasedOnCIEnv('DEVELOPER_CLAIMS');
+  const developerClaims = envVarBasedOnCIEnv('DEVELOPER_CLAIMS', envName);
   // Check if object is empty. If not, return it, otherwise set developer claims as { isTesting: true }
   const defaultDeveloperClaims =
     keys(developerClaims).length > 0 ? developerClaims : { isTesting: true };
@@ -91,28 +89,29 @@ export default function createTestEnvFile(envName) {
     .auth()
     .createCustomToken(uid, defaultDeveloperClaims)
     .then(customToken => {
-      /* eslint-disable no-console */
       logger.success(
         `Custom token generated successfully, writing to ${chalk.cyan(
           DEFAULT_TEST_ENV_FILE_NAME,
         )}`,
       );
-      /* eslint-enable no-console */
       // Remove firebase app
       appFromSA.delete();
 
       // Create config object to be written into test env file by combining with existing config
       const newCypressConfig = Object.assign({}, currentCypressEnvSettings, {
-        TEST_UID: envVarBasedOnCIEnv('TEST_UID'),
+        TEST_UID: uid,
         FIREBASE_PROJECT_ID,
         FIREBASE_API_KEY:
-          envVarBasedOnCIEnv('FIREBASE_API_KEY') ||
-          get(firebaserc, `ci.createConfig.${envName}.firebase.apiKey`, ''),
+          envVarBasedOnCIEnv('FIREBASE_API_KEY', envName) ||
+          get(firebaserc, `ci.createConfig.${envName}.firebase.apiKey`),
         FIREBASE_AUTH_JWT: customToken,
       });
 
-      const stageProjectId = envVarBasedOnCIEnv('STAGE_FIREBASE_PROJECT_ID');
-      const stageApiKey = envVarBasedOnCIEnv('STAGE_FIREBASE_API_KEY');
+      const stageProjectId = envVarBasedOnCIEnv(
+        'STAGE_FIREBASE_PROJECT_ID',
+        envName,
+      );
+      const stageApiKey = envVarBasedOnCIEnv('STAGE_FIREBASE_API_KEY', envName);
 
       if (stageProjectId) {
         newCypressConfig.STAGE_FIREBASE_PROJECT_ID = stageProjectId;
@@ -131,12 +130,10 @@ export default function createTestEnvFile(envName) {
       return customToken;
     })
     .catch(err => {
-      /* eslint-disable no-console */
       logger.error(
         `Custom token could not be generated for uid: ${chalk.cyan(uid)}`,
         err.message || err,
       );
-      /* eslint-enable no-console */
       return Promise.reject(err);
     });
 }
