@@ -1,6 +1,6 @@
 {
   "name": "cypress-firebase",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -25,9 +25,9 @@
   },
   "dependencies": {
     "chalk": "^2.4.2",
-    "commander": "^2.19.0",
+    "commander": "^3.0.0",
     "figures": "^3.0.0",
-    "firebase-admin": "^8.2.0",
+    "firebase-admin": "^8.3.0",
     "firebase-tools-extra": "0.1.0",
     "lodash": "^4.17.11"
   },
