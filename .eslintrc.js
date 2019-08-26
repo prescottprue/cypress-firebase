@@ -8,6 +8,9 @@ module.exports = {
       node: {
         moduleDirectory: ['node_modules', '/']
       }
+    },
+    react: {
+      version: '16.0'
     }
   },
   env: {
@@ -28,17 +31,19 @@ module.exports = {
       }
     ]
   },
-  overrides: {
-    files: ['cmds/**'],
-    rules: {
-      "comma-dangle": ["error", { "functions": "never" }],
-      "prettier/prettier": [
-        'error',
-        {
-          singleQuote: true, // airbnb
-          trailingComma: 'none', // airbnb
-        }
-      ]
+  overrides: [
+    {
+      files: ['cmds/**'],
+      rules: {
+        "comma-dangle": ["error", { "functions": "never" }],
+        "prettier/prettier": [
+          'error',
+          {
+            singleQuote: true, // airbnb
+            trailingComma: 'none', // airbnb
+          }
+        ]
+      }
     }
-  }
+  ]
 }

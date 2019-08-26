@@ -98,14 +98,15 @@ export default function createTestEnvFile(envName) {
       appFromSA.delete();
 
       // Create config object to be written into test env file by combining with existing config
-      const newCypressConfig = Object.assign({}, currentCypressEnvSettings, {
+      const newCypressConfig = {
+        ...currentCypressEnvSettings,
         TEST_UID: uid,
         FIREBASE_PROJECT_ID,
         FIREBASE_API_KEY:
           envVarBasedOnCIEnv('FIREBASE_API_KEY', envName) ||
           get(firebaserc, `ci.createConfig.${envName}.firebase.apiKey`),
         FIREBASE_AUTH_JWT: customToken,
-      });
+      };
 
       const stageProjectId = envVarBasedOnCIEnv(
         'STAGE_FIREBASE_PROJECT_ID',
