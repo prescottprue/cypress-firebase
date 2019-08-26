@@ -1,6 +1,6 @@
 {
   "name": "cypress-firebase",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -27,9 +27,9 @@
     "chalk": "^2.4.2",
     "commander": "^3.0.0",
     "figures": "^3.0.0",
-    "firebase-admin": "^8.3.0",
-    "firebase-tools-extra": "0.1.0",
-    "lodash": "^4.17.11"
+    "firebase-admin": "^8.4.0",
+    "firebase-tools-extra": "0.1.1",
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.5",
@@ -39,18 +39,19 @@
     "babel-eslint": "^10.0.1",
     "babel-plugin-lodash": "^3.3.4",
     "cross-env": "^5.2.0",
-    "eslint": "^5.16.0",
-    "eslint-config-airbnb": "^17.1.0",
-    "eslint-config-prettier": "^6.0.0",
+    "eslint": "^6.1.0",
+    "eslint-config-airbnb": "^18.0.1",
+    "eslint-config-prettier": "^6.1.0",
     "eslint-plugin-babel": "^5.3.0",
-    "eslint-plugin-import": "^2.18.0",
-    "eslint-plugin-jsx-a11y": "^6.2.1",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.0",
-    "eslint-plugin-react": "^7.14.2",
-    "firebase-tools": "^7.2.2",
-    "husky": "^3.0.0",
+    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-react-hooks": "^1.7.0",
+    "firebase-tools": "^7.2.4",
+    "husky": "^3.0.4",
     "prettier": "^1.18.2",
-    "rimraf": "^2.6.3"
+    "rimraf": "^3.0.0"
   },
   "keywords": [
     "cypress",
