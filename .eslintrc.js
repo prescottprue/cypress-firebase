@@ -38,6 +38,7 @@ module.exports = {
       files: ['cmds/**'],
       rules: {
         "comma-dangle": ["error", { "functions": "never" }],
+        "@typescript-eslint/explicit-function-return-type": 0,
         "prettier/prettier": [
           'error',
           {

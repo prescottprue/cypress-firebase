@@ -14,6 +14,11 @@ interface AttachCustomCommandParams {
   firebase: any;
 }
 
+/**
+ * Attach custom commands including cy.login, cy.logout, cy.callRtdb,
+ * @param commandParams - List of params to provide scope during
+ * custom command attachment
+ */
 export default function attachCustomCommands(
   commandParams: AttachCustomCommandParams,
 ): void {

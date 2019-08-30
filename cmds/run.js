@@ -1,6 +1,8 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const chalk = require('chalk');
 const { runCommand } = require('../lib/utils');
-const logger = require('../lib/logger');
+const logError = require('../lib/logger').error;
+const logInfo = require('../lib/logger').info;
 const createTestEnvFile = require('../lib/createTestEnvFile').default;
 
 /**
@@ -15,9 +17,7 @@ module.exports = function run(program) {
     .action(envArg => {
       return createTestEnvFile(envArg)
         .then(() => {
-          logger.info(
-            `Starting test run for environment: ${chalk.cyan(envArg)}`
-          );
+          logInfo(`Starting test run for environment: ${chalk.cyan(envArg)}`);
           const defaultArgs = ['cypress', 'run'];
           return runCommand({
             command: 'npx',
@@ -28,7 +28,7 @@ module.exports = function run(program) {
         })
         .then(() => process.exit(0))
         .catch(err => {
-          logger.error(`Run could not be completed:\n${err.message}`);
+          logError(`Run could not be completed:\n${err.message}`);
           process.exit(1);
           return Promise.reject(err);
         });
