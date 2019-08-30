@@ -17,7 +17,7 @@ import * as logger from './logger';
  * @param {functions.Context} context - Functions context
  * @return {Promise}
  */
-export default function createTestEnvFile(envName) {
+export default function createTestEnvFile(envName: string): Promise<string> {
   const envPrefix = getEnvPrefix(envName);
   // Get UID from environment (falls back to cypress/config.json for local)
   const uid = envVarBasedOnCIEnv('TEST_UID', envName);
@@ -67,7 +67,7 @@ export default function createTestEnvFile(envName) {
   // Remove firebase- prefix (was added to database names for a short period of time)
   const cleanedProjectId = FIREBASE_PROJECT_ID.replace('firebase-', '');
 
-  const admin = require('firebase-admin'); // eslint-disable-line global-require
+  const admin = require('firebase-admin'); // eslint-disable-line @typescript-eslint/no-var-requires, global-require
 
   // Initialize Firebase app with service account
   const appFromSA = admin.initializeApp(
@@ -88,7 +88,7 @@ export default function createTestEnvFile(envName) {
   return appFromSA
     .auth()
     .createCustomToken(uid, defaultDeveloperClaims)
-    .then(customToken => {
+    .then((customToken: string) => {
       logger.success(
         `Custom token generated successfully, writing to ${chalk.cyan(
           DEFAULT_TEST_ENV_FILE_NAME,
@@ -130,7 +130,7 @@ export default function createTestEnvFile(envName) {
       );
       return customToken;
     })
-    .catch(err => {
+    .catch((err: Error) => {
       logger.error(
         `Custom token could not be generated for uid: ${chalk.cyan(uid)}`,
         err.message || err,

@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/camelcase */
 import { isString, drop, compact, isArray, get, dropRight } from 'lodash';
 import path from 'path';
 import chalk from 'chalk';
 import fs from 'fs';
 import stream from 'stream';
+import { spawn } from 'child_process';
 import { TEST_CONFIG_FILE_PATH, TEST_ENV_FILE_PATH } from './filePaths';
 import {
   DEFAULT_BASE_PATH,
@@ -12,13 +14,11 @@ import {
 } from './constants';
 import { info, error, warn } from './logger';
 
-const { spawn } = require('child_process');
-
 /**
  * Get settings from firebaserc file
  * @return {Object} Firebase settings object
  */
-export function readJsonFile(filePath) {
+export function readJsonFile(filePath: string): any {
   if (!fs.existsSync(filePath)) {
     return {};
   }
@@ -35,7 +35,7 @@ export function readJsonFile(filePath) {
   }
 }
 
-function getEnvironmentSlug() {
+function getEnvironmentSlug(): string {
   return (
     process.env.CI_ENVIRONMENT_SLUG || process.env.CI_COMMIT_REF_SLUG || 'stage'
   );
@@ -46,15 +46,15 @@ function getEnvironmentSlug() {
  * within CI. Falls back to staging (i.e. STAGE)
  * @return {String} Environment prefix string
  */
-export function getEnvPrefix(envName) {
+export function getEnvPrefix(envName?: string): string {
   const envSlug = envName || getEnvironmentSlug();
   return `${envSlug.toUpperCase()}_`;
 }
 
-function getServiceAccountPath(envName = '') {
+function getServiceAccountPath(envName?: string): string {
   const withPrefix = path.join(
     DEFAULT_BASE_PATH,
-    `serviceAccount-${envName}.json`,
+    `serviceAccount-${envName || ''}.json`,
   );
   if (fs.existsSync(withPrefix)) {
     return withPrefix;
@@ -67,7 +67,7 @@ function getServiceAccountPath(envName = '') {
  * default folder path ('cypress')
  * @return {String} Path of folder containing cypress folders like "integration"
  */
-export function getCypressFolderPath() {
+export function getCypressFolderPath(): string {
   const cypressConfig = readJsonFile(TEST_CONFIG_FILE_PATH); // eslint-disable-line no-use-before-define
   const integrationTestsFolderPath = get(cypressConfig, 'integrationFolder');
   return integrationTestsFolderPath
@@ -75,7 +75,7 @@ export function getCypressFolderPath() {
     : DEFAULT_TEST_FOLDER_PATH;
 }
 
-export function getCypressConfigPath() {
+export function getCypressConfigPath(): string {
   const cypressFolderPath = getCypressFolderPath();
   const cypressConfigFilePath = path.join(
     cypressFolderPath,
@@ -92,7 +92,7 @@ export function getCypressConfigPath() {
  * envVarBasedOnCIEnv('FIREBASE_PROJECT_ID')
  * // => 'fireadmin-stage' (value of 'STAGE_FIREBASE_PROJECT_ID' environment var)
  */
-export function envVarBasedOnCIEnv(varNameRoot, envName) {
+export function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any {
   const prefix = getEnvPrefix(envName);
   const combined = `${prefix}${varNameRoot}`;
   const localConfigFilePath = getCypressConfigPath();
@@ -122,7 +122,7 @@ export function envVarBasedOnCIEnv(varNameRoot, envName) {
  * getParsedEnvVar('FIREBASE_PRIVATE_KEY_ID')
  * // => 'fireadmin-stage' (parsed value of 'STAGE_FIREBASE_PRIVATE_KEY_ID' environment var)
  */
-function getParsedEnvVar(varNameRoot) {
+function getParsedEnvVar(varNameRoot: string): any {
   const val = envVarBasedOnCIEnv(varNameRoot);
   const prefix = getEnvPrefix();
   const combinedVar = `${prefix}${varNameRoot}`;
@@ -144,11 +144,24 @@ function getParsedEnvVar(varNameRoot) {
   }
 }
 
+interface ServiceAccount {
+  type: string;
+  project_id: string;
+  private_key_id: string;
+  private_key: string;
+  client_email: string;
+  client_id: string;
+  auth_uri: string;
+  token_uri: string;
+  auth_provider_x509_cert_url: string;
+  client_x509_cert_url: string;
+}
+
 /**
  * Get service account from either local file or environment variables
  * @return {Object} Service account object
  */
-export function getServiceAccount(envSlug) {
+export function getServiceAccount(envSlug: string): ServiceAccount {
   const serviceAccountPath = getServiceAccountPath(envSlug);
   // Check for local service account file (Local dev)
   if (fs.existsSync(serviceAccountPath)) {
@@ -201,10 +214,10 @@ export function getServiceAccount(envSlug) {
  * @return {firestore.CollectionReference|firestore.DocumentReference}
  */
 export function slashPathToFirestoreRef(
-  firestoreInstance,
-  slashPath,
-  options = {},
-) {
+  firestoreInstance: any,
+  slashPath: string,
+  options?: any,
+): any {
   let ref = firestoreInstance;
   const srcPathArr = slashPath.split('/');
   srcPathArr.forEach(pathSegment => {
@@ -218,7 +231,7 @@ export function slashPathToFirestoreRef(
   });
 
   // Apply limit to query if it exists
-  if (options.limit && typeof ref.limit === 'function') {
+  if (options && options.limit && typeof ref.limit === 'function') {
     ref = ref.limit(options.limit);
   }
 
@@ -232,7 +245,7 @@ export function slashPathToFirestoreRef(
  * @param  {Array} args - Command arguments to convert into a string
  * @return {String} Arguments section of command string
  */
-export function getArgsString(args) {
+export function getArgsString(args: string[] | any): string {
   return args && args.length ? ` ${args.join(' ')}` : '';
 }
 
@@ -244,7 +257,11 @@ export function getArgsString(args) {
  * @param {Boolean} [opts.disableYes=false] - Whether or not to disable the
  * yes argument
  */
-export function addDefaultArgs(Cypress, args, opts = {}) {
+export function addDefaultArgs(
+  Cypress: any,
+  args: string[],
+  opts?: any,
+): string[] {
   const { disableYes = false, token } = opts;
   const newArgs = [...args];
   // TODO: Load this in a way that understands environment. Currently this will
@@ -272,15 +289,24 @@ export function addDefaultArgs(Cypress, args, opts = {}) {
   return newArgs;
 }
 
-process.env.FORCE_COLOR = true;
+(process as any).env.FORCE_COLOR = true;
 
 /**
  * Check to see if the provided value is a promise object
  * @param  {Any}  valToCheck - Value to be checked for Promise qualities
  * @return {Boolean} Whether or not provided value is a promise
  */
-export function isPromise(valToCheck) {
+export function isPromise(valToCheck: any): boolean {
   return valToCheck && typeof valToCheck.then === 'function';
+}
+
+export interface RunCommandOptions {
+  beforeMsg: string;
+  successMsg: string;
+  command: string;
+  errorMsg: string;
+  args: string[];
+  pipeOutput?: boolean;
 }
 
 /**
@@ -289,32 +315,33 @@ export function isPromise(valToCheck) {
  * @param {String} command - Command to be executed
  * @private
  */
-export function runCommand({
-  beforeMsg,
-  successMsg,
-  command,
-  errorMsg,
-  args,
-  pipeOutput = true,
-}) {
+export function runCommand(runOptions: RunCommandOptions): Promise<any> {
+  const {
+    beforeMsg,
+    successMsg,
+    command,
+    errorMsg,
+    args,
+    pipeOutput = true,
+  } = runOptions;
   if (beforeMsg) info(beforeMsg);
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve, reject): void => {
     const child = spawn(
       isArray(command) ? command[0] : command.split(' ')[0],
       args || compact(drop(command.split(' '))),
     );
-    let output;
-    let error;
+    let output: any;
+    let error: any;
     const customStream = new stream.Writable();
     const customErrorStream = new stream.Writable();
     /* eslint-disable no-underscore-dangle */
-    customStream._write = (data, ...argv) => {
+    customStream._write = (data, ...argv): void => {
       output += data;
       if (pipeOutput) {
         process.stdout._write(data, ...argv);
       }
     };
-    customErrorStream._write = (data, ...argv) => {
+    customErrorStream._write = (data, ...argv): void => {
       error += data;
       if (pipeOutput) {
         process.stderr._write(data, ...argv);
@@ -325,7 +352,7 @@ export function runCommand({
     child.stdout.pipe(customStream);
     child.stderr.pipe(customErrorStream);
     // When child exits resolve or reject based on code
-    child.on('exit', code => {
+    child.on('exit', (code: number): void => {
       if (code !== 0) {
         // Resolve for npm warnings
         if (output && output.indexOf('npm WARN') !== -1) {
@@ -355,8 +382,8 @@ export function runCommand({
  * @param  {Array} a - List of arguments to escape
  * @return {String} Command string with arguments escaped
  */
-export function shellescape(a) {
-  const ret = [];
+export function shellescape(a: string[]): string {
+  const ret: string[] = [];
 
   a.forEach(s => {
     if (/[^A-Za-z0-9_/:=-]/.test(s)) {

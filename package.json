@@ -1,18 +1,19 @@
 {
   "name": "cypress-firebase",
-  "version": "0.2.4",
+  "version": "0.3.0-alpha",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
   "jsnext:main": "es/index.js",
   "scripts": {
     "clean": "rimraf lib dist",
-    "build:commonjs": "cross-env BABEL_ENV=commonjs babel src --out-dir lib",
-    "build:es": "cross-env BABEL_ENV=es babel src --out-dir es",
-    "build": "npm run build:commonjs && npm run build:es",
+    "build": "npm run build:lib && npm run build:esm && npm run build:typefile",
+    "build:typefile": "tsc --declaration --outFile index.d.ts --emitDeclarationOnly",
+    "build:lib": "tsc",
+    "build:esm": "tsc && tsc -m es6 --outDir lib-esm",
     "watch": "npm run build:commonjs -- --watch",
     "watch:es": "npm run build:es -- --watch",
-    "lint": "eslint src",
+    "lint": "eslint src/**.ts --ext .ts",
     "lint:fix": "npm run lint -- --fix",
     "prepare": "npm run clean && npm run build",
     "prepush": "npm run lint"
@@ -32,15 +33,13 @@
     "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "@babel/cli": "^7.5.5",
-    "@babel/core": "^7.5.5",
-    "@babel/plugin-transform-modules-commonjs": "^7.5.0",
-    "@babel/preset-env": "^7.5.5",
-    "babel-eslint": "^10.0.1",
-    "babel-plugin-lodash": "^3.3.4",
+    "@types/lodash": "^4.14.138",
+    "@typescript-eslint/eslint-plugin": "^2.0.0",
+    "@typescript-eslint/parser": "^2.0.0",
     "cross-env": "^5.2.0",
     "eslint": "^6.1.0",
     "eslint-config-airbnb": "^18.0.1",
+    "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.1.0",
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-import": "^2.18.2",
@@ -51,7 +50,8 @@
     "firebase-tools": "^7.2.4",
     "husky": "^3.0.4",
     "prettier": "^1.18.2",
-    "rimraf": "^3.0.0"
+    "rimraf": "^3.0.0",
+    "typescript": "^3.6.2"
   },
   "keywords": [
     "cypress",
