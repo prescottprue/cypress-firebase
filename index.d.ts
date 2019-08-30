@@ -57,7 +57,7 @@ declare module "utils" {
         args: string[];
         pipeOutput?: boolean;
     }
-    export function runCommand(runOptions: RunCommandOptions): Promise<unknown>;
+    export function runCommand(runOptions: RunCommandOptions): Promise<any>;
     export function shellescape(a: string[]): string;
 }
 declare module "buildFirestoreCommand" {
@@ -102,8 +102,8 @@ declare module "extendWithFirebaseConfig" {
         env?: CypressEnvironmentOptions;
         [k: string]: any;
     }
-    export function getFirebaseProjectIdFromConfig(config: CypressConfig): any;
-    export default function extendWithFirebaseConfig(cypressConfig: CypressConfig, settings?: {}): CypressConfig;
+    export function getFirebaseProjectIdFromConfig(config: CypressConfig): string;
+    export default function extendWithFirebaseConfig(cypressConfig: CypressConfig, settings?: {}): any;
 }
 declare module "index" {
     import attachCustomCommands from "attachCustomCommands";

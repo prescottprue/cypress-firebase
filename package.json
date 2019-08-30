@@ -5,8 +5,9 @@
   "main": "lib/index.js",
   "module": "lib/index.js",
   "jsnext:main": "es/index.js",
+  "types": "index.d.ts",
   "scripts": {
-    "clean": "rimraf lib dist",
+    "clean": "rimraf lib lib-esm",
     "build": "npm run build:lib && npm run build:esm && npm run build:typefile",
     "build:typefile": "tsc --declaration --outFile index.d.ts --emitDeclarationOnly",
     "build:lib": "tsc",
@@ -45,8 +46,6 @@
     "eslint-plugin-import": "^2.18.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.0",
-    "eslint-plugin-react": "^7.14.3",
-    "eslint-plugin-react-hooks": "^1.7.0",
     "firebase-tools": "^7.2.4",
     "husky": "^3.0.4",
     "prettier": "^1.18.2",
@@ -75,6 +74,7 @@
     "bin",
     "cmds",
     "lib",
-    "es"
+    "es",
+    "index.d.ts"
   ]
 }
