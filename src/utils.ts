@@ -289,7 +289,7 @@ export function addDefaultArgs(
   return newArgs;
 }
 
-(process as any).env.FORCE_COLOR = true;
+process.env.FORCE_COLOR = 'true';
 
 /**
  * Check to see if the provided value is a promise object
