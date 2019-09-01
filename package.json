@@ -5,7 +5,7 @@
   "main": "lib/index.js",
   "module": "lib/index.js",
   "jsnext:main": "lib/index.js",
-  "types": "index.d.ts",
+  "types": "./index.d.ts",
   "scripts": {
     "clean": "rimraf lib lib-esm",
     "build": "npm run build:lib && npm run build:esm && npm run build:typefile",

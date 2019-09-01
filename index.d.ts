@@ -82,10 +82,20 @@ declare module "buildRtdbCommand" {
     export default function buildRtdbCommand(Cypress: any, action: RTDBAction, actionPath: string, fixturePath: RTDBCommandOptions | string, opts?: RTDBCommandOptions): string;
 }
 declare module "attachCustomCommands" {
-    interface AttachCustomCommandParams {
+    export interface AttachCustomCommandParams {
         Cypress: any;
         cy: any;
         firebase: any;
+    }
+    global {
+        namespace Cypress {
+            interface Chainable {
+                login: () => Chainable;
+                logout: () => Chainable;
+                callRtdb: (action: string, actionPath: string, data?: any, opts?: any) => Chainable;
+                callFirestore: (action: string, actionPath: string, data?: any, opts?: any) => Chainable;
+            }
+        }
     }
     export default function attachCustomCommands(commandParams: AttachCustomCommandParams): void;
 }

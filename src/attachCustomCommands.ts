@@ -8,10 +8,110 @@ import buildRtdbCommand, {
   RTDBCommandOptions,
 } from './buildRtdbCommand';
 
-interface AttachCustomCommandParams {
+export interface AttachCustomCommandParams {
   Cypress: any;
   cy: any;
   firebase: any;
+}
+
+// Add custom commands to the existing Cypress interface
+declare global {
+  /* eslint-disable @typescript-eslint/no-namespace */
+  namespace Cypress {
+    /* eslint-enable @typescript-eslint/no-namespace */
+    interface Chainable {
+      /**
+       * Login to Firebase auth using FIREBASE_AUTH_JWT environment variable
+       * which is generated using firebase-admin authenticated with serviceAccount
+       * during test:buildConfig phase.
+       * @example cy.login()
+       * @type {Cypress.Command}
+       * @name cy.login
+       */
+      login: () => Chainable;
+
+      /**
+       * Log out of Firebase instance
+       * @memberOf Cypress.Chainable#
+       * @type {Cypress.Command}
+       * @name cy.logout
+       * @example
+       * cy.logout()
+       */
+      logout: () => Chainable;
+
+      /**
+       * Call Real Time Database path with some specified action. Authentication is through
+       * FIREBASE_TOKEN since firebase-tools is used (instead of firebaseExtra).
+       * @param {String} action - The action type to call with (set, push, update, remove)
+       * @param {String} actionPath - Path within RTDB that action should be applied
+       * @param {Object} opts - Options
+       * @param {Array} opts.args - Command line args to be passed
+       * @name cy.callRtdb
+       * @type {Cypress.Command}
+       * @example <caption>Set Data</caption>
+       * const fakeProject = { some: 'data' }
+       * cy.callRtdb('set', 'projects/ABC123', fakeProject)
+       * @example <caption>Set Data With Meta</caption>
+       * const fakeProject = { some: 'data' }
+       * // Adds createdAt and createdBy (current user's uid) on data
+       * cy.callRtdb('set', 'projects/ABC123', fakeProject, { withMeta: true })
+       * @example <caption>Get/Verify Data</caption>
+       * cy.callRtdb('get', 'projects/ABC123')
+       *   .then((project) => {
+       *     // Confirm new data has users uid
+       *     cy.wrap(project)
+       *       .its('createdBy')
+       *       .should('equal', Cypress.env('TEST_UID'))
+       *   })
+       * @example <caption>Other Args</caption>
+       * const opts = { args: ['-d'] }
+       * const fakeProject = { some: 'data' }
+       * cy.callRtdb('update', 'project/test-project', fakeProject, opts)
+       */
+      callRtdb: (
+        action: string,
+        actionPath: string,
+        data?: any,
+        opts?: any,
+      ) => Chainable;
+
+      /**
+       * Call Firestore instance with some specified action. Authentication is through
+       * serviceAccount.json since it is at the base
+       * level. If using delete, auth is through `FIREBASE_TOKEN` since
+       * firebase-tools is used (instead of firebaseExtra).
+       * @param {String} action - The action type to call with (set, push, update, remove)
+       * @param {String} actionPath - Path within RTDB that action should be applied
+       * @param {Object} opts - Options
+       * @param {Array} opts.args - Command line args to be passed
+       * @name cy.callFirestore
+       * @type {Cypress.Command}
+       * @example <caption>Basic</caption>
+       * cy.fixture('fakeProject.json').then((project) => {
+       *   cy.callFirestore('add', 'project/test-project', project)
+       * })
+       * @example <caption>Fixture Path</caption>
+       * cy.fixture('fakeProject.json').then((project) => {
+       *   cy.callFirestore('add', 'project/test-project', project)
+       * })
+       * @example <caption>Fixture Path</caption>
+       * cy.callFirestore('add', 'project/test-project', 'fakeProject.json')
+       * @example <caption>Recursive Delete</caption>
+       * const opts = { recursive: true }
+       * cy.callFirestore('delete', 'project/test-project', opts)
+       * @example <caption>Other Args</caption>
+       * const opts = { args: ['-r'] }
+       * cy.callFirestore('delete', 'project/test-project', opts)
+       */
+      callFirestore: (
+        action: string,
+        actionPath: string,
+        data?: any,
+        opts?: any,
+      ) => Chainable;
+    }
+  }
 }
 
 /**
@@ -42,7 +142,7 @@ export default function attachCustomCommands(
     } else if (firebase.auth().currentUser) {
       cy.log('Authed user already exists, login complete.');
     } else {
-      return new Promise((resolve: Function, reject: Function): any => {
+      return new Promise((resolve, reject): any => {
         firebase.auth().onAuthStateChanged((auth: any) => {
           if (auth) {
             resolve(auth);
@@ -88,7 +188,6 @@ export default function attachCustomCommands(
    * @param opts - Options
    * @param opts.args - Command line args to be passed
    * @name cy.callRtdb
-   * @type {Cypress.Command}
    * @example <caption>Set Data</caption>
    * const fakeProject = { some: 'data' }
    * cy.callRtdb('set', 'projects/ABC123', fakeProject)
@@ -164,12 +263,11 @@ export default function attachCustomCommands(
   /**
    * Call Firestore instance with some specified action. Authentication is through serviceAccount.json since it is at the base
    * level. If using delete, auth is through `FIREBASE_TOKEN` since firebase-tools is used (instead of firebaseExtra).
-   * @param {String} action - The action type to call with (set, push, update, remove)
-   * @param {String} actionPath - Path within RTDB that action should be applied
-   * @param {Object} opts - Options
-   * @param {Array} opts.args - Command line args to be passed
+   * @param action - The action type to call with (set, push, update, remove)
+   * @param actionPath - Path within RTDB that action should be applied
+   * @param opts - Options
+   * @param opts.args - Command line args to be passed
    * @name cy.callFirestore
-   * @type {Cypress.Command}
    * @example <caption>Basic</caption>
    * cy.fixture('fakeProject.json').then((project) => {
    *   cy.callFirestore('add', 'project/test-project', project)

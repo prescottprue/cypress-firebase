@@ -23,21 +23,23 @@
 //
 // -- This is will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
-import firebase from 'firebase/app';
-import 'firebase/auth';
-import 'firebase/database';
-import 'firebase/firestore';
-import attachCustomCommands from 'cypress-firebase/lib/attachCustomCommands';
+import attachCustomCommands from 'cypress-firebase/lib/attachCustomCommands'
+import * as firebase from 'firebase/app'
+import 'firebase/auth'
+import 'firebase/database'
+import 'firebase/firestore'
 
 const fbConfig = {
-  apiKey: "AIzaSyCTUERDM-Pchn_UDTsfhVPiwM4TtNIxots",
-  authDomain: "redux-firebasev3.firebaseapp.com",
-  databaseURL: "https://redux-firebasev3.firebaseio.com",
-  projectId: "redux-firebasev3",
-  storageBucket: "redux-firebasev3.appspot.com",
-  messagingSenderId: "823357791673"
+  apiKey: 'AIzaSyCTUERDM-Pchn_UDTsfhVPiwM4TtNIxots',
+  authDomain: 'redux-firebasev3.firebaseapp.com',
+  databaseURL: 'https://redux-firebasev3.firebaseio.com',
+  messagingSenderId: '823357791673',
+  projectId: 'redux-firebasev3',
+  storageBucket: 'redux-firebasev3.appspot.com',
 }
 
-window.fbInstance = firebase.initializeApp(fbConfig);
+cy.window().then((win) => {
+  return (win as any).fbInstance = firebase.initializeApp(fbConfig)
+})
 
 attachCustomCommands({ Cypress, cy, firebase })
