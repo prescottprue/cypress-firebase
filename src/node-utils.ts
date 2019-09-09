@@ -2,6 +2,8 @@
 import { get } from 'lodash';
 import path from 'path';
 import chalk from 'chalk';
+import stream from 'stream';
+import { spawn } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
 import { TEST_CONFIG_FILE_PATH, TEST_ENV_FILE_PATH } from './filePaths';
 import {
@@ -10,7 +12,7 @@ import {
 } from './constants';
 import { info, error, warn } from './logger';
 
-export const DEFAULT_BASE_PATH = process.cwd();
+const DEFAULT_BASE_PATH = process.cwd();
 
 /**
  * Get settings from firebaserc file
@@ -50,12 +52,12 @@ export function getEnvPrefix(envName?: string): string {
 }
 
 function getServiceAccountPath(envName?: string): string {
-  const withPrefix = path.join(
+  const withSuffix = path.join(
     DEFAULT_BASE_PATH,
     `serviceAccount-${envName || ''}.json`,
   );
-  if (existsSync(withPrefix)) {
-    return withPrefix;
+  if (existsSync(withSuffix)) {
+    return withSuffix;
   }
   return path.join(DEFAULT_BASE_PATH, 'serviceAccount.json');
 }
@@ -108,7 +110,7 @@ export function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any {
     return configObj[combined] || configObj[varNameRoot];
   }
 
-  // Config file used for environment (local, containers) from main test path (cypress.env.json)
+  // Config file used for environment from main cypress environment file (cypress.env.json)
   if (existsSync(TEST_ENV_FILE_PATH)) {
     const configObj = readJsonFile(TEST_ENV_FILE_PATH);
     return configObj[combined] || configObj[varNameRoot];
@@ -209,6 +211,79 @@ export function getServiceAccount(envSlug: string): ServiceAccount {
     auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
     client_x509_cert_url: envVarBasedOnCIEnv('FIREBASE_CERT_URL'),
   };
+}
+
+export interface RunCommandOptions {
+  command: string;
+  args: string[];
+  beforeMsg?: string;
+  successMsg?: string;
+  errorMsg?: string;
+  pipeOutput?: boolean;
+}
+
+/**
+ * Run a bash command using spawn pipeing the results to the main process
+ * @param command - Command to be executed
+ * @returns Resolves with results of running the command
+ * @private
+ */
+export function runCommand(runOptions: RunCommandOptions): Promise<any> {
+  const {
+    beforeMsg,
+    successMsg,
+    command,
+    errorMsg,
+    args,
+    pipeOutput = true,
+  } = runOptions;
+  if (beforeMsg) info(beforeMsg);
+  return new Promise((resolve, reject): void => {
+    const child = spawn(command, args);
+    let output: any;
+    let error: any;
+    const customStream = new stream.Writable();
+    const customErrorStream = new stream.Writable();
+    /* eslint-disable no-underscore-dangle */
+    customStream._write = (data, ...argv): void => {
+      output += data;
+      if (pipeOutput) {
+        process.stdout._write(data, ...argv);
+      }
+    };
+    customErrorStream._write = (data, ...argv): void => {
+      error += data;
+      if (pipeOutput) {
+        process.stderr._write(data, ...argv);
+      }
+    };
+    /* eslint-enable no-underscore-dangle */
+    // Pipe errors and console output to main process
+    child.stdout.pipe(customStream);
+    child.stderr.pipe(customErrorStream);
+    // When child exits resolve or reject based on code
+    child.on('exit', (code: number): void => {
+      if (code !== 0) {
+        // Resolve for npm warnings
+        if (output && output.indexOf('npm WARN') !== -1) {
+          return resolve(successMsg || output);
+        }
+        if (errorMsg) {
+          console.log(errorMsg); // eslint-disable-line no-console
+        }
+        reject(error || output);
+      } else {
+        // resolve(null, stdout)
+        if (successMsg) info(successMsg);
+        // Remove leading undefined from response
+        if (output && output.indexOf('undefined') === 0) {
+          resolve(successMsg || output.replace('undefined', ''));
+        } else {
+          resolve(successMsg || output);
+        }
+      }
+    });
+  });
 }
 
 process.env.FORCE_COLOR = 'true';

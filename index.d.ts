@@ -78,7 +78,6 @@ declare module "logger" {
     export function error(message: string, other?: any): void;
 }
 declare module "node-utils" {
-    export const DEFAULT_BASE_PATH: string;
     export function readJsonFile(filePath: string): any;
     export function getEnvPrefix(envName?: string): string;
     export function getCypressFolderPath(): string;
@@ -97,6 +96,15 @@ declare module "node-utils" {
         client_x509_cert_url: string;
     }
     export function getServiceAccount(envSlug: string): ServiceAccount;
+    export interface RunCommandOptions {
+        command: string;
+        args: string[];
+        beforeMsg?: string;
+        successMsg?: string;
+        errorMsg?: string;
+        pipeOutput?: boolean;
+    }
+    export function runCommand(runOptions: RunCommandOptions): Promise<any>;
 }
 declare module "createTestEnvFile" {
     export default function createTestEnvFile(envName: string): Promise<string>;

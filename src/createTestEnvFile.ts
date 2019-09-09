@@ -28,10 +28,12 @@ export default async function createTestEnvFile(
   // Throw if UID is missing in environment
   if (!uid) {
     const errMsg = `${chalk.cyan(
-      varName,
+      'TEST_UID',
     )} is missing from environment. Confirm that ${chalk.cyan(
-      getCypressConfigPath(),
-    )} contains either ${chalk.cyan(varName)} or ${chalk.cyan('TEST_UID')}.`;
+      TEST_ENV_FILE_PATH,
+    )} or ${chalk.cyan(getCypressConfigPath())} contains either ${chalk.cyan(
+      varName,
+    )} or ${chalk.cyan('TEST_UID')}.`;
     return Promise.reject(new Error(errMsg));
   }
 

@@ -3,7 +3,6 @@
  * run commander component
  * To use add require('../cmds/run.js')(program) to your commander.js based node executable before program.parse
  */
-
 const chalk = require('chalk');
 const { runCommand } = require('../lib/node-utils');
 const logger = require('../lib/logger');

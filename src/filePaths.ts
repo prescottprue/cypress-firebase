@@ -1,5 +1,4 @@
 import path from 'path';
-import { DEFAULT_BASE_PATH } from './node-utils';
 import {
   FIREBASE_CONFIG_FILE_NAME,
   DEFAULT_TEST_FOLDER_PATH,
@@ -9,19 +8,19 @@ import {
 } from './constants';
 
 export const FIREBASE_CONFIG_FILE_PATH = path.join(
-  DEFAULT_BASE_PATH,
+  process.cwd(),
   FIREBASE_CONFIG_FILE_NAME,
 );
 export const TEST_CONFIG_FILE_PATH = path.join(
-  DEFAULT_BASE_PATH,
+  process.cwd(),
   DEFAULT_TEST_CONFIG_FILE_NAME,
 );
 export const TEST_ENV_FILE_PATH = path.join(
-  DEFAULT_BASE_PATH,
+  process.cwd(),
   DEFAULT_TEST_ENV_FILE_NAME,
 );
 export const LOCAL_CONFIG_FILE_PATH = path.join(
-  DEFAULT_BASE_PATH,
+  process.cwd(),
   DEFAULT_TEST_FOLDER_PATH,
   DEFAULT_CONFIG_FILE_NAME,
 );
