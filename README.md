@@ -25,7 +25,7 @@ If you are intereted in what drove the need for this checkout [the why section](
 **Note**: Skip cypress install if it already exists within your project
 
 1. Log into your Firebase console for the first time.
-1. Go to Auth tab of Firebase and create a user for testing porpuse
+1. Go to Auth tab of Firebase and create a user for testing purpose
 1. Get the UID of created account. This will be the account which you use to login while running tests (we will call this UID `TEST_UID`)
 1. Go to project setting on firebase console and generate new private key. See how to do [here](https://sites.google.com/site/scriptsexamples/new-connectors-to-google-services/firebase/tutorials/authenticate-with-a-service-account)
 1. Save the downloaded file as `serviceAccount.json` in the root of your project (for local dev)
