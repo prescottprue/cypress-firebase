@@ -9,7 +9,7 @@ describe('Typescript', () => {
       age: 21,
       name: 'Joe',
     }
-    cy.callFirestore('set', 'asdf', { some: 'data' })
+    expect(object).to.have.all.keys('name', 'age')
   })
 
   it('uses cy commands', () => {
@@ -29,96 +29,4 @@ describe('Typescript', () => {
     expect(Cypress.version).to.be.a('string')
   })
 
-})
-
-describe('Cypress Firebase', () => {
-  describe('custom commands', () => {
-    describe('cy.callFirestore', () => {
-      it('is attached to cypress custom commands', () => {
-        expect(cy.callFirestore).to.be.a('function')
-      })
-
-      describe('get action', () => {
-        it('gets data from Firestore', () => {
-          cy.callFirestore('get', 'projects/test-project').then((project) => {
-            expect(project).to.be.an('object')
-          })
-        })
-      })
-
-      describe('set action', () => {
-        it('writes data to Firestore', () => {
-          cy.callFirestore('set', 'projects/test-project').then((project) => {
-            expect(project).to.be.an('object')
-          })
-        })
-
-        it('supports merging', () => {
-          cy.callFirestore('set', 'projects/test-project').then((project) => {
-            expect(project).to.be.an('object')
-          })
-        })
-      })
-
-      describe('update action', () => {
-        it('writes data to Firestore', () => {
-          cy.callFirestore('update', 'projects/test-project').then((project) => {
-            expect(project).to.be.an('object')
-          })
-        })
-      })
-
-      describe('delete action', () => {
-        it('writes data to Firestore', () => {
-          cy.callFirestore('update', 'projects/test-project').then((project) => {
-            expect(project).to.be.an('object')
-          })
-        })
-      })
-    })
-
-    describe('cy.callFirestore', () => {
-      it('is attached to cypress custom commands', () => {
-        expect(cy.callFirestore).to.be.a('function')
-      })
-
-      describe('get action', () => {
-        it('gets data from Firestore', () => {
-          cy.callFirestore('get', 'projects/test-project').then((project) => {
-            expect(project).to.be.an('object')
-          })
-        })
-      })
-
-      describe('set action', () => {
-        it('writes data to Firestore', () => {
-          cy.callFirestore('set', 'projects/test-project').then((project) => {
-            expect(project).to.be.an('object')
-          })
-        })
-
-        it('supports merging', () => {
-          cy.callFirestore('set', 'projects/test-project').then((project) => {
-            expect(project).to.be.an('object')
-          })
-        })
-      })
-
-      describe('update action', () => {
-        it('writes data to Firestore', () => {
-          cy.callFirestore('update', 'projects/test-project').then((project) => {
-            expect(project).to.be.an('object')
-          })
-        })
-      })
-
-      describe('delete action', () => {
-        it('writes data to Firestore', () => {
-          cy.callFirestore('update', 'projects/test-project').then((project) => {
-            expect(project).to.be.an('object')
-          })
-        })
-      })
-    })
-  })
 })

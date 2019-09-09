@@ -1,11 +1,12 @@
 const fs = require('fs')
 const cypressTypeScriptPreprocessor = require('./cy-ts-preprocessor')
+const cypressFirebasePlugin = require('cypress-firebase').plugin
 
-module.exports = on => {
+module.exports = (on, config) => {
   on('file:preprocessor', (file) => {
-    console.log(`preprocessor invoked with ${JSON.stringify(file)}`);
+    // console.log(`preprocessor invoked with ${JSON.stringify(file)}`); // uncomment for debugging webpack crashes
     return cypressTypeScriptPreprocessor(file).then((results) => {
-      console.log(`preprocessor returned ${JSON.stringify(results)}`);
+      // console.log(`preprocessor returned ${JSON.stringify(results)}`); // uncomment for debugging webpack crashes
 
       if (!fs.existsSync(file.outputPath)) {
         console.error(`Output file does not exist on the filesystem: ${JSON.stringify(file)}`);
@@ -17,4 +18,6 @@ module.exports = on => {
       throw err;
     });
   })
+
+  return cypressFirebasePlugin(config)
 }
