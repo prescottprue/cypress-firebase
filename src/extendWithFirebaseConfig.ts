@@ -1,37 +1,52 @@
 import { get } from 'lodash';
-import fs from 'fs';
+import { existsSync, readFileSync } from 'fs';
+import * as logger from './logger';
 
-/**
- * Load .firebaserc file
- */
-function loadFirebaseRc(): string {
-  const rcFilePath = `${process.cwd()}/.firebaserc`;
-  if (!fs.existsSync(rcFilePath)) {
-    throw new Error('.firebaserc file not found');
-  }
-  try {
-    const fileStr = fs.readFileSync(rcFilePath);
-    return JSON.parse(fileStr.toString());
-  } catch (err) {
-    console.log('Error loading .firebaserc: ', err); // eslint-disable-line no-console
-    throw err;
-  }
-}
-
-interface CypressEnvironmentOptions {
+export interface CypressEnvironmentOptions {
   envName?: string;
   firebaseProjectId?: string;
   [k: string]: any;
 }
 
-interface CypressConfig {
+export interface CypressConfig {
   env?: CypressEnvironmentOptions;
+  baseUrl: string;
   [k: string]: any;
+}
+
+export interface ExtendedCypressConfig {
+  [k: string]: any;
+  FIREBASE_PROJECT_ID?: string;
+  baseUrl: string;
+}
+
+export interface ExtendWithFirebaseConfigSettings {
+  localBaseUrl?: string;
+  localHostPort?: string | number;
+}
+
+/**
+ * Load .firebaserc file
+ * @returns Contents of .firebaserc file parsed as JSON
+ */
+function loadFirebaseRc(): string {
+  const rcFilePath = `${process.cwd()}/.firebaserc`;
+  if (!existsSync(rcFilePath)) {
+    throw new Error('.firebaserc file not found');
+  }
+  try {
+    const fileBuffer = readFileSync(rcFilePath);
+    return JSON.parse(fileBuffer.toString());
+  } catch (err) {
+    logger.error('Error loading .firebaserc: ', err); // eslint-disable-line no-console
+    throw err;
+  }
 }
 
 /**
  * Get environment name from cypress config or default to "local"
- * @param {Object} cypressConfig - Cypress config object
+ * @param cypressConfig - Cypress config object
+ * @returns Environment name from config
  */
 function getEnvNameFromConfig(cypressConfig: CypressConfig): string {
   if (!cypressConfig.env || !cypressConfig.env.envName) {
@@ -43,7 +58,8 @@ function getEnvNameFromConfig(cypressConfig: CypressConfig): string {
 /**
  * Get Firebase project id using Cypress config and config
  * loaded from .firebaserc
- * @param {Object} config - Cypress config object
+ * @param config - Cypress config object
+ * @returns Id of firbase project
  */
 export function getFirebaseProjectIdFromConfig(config: CypressConfig): string {
   const projectIdFromConfig = get(config, 'env.firebaseProjectId');
@@ -60,13 +76,14 @@ export function getFirebaseProjectIdFromConfig(config: CypressConfig): string {
 
 /**
  * Load config for Cypress from .firebaserc.
- * @param {Object} cypressConfig - Existing Cypress config
- * @param {Object} settings - Settings
+ * @param cypressConfig - Existing Cypress config
+ * @param settings - Settings
+ * @returns Cypress config extended with FIREBASE_PROJECT_ID and baseUrl
  */
 export default function extendWithFirebaseConfig(
   cypressConfig: CypressConfig,
-  settings = {},
-): any {
+  settings: ExtendWithFirebaseConfigSettings = {},
+): ExtendedCypressConfig {
   // Return original config if baseUrl is already set (so it is not runover)
   if (cypressConfig.baseUrl) {
     return cypressConfig;

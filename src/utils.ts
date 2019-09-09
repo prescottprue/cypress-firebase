@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { isString, drop, compact, isArray, get, dropRight } from 'lodash';
+import { get } from 'lodash';
 import path from 'path';
 import chalk from 'chalk';
-import fs from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import stream from 'stream';
 import { spawn } from 'child_process';
 import { TEST_CONFIG_FILE_PATH, TEST_ENV_FILE_PATH } from './filePaths';
@@ -16,15 +16,15 @@ import { info, error, warn } from './logger';
 
 /**
  * Get settings from firebaserc file
- * @return {Object} Firebase settings object
+ * @returns Firebase settings object
  */
 export function readJsonFile(filePath: string): any {
-  if (!fs.existsSync(filePath)) {
+  if (!existsSync(filePath)) {
     return {};
   }
 
   try {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    return JSON.parse(readFileSync(filePath, 'utf8'));
   } catch (err) {
     error(
       `Unable to parse ${chalk.cyan(
@@ -44,7 +44,7 @@ function getEnvironmentSlug(): string {
 /**
  * Get prefix for current environment based on environment vars available
  * within CI. Falls back to staging (i.e. STAGE)
- * @return {String} Environment prefix string
+ * @returns Environment prefix string
  */
 export function getEnvPrefix(envName?: string): string {
   const envSlug = envName || getEnvironmentSlug();
@@ -56,7 +56,7 @@ function getServiceAccountPath(envName?: string): string {
     DEFAULT_BASE_PATH,
     `serviceAccount-${envName || ''}.json`,
   );
-  if (fs.existsSync(withPrefix)) {
+  if (existsSync(withPrefix)) {
     return withPrefix;
   }
   return path.join(DEFAULT_BASE_PATH, 'serviceAccount.json');
@@ -65,16 +65,23 @@ function getServiceAccountPath(envName?: string): string {
 /**
  * Get cypress folder path from cypress.json config file or fallback to
  * default folder path ('cypress')
- * @return {String} Path of folder containing cypress folders like "integration"
+ * @returns Path of folder containing cypress folders like "integration"
  */
 export function getCypressFolderPath(): string {
   const cypressConfig = readJsonFile(TEST_CONFIG_FILE_PATH); // eslint-disable-line no-use-before-define
   const integrationTestsFolderPath = get(cypressConfig, 'integrationFolder');
   return integrationTestsFolderPath
-    ? dropRight(integrationTestsFolderPath.split('/')).join('/')
+    ? integrationTestsFolderPath
+        .split('/')
+        .slice(0, -1)
+        .join('/')
     : DEFAULT_TEST_FOLDER_PATH;
 }
 
+/**
+ * Get path to cypress config file
+ * @returns Path to cypress config file
+ */
 export function getCypressConfigPath(): string {
   const cypressFolderPath = getCypressFolderPath();
   const cypressConfigFilePath = path.join(
@@ -86,8 +93,8 @@ export function getCypressConfigPath(): string {
 
 /**
  * Get environment variable based on the current CI environment
- * @param  {String} varNameRoot - variable name without the environment prefix
- * @return {Any} Value of the environment variable
+ * @param varNameRoot - variable name without the environment prefix
+ * @returns Value of the environment variable
  * @example
  * envVarBasedOnCIEnv('FIREBASE_PROJECT_ID')
  * // => 'fireadmin-stage' (value of 'STAGE_FIREBASE_PROJECT_ID' environment var)
@@ -98,13 +105,13 @@ export function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any {
   const localConfigFilePath = getCypressConfigPath();
 
   // Config file used for environment (local, containers) from main test path ({integrationFolder}/config.json)
-  if (fs.existsSync(localConfigFilePath)) {
+  if (existsSync(localConfigFilePath)) {
     const configObj = readJsonFile(localConfigFilePath);
     return configObj[combined] || configObj[varNameRoot];
   }
 
   // Config file used for environment (local, containers) from main test path (cypress.env.json)
-  if (fs.existsSync(TEST_ENV_FILE_PATH)) {
+  if (existsSync(TEST_ENV_FILE_PATH)) {
     const configObj = readJsonFile(TEST_ENV_FILE_PATH);
     return configObj[combined] || configObj[varNameRoot];
   }
@@ -116,8 +123,8 @@ export function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any {
 /**
  * Get parsed value of environment variable. Useful for environment variables
  * which have characters that need to be escaped.
- * @param  {String} varNameRoot - variable name without the environment prefix
- * @return {Any} Value of the environment variable
+ * @param varNameRoot - variable name without the environment prefix
+ * @returns Value of the environment variable
  * @example
  * getParsedEnvVar('FIREBASE_PRIVATE_KEY_ID')
  * // => 'fireadmin-stage' (parsed value of 'STAGE_FIREBASE_PRIVATE_KEY_ID' environment var)
@@ -134,7 +141,7 @@ function getParsedEnvVar(varNameRoot: string): any {
     );
   }
   try {
-    if (isString(val)) {
+    if (typeof val === 'string') {
       return JSON.parse(val);
     }
     return val;
@@ -159,12 +166,12 @@ interface ServiceAccount {
 
 /**
  * Get service account from either local file or environment variables
- * @return {Object} Service account object
+ * @returns Service account object
  */
 export function getServiceAccount(envSlug: string): ServiceAccount {
   const serviceAccountPath = getServiceAccountPath(envSlug);
   // Check for local service account file (Local dev)
-  if (fs.existsSync(serviceAccountPath)) {
+  if (existsSync(serviceAccountPath)) {
     return readJsonFile(serviceAccountPath); // eslint-disable-line global-require, import/no-dynamic-require
   }
   info(
@@ -242,8 +249,8 @@ export function slashPathToFirestoreRef(
  * Create command arguments string from an array of arguments by joining them
  * with a space including a leading space. If no args provided, empty string
  * is returned
- * @param  {Array} args - Command arguments to convert into a string
- * @return {String} Arguments section of command string
+ * @param args - Command arguments to convert into a string
+ * @return Arguments section of command string
  */
 export function getArgsString(args: string[] | any): string {
   return args && args.length ? ` ${args.join(' ')}` : '';
@@ -251,11 +258,10 @@ export function getArgsString(args: string[] | any): string {
 
 /**
  * Add default Firebase arguments to arguments array.
- * @param {Array} args - arguments array
- * @param  {Object} [opts={}] - Options object
- * @param {String} opts.token - Firebase CI token to pass as the token argument
- * @param {Boolean} [opts.disableYes=false] - Whether or not to disable the
- * yes argument
+ * @param args - arguments array
+ * @param [opts={}] - Options object
+ * @param opts.token - Firebase CI token to pass as the token argument
+ * @param [opts.disableYes=false] - Whether or not to disable the yes argument
  */
 export function addDefaultArgs(
   Cypress: any,
@@ -293,26 +299,26 @@ process.env.FORCE_COLOR = 'true';
 
 /**
  * Check to see if the provided value is a promise object
- * @param  {Any}  valToCheck - Value to be checked for Promise qualities
- * @return {Boolean} Whether or not provided value is a promise
+ * @param valToCheck - Value to be checked for Promise qualities
+ * @returns Whether or not provided value is a promise
  */
 export function isPromise(valToCheck: any): boolean {
   return valToCheck && typeof valToCheck.then === 'function';
 }
 
 export interface RunCommandOptions {
-  beforeMsg: string;
-  successMsg: string;
   command: string;
-  errorMsg: string;
   args: string[];
+  beforeMsg?: string;
+  successMsg?: string;
+  errorMsg?: string;
   pipeOutput?: boolean;
 }
 
 /**
- * @description Run a bash command using spawn pipeing the results to the main
- * process
- * @param {String} command - Command to be executed
+ * Run a bash command using spawn pipeing the results to the main process
+ * @param command - Command to be executed
+ * @returns Resolves with results of running the command
  * @private
  */
 export function runCommand(runOptions: RunCommandOptions): Promise<any> {
@@ -326,10 +332,7 @@ export function runCommand(runOptions: RunCommandOptions): Promise<any> {
   } = runOptions;
   if (beforeMsg) info(beforeMsg);
   return new Promise((resolve, reject): void => {
-    const child = spawn(
-      isArray(command) ? command[0] : command.split(' ')[0],
-      args || compact(drop(command.split(' '))),
-    );
+    const child = spawn(command, args);
     let output: any;
     let error: any;
     const customStream = new stream.Writable();
@@ -379,8 +382,8 @@ export function runCommand(runOptions: RunCommandOptions): Promise<any> {
 
 /**
  * Escape shell command arguments and join them to a single string
- * @param  {Array} a - List of arguments to escape
- * @return {String} Command string with arguments escaped
+ * @param a - List of arguments to escape
+ * @returns Command string with arguments escaped
  */
 export function shellescape(a: string[]): string {
   const ret: string[] = [];

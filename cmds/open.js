@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /**
  * run commander component
  * To use add require('../cmds/run.js')(program) to your commander.js based node executable before program.parse
@@ -21,7 +22,8 @@ module.exports = function open(program) {
     .action(envArg => {
       const envName = typeof envArg === 'string' ? envArg : 'local';
       return runCommand({
-        command: `cypress-firebase createTestEnvFile ${envName}`
+        command: 'cypress-firebase',
+        args: ['createTestEnvFile', envName]
       })
         .then(() => {
           logger.info(

@@ -22,7 +22,7 @@ export interface RTDBCommandOptions {
  * it is used as options.
  * @param [opts={}] - Options object
  * @param opts.args - Extra arguments to be passed with command
- * @return Command string to be used with cy.exec
+ * @returns Command string to be used with cy.exec
  */
 export default function buildRtdbCommand(
   Cypress: any,

@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import fs from 'fs';
-import { pickBy, get, size, keys, isUndefined } from 'lodash';
+import { pickBy, get, isUndefined } from 'lodash';
 import {
   envVarBasedOnCIEnv,
   getServiceAccount,
@@ -13,9 +13,9 @@ import { FIREBASE_CONFIG_FILE_PATH, TEST_ENV_FILE_PATH } from './filePaths';
 import * as logger from './logger';
 
 /**
- * @param  {functions.Event} event - Function event
- * @param {functions.Context} context - Functions context
- * @return {Promise}
+ * Create test environment file
+ * @param envName - Environment name
+ * @returns Promise which resolves with the custom token generated for the file
  */
 export default function createTestEnvFile(envName: string): Promise<string> {
   const envPrefix = getEnvPrefix(envName);
@@ -39,6 +39,7 @@ export default function createTestEnvFile(envName: string): Promise<string> {
 
   const FIREBASE_PROJECT_ID =
     get(currentCypressEnvSettings, 'FIREBASE_PROJECT_ID') ||
+    envVarBasedOnCIEnv('FIREBASE_PROJECT_ID', envName) ||
     envVarBasedOnCIEnv(`${envPrefix}FIREBASE_PROJECT_ID`, envName) ||
     get(
       firebaserc,
@@ -57,8 +58,9 @@ export default function createTestEnvFile(envName: string): Promise<string> {
 
   // Confirm service account has all parameters
   const serviceAccountMissingParams = pickBy(serviceAccount, isUndefined);
-  if (size(serviceAccountMissingParams)) {
-    const errMsg = `Service Account is missing parameters: ${keys(
+
+  if (Object.keys(serviceAccountMissingParams).length > 0) {
+    const errMsg = `Service Account is missing parameters: ${Object.keys(
       serviceAccountMissingParams,
     ).join(', ')}`;
     return Promise.reject(new Error(errMsg));
@@ -82,7 +84,9 @@ export default function createTestEnvFile(envName: string): Promise<string> {
   const developerClaims = envVarBasedOnCIEnv('DEVELOPER_CLAIMS', envName);
   // Check if object is empty. If not, return it, otherwise set developer claims as { isTesting: true }
   const defaultDeveloperClaims =
-    keys(developerClaims).length > 0 ? developerClaims : { isTesting: true };
+    Object.keys(developerClaims).length > 0
+      ? developerClaims
+      : { isTesting: true };
 
   // Create auth token
   return appFromSA
