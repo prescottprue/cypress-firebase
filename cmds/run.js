@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const chalk = require('chalk');
-const { runCommand } = require('../lib/utils');
+const { runCommand } = require('../lib/node-utils');
 const logger = require('../lib/logger');
 const createTestEnvFile = require('../lib/createTestEnvFile').default;
 
@@ -13,17 +14,15 @@ module.exports = function run(program) {
     .command('run [envName]')
     .description('Build test configuration file then run cypress run command')
     .action(envArg => {
-      return createTestEnvFile(envArg)
+      const envName = typeof envArg === 'string' ? envArg : 'local';
+      return createTestEnvFile(envName)
         .then(() => {
           logger.info(
-            `Starting test run for environment: ${chalk.cyan(envArg)}`
+            `Starting test run for environment: ${chalk.cyan(envName)}`
           );
-          const defaultArgs = ['cypress', 'run'];
           return runCommand({
             command: 'npx',
-            args: envArg
-              ? defaultArgs.concat(['--env', `envName=${envArg}`])
-              : defaultArgs
+            args: ['cypress', 'run'].concat(['--env', `envName=${envName}`])
           });
         })
         .then(() => process.exit(0))

@@ -1,30 +1,30 @@
-import { isString, drop, compact, isArray, get, dropRight } from 'lodash';
+/* eslint-disable @typescript-eslint/camelcase */
+import { get } from 'lodash';
 import path from 'path';
 import chalk from 'chalk';
-import fs from 'fs';
 import stream from 'stream';
+import { spawn } from 'child_process';
+import { existsSync, readFileSync } from 'fs';
 import { TEST_CONFIG_FILE_PATH, TEST_ENV_FILE_PATH } from './filePaths';
 import {
-  DEFAULT_BASE_PATH,
   DEFAULT_TEST_FOLDER_PATH,
-  FIREBASE_TOOLS_YES_ARGUMENT,
   DEFAULT_CONFIG_FILE_NAME,
 } from './constants';
 import { info, error, warn } from './logger';
 
-const { spawn } = require('child_process');
+const DEFAULT_BASE_PATH = process.cwd();
 
 /**
  * Get settings from firebaserc file
- * @return {Object} Firebase settings object
+ * @returns Firebase settings object
  */
-export function readJsonFile(filePath) {
-  if (!fs.existsSync(filePath)) {
+export function readJsonFile(filePath: string): any {
+  if (!existsSync(filePath)) {
     return {};
   }
 
   try {
-    return JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    return JSON.parse(readFileSync(filePath, 'utf8'));
   } catch (err) {
     error(
       `Unable to parse ${chalk.cyan(
@@ -35,7 +35,7 @@ export function readJsonFile(filePath) {
   }
 }
 
-function getEnvironmentSlug() {
+function getEnvironmentSlug(): string {
   return (
     process.env.CI_ENVIRONMENT_SLUG || process.env.CI_COMMIT_REF_SLUG || 'stage'
   );
@@ -44,20 +44,20 @@ function getEnvironmentSlug() {
 /**
  * Get prefix for current environment based on environment vars available
  * within CI. Falls back to staging (i.e. STAGE)
- * @return {String} Environment prefix string
+ * @returns Environment prefix string
  */
-export function getEnvPrefix(envName) {
+export function getEnvPrefix(envName?: string): string {
   const envSlug = envName || getEnvironmentSlug();
   return `${envSlug.toUpperCase()}_`;
 }
 
-function getServiceAccountPath(envName = '') {
-  const withPrefix = path.join(
+function getServiceAccountPath(envName?: string): string {
+  const withSuffix = path.join(
     DEFAULT_BASE_PATH,
-    `serviceAccount-${envName}.json`,
+    `serviceAccount-${envName || ''}.json`,
   );
-  if (fs.existsSync(withPrefix)) {
-    return withPrefix;
+  if (existsSync(withSuffix)) {
+    return withSuffix;
   }
   return path.join(DEFAULT_BASE_PATH, 'serviceAccount.json');
 }
@@ -65,17 +65,24 @@ function getServiceAccountPath(envName = '') {
 /**
  * Get cypress folder path from cypress.json config file or fallback to
  * default folder path ('cypress')
- * @return {String} Path of folder containing cypress folders like "integration"
+ * @returns Path of folder containing cypress folders like "integration"
  */
-export function getCypressFolderPath() {
+export function getCypressFolderPath(): string {
   const cypressConfig = readJsonFile(TEST_CONFIG_FILE_PATH); // eslint-disable-line no-use-before-define
   const integrationTestsFolderPath = get(cypressConfig, 'integrationFolder');
   return integrationTestsFolderPath
-    ? dropRight(integrationTestsFolderPath.split('/')).join('/')
+    ? integrationTestsFolderPath
+        .split('/')
+        .slice(0, -1) // Drop last item (equivalent to dropRight)
+        .join('/')
     : DEFAULT_TEST_FOLDER_PATH;
 }
 
-export function getCypressConfigPath() {
+/**
+ * Get path to cypress config file
+ * @returns Path to cypress config file
+ */
+export function getCypressConfigPath(): string {
   const cypressFolderPath = getCypressFolderPath();
   const cypressConfigFilePath = path.join(
     cypressFolderPath,
@@ -86,25 +93,25 @@ export function getCypressConfigPath() {
 
 /**
  * Get environment variable based on the current CI environment
- * @param  {String} varNameRoot - variable name without the environment prefix
- * @return {Any} Value of the environment variable
+ * @param varNameRoot - variable name without the environment prefix
+ * @returns Value of the environment variable
  * @example
  * envVarBasedOnCIEnv('FIREBASE_PROJECT_ID')
  * // => 'fireadmin-stage' (value of 'STAGE_FIREBASE_PROJECT_ID' environment var)
  */
-export function envVarBasedOnCIEnv(varNameRoot, envName) {
+export function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any {
   const prefix = getEnvPrefix(envName);
   const combined = `${prefix}${varNameRoot}`;
   const localConfigFilePath = getCypressConfigPath();
 
   // Config file used for environment (local, containers) from main test path ({integrationFolder}/config.json)
-  if (fs.existsSync(localConfigFilePath)) {
+  if (existsSync(localConfigFilePath)) {
     const configObj = readJsonFile(localConfigFilePath);
     return configObj[combined] || configObj[varNameRoot];
   }
 
-  // Config file used for environment (local, containers) from main test path (cypress.env.json)
-  if (fs.existsSync(TEST_ENV_FILE_PATH)) {
+  // Config file used for environment from main cypress environment file (cypress.env.json)
+  if (existsSync(TEST_ENV_FILE_PATH)) {
     const configObj = readJsonFile(TEST_ENV_FILE_PATH);
     return configObj[combined] || configObj[varNameRoot];
   }
@@ -116,13 +123,13 @@ export function envVarBasedOnCIEnv(varNameRoot, envName) {
 /**
  * Get parsed value of environment variable. Useful for environment variables
  * which have characters that need to be escaped.
- * @param  {String} varNameRoot - variable name without the environment prefix
- * @return {Any} Value of the environment variable
+ * @param varNameRoot - variable name without the environment prefix
+ * @returns Value of the environment variable
  * @example
  * getParsedEnvVar('FIREBASE_PRIVATE_KEY_ID')
  * // => 'fireadmin-stage' (parsed value of 'STAGE_FIREBASE_PRIVATE_KEY_ID' environment var)
  */
-function getParsedEnvVar(varNameRoot) {
+function getParsedEnvVar(varNameRoot: string): any {
   const val = envVarBasedOnCIEnv(varNameRoot);
   const prefix = getEnvPrefix();
   const combinedVar = `${prefix}${varNameRoot}`;
@@ -134,7 +141,7 @@ function getParsedEnvVar(varNameRoot) {
     );
   }
   try {
-    if (isString(val)) {
+    if (typeof val === 'string') {
       return JSON.parse(val);
     }
     return val;
@@ -144,14 +151,27 @@ function getParsedEnvVar(varNameRoot) {
   }
 }
 
+interface ServiceAccount {
+  type: string;
+  project_id: string;
+  private_key_id: string;
+  private_key: string;
+  client_email: string;
+  client_id: string;
+  auth_uri: string;
+  token_uri: string;
+  auth_provider_x509_cert_url: string;
+  client_x509_cert_url: string;
+}
+
 /**
  * Get service account from either local file or environment variables
- * @return {Object} Service account object
+ * @returns Service account object
  */
-export function getServiceAccount(envSlug) {
+export function getServiceAccount(envSlug: string): ServiceAccount {
   const serviceAccountPath = getServiceAccountPath(envSlug);
   // Check for local service account file (Local dev)
-  if (fs.existsSync(serviceAccountPath)) {
+  if (existsSync(serviceAccountPath)) {
     return readJsonFile(serviceAccountPath); // eslint-disable-line global-require, import/no-dynamic-require
   }
   info(
@@ -193,128 +213,45 @@ export function getServiceAccount(envSlug) {
   };
 }
 
-/**
- * Convert slash path to Firestore reference
- * @param  {firestore.Firestore} firestoreInstance - Instance on which to
- * create ref
- * @param  {String} slashPath - Path to convert into firestore refernce
- * @return {firestore.CollectionReference|firestore.DocumentReference}
- */
-export function slashPathToFirestoreRef(
-  firestoreInstance,
-  slashPath,
-  options = {},
-) {
-  let ref = firestoreInstance;
-  const srcPathArr = slashPath.split('/');
-  srcPathArr.forEach(pathSegment => {
-    if (ref.collection) {
-      ref = ref.collection(pathSegment);
-    } else if (ref.doc) {
-      ref = ref.doc(pathSegment);
-    } else {
-      throw new Error(`Invalid slash path: ${slashPath}`);
-    }
-  });
-
-  // Apply limit to query if it exists
-  if (options.limit && typeof ref.limit === 'function') {
-    ref = ref.limit(options.limit);
-  }
-
-  return ref;
+export interface RunCommandOptions {
+  command: string;
+  args: string[];
+  beforeMsg?: string;
+  successMsg?: string;
+  errorMsg?: string;
+  pipeOutput?: boolean;
 }
 
 /**
- * Create command arguments string from an array of arguments by joining them
- * with a space including a leading space. If no args provided, empty string
- * is returned
- * @param  {Array} args - Command arguments to convert into a string
- * @return {String} Arguments section of command string
- */
-export function getArgsString(args) {
-  return args && args.length ? ` ${args.join(' ')}` : '';
-}
-
-/**
- * Add default Firebase arguments to arguments array.
- * @param {Array} args - arguments array
- * @param  {Object} [opts={}] - Options object
- * @param {String} opts.token - Firebase CI token to pass as the token argument
- * @param {Boolean} [opts.disableYes=false] - Whether or not to disable the
- * yes argument
- */
-export function addDefaultArgs(Cypress, args, opts = {}) {
-  const { disableYes = false, token } = opts;
-  const newArgs = [...args];
-  // TODO: Load this in a way that understands environment. Currently this will
-  // go to the first project id that is defined, not which one should be used
-  // for the specified environment
-  const projectId =
-    Cypress.env('firebaseProjectId') ||
-    Cypress.env('FIREBASE_PROJECT_ID') ||
-    Cypress.env('STAGE_FIREBASE_PROJECT_ID');
-  // Include project id command so command runs on the current project
-  if (!newArgs.includes('-P') || !newArgs.includes(projectId)) {
-    newArgs.push('-P');
-    newArgs.push(projectId);
-  }
-  const tokenFromEnv = Cypress.env('FIREBASE_TOKEN');
-  // Include token if it exists in environment
-  if (!newArgs.includes('--token') && (token || tokenFromEnv)) {
-    newArgs.push('--token');
-    newArgs.push(token || tokenFromEnv);
-  }
-  // Add Firebase's automatic approval argument if it is not already in newArgs
-  if (!disableYes && !newArgs.includes(FIREBASE_TOOLS_YES_ARGUMENT)) {
-    newArgs.push(FIREBASE_TOOLS_YES_ARGUMENT);
-  }
-  return newArgs;
-}
-
-process.env.FORCE_COLOR = true;
-
-/**
- * Check to see if the provided value is a promise object
- * @param  {Any}  valToCheck - Value to be checked for Promise qualities
- * @return {Boolean} Whether or not provided value is a promise
- */
-export function isPromise(valToCheck) {
-  return valToCheck && typeof valToCheck.then === 'function';
-}
-
-/**
- * @description Run a bash command using spawn pipeing the results to the main
- * process
- * @param {String} command - Command to be executed
+ * Run a bash command using spawn pipeing the results to the main process
+ * @param command - Command to be executed
+ * @returns Resolves with results of running the command
  * @private
  */
-export function runCommand({
-  beforeMsg,
-  successMsg,
-  command,
-  errorMsg,
-  args,
-  pipeOutput = true,
-}) {
+export function runCommand(runOptions: RunCommandOptions): Promise<any> {
+  const {
+    beforeMsg,
+    successMsg,
+    command,
+    errorMsg,
+    args,
+    pipeOutput = true,
+  } = runOptions;
   if (beforeMsg) info(beforeMsg);
-  return new Promise((resolve, reject) => {
-    const child = spawn(
-      isArray(command) ? command[0] : command.split(' ')[0],
-      args || compact(drop(command.split(' '))),
-    );
-    let output;
-    let error;
+  return new Promise((resolve, reject): void => {
+    const child = spawn(command, args);
+    let output: any;
+    let error: any;
     const customStream = new stream.Writable();
     const customErrorStream = new stream.Writable();
     /* eslint-disable no-underscore-dangle */
-    customStream._write = (data, ...argv) => {
+    customStream._write = (data, ...argv): void => {
       output += data;
       if (pipeOutput) {
         process.stdout._write(data, ...argv);
       }
     };
-    customErrorStream._write = (data, ...argv) => {
+    customErrorStream._write = (data, ...argv): void => {
       error += data;
       if (pipeOutput) {
         process.stderr._write(data, ...argv);
@@ -325,7 +262,7 @@ export function runCommand({
     child.stdout.pipe(customStream);
     child.stderr.pipe(customErrorStream);
     // When child exits resolve or reject based on code
-    child.on('exit', code => {
+    child.on('exit', (code: number): void => {
       if (code !== 0) {
         // Resolve for npm warnings
         if (output && output.indexOf('npm WARN') !== -1) {
@@ -342,7 +279,6 @@ export function runCommand({
         if (output && output.indexOf('undefined') === 0) {
           resolve(successMsg || output.replace('undefined', ''));
         } else {
-          console.log('output: ', output); // eslint-disable-line no-console
           resolve(successMsg || output);
         }
       }
@@ -350,24 +286,4 @@ export function runCommand({
   });
 }
 
-/**
- * Escape shell command arguments and join them to a single string
- * @param  {Array} a - List of arguments to escape
- * @return {String} Command string with arguments escaped
- */
-export function shellescape(a) {
-  const ret = [];
-
-  a.forEach(s => {
-    if (/[^A-Za-z0-9_/:=-]/.test(s)) {
-      // eslint-disable-line no-useless-escape
-      s = `'${s.replace(/'/g, "'\\''")}'`; // eslint-disable-line no-param-reassign
-      s = s // eslint-disable-line no-param-reassign
-        .replace(/^(?:'')+/g, '') // unduplicate single-quote at the beginning
-        .replace(/\\'''/g, "\\'"); // remove non-escaped single-quote if there are enclosed between 2 escaped
-    }
-    ret.push(s);
-  });
-
-  return ret.join(' ');
-}
+process.env.FORCE_COLOR = 'true';

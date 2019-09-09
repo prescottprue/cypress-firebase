@@ -11,17 +11,17 @@ variables:
 ## Cache dependencies across jobs only pulling not uploading (upload to cache
 ## happens in build stage)
 cache:
-  key: $CI_COMMIT_REF_SLUG
   policy: pull # only pull cache, skip uploading
+  key: $CI_COMMIT_REF_SLUG
   paths:
-    - .npm
+    - .yarn
 
 ## Install dependencies for React App and Cloud Functions. Installing of
 ## Cypress binary is skipped (done in E2E Testing Stage)
 ## Script run before all stages unless otherwise overriden
 before_script:
   - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
-  - npm ci
+  - yarn install --frozen-lockfile --cache-folder .yarn
 
 # Build Stage
 ## Installs dependencies, builds app, and saves results for later (artifacts).
@@ -37,17 +37,17 @@ Build Node 8:
   cache:
     key: $CI_COMMIT_REF_SLUG
     paths:
-      - .npm
+      - .yarn
   artifacts:
     name: $CI_JOB_STAGE-$CI_COMMIT_REF_SLUG
     expire_in: 2 weeks
     when: always
     paths:
       - lib
-      - es
+      - lib-esm
   script:
-    - npm run lint
-    - npm run build
+    - yarn lint
+    - yarn build
 
 # Build Stage
 ## Installs dependencies, builds app, and saves results for later (artifacts).
@@ -63,17 +63,17 @@ Build Node 10:
   cache:
     key: $CI_COMMIT_REF_SLUG
     paths:
-      - .npm
+      - .yarn
   artifacts:
     name: $CI_JOB_STAGE-$CI_COMMIT_REF_SLUG
     expire_in: 2 weeks
     when: always
     paths:
       - lib
-      - es
+      - lib-esm
   script:
-    - npm run lint
-    - npm run build
+    - yarn lint
+    - yarn build
 
 # Deploy Latest Stage
 ## Deploy Library to latest tag
