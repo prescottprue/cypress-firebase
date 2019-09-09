@@ -638,6 +638,19 @@
     lodash "^4.17.13"
     to-fast-properties "^2.0.0"
 
+"@bahmutov/add-typescript-to-cypress@^2.1.2":
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/@bahmutov/add-typescript-to-cypress/-/add-typescript-to-cypress-2.1.2.tgz#998b68165bc264eaca4bef86ed9c2800d07cce2c"
+  integrity sha512-fOfkDxs+3KAE9PmJOrSW0wqM7ZpGJOObq/qxv2rI9+8h7f8LGcRzKGVthkrl08HFQ/Ij8Le/fawcG7TXBuckDg==
+  dependencies:
+    "@cypress/webpack-preprocessor" "4.1.0"
+    am-i-a-dependency "1.1.2"
+    chalk "2.4.2"
+    debug "4.1.1"
+    shelljs "0.8.3"
+    terminal-banner "1.1.0"
+    ts-loader "5.4.5"
+
 "@cypress/listr-verbose-renderer@0.4.1":
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/@cypress/listr-verbose-renderer/-/listr-verbose-renderer-0.4.1.tgz#a77492f4b11dcc7c446a34b3e28721afd33c642a"
@@ -648,7 +661,7 @@
     date-fns "^1.27.2"
     figures "^1.7.0"
 
-"@cypress/webpack-preprocessor@^4.1.0":
+"@cypress/webpack-preprocessor@4.1.0", "@cypress/webpack-preprocessor@^4.1.0":
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/@cypress/webpack-preprocessor/-/webpack-preprocessor-4.1.0.tgz#8c4debc0b1abf045b62524d1996dd9aeaf7e86a8"
   integrity sha512-LbxsdYVpHGoC2fMOdW0aQvuvVRD7aZx8p8DrP53HISpl7bD1PqLGWKzhHn7cGG24UHycBJrbaEeKEosW29W1dg==
@@ -1089,6 +1102,11 @@ ajv@^6.1.0, ajv@^6.10.2, ajv@^6.5.5:
     fast-json-stable-stringify "^2.0.0"
     json-schema-traverse "^0.4.1"
     uri-js "^4.2.2"
+
+am-i-a-dependency@1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/am-i-a-dependency/-/am-i-a-dependency-1.1.2.tgz#f9d3422304d6f642f821e4c407565035f6167f1f"
+  integrity sha1-+dNCIwTW9kL4IeTEB1ZQNfYWfx8=
 
 ansi-escapes@^1.0.0:
   version "1.4.0"
@@ -1920,7 +1938,7 @@ debug@3.2.6, debug@^3.1.0, debug@^3.2.6:
   dependencies:
     ms "^2.1.1"
 
-debug@^4.1.0:
+debug@4.1.1, debug@^4.1.0:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.1.1.tgz#3b72260255109c6b589cee050f1d516139664791"
   integrity sha512-pYAIzeRo8J6KPEaJ0VWOh5Pzkbw/RetuzehGM7QRRX5he4fPHx2rdKMB256ehJCkX+XRQm16eZLqLNS8RSZXZw==
@@ -2513,7 +2531,7 @@ glob-parent@^3.1.0:
     is-glob "^3.1.0"
     path-dirname "^1.0.0"
 
-glob@^7.0.5, glob@^7.1.1, glob@^7.1.3, glob@^7.1.4:
+glob@^7.0.0, glob@^7.0.5, glob@^7.1.1, glob@^7.1.3, glob@^7.1.4:
   version "7.1.4"
   resolved "https://registry.yarnpkg.com/glob/-/glob-7.1.4.tgz#aa608a2f6c577ad357e1ae5a5c26d9a8d1969255"
   integrity sha512-hkLPepehmnKk41pUGm3sYxoFs/umurYfYJCerbXEyFIWcAzvpipAgVkBqqT9RBKMGjnq6kMuyYwha6csxbiM1A==
@@ -2793,7 +2811,7 @@ ini@^1.3.4, ini@^1.3.5, ini@~1.3.0:
   resolved "https://registry.yarnpkg.com/ini/-/ini-1.3.5.tgz#eee25f56db1c9ec6085e0c22778083f596abf927"
   integrity sha512-RZY5huIKCMRWDUqZlEi72f/lmXKMvuszcMBduliQ3nnWbx9X/ZBQO7DijMEYS9EhHBb2qacRUMtC7svLwe0lcw==
 
-interpret@1.2.0:
+interpret@1.2.0, interpret@^1.0.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/interpret/-/interpret-1.2.0.tgz#d5061a6224be58e8083985f5014d844359576296"
   integrity sha512-mT34yGKMNceBQUoVn7iCDKDntA7SC6gycMAWzGx1z/CMCTV7b2AAtXlo3nRyHZ1FelRkQbQjprHSYGwzLtkVbw==
@@ -4127,6 +4145,13 @@ readdirp@^2.2.1:
     micromatch "^3.1.10"
     readable-stream "^2.0.2"
 
+rechoir@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/rechoir/-/rechoir-0.6.2.tgz#85204b54dba82d5742e28c96756ef43af50e3384"
+  integrity sha1-hSBLVNuoLVdC4oyWdW70OvUOM4Q=
+  dependencies:
+    resolve "^1.1.6"
+
 regenerate-unicode-properties@^8.1.0:
   version "8.1.0"
   resolved "https://registry.yarnpkg.com/regenerate-unicode-properties/-/regenerate-unicode-properties-8.1.0.tgz#ef51e0f0ea4ad424b77bf7cb41f3e015c70a3f0e"
@@ -4273,7 +4298,7 @@ resolve-url@^0.2.1:
   resolved "https://registry.yarnpkg.com/resolve-url/-/resolve-url-0.2.1.tgz#2c637fe77c893afd2a663fe21aa9080068e2052a"
   integrity sha1-LGN/53yJOv0qZj/iGqkIAGjiBSo=
 
-resolve@^1.3.2:
+resolve@^1.1.6, resolve@^1.3.2:
   version "1.12.0"
   resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.12.0.tgz#3fc644a35c84a48554609ff26ec52b66fa577df6"
   integrity sha512-B/dOmuoAik5bKcD6s6nXDCjzUKnaDvdkRyAk6rsmsKLipWj4797iothd7jmmUhWTfinVMU+wc56rYKsit2Qy4w==
@@ -4358,7 +4383,7 @@ schema-utils@^1.0.0:
     ajv-errors "^1.0.0"
     ajv-keywords "^3.1.0"
 
-semver@^5.3.0, semver@^5.4.1, semver@^5.5.0, semver@^5.6.0:
+semver@^5.0.1, semver@^5.3.0, semver@^5.4.1, semver@^5.5.0, semver@^5.6.0:
   version "5.7.1"
   resolved "https://registry.yarnpkg.com/semver/-/semver-5.7.1.tgz#a954f931aeba508d307bbf069eff0c01c96116f7"
   integrity sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==
@@ -4412,6 +4437,15 @@ shebang-regex@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/shebang-regex/-/shebang-regex-1.0.0.tgz#da42f49740c0b42db2ca9728571cb190c98efea3"
   integrity sha1-2kL0l0DAtC2yypcoVxyxkMmO/qM=
+
+shelljs@0.8.3:
+  version "0.8.3"
+  resolved "https://registry.yarnpkg.com/shelljs/-/shelljs-0.8.3.tgz#a7f3319520ebf09ee81275b2368adb286659b097"
+  integrity sha512-fc0BKlAWiLpwZljmOvAOTE/gXawtCoNrP5oaY7KIaQbbyHeQVg01pSEuEGvGh3HEdBU4baCD7wQBwADmM/7f7A==
+  dependencies:
+    glob "^7.0.0"
+    interpret "^1.0.0"
+    rechoir "^0.6.2"
 
 signal-exit@^3.0.0:
   version "3.0.2"
@@ -4684,6 +4718,11 @@ tar@^4:
     safe-buffer "^5.1.2"
     yallist "^3.0.3"
 
+terminal-banner@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/terminal-banner/-/terminal-banner-1.1.0.tgz#ef81ce7d9d7e541a81d09eb2c0257c3d5463c3ea"
+  integrity sha512-A70B8Io5gGOTKQuoqU6LUPLouNd9DvFLgw3cPh6bfrQjdy7HWW1t04VJfQwjTnygTVDX0xremaj1cg3SQaCGyg==
+
 terser-webpack-plugin@^1.4.1:
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/terser-webpack-plugin/-/terser-webpack-plugin-1.4.1.tgz#61b18e40eaee5be97e771cdbb10ed1280888c2b4"
@@ -4789,6 +4828,17 @@ trim-right@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/trim-right/-/trim-right-1.0.1.tgz#cb2e1203067e0c8de1f614094b9fe45704ea6003"
   integrity sha1-yy4SAwZ+DI3h9hQJS5/kVwTqYAM=
+
+ts-loader@5.4.5:
+  version "5.4.5"
+  resolved "https://registry.yarnpkg.com/ts-loader/-/ts-loader-5.4.5.tgz#a0c1f034b017a9344cef0961bfd97cc192492b8b"
+  integrity sha512-XYsjfnRQCBum9AMRZpk2rTYSVpdZBpZK+kDh0TeT3kxmQNBDVIeUjdPjY5RZry4eIAb8XHc4gYSUiUWPYvzSRw==
+  dependencies:
+    chalk "^2.3.0"
+    enhanced-resolve "^4.0.0"
+    loader-utils "^1.0.2"
+    micromatch "^3.1.4"
+    semver "^5.0.1"
 
 ts-loader@^6.0.4:
   version "6.0.4"

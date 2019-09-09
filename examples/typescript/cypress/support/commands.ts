@@ -28,18 +28,17 @@ import * as firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/database'
 import 'firebase/firestore'
-
-const fbConfig = {
+const fbInstance = firebase.initializeApp({
   apiKey: 'AIzaSyCTUERDM-Pchn_UDTsfhVPiwM4TtNIxots',
   authDomain: 'redux-firebasev3.firebaseapp.com',
   databaseURL: 'https://redux-firebasev3.firebaseio.com',
   messagingSenderId: '823357791673',
   projectId: 'redux-firebasev3',
   storageBucket: 'redux-firebasev3.appspot.com',
-}
-
-cy.window().then((win) => {
-  return (win as any).fbInstance = firebase.initializeApp(fbConfig)
 })
+
+if (fbInstance) {
+  (window as any).fbInstance = fbInstance
+}
 
 attachCustomCommands({ Cypress, cy, firebase })

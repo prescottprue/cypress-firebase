@@ -1,6 +1,6 @@
 import path from 'path';
+import { DEFAULT_BASE_PATH } from './node-utils';
 import {
-  DEFAULT_BASE_PATH,
   FIREBASE_CONFIG_FILE_NAME,
   DEFAULT_TEST_FOLDER_PATH,
   DEFAULT_CONFIG_FILE_NAME,

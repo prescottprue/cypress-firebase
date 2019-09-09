@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const chalk = require('chalk');
-const { runCommand } = require('../lib/utils');
+const { runCommand } = require('../lib/node-utils');
 const logError = require('../lib/logger').error;
 const logInfo = require('../lib/logger').info;
 const createTestEnvFile = require('../lib/createTestEnvFile').default;

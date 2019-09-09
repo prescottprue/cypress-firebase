@@ -5,7 +5,7 @@
  */
 
 const chalk = require('chalk');
-const { runCommand } = require('../lib/utils');
+const { runCommand } = require('../lib/node-utils');
 const logger = require('../lib/logger');
 
 /**

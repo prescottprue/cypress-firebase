@@ -7,7 +7,8 @@ import {
   getEnvPrefix,
   readJsonFile,
   getCypressConfigPath,
-} from './utils';
+} from './node-utils';
+import { to } from './utils';
 import { DEFAULT_TEST_ENV_FILE_NAME } from './constants';
 import { FIREBASE_CONFIG_FILE_PATH, TEST_ENV_FILE_PATH } from './filePaths';
 import * as logger from './logger';
@@ -15,9 +16,11 @@ import * as logger from './logger';
 /**
  * Create test environment file
  * @param envName - Environment name
- * @returns Promise which resolves with the custom token generated for the file
+ * @returns Promise which resolves with the contents of the test env file
  */
-export default function createTestEnvFile(envName: string): Promise<string> {
+export default async function createTestEnvFile(
+  envName: string,
+): Promise<string> {
   const envPrefix = getEnvPrefix(envName);
   // Get UID from environment (falls back to cypress/config.json for local)
   const uid = envVarBasedOnCIEnv('TEST_UID', envName);
@@ -84,61 +87,64 @@ export default function createTestEnvFile(envName: string): Promise<string> {
   const developerClaims = envVarBasedOnCIEnv('DEVELOPER_CLAIMS', envName);
   // Check if object is empty. If not, return it, otherwise set developer claims as { isTesting: true }
   const defaultDeveloperClaims =
-    Object.keys(developerClaims).length > 0
+    !!developerClaims && Object.keys(developerClaims).length > 0
       ? developerClaims
       : { isTesting: true };
 
   // Create auth token
-  return appFromSA
-    .auth()
-    .createCustomToken(uid, defaultDeveloperClaims)
-    .then((customToken: string) => {
-      logger.success(
-        `Custom token generated successfully, writing to ${chalk.cyan(
-          DEFAULT_TEST_ENV_FILE_NAME,
-        )}`,
-      );
-      // Remove firebase app
-      appFromSA.delete();
+  const [err, customToken] = await to(
+    appFromSA.auth().createCustomToken(uid, defaultDeveloperClaims),
+  );
 
-      // Create config object to be written into test env file by combining with existing config
-      const newCypressConfig = {
-        ...currentCypressEnvSettings,
-        TEST_UID: uid,
-        FIREBASE_PROJECT_ID,
-        FIREBASE_API_KEY:
-          envVarBasedOnCIEnv('FIREBASE_API_KEY', envName) ||
-          get(firebaserc, `ci.createConfig.${envName}.firebase.apiKey`),
-        FIREBASE_AUTH_JWT: customToken,
-      };
+  // Handle errors generating custom token
+  if (err) {
+    logger.error(
+      `Custom token could not be generated for uid: ${chalk.cyan(uid)}`,
+      err.message || err,
+    );
+    throw err;
+  }
 
-      const stageProjectId = envVarBasedOnCIEnv(
-        'STAGE_FIREBASE_PROJECT_ID',
-        envName,
-      );
-      const stageApiKey = envVarBasedOnCIEnv('STAGE_FIREBASE_API_KEY', envName);
+  logger.success(
+    `Custom token generated successfully, writing to ${chalk.cyan(
+      DEFAULT_TEST_ENV_FILE_NAME,
+    )}`,
+  );
 
-      if (stageProjectId) {
-        newCypressConfig.STAGE_FIREBASE_PROJECT_ID = stageProjectId;
-        newCypressConfig.STAGE_FIREBASE_API_KEY = stageApiKey;
-      }
+  // Remove firebase app
+  appFromSA.delete();
 
-      // Write config file to cypress.env.json
-      fs.writeFileSync(
-        TEST_ENV_FILE_PATH,
-        JSON.stringify(newCypressConfig, null, 2),
-      );
+  // Create config object to be written into test env file by combining with existing config
+  const newCypressConfig = {
+    ...currentCypressEnvSettings,
+    TEST_UID: uid,
+    FIREBASE_PROJECT_ID,
+    FIREBASE_API_KEY:
+      envVarBasedOnCIEnv('FIREBASE_API_KEY', envName) ||
+      get(firebaserc, `ci.createConfig.${envName}.firebase.apiKey`),
+    FIREBASE_AUTH_JWT: customToken,
+  };
 
-      logger.success(
-        `${chalk.cyan(DEFAULT_TEST_ENV_FILE_NAME)} updated successfully`,
-      );
-      return customToken;
-    })
-    .catch((err: Error) => {
-      logger.error(
-        `Custom token could not be generated for uid: ${chalk.cyan(uid)}`,
-        err.message || err,
-      );
-      return Promise.reject(err);
-    });
+  const stageProjectId = envVarBasedOnCIEnv(
+    'STAGE_FIREBASE_PROJECT_ID',
+    envName,
+  );
+  const stageApiKey = envVarBasedOnCIEnv('STAGE_FIREBASE_API_KEY', envName);
+
+  if (stageProjectId) {
+    newCypressConfig.STAGE_FIREBASE_PROJECT_ID = stageProjectId;
+    newCypressConfig.STAGE_FIREBASE_API_KEY = stageApiKey;
+  }
+
+  // Write config file to cypress.env.json
+  fs.writeFileSync(
+    TEST_ENV_FILE_PATH,
+    JSON.stringify(newCypressConfig, null, 2),
+  );
+
+  logger.success(
+    `${chalk.cyan(DEFAULT_TEST_ENV_FILE_NAME)} updated successfully`,
+  );
+
+  return newCypressConfig;
 }

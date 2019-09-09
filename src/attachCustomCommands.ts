@@ -8,6 +8,10 @@ import buildRtdbCommand, {
   RTDBCommandOptions,
 } from './buildRtdbCommand';
 
+export interface FixtureData {
+  [k: string]: any;
+}
+
 export interface AttachCustomCommandParams {
   Cypress: any;
   cy: any;
@@ -24,31 +28,21 @@ declare global {
        * Login to Firebase auth using FIREBASE_AUTH_JWT environment variable
        * which is generated using firebase-admin authenticated with serviceAccount
        * during test:buildConfig phase.
-       * @example cy.login()
-       * @type {Cypress.Command}
-       * @name cy.login
        */
       login: () => Chainable;
 
       /**
        * Log out of Firebase instance
-       * @memberOf Cypress.Chainable#
-       * @type {Cypress.Command}
-       * @name cy.logout
-       * @example
-       * cy.logout()
        */
       logout: () => Chainable;
 
       /**
        * Call Real Time Database path with some specified action. Authentication is through
        * FIREBASE_TOKEN since firebase-tools is used (instead of firebaseExtra).
-       * @param {String} action - The action type to call with (set, push, update, remove)
-       * @param {String} actionPath - Path within RTDB that action should be applied
-       * @param {Object} opts - Options
-       * @param {Array} opts.args - Command line args to be passed
-       * @name cy.callRtdb
-       * @type {Cypress.Command}
+       * @param action - The action type to call with (set, push, update, remove)
+       * @param actionPath - Path within RTDB that action should be applied
+       * @param opts - Options
+       * @param opts.args - Command line args to be passed
        * @example <caption>Set Data</caption>
        * const fakeProject = { some: 'data' }
        * cy.callRtdb('set', 'projects/ABC123', fakeProject)
@@ -70,10 +64,10 @@ declare global {
        * cy.callRtdb('update', 'project/test-project', fakeProject, opts)
        */
       callRtdb: (
-        action: string,
+        action: RTDBAction,
         actionPath: string,
-        data?: any,
-        opts?: any,
+        fixtureDataOrPath?: FixtureData | string,
+        opts?: RTDBCommandOptions,
       ) => Chainable;
 
       /**
@@ -81,22 +75,26 @@ declare global {
        * serviceAccount.json since it is at the base
        * level. If using delete, auth is through `FIREBASE_TOKEN` since
        * firebase-tools is used (instead of firebaseExtra).
-       * @param {String} action - The action type to call with (set, push, update, remove)
-       * @param {String} actionPath - Path within RTDB that action should be applied
-       * @param {Object} opts - Options
-       * @param {Array} opts.args - Command line args to be passed
-       * @name cy.callFirestore
-       * @type {Cypress.Command}
-       * @example <caption>Basic</caption>
+       * @param action - The action type to call with (set, push, update, remove)
+       * @param actionPath - Path within RTDB that action should be applied
+       * @param opts - Options
+       * @param opts.args - Command line args to be passed
+       * @example <caption>Basic Set</caption>
+       * const project = { some: 'data' }
+       * cy.callFirestore('set', 'project/test-project', project)
+       * @example <caption>Basic Add</caption>
+       * const project = { some: 'data' }
+       * cy.callFirestore('add', 'projects', project)
+       * @example <caption>Basic Get</caption>
+       * cy.callFirestore('get', 'projects/test-project').then((project) => {
+       *   cy.log('Project:', project)
+       * })
+       * @example <caption>Manually Loading Fixture</caption>
        * cy.fixture('fakeProject.json').then((project) => {
-       *   cy.callFirestore('add', 'project/test-project', project)
+       *   cy.callFirestore('add', 'projects', project)
        * })
        * @example <caption>Fixture Path</caption>
-       * cy.fixture('fakeProject.json').then((project) => {
-       *   cy.callFirestore('add', 'project/test-project', project)
-       * })
-       * @example <caption>Fixture Path</caption>
-       * cy.callFirestore('add', 'project/test-project', 'fakeProject.json')
+       * cy.callFirestore('set', 'project/test-project', 'fakeProject.json')
        * @example <caption>Recursive Delete</caption>
        * const opts = { recursive: true }
        * cy.callFirestore('delete', 'project/test-project', opts)
@@ -105,10 +103,10 @@ declare global {
        * cy.callFirestore('delete', 'project/test-project', opts)
        */
       callFirestore: (
-        action: string,
+        action: FirestoreAction,
         actionPath: string,
-        data?: any,
-        opts?: any,
+        fixtureDataOrPath?: FixtureData | string,
+        opts?: FirestoreCommandOptions,
       ) => Chainable;
     }
   }
@@ -128,7 +126,6 @@ export default function attachCustomCommands(
    * Login to Firebase auth using FIREBASE_AUTH_JWT environment variable
    * which is generated using firebase-admin authenticated with serviceAccount
    * during test:buildConfig phase.
-   * @type {Cypress.Command}
    * @name cy.login
    * @example
    * cy.login()
@@ -158,8 +155,6 @@ export default function attachCustomCommands(
 
   /**
    * Log out of Firebase instance
-   * @memberOf Cypress.Chainable#
-   * @type {Cypress.Command}
    * @name cy.logout
    * @example
    * cy.logout()
@@ -188,25 +183,6 @@ export default function attachCustomCommands(
    * @param opts - Options
    * @param opts.args - Command line args to be passed
    * @name cy.callRtdb
-   * @example <caption>Set Data</caption>
-   * const fakeProject = { some: 'data' }
-   * cy.callRtdb('set', 'projects/ABC123', fakeProject)
-   * @example <caption>Set Data With Meta</caption>
-   * const fakeProject = { some: 'data' }
-   * // Adds createdAt and createdBy (current user's uid) on data
-   * cy.callRtdb('set', 'projects/ABC123', fakeProject, { withMeta: true })
-   * @example <caption>Get/Verify Data</caption>
-   * cy.callRtdb('get', 'projects/ABC123')
-   *   .then((project) => {
-   *     // Confirm new data has users uid
-   *     cy.wrap(project)
-   *       .its('createdBy')
-   *       .should('equal', Cypress.env('TEST_UID'))
-   *   })
-   * @example <caption>Other Args</caption>
-   * const opts = { args: ['-d'] }
-   * const fakeProject = { some: 'data' }
-   * cy.callRtdb('update', 'project/test-project', fakeProject, opts)
    */
   Cypress.Commands.add(
     'callRtdb',
@@ -268,18 +244,6 @@ export default function attachCustomCommands(
    * @param opts - Options
    * @param opts.args - Command line args to be passed
    * @name cy.callFirestore
-   * @example <caption>Basic</caption>
-   * cy.fixture('fakeProject.json').then((project) => {
-   *   cy.callFirestore('add', 'project/test-project', project)
-   * })
-   * @example <caption>Fixture Path</caption>
-   * cy.callFirestore('add', 'project/test-project', 'fakeProject.json')
-   * @example <caption>Recursive Delete</caption>
-   * const opts = { recursive: true }
-   * cy.callFirestore('delete', 'project/test-project', opts)
-   * @example <caption>Other Args</caption>
-   * const opts = { args: ['-r'] }
-   * cy.callFirestore('delete', 'project/test-project', opts)
    */
   Cypress.Commands.add(
     'callFirestore',

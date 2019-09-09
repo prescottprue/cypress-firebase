@@ -4,10 +4,26 @@ import { FIREBASE_TOOLS_BASE_COMMAND, FIREBASE_EXTRA_PATH } from './constants';
 
 export type FirestoreAction = 'delete' | 'set' | 'update' | 'get';
 
+/**
+ * Options for building Firestore commands
+ */
 export interface FirestoreCommandOptions {
+  /**
+   * Whether or not to include createdAt and createdBy
+   */
   withMeta?: boolean;
+  /**
+   * Extra command line arguments to add to command
+   */
   args?: string[];
+  /**
+   * firebase-tools CI token
+   */
   token?: string;
+  /**
+   * Whether or not to run recursive delete of collections
+   * and subcollections
+   */
   recursive?: boolean;
 }
 
