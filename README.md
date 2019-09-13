@@ -16,7 +16,7 @@
   * [cy.callRtdb][6]
   * [cy.callFirestore][9]
 
-If you are intereted in what drove the need for this checkout [the why section](#why)
+If you are interested in what drove the need for this checkout [the why section](#why)
 
 ## Usage
 
