@@ -48,7 +48,9 @@ If you are interested in what drove the need for this checkout [the why section]
     "test:stage": "npm run test -- --env envName=stage",
     "test:open:stage": "npm run test:open -- --env envName=stage"
     ```
+
     Environment variables can be passed through `--env`. `envName` points to the firebase project within the projects section of `.firebaserc`.
+
 1. Add your config info to `cypress/config.json`
   
     ```js
@@ -107,6 +109,7 @@ Tests will run faster locally if you tests against the build version of your app
     ```json
     "start:dist": "npm run build && firebase serve --only hosting -p 3000",
     ```
+
 1. Run `npm run start:dist` to build your app and serve it with firebase
 1. In another terminal window, run a test command such as `npm run test:open`
 

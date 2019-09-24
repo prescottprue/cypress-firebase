@@ -31,6 +31,7 @@ export interface FirestoreCommandOptions {
  * Build Command to run Firestore action. Commands call either firebase-extra
  * (in bin/firebaseExtra.js) or firebase-tools directly. FIREBASE_TOKEN must
  * exist in environment if running commands that call firebase-tools.
+ * @param Cypress - Cypress object
  * @param action - action to run on Firstore (i.e. "add", "delete")
  * @param actionPath - Firestore path where action should be run
  * @param fixturePath - Path to fixture. If object is passed,
