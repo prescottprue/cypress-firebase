@@ -180,7 +180,7 @@ export function getServiceAccount(envSlug: string): ServiceAccount {
     )}" falling back to environment variables...`,
   );
   // Use environment variables (CI)
-  const serviceAccountEnvVar = envVarBasedOnCIEnv('SERVICE_ACCOUNT');
+  const serviceAccountEnvVar = envVarBasedOnCIEnv('SERVICE_ACCOUNT', envSlug);
   if (serviceAccountEnvVar) {
     if (typeof serviceAccountEnvVar === 'string') {
       try {
@@ -193,7 +193,7 @@ export function getServiceAccount(envSlug: string): ServiceAccount {
     }
     return serviceAccountEnvVar;
   }
-  const clientId = envVarBasedOnCIEnv('FIREBASE_CLIENT_ID');
+  const clientId = envVarBasedOnCIEnv('FIREBASE_CLIENT_ID', envSlug);
   if (clientId) {
     warn(
       '"FIREBASE_CLIENT_ID" will override FIREBASE_TOKEN for auth when calling firebase-tools - this may cause unexepected behavior',
@@ -201,15 +201,15 @@ export function getServiceAccount(envSlug: string): ServiceAccount {
   }
   return {
     type: 'service_account',
-    project_id: envVarBasedOnCIEnv('FIREBASE_PROJECT_ID'),
-    private_key_id: envVarBasedOnCIEnv('FIREBASE_PRIVATE_KEY_ID'),
-    private_key: getParsedEnvVar('FIREBASE_PRIVATE_KEY'),
-    client_email: envVarBasedOnCIEnv('FIREBASE_CLIENT_EMAIL'),
+    project_id: envVarBasedOnCIEnv('FIREBASE_PROJECT_ID', envSlug),
+    private_key_id: envVarBasedOnCIEnv('FIREBASE_PRIVATE_KEY_ID', envSlug),
+    private_key: getParsedEnvVar('FIREBASE_PRIVATE_KEY', envSlug),
+    client_email: envVarBasedOnCIEnv('FIREBASE_CLIENT_EMAIL', envSlug),
     client_id: clientId,
     auth_uri: 'https://accounts.google.com/o/oauth2/auth',
     token_uri: 'https://accounts.google.com/o/oauth2/token',
     auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
-    client_x509_cert_url: envVarBasedOnCIEnv('FIREBASE_CERT_URL'),
+    client_x509_cert_url: envVarBasedOnCIEnv('FIREBASE_CERT_URL', envSlug),
   };
 }
 

@@ -46,6 +46,7 @@ export default async function createTestEnvFile(
     get(currentCypressEnvSettings, 'FIREBASE_PROJECT_ID') ||
     envVarBasedOnCIEnv('FIREBASE_PROJECT_ID', envName) ||
     envVarBasedOnCIEnv(`${envPrefix}FIREBASE_PROJECT_ID`, envName) ||
+    envVarBasedOnCIEnv('FIREBASE_PROJECT_ID', envName) ||
     get(
       firebaserc,
       `projects.${envName}`,

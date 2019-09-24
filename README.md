@@ -16,7 +16,7 @@
   * [cy.callRtdb][6]
   * [cy.callFirestore][9]
 
-If you are intereted in what drove the need for this checkout [the why section](#why)
+If you are interested in what drove the need for this checkout [the why section](#why)
 
 ## Usage
 
@@ -25,7 +25,7 @@ If you are intereted in what drove the need for this checkout [the why section](
 **Note**: Skip cypress install if it already exists within your project
 
 1. Log into your Firebase console for the first time.
-1. Go to Auth tab of Firebase and create a user for testing porpuse
+1. Go to Auth tab of Firebase and create a user for testing purpose
 1. Get the UID of created account. This will be the account which you use to login while running tests (we will call this UID `TEST_UID`)
 1. Go to project setting on firebase console and generate new private key. See how to do [here](https://sites.google.com/site/scriptsexamples/new-connectors-to-google-services/firebase/tutorials/authenticate-with-a-service-account)
 1. Save the downloaded file as `serviceAccount.json` in the root of your project (for local dev)
@@ -315,7 +315,7 @@ describe('Test firestore', () => {
 
 It isn't currently possible to use Firebase's `firebase-admin` SDK directly within Cypress due to dependencies not being able to be loaded into the Browser environment. Since `firebase-admin` is nessesary to generate custom token needed to login to Firebase, the usage of it happens outside of Cypress (through `cypress-firebase createTestEnvFile`) before booting up.
 
-Instead of a cli tool, the plugin that is include could maybe use `firebase-admin` (since cypress plugins is a node environment) - when investigating this, I found it frustrating to get the values back into the test. That said, always open to better ways of solving this, so please reach out with your ideas!
+Instead of a cli tool, the plugin that is included could maybe use `firebase-admin` (since cypress plugins is a node environment) - when investigating this, I found it frustrating to get the values back into the test. That said, always open to better ways of solving this, so please reach out with your ideas!
 
 ## Projects Using It
 
