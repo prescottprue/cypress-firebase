@@ -80,7 +80,7 @@ export function addDefaultArgs(
   args: string[],
   opts?: any,
 ): string[] {
-  const { disableYes = false, token } = opts;
+  const { disableYes = false, token } = opts || {};
   const newArgs = [...args];
   // TODO: Load this in a way that understands environment. Currently this will
   // go to the first project id that is defined, not which one should be used

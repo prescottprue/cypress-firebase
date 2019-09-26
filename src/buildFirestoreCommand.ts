@@ -59,7 +59,7 @@ export default function buildFirestoreCommand(
       const deleteArgsWithDefaults = addDefaultArgs(Cypress, args);
       // Add -r to args string (recursive) if recursive option is true otherwise specify shallow
       const finalDeleteArgs = deleteArgsWithDefaults.concat(
-        options.recursive ? '-r' : '--shallow',
+        options && options.recursive ? '-r' : '--shallow',
       );
       const deleteArgsStr = getArgsString(finalDeleteArgs);
       return `${FIREBASE_TOOLS_BASE_COMMAND} firestore:${action} ${actionPath}${deleteArgsStr}`;
@@ -68,11 +68,11 @@ export default function buildFirestoreCommand(
       // Add -m to argsWithDefaults string (meta) if withmeta option is true
       return `${FIREBASE_EXTRA_PATH} firestore ${action} ${actionPath} '${JSON.stringify(
         fixturePath,
-      )}'${options.withMeta ? ' -m' : ''}`;
+      )}'${options && options.withMeta ? ' -m' : ''}`;
     }
     default: {
       // Add -m to argsWithDefaults string (meta) if withmeta option is true
-      if (options.withMeta) {
+      if (options && options.withMeta) {
         argsWithDefaults.push('-m');
       }
       return `${FIREBASE_EXTRA_PATH} firestore ${action} ${actionPath} '${JSON.stringify(
