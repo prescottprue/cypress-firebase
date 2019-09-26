@@ -13,14 +13,22 @@ import { DEFAULT_TEST_ENV_FILE_NAME } from './constants';
 import { FIREBASE_CONFIG_FILE_PATH, TEST_ENV_FILE_PATH } from './filePaths';
 import * as logger from './logger';
 
+/* eslint-disable no-irregular-whitespace */
 /**
- * Create test environment file
+ * Create test environment file (cypress.env.json). Uses admin.auth().createCustomToken
+ * from firebase-admin authenticated with a Service Account which is loaded from environment
+ * variables or config.json in test folder. Parameters which are added/copied:
+ * - `TEST_UID`
+ * - `FIREBASE_API_KEY`
+ * - `FIREBASE_PROJECT_ID`
+ * - `FIREBASE_AUTH_JWT`
  * @param envName - Environment name
  * @returns Promise which resolves with the contents of the test env file
  */
 export default async function createTestEnvFile(
   envName: string,
 ): Promise<string> {
+  /* eslint-disable no-irregular-whitespace */
   const envPrefix = getEnvPrefix(envName);
   // Get UID from environment (falls back to cypress/config.json for local)
   const uid = envVarBasedOnCIEnv('TEST_UID', envName);
@@ -46,6 +54,7 @@ export default async function createTestEnvFile(
     get(currentCypressEnvSettings, 'FIREBASE_PROJECT_ID') ||
     envVarBasedOnCIEnv('FIREBASE_PROJECT_ID', envName) ||
     envVarBasedOnCIEnv(`${envPrefix}FIREBASE_PROJECT_ID`, envName) ||
+    envVarBasedOnCIEnv('FIREBASE_PROJECT_ID', envName) ||
     get(
       firebaserc,
       `projects.${envName}`,

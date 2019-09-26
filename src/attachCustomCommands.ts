@@ -25,14 +25,19 @@ declare global {
     /* eslint-enable @typescript-eslint/no-namespace */
     interface Chainable {
       /**
-       * Login to Firebase auth using FIREBASE_AUTH_JWT environment variable
-       * which is generated using firebase-admin authenticated with serviceAccount
-       * during test:buildConfig phase.
+       * Login to Firebase auth using FIREBASE_AUTH_JWT environment variable and TEST_UID
+       * environment variables.
+       * @see https://github.com/prescottprue/cypress-firebase#cylogin
+       * @example
+       * cy.login()
        */
       login: () => Chainable;
 
       /**
        * Log out of Firebase instance
+       * @see https://github.com/prescottprue/cypress-firebase#cylogout
+       * @example
+       * cy.logout()
        */
       logout: () => Chainable;
 
@@ -43,6 +48,7 @@ declare global {
        * @param actionPath - Path within RTDB that action should be applied
        * @param opts - Options
        * @param opts.args - Command line args to be passed
+       * @see https://github.com/prescottprue/cypress-firebase#cycallrtdb
        * @example <caption>Set Data</caption>
        * const fakeProject = { some: 'data' }
        * cy.callRtdb('set', 'projects/ABC123', fakeProject)
@@ -50,15 +56,7 @@ declare global {
        * const fakeProject = { some: 'data' }
        * // Adds createdAt and createdBy (current user's uid) on data
        * cy.callRtdb('set', 'projects/ABC123', fakeProject, { withMeta: true })
-       * @example <caption>Get/Verify Data</caption>
-       * cy.callRtdb('get', 'projects/ABC123')
-       *   .then((project) => {
-       *     // Confirm new data has users uid
-       *     cy.wrap(project)
-       *       .its('createdBy')
-       *       .should('equal', Cypress.env('TEST_UID'))
-       *   })
-       * @example <caption>Other Args</caption>
+       * @example <caption>Passing Other Arguments</caption>
        * const opts = { args: ['-d'] }
        * const fakeProject = { some: 'data' }
        * cy.callRtdb('update', 'project/test-project', fakeProject, opts)
@@ -79,6 +77,7 @@ declare global {
        * @param actionPath - Path within RTDB that action should be applied
        * @param opts - Options
        * @param opts.args - Command line args to be passed
+       * @see https://github.com/prescottprue/cypress-firebase#cycallfirestore
        * @example <caption>Basic Set</caption>
        * const project = { some: 'data' }
        * cy.callFirestore('set', 'project/test-project', project)
@@ -156,6 +155,7 @@ export default function attachCustomCommands(
   /**
    * Log out of Firebase instance
    * @name cy.logout
+   * @see https://github.com/prescottprue/cypress-firebase#cylogout
    * @example
    * cy.logout()
    */

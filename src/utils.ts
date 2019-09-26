@@ -4,6 +4,7 @@ import { FIREBASE_TOOLS_YES_ARGUMENT } from './constants';
 /**
  * Async await wrapper for easy error handling
  * @param promise - Promise to wrap responses of in array
+ * @param errorExt - Extension for error
  * @returns Resolves and rejects with an array
  */
 export function to<T, U = Error>(
@@ -26,7 +27,8 @@ export function to<T, U = Error>(
  * @param firestoreInstance - Instance on which to
  * create ref
  * @param slashPath - Path to convert into firestore refernce
- * @returns
+ * @param options - Options object
+ * @returns Ref at slash path
  */
 export function slashPathToFirestoreRef(
   firestoreInstance: any,
@@ -58,7 +60,7 @@ export function slashPathToFirestoreRef(
  * with a space including a leading space. If no args provided, empty string
  * is returned
  * @param args - Command arguments to convert into a string
- * @return Arguments section of command string
+ * @returns Arguments section of command string
  */
 export function getArgsString(args: string[] | any): string {
   return args && args.length ? ` ${args.join(' ')}` : '';
@@ -66,10 +68,12 @@ export function getArgsString(args: string[] | any): string {
 
 /**
  * Add default Firebase arguments to arguments array.
+ * @param Cypress - Cypress object
  * @param args - arguments array
  * @param [opts={}] - Options object
  * @param opts.token - Firebase CI token to pass as the token argument
  * @param [opts.disableYes=false] - Whether or not to disable the yes argument
+ * @returns Default args list
  */
 export function addDefaultArgs(
   Cypress: any,

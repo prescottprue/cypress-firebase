@@ -16,6 +16,7 @@ const DEFAULT_BASE_PATH = process.cwd();
 
 /**
  * Get settings from firebaserc file
+ * @param filePath - Path for file
  * @returns Firebase settings object
  */
 export function readJsonFile(filePath: string): any {
@@ -35,6 +36,10 @@ export function readJsonFile(filePath: string): any {
   }
 }
 
+/**
+ * Get environment slug
+ * @returns Environment slug
+ */
 function getEnvironmentSlug(): string {
   return (
     process.env.CI_ENVIRONMENT_SLUG || process.env.CI_COMMIT_REF_SLUG || 'stage'
@@ -44,6 +49,7 @@ function getEnvironmentSlug(): string {
 /**
  * Get prefix for current environment based on environment vars available
  * within CI. Falls back to staging (i.e. STAGE)
+ * @param envName - Environment option
  * @returns Environment prefix string
  */
 export function getEnvPrefix(envName?: string): string {
@@ -51,6 +57,11 @@ export function getEnvPrefix(envName?: string): string {
   return `${envSlug.toUpperCase()}_`;
 }
 
+/**
+ * Get path to local service account
+ * @param envName - Environment option
+ * @returns Path to service account
+ */
 function getServiceAccountPath(envName?: string): string {
   const withSuffix = path.join(
     DEFAULT_BASE_PATH,
@@ -94,6 +105,7 @@ export function getCypressConfigPath(): string {
 /**
  * Get environment variable based on the current CI environment
  * @param varNameRoot - variable name without the environment prefix
+ * @param envName - Environment option
  * @returns Value of the environment variable
  * @example
  * envVarBasedOnCIEnv('FIREBASE_PROJECT_ID')
@@ -124,13 +136,14 @@ export function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any {
  * Get parsed value of environment variable. Useful for environment variables
  * which have characters that need to be escaped.
  * @param varNameRoot - variable name without the environment prefix
+ * @param envName - Environment option
  * @returns Value of the environment variable
  * @example
  * getParsedEnvVar('FIREBASE_PRIVATE_KEY_ID')
  * // => 'fireadmin-stage' (parsed value of 'STAGE_FIREBASE_PRIVATE_KEY_ID' environment var)
  */
-function getParsedEnvVar(varNameRoot: string): any {
-  const val = envVarBasedOnCIEnv(varNameRoot);
+function getParsedEnvVar(varNameRoot: string, envName: string): any {
+  const val = envVarBasedOnCIEnv(varNameRoot, envName);
   const prefix = getEnvPrefix();
   const combinedVar = `${prefix}${varNameRoot}`;
   if (!val) {
@@ -166,6 +179,7 @@ interface ServiceAccount {
 
 /**
  * Get service account from either local file or environment variables
+ * @param envSlug - Environment option
  * @returns Service account object
  */
 export function getServiceAccount(envSlug: string): ServiceAccount {
@@ -180,7 +194,7 @@ export function getServiceAccount(envSlug: string): ServiceAccount {
     )}" falling back to environment variables...`,
   );
   // Use environment variables (CI)
-  const serviceAccountEnvVar = envVarBasedOnCIEnv('SERVICE_ACCOUNT');
+  const serviceAccountEnvVar = envVarBasedOnCIEnv('SERVICE_ACCOUNT', envSlug);
   if (serviceAccountEnvVar) {
     if (typeof serviceAccountEnvVar === 'string') {
       try {
@@ -193,7 +207,7 @@ export function getServiceAccount(envSlug: string): ServiceAccount {
     }
     return serviceAccountEnvVar;
   }
-  const clientId = envVarBasedOnCIEnv('FIREBASE_CLIENT_ID');
+  const clientId = envVarBasedOnCIEnv('FIREBASE_CLIENT_ID', envSlug);
   if (clientId) {
     warn(
       '"FIREBASE_CLIENT_ID" will override FIREBASE_TOKEN for auth when calling firebase-tools - this may cause unexepected behavior',
@@ -201,15 +215,15 @@ export function getServiceAccount(envSlug: string): ServiceAccount {
   }
   return {
     type: 'service_account',
-    project_id: envVarBasedOnCIEnv('FIREBASE_PROJECT_ID'),
-    private_key_id: envVarBasedOnCIEnv('FIREBASE_PRIVATE_KEY_ID'),
-    private_key: getParsedEnvVar('FIREBASE_PRIVATE_KEY'),
-    client_email: envVarBasedOnCIEnv('FIREBASE_CLIENT_EMAIL'),
+    project_id: envVarBasedOnCIEnv('FIREBASE_PROJECT_ID', envSlug),
+    private_key_id: envVarBasedOnCIEnv('FIREBASE_PRIVATE_KEY_ID', envSlug),
+    private_key: getParsedEnvVar('FIREBASE_PRIVATE_KEY', envSlug),
+    client_email: envVarBasedOnCIEnv('FIREBASE_CLIENT_EMAIL', envSlug),
     client_id: clientId,
     auth_uri: 'https://accounts.google.com/o/oauth2/auth',
     token_uri: 'https://accounts.google.com/o/oauth2/token',
     auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
-    client_x509_cert_url: envVarBasedOnCIEnv('FIREBASE_CERT_URL'),
+    client_x509_cert_url: envVarBasedOnCIEnv('FIREBASE_CERT_URL', envSlug),
   };
 }
 
@@ -224,7 +238,9 @@ export interface RunCommandOptions {
 
 /**
  * Run a bash command using spawn pipeing the results to the main process
- * @param command - Command to be executed
+ * @param runOptions - Options for command run
+ * @param runOptions.command - Command to be executed
+ * @param runOptions.args - Command arguments
  * @returns Resolves with results of running the command
  * @private
  */
