@@ -90,7 +90,7 @@ export function addDefaultArgs(
     Cypress.env('FIREBASE_PROJECT_ID') ||
     Cypress.env('STAGE_FIREBASE_PROJECT_ID');
   // Include project id command so command runs on the current project
-  if (!newArgs.includes('-P') || !newArgs.includes(projectId)) {
+  if (projectId && !newArgs.includes('-P') && !newArgs.includes(projectId)) {
     newArgs.push('-P');
     newArgs.push(projectId);
   }

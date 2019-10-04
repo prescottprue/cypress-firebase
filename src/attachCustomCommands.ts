@@ -2,15 +2,12 @@ import { isObject } from 'lodash';
 import buildFirestoreCommand, {
   FirestoreAction,
   FirestoreCommandOptions,
+  FixtureData, // eslint-disable-line @typescript-eslint/no-unused-vars
 } from './buildFirestoreCommand';
 import buildRtdbCommand, {
   RTDBAction,
   RTDBCommandOptions,
 } from './buildRtdbCommand';
-
-export interface FixtureData {
-  [k: string]: any;
-}
 
 export interface AttachCustomCommandParams {
   Cypress: any;
