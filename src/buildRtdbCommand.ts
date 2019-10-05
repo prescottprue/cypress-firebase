@@ -1,4 +1,5 @@
 import { isObject, isBoolean } from 'lodash';
+import { FixtureData } from './buildFirestoreCommand';
 import { addDefaultArgs, getArgsString } from './utils';
 import { FIREBASE_TOOLS_BASE_COMMAND } from './constants';
 
@@ -28,7 +29,7 @@ export default function buildRtdbCommand(
   Cypress: any,
   action: RTDBAction,
   actionPath: string,
-  fixturePath: RTDBCommandOptions | string,
+  fixturePath?: FixtureData | RTDBCommandOptions | string,
   opts: RTDBCommandOptions = {},
 ): string {
   const options = isObject(fixturePath) ? fixturePath : opts;

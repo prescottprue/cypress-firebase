@@ -118,14 +118,21 @@ export function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any {
 
   // Config file used for environment (local, containers) from main test path ({integrationFolder}/config.json)
   if (existsSync(localConfigFilePath)) {
-    const configObj = readJsonFile(localConfigFilePath);
-    return configObj[combined] || configObj[varNameRoot];
+    const localConfigObj = readJsonFile(localConfigFilePath);
+    const valueFromLocalConfig =
+      localConfigObj[combined] || localConfigObj[varNameRoot];
+    if (valueFromLocalConfig) {
+      return valueFromLocalConfig;
+    }
   }
 
   // Config file used for environment from main cypress environment file (cypress.env.json)
   if (existsSync(TEST_ENV_FILE_PATH)) {
     const configObj = readJsonFile(TEST_ENV_FILE_PATH);
-    return configObj[combined] || configObj[varNameRoot];
+    const valueFromCypressEnv = configObj[combined] || configObj[varNameRoot];
+    if (valueFromCypressEnv) {
+      return valueFromCypressEnv;
+    }
   }
 
   // CI Environment (environment variables loaded directly)

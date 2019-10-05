@@ -4,6 +4,10 @@ import { FIREBASE_TOOLS_BASE_COMMAND, FIREBASE_EXTRA_PATH } from './constants';
 
 export type FirestoreAction = 'delete' | 'set' | 'update' | 'get';
 
+export interface FixtureData {
+  [k: string]: any;
+}
+
 /**
  * Options for building Firestore commands
  */
@@ -34,7 +38,7 @@ export interface FirestoreCommandOptions {
  * @param Cypress - Cypress object
  * @param action - action to run on Firstore (i.e. "add", "delete")
  * @param actionPath - Firestore path where action should be run
- * @param fixturePath - Path to fixture. If object is passed,
+ * @param fixturePathOrData - Path to fixture. If object is passed,
  * it is used as options.
  * @param [opts={}] - Options object
  * @param opts.args - Extra arguments to be passed with command
@@ -45,10 +49,10 @@ export default function buildFirestoreCommand(
   Cypress: any,
   action: FirestoreAction,
   actionPath: string,
-  fixturePath: FirestoreCommandOptions | string,
+  fixturePathOrData?: FixtureData | string | FirestoreCommandOptions,
   opts: FirestoreCommandOptions = {},
 ): string {
-  const options = isObject(fixturePath) ? fixturePath : opts;
+  const options = isObject(fixturePathOrData) ? fixturePathOrData : opts;
   const { args = [] } = options;
   const argsWithDefaults = addDefaultArgs(Cypress, args, {
     ...options,
@@ -67,8 +71,12 @@ export default function buildFirestoreCommand(
     case 'set': {
       // Add -m to argsWithDefaults string (meta) if withmeta option is true
       return `${FIREBASE_EXTRA_PATH} firestore ${action} ${actionPath} '${JSON.stringify(
-        fixturePath,
+        fixturePathOrData,
       )}'${options && options.withMeta ? ' -m' : ''}`;
+    }
+    case 'get': {
+      // Add -m to argsWithDefaults string (meta) if withmeta option is true
+      return `${FIREBASE_EXTRA_PATH} firestore ${action} ${actionPath}`;
     }
     default: {
       // Add -m to argsWithDefaults string (meta) if withmeta option is true
@@ -76,7 +84,7 @@ export default function buildFirestoreCommand(
         argsWithDefaults.push('-m');
       }
       return `${FIREBASE_EXTRA_PATH} firestore ${action} ${actionPath} '${JSON.stringify(
-        fixturePath,
+        fixturePathOrData,
       )}'`;
     }
   }
