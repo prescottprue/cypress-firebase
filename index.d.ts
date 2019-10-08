@@ -59,6 +59,9 @@ declare module "utils" {
 }
 declare module "buildFirestoreCommand" {
     export type FirestoreAction = 'delete' | 'set' | 'update' | 'get';
+    export interface FixtureData {
+        [k: string]: any;
+    }
     /**
      * Options for building Firestore commands
      */
@@ -88,16 +91,17 @@ declare module "buildFirestoreCommand" {
      * @param Cypress - Cypress object
      * @param action - action to run on Firstore (i.e. "add", "delete")
      * @param actionPath - Firestore path where action should be run
-     * @param fixturePath - Path to fixture. If object is passed,
+     * @param fixturePathOrData - Path to fixture. If object is passed,
      * it is used as options.
      * @param [opts={}] - Options object
      * @param opts.args - Extra arguments to be passed with command
      * @param opts.token - Firebase CI token to pass as the token argument
      * @returns Command string to be used with cy.exec
      */
-    export default function buildFirestoreCommand(Cypress: any, action: FirestoreAction, actionPath: string, fixturePath: FirestoreCommandOptions | string, opts?: FirestoreCommandOptions): string;
+    export default function buildFirestoreCommand(Cypress: any, action: FirestoreAction, actionPath: string, fixturePathOrData?: FixtureData | string | FirestoreCommandOptions, opts?: FirestoreCommandOptions): string;
 }
 declare module "buildRtdbCommand" {
+    import { FixtureData } from "buildFirestoreCommand";
     export type RTDBAction = 'remove' | 'set' | 'update' | 'delete' | 'get';
     export interface RTDBCommandOptions {
         withMeta?: boolean;
@@ -118,14 +122,11 @@ declare module "buildRtdbCommand" {
      * @param opts.args - Extra arguments to be passed with command
      * @returns Command string to be used with cy.exec
      */
-    export default function buildRtdbCommand(Cypress: any, action: RTDBAction, actionPath: string, fixturePath: RTDBCommandOptions | string, opts?: RTDBCommandOptions): string;
+    export default function buildRtdbCommand(Cypress: any, action: RTDBAction, actionPath: string, fixturePath?: FixtureData | RTDBCommandOptions | any, opts?: RTDBCommandOptions): string;
 }
 declare module "attachCustomCommands" {
-    import { FirestoreAction, FirestoreCommandOptions } from "buildFirestoreCommand";
+    import { FirestoreAction, FirestoreCommandOptions, FixtureData } from "buildFirestoreCommand";
     import { RTDBAction, RTDBCommandOptions } from "buildRtdbCommand";
-    export interface FixtureData {
-        [k: string]: any;
-    }
     export interface AttachCustomCommandParams {
         Cypress: any;
         cy: any;

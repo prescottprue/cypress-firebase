@@ -29,10 +29,12 @@ export default function buildRtdbCommand(
   Cypress: any,
   action: RTDBAction,
   actionPath: string,
-  fixturePath?: FixtureData | RTDBCommandOptions | string,
-  opts: RTDBCommandOptions = {},
+  fixturePath?: FixtureData | RTDBCommandOptions | any,
+  opts?: RTDBCommandOptions,
 ): string {
-  const options = isObject(fixturePath) ? fixturePath : opts;
+  const options: RTDBCommandOptions = isObject(fixturePath)
+    ? fixturePath
+    : opts || {};
   const { args = [] } = options;
   const argsWithDefaults = addDefaultArgs(Cypress, args);
   const argsStr = getArgsString(argsWithDefaults);
@@ -67,9 +69,11 @@ export default function buildRtdbCommand(
       return `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} ${cleanActionPath}${getDataArgsStr}`;
     }
     default: {
-      return `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} ${cleanActionPath} -d '${JSON.stringify(
-        options,
-      )}'${argsStr}`;
+      const commandString = `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} ${cleanActionPath}`;
+      if (!isObject(fixturePath)) {
+        return `${commandString} ${fixturePath}${argsStr}`;
+      }
+      return `${commandString} -d '${JSON.stringify(fixturePath)}'${argsStr}`;
     }
   }
 }

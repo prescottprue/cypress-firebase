@@ -80,7 +80,7 @@ export function addDefaultArgs(
   args: string[],
   opts?: any,
 ): string[] {
-  const { disableYes = false, token } = opts || {};
+  const { disableYes = false, token, withMeta } = opts || {};
   const newArgs = [...args];
   // TODO: Load this in a way that understands environment. Currently this will
   // go to the first project id that is defined, not which one should be used
@@ -103,6 +103,10 @@ export function addDefaultArgs(
   // Add Firebase's automatic approval argument if it is not already in newArgs
   if (!disableYes && !newArgs.includes(FIREBASE_TOOLS_YES_ARGUMENT)) {
     newArgs.push(FIREBASE_TOOLS_YES_ARGUMENT);
+  }
+  if (withMeta) {
+    // Add -m to argsWithDefaults string (meta) if withmeta option is true
+    newArgs.push('-m');
   }
   return newArgs;
 }

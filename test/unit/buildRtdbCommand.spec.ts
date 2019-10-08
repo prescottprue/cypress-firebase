@@ -19,12 +19,28 @@ describe('buildRtdbCommand', () => {
   });
 
   describe('set', () => {
-    it('calls set with a path', () => {
+    it('creates a set command with path and object data', () => {
       const actionPath = 'some/path'
       const action = 'set'
       const data = { some: 'other' }
       expect(buildRtdbCommand(Cypress, action, actionPath, data))
         .to.equal(`${firebasePath} database:${action} /${actionPath} -d '${JSON.stringify(data)}' -y`)
+    })
+
+    it('creates a set command with path and non-string value', () => {
+      const actionPath = 'some/path'
+      const action = 'set'
+      const data = 123
+      expect(buildRtdbCommand(Cypress, action, actionPath, data))
+        .to.equal(`${firebasePath} database:${action} /${actionPath} ${data} -y`)
+    })
+
+    it('creates a set command with path and string value', () => {
+      const actionPath = 'some/path'
+      const action = 'set'
+      const data = '123ABC'
+      expect(buildRtdbCommand(Cypress, action, actionPath, data))
+        .to.equal(`${firebasePath} database:${action} /${actionPath} ${data} -y`)
     })
   });
 
