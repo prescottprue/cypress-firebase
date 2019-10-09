@@ -53,8 +53,6 @@ export default async function createTestEnvFile(
   const FIREBASE_PROJECT_ID =
     get(currentCypressEnvSettings, 'FIREBASE_PROJECT_ID') ||
     envVarBasedOnCIEnv('FIREBASE_PROJECT_ID', envName) ||
-    envVarBasedOnCIEnv(`${envPrefix}FIREBASE_PROJECT_ID`, envName) ||
-    envVarBasedOnCIEnv('FIREBASE_PROJECT_ID', envName) ||
     get(
       firebaserc,
       `projects.${envName}`,
@@ -77,7 +75,7 @@ export default async function createTestEnvFile(
     const errMsg = `Service Account is missing parameters: ${Object.keys(
       serviceAccountMissingParams,
     ).join(', ')}`;
-    return Promise.reject(new Error(errMsg));
+    throw new Error(errMsg);
   }
 
   // Remove firebase- prefix (was added to database names for a short period of time)
