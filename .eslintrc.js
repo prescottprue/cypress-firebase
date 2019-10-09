@@ -57,6 +57,22 @@ module.exports = {
           }
         ]
       }
+    },
+    {
+      files: ['scripts/docgen/**'],
+      rules: {
+        'comma-dangle': ['error', { 'functions': 'never' }],
+        '@typescript-eslint/explicit-function-return-type': 0,
+        '@typescript-eslint/no-var-requires': 0,
+        'import/no-extraneous-dependencies': 0,
+        'prettier/prettier': [
+          'error',
+          {
+            singleQuote: true, // airbnb
+            trailingComma: 'none', // airbnb
+          }
+        ]
+      }
     }
   ]
 }
