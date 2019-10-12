@@ -2,7 +2,7 @@
  * createTestEnvFile commander component
  * To use add require('../cmds/deploy.js')(program) to your commander.js based node executable before program.parse
  */
-const logger = require('../lib/logger');
+const logError = require('../lib/logger').error;
 const createTestEnvFile = require('../lib/createTestEnvFile').default;
 
 /**
@@ -24,7 +24,7 @@ module.exports = function runCreateTestEnvFile(program) {
       return createTestEnvFile(envArg)
         .then(() => process.exit(0))
         .catch(err => {
-          logger.error(`Test env file could not be created:\n${err.message}`);
+          logError(`Test env file could not be created:\n${err.message}`);
           process.exit(1);
           return Promise.reject(err);
         });

@@ -29,9 +29,15 @@ If you are interested in what drove the need for this checkout [the why section]
 1. Get the UID of created account. This will be the account which you use to login while running tests (we will call this UID `TEST_UID`)
 1. Go to project setting on firebase console and generate new private key. See how to do [here](https://sites.google.com/site/scriptsexamples/new-connectors-to-google-services/firebase/tutorials/authenticate-with-a-service-account)
 1. Save the downloaded file as `serviceAccount.json` in the root of your project (for local dev)
-1. Set service account as the `SERVICE_ACCOUNT` environment variable within your CI (make sure to wrap it in `"`)
+1. Set service account as the `SERVICE_ACCOUNT` environment variable within your CI
 1. Install Cypress and add it to your package file: `npm i --save-dev cypress`
 1. Add cypress folder by calling `cypress open`
+1. Add the following to your `.gitignore`:
+    ```
+    serviceAccount.json
+    cypress/config.json
+    cypress.env.json
+    ```
 
 ### Setup
 
@@ -48,7 +54,9 @@ If you are interested in what drove the need for this checkout [the why section]
     "test:stage": "npm run test -- --env envName=stage",
     "test:open:stage": "npm run test:open -- --env envName=stage"
     ```
+
     Environment variables can be passed through `--env`. `envName` points to the firebase project within the projects section of `.firebaserc`.
+
 1. Add your config info to `cypress/config.json`
   
     ```js
@@ -107,6 +115,7 @@ Tests will run faster locally if you tests against the build version of your app
     ```json
     "start:dist": "npm run build && firebase serve --only hosting -p 3000",
     ```
+
 1. Run `npm run start:dist` to build your app and serve it with firebase
 1. In another terminal window, run a test command such as `npm run test:open`
 

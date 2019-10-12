@@ -1,0 +1,49 @@
+{
+  "name": "cypress-example-typescript-webpack",
+  "version": "1.0.0",
+  "description": "Example showing TypeScript tests with Cypress",
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "yarn cypress:run",
+    "cypress:run": "cypress run",
+    "cypress:open": "cypress open",
+    "build:test": "webpack --output-filename out.js --entry ./cypress/integration/spec.ts",
+    "lint": "tslint --project ./tsconfig.json",
+    "postlint": "npm run tsc",
+    "tsc": "tsc --pretty --noEmit",
+    "precypress:run": "npm run lint"
+  },
+  "devDependencies": {
+    "@cypress/webpack-preprocessor": "^4.1.0",
+    "cypress": "^3.4.1",
+    "ts-loader": "^6.0.4",
+    "tslint": "^5.19.0",
+    "typescript": "^3.6.2",
+    "webpack": "^4.39.3",
+    "webpack-cli": "^3.3.7",
+    "react-scripts": "3.1.2"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "firebase": "^6.5.0",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-redux": "^5.0.7",
+    "react-redux-firebase": "^2.4.1",
+    "recompose": "^0.30.0",
+    "redux": "^4.0.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
