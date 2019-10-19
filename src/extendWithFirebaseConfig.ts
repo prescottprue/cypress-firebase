@@ -1,6 +1,6 @@
 import { get } from 'lodash';
 import { existsSync } from 'fs';
-import { FIREBASE_CONFIG_FILE_NAME } from './constants'
+import { FIREBASE_CONFIG_FILE_NAME } from './constants';
 import { readJsonFile } from './node-utils';
 
 export interface CypressEnvironmentOptions {
@@ -35,7 +35,7 @@ function loadFirebaseRc(): string {
   if (!existsSync(rcFilePath)) {
     throw new Error(`${FIREBASE_CONFIG_FILE_NAME} file not found`);
   }
-  return readJsonFile(rcFilePath)
+  return readJsonFile(rcFilePath);
 }
 
 /**

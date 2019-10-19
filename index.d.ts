@@ -37,7 +37,13 @@ declare module "utils" {
     export function addDefaultArgs(Cypress: any, args: string[], opts?: any): string[];
 }
 declare module "buildFirestoreCommand" {
+    /**
+     * Action for Firestore
+     */
     export type FirestoreAction = 'delete' | 'set' | 'update' | 'get';
+    /**
+     * Data from loaded fixture
+     */
     export interface FixtureData {
         [k: string]: any;
     }
@@ -81,13 +87,64 @@ declare module "buildFirestoreCommand" {
 }
 declare module "buildRtdbCommand" {
     import { FixtureData } from "buildFirestoreCommand";
+    /**
+     * Action for Real Time Database
+     */
     export type RTDBAction = 'remove' | 'set' | 'update' | 'delete' | 'get';
+    /**
+     * Options for callRtdb commands
+     */
     export interface RTDBCommandOptions {
+        /**
+         * Whether or not to include meta data
+         */
         withMeta?: boolean;
+        /**
+         * Extra arguments
+         */
         args?: string[];
+        /**
+         * CI Token
+         */
         token?: string;
-        limitToLast?: boolean;
-        orderByChild?: boolean;
+        /**
+         * Limit to the last <num> results. If true is passed
+         * than query is limited to last 1 item.
+         */
+        limitToLast?: boolean | number;
+        /**
+         * Limit to the first <num> results. If true is passed
+         * than query is limited to last 1 item.
+         */
+        limitToFirst?: boolean | number;
+        /**
+         * Select a child key by which to order results
+         */
+        orderByChild?: string;
+        /**
+         * Order by key name
+         */
+        orderByKey?: boolean;
+        /**
+         * Order by primitive value
+         */
+        orderByValue?: boolean;
+        /**
+         * Start results at <val> (based on specified ordering)
+         */
+        startAt?: any;
+        /**
+         * End results at <val> (based on specified ordering)
+         */
+        endAt?: any;
+        /**
+         * Restrict results to <val> (based on specified ordering)
+         */
+        equalTo?: any;
+        /**
+         * Use the database <instance>.firebaseio.com (if omitted, use default database instance)
+         */
+        instance?: string;
     }
     /**
      * Build Command to run Real Time Database action. All commands call
@@ -131,7 +188,8 @@ declare module "attachCustomCommands" {
                 logout: () => Chainable;
                 /**
                  * Call Real Time Database path with some specified action. Authentication is through
-                 * FIREBASE_TOKEN since firebase-tools is used (instead of firebaseExtra).
+                 * `FIREBASE_TOKEN` (CI token) since firebase-tools is used under the hood, allowing
+                 * for adming privileges.
                  * @param action - The action type to call with (set, push, update, remove)
                  * @param actionPath - Path within RTDB that action should be applied
                  * @param opts - Options
@@ -140,14 +198,14 @@ declare module "attachCustomCommands" {
                  * @example <caption>Set Data</caption>
                  * const fakeProject = { some: 'data' }
                  * cy.callRtdb('set', 'projects/ABC123', fakeProject)
-                 * @example <caption>Set Data With Meta</caption>
+                 * @example <caption>Set Data With Meta Data</caption>
                  * const fakeProject = { some: 'data' }
                  * // Adds createdAt and createdBy (current user's uid) on data
                  * cy.callRtdb('set', 'projects/ABC123', fakeProject, { withMeta: true })
                  * @example <caption>Passing Other Arguments</caption>
-                 * const opts = { args: ['-d'] }
+                 * const options = { args: ['-d'] }
                  * const fakeProject = { some: 'data' }
-                 * cy.callRtdb('update', 'project/test-project', fakeProject, opts)
+                 * cy.callRtdb('update', 'project/test-project', fakeProject, options)
                  */
                 callRtdb: (action: RTDBAction, actionPath: string, fixtureDataOrPath?: FixtureData | string, opts?: RTDBCommandOptions) => Chainable;
                 /**
@@ -160,25 +218,25 @@ declare module "attachCustomCommands" {
                  * @param opts - Options
                  * @param opts.args - Command line args to be passed
                  * @see https://github.com/prescottprue/cypress-firebase#cycallfirestore
-                 * @example <caption>Basic Set</caption>
+                 * @example <caption>Set Data</caption>
                  * const project = { some: 'data' }
                  * cy.callFirestore('set', 'project/test-project', project)
-                 * @example <caption>Basic Add</caption>
+                 * @example <caption>Add New Document</caption>
                  * const project = { some: 'data' }
                  * cy.callFirestore('add', 'projects', project)
                  * @example <caption>Basic Get</caption>
                  * cy.callFirestore('get', 'projects/test-project').then((project) => {
                  *   cy.log('Project:', project)
                  * })
+                 * @example <caption>Recursive Delete</caption>
+                 * const opts = { recursive: true }
+                 * cy.callFirestore('delete', 'project/test-project', opts)
                  * @example <caption>Manually Loading Fixture</caption>
                  * cy.fixture('fakeProject.json').then((project) => {
                  *   cy.callFirestore('add', 'projects', project)
                  * })
                  * @example <caption>Fixture Path</caption>
                  * cy.callFirestore('set', 'project/test-project', 'fakeProject.json')
-                 * @example <caption>Recursive Delete</caption>
-                 * const opts = { recursive: true }
-                 * cy.callFirestore('delete', 'project/test-project', opts)
                  * @example <caption>Other Args</caption>
                  * const opts = { args: ['-r'] }
                  * cy.callFirestore('delete', 'project/test-project', opts)

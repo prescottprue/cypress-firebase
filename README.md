@@ -185,17 +185,6 @@ during `build:testConfig` phase.
 cy.login()
 ```
 
-#### Get current UserId and aliases it for later usage.
-
-```javascript
-  //Assuming there's a uid property at the root level of the user object.
-  cy.login().then($auth => cy.wrap($auth).its('uid').as('uid'));
-  //Then, later somewhere in the test, use the uid like this,
-  cy.get('@uid').then((uid) => { 
-  //Your code here.
-  }
-```
-
 #### cy.logout
 
 Log out of Firebase instance
@@ -214,7 +203,16 @@ Call Real Time Database path with some specified action. Authentication is throu
 
 -   `action` **[String][11]** The action type to call with (set, push, update, remove)
 -   `actionPath` **[String][11]** Path within RTDB that action should be applied
--   `opts` **[Object][12]** Options
+-   `opts` **[object][12]** Options
+    -   `opts.limitToFirst` **[number|boolean][13]** Limit to the first `<num>` results. If true is passed than query is limited to last 1 item.
+    -   `opts.limitToLast` **[number|boolean][13]** Limit to the last `<num>` results. If true is passed than query is limited to last 1 item.
+    -   `opts.orderByKey` **[boolean][13]** Order by key name
+    -   `opts.orderByValue` **[boolean][13]** Order by primitive value
+    -   `opts.orderByChild` **[string][11]** Select a child key by which to order results
+    -   `opts.equalTo` **[string][11]** Restrict results to `<val>` (based on specified ordering)
+    -   `opts.startAt` **[string][11]** Start results at `<val>` (based on specified ordering)
+    -   `opts.endAt` **[string][11]** End results at `<val>` (based on specified ordering)
+    -   `opts.instance` **[string][11]** Use the database `<instance>.firebaseio.com` (if omitted, use default database instance)
     -   `opts.args` **[Array][13]** Command line args to be passed
 
 ##### Examples

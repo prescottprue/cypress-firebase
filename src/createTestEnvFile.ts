@@ -1,7 +1,7 @@
 import chalk from 'chalk';
 import { writeFile } from 'fs';
 import { pickBy, get, isUndefined } from 'lodash';
-import { promisify } from 'util'
+import { promisify } from 'util';
 import {
   envVarBasedOnCIEnv,
   getServiceAccount,
@@ -14,7 +14,7 @@ import { DEFAULT_TEST_ENV_FILE_NAME } from './constants';
 import { FIREBASE_CONFIG_FILE_PATH, TEST_ENV_FILE_PATH } from './filePaths';
 import * as logger from './logger';
 
-const writeFilePromise = promisify(writeFile)
+const writeFilePromise = promisify(writeFile);
 
 /* eslint-disable no-irregular-whitespace */
 /**
