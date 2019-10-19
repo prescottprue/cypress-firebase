@@ -1,6 +1,6 @@
 {
   "name": "cypress-firebase",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -30,8 +30,8 @@
     "chalk": "^2.4.2",
     "commander": "^3.0.0",
     "figures": "^3.0.0",
-    "firebase-admin": "^8.5.0",
-    "firebase-tools-extra": "0.1.1",
+    "firebase-admin": "^8.6.1",
+    "firebase-tools-extra": "0.2.0",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
@@ -52,7 +52,7 @@
     "eslint-plugin-jsdoc": "^15.9.2",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.0",
-    "firebase-tools": "^7.3.1",
+    "firebase-tools": "^7.6.1",
     "husky": "^3.0.4",
     "mocha": "^6.2.1",
     "prettier": "^1.18.2",

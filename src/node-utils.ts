@@ -25,7 +25,8 @@ export function readJsonFile(filePath: string): any {
   }
 
   try {
-    return JSON.parse(readFileSync(filePath, 'utf8'));
+    const fileBuffer = readFileSync(filePath, 'utf8');
+    return JSON.parse(fileBuffer.toString());
   } catch (err) {
     error(
       `Unable to parse ${chalk.cyan(

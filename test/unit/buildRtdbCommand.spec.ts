@@ -16,6 +16,86 @@ describe('buildRtdbCommand', () => {
       expect(buildRtdbCommand(Cypress, action, actionPath))
         .to.equal(`${firebasePath} database:${action} /${actionPath}`)
     })
+    
+    it('supports orderByChild (--order-by flag for firebase-tools)', () => {
+      const actionPath = 'some/path'
+      const action = 'get'
+      const orderByChild = 'asdf'
+      expect(buildRtdbCommand(Cypress, action, actionPath, { orderByChild  }))
+        .to.equal(`${firebasePath} database:${action} /${actionPath} --order-by ${orderByChild}`)
+    })
+
+    it('supports orderByKey (--order-by-key flag for firebase-tools)', () => {
+      const actionPath = 'some/path'
+      const action = 'get'
+      expect(buildRtdbCommand(Cypress, action, actionPath, { orderByKey: true  }))
+        .to.equal(`${firebasePath} database:${action} /${actionPath} --order-by-key`)
+    })
+
+    it('supports orderByValue (--order-by-value flag for firebase-tools)', () => {
+      const actionPath = 'some/path'
+      const action = 'get'
+      expect(buildRtdbCommand(Cypress, action, actionPath, { orderByValue: true  }))
+        .to.equal(`${firebasePath} database:${action} /${actionPath} --order-by-value`)
+    })
+
+    it('supports startAt (--start-at flag for firebase-tools)', () => {
+      const actionPath = 'some/path'
+      const action = 'get'
+      const startAt = 'asdf'
+      expect(buildRtdbCommand(Cypress, action, actionPath, { startAt  }))
+        .to.equal(`${firebasePath} database:${action} /${actionPath} --start-at ${startAt}`)
+    })
+
+    it('supports endAt (--end-at flag for firebase-tools)', () => {
+      const actionPath = 'some/path'
+      const action = 'get'
+      const endAt = 'asdf'
+      expect(buildRtdbCommand(Cypress, action, actionPath, { endAt }))
+        .to.equal(`${firebasePath} database:${action} /${actionPath} --end-at ${endAt}`)
+    })
+
+    it('supports equalTo (--equal-to flag for firebase-tools)', () => {
+      const actionPath = 'some/path'
+      const action = 'get'
+      const equalTo = 'asdf'
+      expect(buildRtdbCommand(Cypress, action, actionPath, { equalTo }))
+        .to.equal(`${firebasePath} database:${action} /${actionPath} --equal-to ${equalTo}`)
+    })
+
+    it('supports instance (--instance flag for firebase-tools)', () => {
+      const actionPath = 'some/path'
+      const action = 'get'
+      const instance = 'asdf'
+      expect(buildRtdbCommand(Cypress, action, actionPath, { instance }))
+        .to.equal(`${firebasePath} database:${action} /${actionPath} --instance ${instance}`)
+    })
+
+    it('supports limitToLast (--limitToLast flag for firebase-tools)', () => {
+      const actionPath = 'some/path'
+      const action = 'get'
+      const limitToLast = 'asdf'
+      expect(buildRtdbCommand(Cypress, action, actionPath, { limitToLast }))
+        .to.equal(`${firebasePath} database:${action} /${actionPath} --order-by-key --limit-to-last ${limitToLast}`)
+    })
+
+    describe('supports limitToFirst (--limitToFirst flag for firebase-tools)', () => {
+      it('as a boolean (defaults to 1 with order by key)', () => {
+        const actionPath = 'some/path'
+        const action = 'get'
+        const limitToFirst = 1
+        expect(buildRtdbCommand(Cypress, action, actionPath, { limitToFirst }))
+          .to.equal(`${firebasePath} database:${action} /${actionPath} --order-by-key --limit-to-first ${limitToFirst}`)
+      })
+
+      it('as a string', () => {
+        const actionPath = 'some/path'
+        const action = 'get'
+        const limitToFirst = 'asdf'
+        expect(buildRtdbCommand(Cypress, action, actionPath, { limitToFirst }))
+          .to.equal(`${firebasePath} database:${action} /${actionPath} --order-by-key --limit-to-first ${limitToFirst}`)
+      })
+    })
   });
 
   describe('set', () => {

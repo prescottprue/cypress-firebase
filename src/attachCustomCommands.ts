@@ -40,7 +40,8 @@ declare global {
 
       /**
        * Call Real Time Database path with some specified action. Authentication is through
-       * FIREBASE_TOKEN since firebase-tools is used (instead of firebaseExtra).
+       * `FIREBASE_TOKEN` (CI token) since firebase-tools is used under the hood, allowing
+       * for adming privileges.
        * @param action - The action type to call with (set, push, update, remove)
        * @param actionPath - Path within RTDB that action should be applied
        * @param opts - Options
@@ -49,14 +50,14 @@ declare global {
        * @example <caption>Set Data</caption>
        * const fakeProject = { some: 'data' }
        * cy.callRtdb('set', 'projects/ABC123', fakeProject)
-       * @example <caption>Set Data With Meta</caption>
+       * @example <caption>Set Data With Meta Data</caption>
        * const fakeProject = { some: 'data' }
        * // Adds createdAt and createdBy (current user's uid) on data
        * cy.callRtdb('set', 'projects/ABC123', fakeProject, { withMeta: true })
        * @example <caption>Passing Other Arguments</caption>
-       * const opts = { args: ['-d'] }
+       * const options = { args: ['-d'] }
        * const fakeProject = { some: 'data' }
-       * cy.callRtdb('update', 'project/test-project', fakeProject, opts)
+       * cy.callRtdb('update', 'project/test-project', fakeProject, options)
        */
       callRtdb: (
         action: RTDBAction,
@@ -75,25 +76,25 @@ declare global {
        * @param opts - Options
        * @param opts.args - Command line args to be passed
        * @see https://github.com/prescottprue/cypress-firebase#cycallfirestore
-       * @example <caption>Basic Set</caption>
+       * @example <caption>Set Data</caption>
        * const project = { some: 'data' }
        * cy.callFirestore('set', 'project/test-project', project)
-       * @example <caption>Basic Add</caption>
+       * @example <caption>Add New Document</caption>
        * const project = { some: 'data' }
        * cy.callFirestore('add', 'projects', project)
        * @example <caption>Basic Get</caption>
        * cy.callFirestore('get', 'projects/test-project').then((project) => {
        *   cy.log('Project:', project)
        * })
+       * @example <caption>Recursive Delete</caption>
+       * const opts = { recursive: true }
+       * cy.callFirestore('delete', 'project/test-project', opts)
        * @example <caption>Manually Loading Fixture</caption>
        * cy.fixture('fakeProject.json').then((project) => {
        *   cy.callFirestore('add', 'projects', project)
        * })
        * @example <caption>Fixture Path</caption>
        * cy.callFirestore('set', 'project/test-project', 'fakeProject.json')
-       * @example <caption>Recursive Delete</caption>
-       * const opts = { recursive: true }
-       * cy.callFirestore('delete', 'project/test-project', opts)
        * @example <caption>Other Args</caption>
        * const opts = { args: ['-r'] }
        * cy.callFirestore('delete', 'project/test-project', opts)
@@ -123,8 +124,6 @@ export default function attachCustomCommands(
    * which is generated using firebase-admin authenticated with serviceAccount
    * during test:buildConfig phase.
    * @name cy.login
-   * @example
-   * cy.login()
    */
   Cypress.Commands.add('login', (): any => {
     /** Log in using token * */
@@ -174,7 +173,8 @@ export default function attachCustomCommands(
   );
 
   /**
-   * Call Real Time Database path with some specified action. Authentication is through FIREBASE_TOKEN since firebase-tools is used (instead of firebaseExtra).
+   * Call Real Time Database path with some specified action. Authentication is through
+   * FIREBASE_TOKEN since firebase-tools is used (instead of firebaseExtra).
    * @param action - The action type to call with (set, push, update, remove)
    * @param actionPath - Path within RTDB that action should be applied
    * @param opts - Options
@@ -273,18 +273,22 @@ export default function attachCustomCommands(
 
       cy.log(`Calling Firestore command:\n${firestoreCommand}`);
 
-      cy.exec(firestoreCommand, { timeout: 100000 }).then((out: any) => {
+      return cy.exec(firestoreCommand, { timeout: 100000 }).then((out: any) => {
         const { stdout, stderr } = out;
         // Reject with Error if error in firestoreCommand call
         if (stderr) {
           cy.log(`Error in Firestore Command:\n${stderr}`);
           return Promise.reject(stderr);
         }
-
         // Parse result if using get action so that data can be verified
-        if (action === 'get' && typeof stdout === 'string') {
+        if (
+          action === 'get' &&
+          (typeof stdout === 'string' || stdout instanceof String)
+        ) {
           try {
-            return JSON.parse(stdout);
+            return JSON.parse(
+              stdout instanceof String ? stdout.toString() : stdout,
+            );
           } catch (err) {
             cy.log('Error parsing data from callFirestore response', out);
             return Promise.reject(err);

@@ -2,8 +2,14 @@ import { isObject } from 'lodash';
 import { addDefaultArgs, getArgsString } from './utils';
 import { FIREBASE_TOOLS_BASE_COMMAND, FIREBASE_EXTRA_PATH } from './constants';
 
+/**
+ * Action for Firestore
+ */
 export type FirestoreAction = 'delete' | 'set' | 'update' | 'get';
 
+/**
+ * Data from loaded fixture
+ */
 export interface FixtureData {
   [k: string]: any;
 }
