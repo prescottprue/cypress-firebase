@@ -1984,10 +1984,10 @@ firebase-admin@^8.6.1:
     "@google-cloud/firestore" "^2.0.0"
     "@google-cloud/storage" "^3.0.2"
 
-firebase-tools-extra@0.2.0-alpha:
-  version "0.2.0-alpha"
-  resolved "https://registry.yarnpkg.com/firebase-tools-extra/-/firebase-tools-extra-0.2.0-alpha.tgz#6cd4716e9693f5a7da24b3a49dcda0b93cf174bc"
-  integrity sha512-RSt9CZdf422T0EWyttV7btG3nfGYuUW5leAk2R+RpHVDcmhtrVemSYDdvdxTcz40jMpkxt98NKaHJNAyjU+d8Q==
+firebase-tools-extra@0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/firebase-tools-extra/-/firebase-tools-extra-0.2.0.tgz#86ea500fdbe9c6d8b5882f7ae390099cb95020f9"
+  integrity sha512-QPu3uxXjZGRq5Y9WynxPd+rq5pVJZlPDGcvjdc12JTq34e0Vf65CX0fSkWMjrbgN3iyyezJTwcCd0L3vc9H/9g==
   dependencies:
     firebase-admin "^8.6.1"
     lodash "^4.17.15"

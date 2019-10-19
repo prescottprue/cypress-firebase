@@ -31,7 +31,7 @@
     "commander": "^3.0.0",
     "figures": "^3.0.0",
     "firebase-admin": "^8.6.1",
-    "firebase-tools-extra": "0.2.0-alpha",
+    "firebase-tools-extra": "0.2.0",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
