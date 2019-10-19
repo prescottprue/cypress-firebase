@@ -1,6 +1,7 @@
 import { get } from 'lodash';
-import { existsSync, readFileSync } from 'fs';
-import * as logger from './logger';
+import { existsSync } from 'fs';
+import { FIREBASE_CONFIG_FILE_NAME } from './constants'
+import { readJsonFile } from './node-utils';
 
 export interface CypressEnvironmentOptions {
   envName?: string;
@@ -30,17 +31,11 @@ export interface ExtendWithFirebaseConfigSettings {
  * @returns Contents of .firebaserc file parsed as JSON
  */
 function loadFirebaseRc(): string {
-  const rcFilePath = `${process.cwd()}/.firebaserc`;
+  const rcFilePath = `${process.cwd()}/${FIREBASE_CONFIG_FILE_NAME}`;
   if (!existsSync(rcFilePath)) {
-    throw new Error('.firebaserc file not found');
+    throw new Error(`${FIREBASE_CONFIG_FILE_NAME} file not found`);
   }
-  try {
-    const fileBuffer = readFileSync(rcFilePath);
-    return JSON.parse(fileBuffer.toString());
-  } catch (err) {
-    logger.error('Error loading .firebaserc: ', err); // eslint-disable-line no-console
-    throw err;
-  }
+  return readJsonFile(rcFilePath)
 }
 
 /**

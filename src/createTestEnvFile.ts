@@ -1,6 +1,7 @@
 import chalk from 'chalk';
-import fs from 'fs';
+import { writeFile } from 'fs';
 import { pickBy, get, isUndefined } from 'lodash';
+import { promisify } from 'util'
 import {
   envVarBasedOnCIEnv,
   getServiceAccount,
@@ -12,6 +13,8 @@ import { to } from './utils';
 import { DEFAULT_TEST_ENV_FILE_NAME } from './constants';
 import { FIREBASE_CONFIG_FILE_PATH, TEST_ENV_FILE_PATH } from './filePaths';
 import * as logger from './logger';
+
+const writeFilePromise = promisify(writeFile)
 
 /* eslint-disable no-irregular-whitespace */
 /**
@@ -146,7 +149,7 @@ export default async function createTestEnvFile(
   }
 
   // Write config file to cypress.env.json
-  fs.writeFileSync(
+  await writeFilePromise(
     TEST_ENV_FILE_PATH,
     JSON.stringify(newCypressConfig, null, 2),
   );

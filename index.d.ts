@@ -18,15 +18,6 @@ declare module "utils" {
      */
     export function to<T, U = Error>(promise: Promise<T>, errorExt?: object): Promise<[U | null, T | undefined]>;
     /**
-     * Convert slash path to Firestore reference
-     * @param firestoreInstance - Instance on which to
-     * create ref
-     * @param slashPath - Path to convert into firestore refernce
-     * @param options - Options object
-     * @returns Ref at slash path
-     */
-    export function slashPathToFirestoreRef(firestoreInstance: any, slashPath: string, options?: any): any;
-    /**
      * Create command arguments string from an array of arguments by joining them
      * with a space including a leading space. If no args provided, empty string
      * is returned
@@ -44,18 +35,6 @@ declare module "utils" {
      * @returns Default args list
      */
     export function addDefaultArgs(Cypress: any, args: string[], opts?: any): string[];
-    /**
-     * Check to see if the provided value is a promise object
-     * @param valToCheck - Value to be checked for Promise qualities
-     * @returns Whether or not provided value is a promise
-     */
-    export function isPromise(valToCheck: any): boolean;
-    /**
-     * Escape shell command arguments and join them to a single string
-     * @param a - List of arguments to escape
-     * @returns Command string with arguments escaped
-     */
-    export function shellescape(a: string[]): string;
 }
 declare module "buildFirestoreCommand" {
     export type FirestoreAction = 'delete' | 'set' | 'update' | 'get';

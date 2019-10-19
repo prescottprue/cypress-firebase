@@ -273,18 +273,17 @@ export default function attachCustomCommands(
 
       cy.log(`Calling Firestore command:\n${firestoreCommand}`);
 
-      cy.exec(firestoreCommand, { timeout: 100000 }).then((out: any) => {
+      return cy.exec(firestoreCommand, { timeout: 100000 }).then((out: any) => {
         const { stdout, stderr } = out;
         // Reject with Error if error in firestoreCommand call
         if (stderr) {
           cy.log(`Error in Firestore Command:\n${stderr}`);
           return Promise.reject(stderr);
         }
-
         // Parse result if using get action so that data can be verified
-        if (action === 'get' && typeof stdout === 'string') {
+        if (action === 'get' && (typeof stdout === 'string' || stdout instanceof String)) {
           try {
-            return JSON.parse(stdout);
+            return JSON.parse(stdout instanceof String ? stdout.toString() : stdout);
           } catch (err) {
             cy.log('Error parsing data from callFirestore response', out);
             return Promise.reject(err);
