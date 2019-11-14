@@ -43,7 +43,7 @@ If you are interested in what drove the need for this checkout [the why section]
 
 **Note:** These instructions assume your tests are in the `cypress` folder (cypress' default). See the [folders section below](#folders) for more info about other supported folders.
 
-1. Make sure you have `firebase-tools` installed (globally or within project). It is used to call to database when using `cy.callRtdb` and `cy.callFirestore`.
+1. Make sure you have `firebase-tools` installed (globally and within project). It is used to call to database when using `cy.callRtdb` and `cy.callFirestore`.
 1. Install using `npm i cypress-firebase --save-dev`
 1. Add the following to the `scripts` section of your `package.json`:
 
