@@ -33,10 +33,11 @@ jobs:
         run: |
           yarn install --frozen-lockfile
 
-      - name: Run Build + Unit Tests + Coverage
+      - name: Run Build
         run: yarn build
 
       - name: Run Unit Tests + Coverage
+        if: success()
         run: yarn test:cov
 
       - name: Upload Coverage
@@ -45,6 +46,6 @@ jobs:
           CI: true
           CODE_COV: ${{ secrets.CODE_COV }}
         run: |
-          # Upload to Code Cover. Curl used in place of codecov/codecov-action
+          # Upload to codecov.io. Curl used in place of codecov/codecov-action
           # due to long build time. See https://github.com/codecov/codecov-action/issues/21
           curl -s https://codecov.io/bash | bash -s -- -t $CODE_COV
