@@ -1,6 +1,7 @@
 # cypress-firebase
+
 [![NPM version][npm-image]][npm-url]
-[![Build Status][travis-image]][travis-url]
+[![Build Status][build-status-image]][build-status-url]
 [![Dependency Status][daviddm-image]][daviddm-url]
 [![License][license-image]][license-url]
 [![Code Style][code-style-image]][code-style-url]
@@ -360,13 +361,13 @@ Instead of a cli tool, the plugin that is included could maybe use `firebase-adm
 
 [14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
 
-
 [fireadmin-url]: https://fireadmin.io
 [fireadmin-source]: https://github.com/prescottprue/fireadmin
 [npm-image]: https://img.shields.io/npm/v/cypress-firebase.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/cypress-firebase
-[travis-image]: https://img.shields.io/travis/prescottprue/cypress-firebase/master.svg?style=flat-square
-[travis-url]: https://travis-ci.org/prescottprue/cypress-firebase
+[build-status-image]: https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fprescottprue%2Fcypress-firebase%2Fbadge&label=build&style=flat-square
+[build-status-image-next]: https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fprescottprue%2Fcypress-firebase%2Fbadge%3Fref%3Dnext&label=build&style=flat-square
+[build-status-url]: https://github.com/prescottprue/cypress-firebase/workflows/publish.yml/badge.svg?branch=next
 [daviddm-image]: https://img.shields.io/david/prescottprue/cypress-firebase.svg?style=flat-square
 [daviddm-url]: https://david-dm.org/prescottprue/cypress-firebase
 [climate-image]: https://img.shields.io/codeclimate/github/prescottprue/cypress-firebase.svg?style=flat-square
