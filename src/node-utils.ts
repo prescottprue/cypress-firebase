@@ -38,12 +38,32 @@ export function readJsonFile(filePath: string): any {
 }
 
 /**
+ * Get branch name from GITHUB_REF environment variable which is
+ * available in Github Actions environment.
+ * @returns Branch name if environment variable exists
+ */
+function branchNameForGithubAction(): string | undefined {
+  const { GITHUB_HEAD_REF, GITHUB_REF } = process.env;
+  // GITHUB_HEAD_REF for pull requests
+  if (GITHUB_HEAD_REF) {
+    return GITHUB_HEAD_REF;
+  }
+  // GITHUB_REF for commits (i.e. refs/heads/master)
+  if (GITHUB_REF) {
+    return GITHUB_REF.split('/')[2];
+  }
+}
+
+/**
  * Get environment slug
  * @returns Environment slug
  */
 function getEnvironmentSlug(): string {
   return (
-    process.env.CI_ENVIRONMENT_SLUG || process.env.CI_COMMIT_REF_SLUG || 'stage'
+    branchNameForGithubAction() ||
+    process.env.CI_ENVIRONMENT_SLUG ||
+    process.env.CI_COMMIT_REF_SLUG ||
+    'stage'
   );
 }
 

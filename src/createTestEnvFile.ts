@@ -40,7 +40,7 @@ export default async function createTestEnvFile(
   if (!uid) {
     const errMsg = `${chalk.cyan(
       'TEST_UID',
-    )} is missing from environment. Confirm that ${chalk.cyan(
+    )} is missing from environment. Confirm that environment variables or ${chalk.cyan(
       TEST_ENV_FILE_PATH,
     )} or ${chalk.cyan(getCypressConfigPath())} contains either ${chalk.cyan(
       varName,
