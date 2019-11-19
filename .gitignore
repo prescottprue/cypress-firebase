@@ -7,3 +7,5 @@ es
 **/cypress.env.json
 **/serviceAccount.json
 *.log*
+.nyc_output/**
+coverage/**

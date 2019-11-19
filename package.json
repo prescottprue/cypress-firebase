@@ -17,6 +17,8 @@
     "lint": "eslint src/**.ts --ext .ts",
     "lint:fix": "npm run lint -- --fix",
     "test": "mocha -r ts-node/register --require ./test/setup.ts ./test/unit/**/*.spec.ts",
+    "test:cov": "nyc --reporter=lcov npm run test",
+    "codecov": "cat coverage/lcov.info | codecov",
     "prepare": "npm run clean && npm run build",
     "prepush": "npm run lint"
   },
@@ -30,7 +32,7 @@
     "chalk": "^2.4.2",
     "commander": "^3.0.0",
     "figures": "^3.1.0",
-    "firebase-admin": "^8.7.0",
+    "firebase-admin": "^8.8.0",
     "firebase-tools-extra": "0.2.1",
     "lodash": "^4.17.15"
   },
@@ -43,6 +45,7 @@
     "@typescript-eslint/eslint-plugin": "^2.6.1",
     "@typescript-eslint/parser": "^2.6.1",
     "chai": "^4.2.0",
+    "codecov": "^3.6.1",
     "cross-env": "^6.0.3",
     "eslint": "^6.6.0",
     "eslint-config-airbnb-base": "^14.0.0",
@@ -55,6 +58,7 @@
     "firebase-tools": "^7.6.2",
     "husky": "^3.0.9",
     "mocha": "^6.2.2",
+    "nyc": "^14.1.1",
     "prettier": "^1.18.2",
     "rimraf": "^3.0.0",
     "sinon": "^7.5.0",
@@ -66,7 +70,8 @@
     "cypress",
     "cypress-plugin",
     "firebase",
-    "testing"
+    "testing",
+    "github-actions"
   ],
   "license": "MIT",
   "repository": {

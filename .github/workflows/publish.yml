@@ -53,19 +53,15 @@ jobs:
           name: build
           path: lib
 
-      - name: Upload Coverage + Climate
+      - name: Upload Coverage
         if: success()
         env:
           CI: true
           CODE_COV: ${{ secrets.CODE_COV }}
-          CODECLIMATE_REPO_TOKEN: ${{ secrets.CODE_CLIMATE }}
         run: |
           # Upload to Code Cover. Curl used in place of codecov/codecov-action
           # due to long build time. See https://github.com/codecov/codecov-action/issues/21
           curl -s https://codecov.io/bash | bash -s -- -t $CODE_COV
-          # Install codeclimate tool and upload
-          npm install -g codeclimate-test-reporter
-          codeclimate-test-reporter < coverage/lcov.info
 
   publish-npm:
     needs: build
