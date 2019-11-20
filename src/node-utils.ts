@@ -79,6 +79,17 @@ export function getEnvPrefix(envName?: string): string {
 }
 
 /**
+ * Create a variable name string with environment prefix (i.e. STAGE_SERVICE_ACCOUNT)
+ * @param varNameRoot - Root of environment variable name
+ * @param envName - Environment option
+ * @returns Environment var name with prefix
+ */
+export function withEnvPrefix(varNameRoot: string, envName?: string): string {
+  const envPrefix = getEnvPrefix(envName);
+  return `${envPrefix}${varNameRoot}`;
+}
+
+/**
  * Get path to local service account
  * @param envName - Environment option
  * @returns Path to service account
@@ -133,8 +144,7 @@ export function getCypressConfigPath(): string {
  * // => 'fireadmin-stage' (value of 'STAGE_FIREBASE_PROJECT_ID' environment var)
  */
 export function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any {
-  const prefix = getEnvPrefix(envName);
-  const combined = `${prefix}${varNameRoot}`;
+  const combined = withEnvPrefix(varNameRoot, envName);
   const localConfigFilePath = getCypressConfigPath();
 
   // Config file used for environment (local, containers) from main test path ({integrationFolder}/config.json)
@@ -172,8 +182,7 @@ export function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any {
  */
 function getParsedEnvVar(varNameRoot: string, envName: string): any {
   const val = envVarBasedOnCIEnv(varNameRoot, envName);
-  const prefix = getEnvPrefix();
-  const combinedVar = `${prefix}${varNameRoot}`;
+  const combinedVar = withEnvPrefix(varNameRoot, envName);
   if (!val) {
     error(
       `${chalk.cyan(
@@ -221,6 +230,7 @@ export function getServiceAccount(envSlug: string): ServiceAccount {
       serviceAccountPath.replace(`${DEFAULT_BASE_PATH}/`, ''),
     )}" falling back to environment variables...`,
   );
+
   // Use environment variables (CI)
   const serviceAccountEnvVar = envVarBasedOnCIEnv('SERVICE_ACCOUNT', envSlug);
   if (serviceAccountEnvVar) {
@@ -229,16 +239,29 @@ export function getServiceAccount(envSlug: string): ServiceAccount {
         return JSON.parse(serviceAccountEnvVar);
       } catch (err) {
         warn(
-          'Issue parsing SERVICE_ACCOUNT environment variable from string to object, returning string',
+          `Issue parsing ${chalk.cyan(
+            'SERVICE_ACCOUNT',
+          )} environment variable from string to object, returning string`,
         );
       }
     }
     return serviceAccountEnvVar;
   }
+
+  info(
+    `Service account does not exist as a single environment variable within ${chalk.cyan(
+      'SERVICE_ACCOUNT',
+    )} or ${chalk.cyan(
+      withEnvPrefix('SERVICE_ACCOUNT'),
+    )}, checking separate environment variables...`,
+  );
+
   const clientId = envVarBasedOnCIEnv('FIREBASE_CLIENT_ID', envSlug);
   if (clientId) {
     warn(
-      '"FIREBASE_CLIENT_ID" will override FIREBASE_TOKEN for auth when calling firebase-tools - this may cause unexepected behavior',
+      `${chalk.cyan('FIREBASE_CLIENT_ID')} will override ${chalk.cyan(
+        'FIREBASE_TOKEN',
+      )} for auth when calling firebase-tools - this may cause unexepected behavior`,
     );
   }
   return {

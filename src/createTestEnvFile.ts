@@ -5,9 +5,9 @@ import { promisify } from 'util';
 import {
   envVarBasedOnCIEnv,
   getServiceAccount,
-  getEnvPrefix,
   readJsonFile,
   getCypressConfigPath,
+  withEnvPrefix,
 } from './node-utils';
 import { to } from './utils';
 import { DEFAULT_TEST_ENV_FILE_NAME } from './constants';
@@ -31,20 +31,20 @@ const writeFilePromise = promisify(writeFile);
 export default async function createTestEnvFile(
   envName: string,
 ): Promise<string> {
-  /* eslint-disable no-irregular-whitespace */
-  const envPrefix = getEnvPrefix(envName);
   // Get UID from environment (falls back to cypress/config.json for local)
-  const uid = envVarBasedOnCIEnv('TEST_UID', envName);
-  const varName = `${envPrefix}TEST_UID`;
+  const varName = 'TEST_UID';
+  const uid = envVarBasedOnCIEnv(varName, envName);
   // Throw if UID is missing in environment
   if (!uid) {
     const errMsg = `${chalk.cyan(
-      'TEST_UID',
-    )} is missing from environment. Confirm that environment variables or ${chalk.cyan(
-      TEST_ENV_FILE_PATH,
-    )} or ${chalk.cyan(getCypressConfigPath())} contains either ${chalk.cyan(
       varName,
-    )} or ${chalk.cyan('TEST_UID')}.`;
+    )} is missing from environment. Confirm that either ${chalk.cyan(
+      withEnvPrefix(varName),
+    )} or ${chalk.cyan(
+      varName,
+    )} are set within environment variables, ${chalk.cyan(
+      DEFAULT_TEST_ENV_FILE_NAME,
+    )}, or ${chalk.cyan(getCypressConfigPath())}.`;
     return Promise.reject(new Error(errMsg));
   }
 

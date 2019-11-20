@@ -18,7 +18,7 @@ program.on('*', name => {
 
 program.parse(process.argv);
 
-if (program.args.length < 1) {
+if (program.rawArgs.length < 3) {
   console.log("No command specified. See 'cypress-firebase --help':"); // eslint-disable-line no-console
   program.outputHelp();
   process.exit(1);
