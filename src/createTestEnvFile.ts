@@ -139,7 +139,11 @@ export default async function createTestEnvFile(
     FIREBASE_PROJECT_ID,
     FIREBASE_API_KEY:
       envVarBasedOnCIEnv('FIREBASE_API_KEY', envName) ||
-      get(firebaserc, `ci.createConfig.${envSlug}.firebase.apiKey`),
+      get(
+        firebaserc,
+        `ci.createConfig.${envSlug}.firebase.apiKey`,
+        get(firebaserc, `ci.createConfig.master.firebase.apiKey`),
+      ),
     FIREBASE_AUTH_JWT: customToken,
   };
 
