@@ -1,7 +1,7 @@
 # cypress-firebase
+
 [![NPM version][npm-image]][npm-url]
-[![Build Status][travis-image]][travis-url]
-[![Dependency Status][daviddm-image]][daviddm-url]
+[![Build Status][build-status-image]][build-status-url]
 [![License][license-image]][license-url]
 [![Code Style][code-style-image]][code-style-url]
 
@@ -57,7 +57,7 @@ If you are interested in what drove the need for this checkout [the why section]
 
     Environment variables can be passed through `--env`. `envName` points to the firebase project within the projects section of `.firebaserc`.
 
-1. Add your config info to `cypress/config.json`
+1. Add your config info to your environment variables or `cypress/config.json` (make sure this is in you `.gitignore`)
   
     ```js
     {
@@ -123,6 +123,100 @@ Tests will run faster locally if you tests against the build version of your app
 
 1. Run `firebase login:ci` to generate a CI token for `firebase-tools` (this will give your `cy.callRtdb` and `cy.callFirestore` commands admin access to the DB)
 1. Set `FIREBASE_TOKEN` within CI environment variables
+
+#### Github Actions Examples
+
+**Separate Install**
+
+```yml
+name: Test Build
+
+on: [pull_request]
+
+jobs:
+  ui-tests:
+    name: UI Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v1
+
+      # Install is run separatley from test so that dependencies are available
+      # for other steps
+      - name: Install Dependencies
+        uses: cypress-io/github-action@v1
+        with:
+          # just perform install
+          runTests: false
+
+      - name: Build Test Environment Config
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          TEST_UID: ${{ secrets.TEST_UID }}
+          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+        run: |
+          $(npm bin)/cypress-firebase createTestEnvFile $TEST_ENV
+
+      # Cypress action manages installing/caching npm dependencies and Cypress binary.
+      - name: Cypress Run
+        uses: cypress-io/github-action@v1
+        with:
+          # we have already installed all dependencies above
+          install: false
+          group: 'E2E Tests'
+        env:
+          # pass the Dashboard record key as an environment variable
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_KEY }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+```
+
+**Using Start For Local**
+
+```yml
+name: Test Hosted
+
+on: [pull_request]
+
+jobs:
+  ui-tests:
+    name: UI Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v1
+
+      # Install is run separatley from test so that dependencies are available
+      # for other steps
+      - name: Install Dependencies
+        uses: cypress-io/github-action@v1
+        with:
+          # just perform install
+          runTests: false
+
+      - name: Build Test Environment Config
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          TEST_UID: ${{ secrets.TEST_UID }}
+          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+        run: |
+          $(npm bin)/cypress-firebase createTestEnvFile $TEST_ENV
+
+      # Cypress action manages installing/caching npm dependencies and Cypress binary.
+      - name: Cypress Run
+        uses: cypress-io/github-action@v1
+        with:
+          # we have already installed all dependencies above
+          install: false
+          group: 'E2E Tests'
+          start: npm start
+          wait-on: http://localhost:3000
+        env:
+          # pass the Dashboard record key as an environment variable
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_KEY }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          GITHUB_REF: ${{ github.head_ref }}
+```
 
 ### Folders
 
@@ -360,13 +454,13 @@ Instead of a cli tool, the plugin that is included could maybe use `firebase-adm
 
 [14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
 
-
 [fireadmin-url]: https://fireadmin.io
 [fireadmin-source]: https://github.com/prescottprue/fireadmin
 [npm-image]: https://img.shields.io/npm/v/cypress-firebase.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/cypress-firebase
-[travis-image]: https://img.shields.io/travis/prescottprue/cypress-firebase/master.svg?style=flat-square
-[travis-url]: https://travis-ci.org/prescottprue/cypress-firebase
+[build-status-image]: https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fprescottprue%2Fcypress-firebase%2Fbadge&label=build&style=flat-square
+[build-status-image-next]: https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fprescottprue%2Fcypress-firebase%2Fbadge%3Fref%3Dnext&label=build&style=flat-square
+[build-status-url]: https://github.com/prescottprue/cypress-firebase/workflows/publish.yml/badge.svg?branch=next
 [daviddm-image]: https://img.shields.io/david/prescottprue/cypress-firebase.svg?style=flat-square
 [daviddm-url]: https://david-dm.org/prescottprue/cypress-firebase
 [climate-image]: https://img.shields.io/codeclimate/github/prescottprue/cypress-firebase.svg?style=flat-square
