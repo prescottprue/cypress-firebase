@@ -50,7 +50,7 @@ function branchNameForGithubAction(): string | undefined {
   }
   // GITHUB_REF for commits (i.e. refs/heads/master)
   if (GITHUB_REF) {
-    return GITHUB_REF.split('/')[2];
+    return GITHUB_REF.replace('refs/heads/', ''); // remove prefix if it exists
   }
 }
 
@@ -58,12 +58,12 @@ function branchNameForGithubAction(): string | undefined {
  * Get environment slug
  * @returns Environment slug
  */
-function getEnvironmentSlug(): string {
+export function getEnvironmentSlug(): string {
   return (
     branchNameForGithubAction() ||
-    process.env.CI_ENVIRONMENT_SLUG ||
-    process.env.CI_COMMIT_REF_SLUG ||
-    'stage'
+    process.env.CI_ENVIRONMENT_SLUG || // Gitlab-CI "environment" param
+    process.env.CI_COMMIT_REF_SLUG || // Gitlab-CI
+    'master'
   );
 }
 

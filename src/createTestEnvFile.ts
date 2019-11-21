@@ -8,6 +8,7 @@ import {
   readJsonFile,
   getCypressConfigPath,
   withEnvPrefix,
+  getEnvironmentSlug,
 } from './node-utils';
 import { to } from './utils';
 import { DEFAULT_TEST_ENV_FILE_NAME } from './constants';
@@ -45,7 +46,7 @@ export default async function createTestEnvFile(
     )} are set within environment variables, ${chalk.cyan(
       DEFAULT_TEST_ENV_FILE_NAME,
     )}, or ${chalk.cyan(getCypressConfigPath())}.`;
-    return Promise.reject(new Error(errMsg));
+    throw new Error(errMsg);
   }
 
   // Get project from .firebaserc
@@ -84,6 +85,9 @@ export default async function createTestEnvFile(
   // Remove firebase- prefix (was added to database names for a short period of time)
   const cleanedProjectId = FIREBASE_PROJECT_ID.replace('firebase-', '');
 
+  // TODO: Look into if inline require is still needed
+  // It used to be associated with an error in utils when loaded in browser
+  // environment (the reason why node-utils exists).
   const admin = require('firebase-admin'); // eslint-disable-line @typescript-eslint/no-var-requires, global-require
 
   // Initialize Firebase app with service account
@@ -126,6 +130,8 @@ export default async function createTestEnvFile(
   // Remove firebase app
   appFromSA.delete();
 
+  const envSlug = envName || getEnvironmentSlug();
+
   // Create config object to be written into test env file by combining with existing config
   const newCypressConfig = {
     ...currentCypressEnvSettings,
@@ -133,20 +139,9 @@ export default async function createTestEnvFile(
     FIREBASE_PROJECT_ID,
     FIREBASE_API_KEY:
       envVarBasedOnCIEnv('FIREBASE_API_KEY', envName) ||
-      get(firebaserc, `ci.createConfig.${envName}.firebase.apiKey`),
+      get(firebaserc, `ci.createConfig.${envSlug}.firebase.apiKey`),
     FIREBASE_AUTH_JWT: customToken,
   };
-
-  const stageProjectId = envVarBasedOnCIEnv(
-    'STAGE_FIREBASE_PROJECT_ID',
-    envName,
-  );
-  const stageApiKey = envVarBasedOnCIEnv('STAGE_FIREBASE_API_KEY', envName);
-
-  if (stageProjectId) {
-    newCypressConfig.STAGE_FIREBASE_PROJECT_ID = stageProjectId;
-    newCypressConfig.STAGE_FIREBASE_API_KEY = stageApiKey;
-  }
 
   // Write config file to cypress.env.json
   await writeFilePromise(
