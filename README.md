@@ -2,7 +2,6 @@
 
 [![NPM version][npm-image]][npm-url]
 [![Build Status][build-status-image]][build-status-url]
-[![Dependency Status][daviddm-image]][daviddm-url]
 [![License][license-image]][license-url]
 [![Code Style][code-style-image]][code-style-url]
 
