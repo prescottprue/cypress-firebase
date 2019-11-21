@@ -127,56 +127,10 @@ Tests will run faster locally if you tests against the build version of your app
 
 #### Github Actions Examples
 
-**Using Start**
-
-```yml
-name: Test Hosted
-
-on: [pull_request]
-
-jobs:
-  ui-tests:
-    name: UI Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v1
-
-      # Install is run separatley from test so that dependencies are available
-      # for other steps
-      - name: Install Dependencies
-        uses: cypress-io/github-action@v1
-        with:
-          # just perform install
-          runTests: false
-
-      - name: Build Test Environment Config
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          TEST_UID: ${{ secrets.TEST_UID }}
-          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
-        run: |
-          $(npm bin)/cypress-firebase createTestEnvFile $TEST_ENV
-
-      # Cypress action manages installing/caching npm dependencies and Cypress binary.
-      - name: Cypress Run
-        uses: cypress-io/github-action@v1
-        with:
-          # we have already installed all dependencies above
-          install: false
-          group: 'E2E Tests'
-          start: 
-        env:
-          # pass the Dashboard record key as an environment variable
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_KEY }}
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          GITHUB_REF: ${{ github.head_ref }}
-```
-
 **Separate Install**
 
 ```yml
-name: Test Hosted
+name: Test Build
 
 on: [pull_request]
 
@@ -216,6 +170,53 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_KEY }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           GITHUB_HEAD_REF: ${{ github.head_ref }}
+```
+
+**Using Start For Local**
+
+```yml
+name: Test Hosted
+
+on: [pull_request]
+
+jobs:
+  ui-tests:
+    name: UI Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v1
+
+      # Install is run separatley from test so that dependencies are available
+      # for other steps
+      - name: Install Dependencies
+        uses: cypress-io/github-action@v1
+        with:
+          # just perform install
+          runTests: false
+
+      - name: Build Test Environment Config
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          TEST_UID: ${{ secrets.TEST_UID }}
+          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+        run: |
+          $(npm bin)/cypress-firebase createTestEnvFile $TEST_ENV
+
+      # Cypress action manages installing/caching npm dependencies and Cypress binary.
+      - name: Cypress Run
+        uses: cypress-io/github-action@v1
+        with:
+          # we have already installed all dependencies above
+          install: false
+          group: 'E2E Tests'
+          start: npm start
+          wait-on: http://localhost:3000
+        env:
+          # pass the Dashboard record key as an environment variable
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_KEY }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          GITHUB_REF: ${{ github.head_ref }}
 ```
 
 ### Folders
