@@ -6,7 +6,7 @@ const addSpy = sinon.spy()
 const envSpy = sinon.spy()
 const Cypress = { Commands: { add: addSpy }, env: envSpy }
 
-const firebasePath = '$(npm bin)/firebase'
+const firebasePath = 'npx firebase'
 
 describe('buildRtdbCommand', () => {
   describe('get', () => {

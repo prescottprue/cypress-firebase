@@ -5,8 +5,8 @@ declare module "constants" {
     export const DEFAULT_TEST_CONFIG_FILE_NAME = "cypress.json";
     export const DEFAULT_CONFIG_FILE_NAME = "config.json";
     export const FIREBASE_CONFIG_FILE_NAME = ".firebaserc";
-    export const FIREBASE_TOOLS_BASE_COMMAND = "$(npm bin)/firebase";
-    export const FIREBASE_EXTRA_PATH = "$(npm bin)/firebase-extra";
+    export const FIREBASE_TOOLS_BASE_COMMAND = "npx firebase";
+    export const FIREBASE_EXTRA_PATH = "npx firebase-extra";
     export const FIREBASE_TOOLS_YES_ARGUMENT = "-y";
 }
 declare module "utils" {
