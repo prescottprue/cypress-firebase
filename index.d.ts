@@ -319,12 +319,6 @@ declare module "node-utils" {
      */
     export function withEnvPrefix(varNameRoot: string, envName?: string): string;
     /**
-     * Get cypress folder path from cypress.json config file or fallback to
-     * default folder path ('cypress')
-     * @returns Path of folder containing cypress folders like "integration"
-     */
-    export function getCypressFolderPath(): string;
-    /**
      * Get path to cypress config file
      * @returns Path to cypress config file
      */
