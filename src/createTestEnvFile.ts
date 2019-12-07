@@ -54,14 +54,15 @@ export default async function createTestEnvFile(
 
   const currentCypressEnvSettings = readJsonFile(TEST_ENV_FILE_PATH);
 
+  const envSlug = envName || getEnvironmentSlug();
+
   const FIREBASE_PROJECT_ID =
-    get(currentCypressEnvSettings, 'FIREBASE_PROJECT_ID') ||
-    envVarBasedOnCIEnv('FIREBASE_PROJECT_ID', envName) ||
-    get(
-      firebaserc,
-      `projects.${envName}`,
-      get(firebaserc, 'projects.default', ''),
-    );
+    get(currentCypressEnvSettings, 'FIREBASE_PROJECT_ID') || // FIREBASE_PROJECT_ID already in cypress config
+    envVarBasedOnCIEnv('FIREBASE_PROJECT_ID', envSlug) || // FIREBASE_PROJECT_ID Environment variables
+    envVarBasedOnCIEnv('FIREBASE_PROJECT', envSlug) || // FIREBASE_PROJECT Environment variables
+    get(firebaserc, `ci.createConfig.${envSlug}.firebase.projectId`) || // CI createConfig projectId based on branch
+    get(firebaserc, `projects.${envSlug}`) || // project by branch name
+    get(firebaserc, 'projects.default', '');
 
   logger.info(
     `Generating custom auth token for Firebase project with projectId: ${chalk.cyan(
@@ -129,8 +130,6 @@ export default async function createTestEnvFile(
 
   // Remove firebase app
   appFromSA.delete();
-
-  const envSlug = envName || getEnvironmentSlug();
 
   // Create config object to be written into test env file by combining with existing config
   const newCypressConfig = {
