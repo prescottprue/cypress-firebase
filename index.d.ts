@@ -300,6 +300,11 @@ declare module "node-utils" {
      */
     export function readJsonFile(filePath: string): any;
     /**
+     * Get environment slug
+     * @returns Environment slug
+     */
+    export function getEnvironmentSlug(): string;
+    /**
      * Get prefix for current environment based on environment vars available
      * within CI. Falls back to staging (i.e. STAGE)
      * @param envName - Environment option
@@ -307,11 +312,12 @@ declare module "node-utils" {
      */
     export function getEnvPrefix(envName?: string): string;
     /**
-     * Get cypress folder path from cypress.json config file or fallback to
-     * default folder path ('cypress')
-     * @returns Path of folder containing cypress folders like "integration"
+     * Create a variable name string with environment prefix (i.e. STAGE_SERVICE_ACCOUNT)
+     * @param varNameRoot - Root of environment variable name
+     * @param envName - Environment option
+     * @returns Environment var name with prefix
      */
-    export function getCypressFolderPath(): string;
+    export function withEnvPrefix(varNameRoot: string, envName?: string): string;
     /**
      * Get path to cypress config file
      * @returns Path to cypress config file
@@ -348,9 +354,6 @@ declare module "node-utils" {
     export interface RunCommandOptions {
         command: string;
         args: string[];
-        beforeMsg?: string;
-        successMsg?: string;
-        errorMsg?: string;
         pipeOutput?: boolean;
     }
     /**

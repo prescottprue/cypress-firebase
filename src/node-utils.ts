@@ -110,7 +110,7 @@ function getServiceAccountPath(envName?: string): string {
  * default folder path ('cypress')
  * @returns Path of folder containing cypress folders like "integration"
  */
-export function getCypressFolderPath(): string {
+function getCypressFolderPath(): string {
   const cypressConfig = readJsonFile(TEST_CONFIG_FILE_PATH); // eslint-disable-line no-use-before-define
   const integrationTestsFolderPath = get(cypressConfig, 'integrationFolder');
   return integrationTestsFolderPath
@@ -281,9 +281,6 @@ export function getServiceAccount(envSlug: string): ServiceAccount {
 export interface RunCommandOptions {
   command: string;
   args: string[];
-  beforeMsg?: string;
-  successMsg?: string;
-  errorMsg?: string;
   pipeOutput?: boolean;
 }
 
@@ -296,15 +293,7 @@ export interface RunCommandOptions {
  * @private
  */
 export function runCommand(runOptions: RunCommandOptions): Promise<any> {
-  const {
-    beforeMsg,
-    successMsg,
-    command,
-    errorMsg,
-    args,
-    pipeOutput = true,
-  } = runOptions;
-  if (beforeMsg) info(beforeMsg);
+  const { command, args, pipeOutput = true } = runOptions;
   return new Promise((resolve, reject): void => {
     const child = spawn(command, args);
     let output: any;
@@ -332,22 +321,17 @@ export function runCommand(runOptions: RunCommandOptions): Promise<any> {
     child.on('exit', (code: number): void => {
       if (code !== 0) {
         // Resolve for npm warnings
-        if (output && output.indexOf('npm WARN') !== -1) {
-          return resolve(successMsg || output);
-        }
-        if (errorMsg) {
-          console.log(errorMsg); // eslint-disable-line no-console
+        if (output && output.includes('npm WARN')) {
+          return resolve(output);
         }
         reject(error || output);
       } else {
-        // resolve(null, stdout)
-        if (successMsg) info(successMsg);
         // Remove leading undefined from response
-        if (output && output.indexOf('undefined') === 0) {
-          resolve(successMsg || output.replace('undefined', ''));
-        } else {
-          resolve(successMsg || output);
-        }
+        resolve(
+          output && output.indexOf('undefined') === 0
+            ? output.replace('undefined', '')
+            : output,
+        );
       }
     });
   });
