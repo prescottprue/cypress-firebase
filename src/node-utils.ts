@@ -38,12 +38,32 @@ export function readJsonFile(filePath: string): any {
 }
 
 /**
+ * Get branch name from GITHUB_REF environment variable which is
+ * available in Github Actions environment.
+ * @returns Branch name if environment variable exists
+ */
+function branchNameForGithubAction(): string | undefined {
+  const { GITHUB_HEAD_REF, GITHUB_REF } = process.env;
+  // GITHUB_HEAD_REF for pull requests
+  if (GITHUB_HEAD_REF) {
+    return GITHUB_HEAD_REF;
+  }
+  // GITHUB_REF for commits (i.e. refs/heads/master)
+  if (GITHUB_REF) {
+    return GITHUB_REF.replace('refs/heads/', ''); // remove prefix if it exists
+  }
+}
+
+/**
  * Get environment slug
  * @returns Environment slug
  */
-function getEnvironmentSlug(): string {
+export function getEnvironmentSlug(): string {
   return (
-    process.env.CI_ENVIRONMENT_SLUG || process.env.CI_COMMIT_REF_SLUG || 'stage'
+    branchNameForGithubAction() ||
+    process.env.CI_ENVIRONMENT_SLUG || // Gitlab-CI "environment" param
+    process.env.CI_COMMIT_REF_SLUG || // Gitlab-CI
+    'master'
   );
 }
 
@@ -56,6 +76,17 @@ function getEnvironmentSlug(): string {
 export function getEnvPrefix(envName?: string): string {
   const envSlug = envName || getEnvironmentSlug();
   return `${envSlug.toUpperCase()}_`;
+}
+
+/**
+ * Create a variable name string with environment prefix (i.e. STAGE_SERVICE_ACCOUNT)
+ * @param varNameRoot - Root of environment variable name
+ * @param envName - Environment option
+ * @returns Environment var name with prefix
+ */
+export function withEnvPrefix(varNameRoot: string, envName?: string): string {
+  const envPrefix = getEnvPrefix(envName);
+  return `${envPrefix}${varNameRoot}`;
 }
 
 /**
@@ -79,7 +110,7 @@ function getServiceAccountPath(envName?: string): string {
  * default folder path ('cypress')
  * @returns Path of folder containing cypress folders like "integration"
  */
-export function getCypressFolderPath(): string {
+function getCypressFolderPath(): string {
   const cypressConfig = readJsonFile(TEST_CONFIG_FILE_PATH); // eslint-disable-line no-use-before-define
   const integrationTestsFolderPath = get(cypressConfig, 'integrationFolder');
   return integrationTestsFolderPath
@@ -113,8 +144,7 @@ export function getCypressConfigPath(): string {
  * // => 'fireadmin-stage' (value of 'STAGE_FIREBASE_PROJECT_ID' environment var)
  */
 export function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any {
-  const prefix = getEnvPrefix(envName);
-  const combined = `${prefix}${varNameRoot}`;
+  const combined = withEnvPrefix(varNameRoot, envName);
   const localConfigFilePath = getCypressConfigPath();
 
   // Config file used for environment (local, containers) from main test path ({integrationFolder}/config.json)
@@ -152,8 +182,7 @@ export function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any {
  */
 function getParsedEnvVar(varNameRoot: string, envName: string): any {
   const val = envVarBasedOnCIEnv(varNameRoot, envName);
-  const prefix = getEnvPrefix();
-  const combinedVar = `${prefix}${varNameRoot}`;
+  const combinedVar = withEnvPrefix(varNameRoot, envName);
   if (!val) {
     error(
       `${chalk.cyan(
@@ -201,6 +230,7 @@ export function getServiceAccount(envSlug: string): ServiceAccount {
       serviceAccountPath.replace(`${DEFAULT_BASE_PATH}/`, ''),
     )}" falling back to environment variables...`,
   );
+
   // Use environment variables (CI)
   const serviceAccountEnvVar = envVarBasedOnCIEnv('SERVICE_ACCOUNT', envSlug);
   if (serviceAccountEnvVar) {
@@ -209,16 +239,29 @@ export function getServiceAccount(envSlug: string): ServiceAccount {
         return JSON.parse(serviceAccountEnvVar);
       } catch (err) {
         warn(
-          'Issue parsing SERVICE_ACCOUNT environment variable from string to object, returning string',
+          `Issue parsing ${chalk.cyan(
+            'SERVICE_ACCOUNT',
+          )} environment variable from string to object, returning string`,
         );
       }
     }
     return serviceAccountEnvVar;
   }
+
+  info(
+    `Service account does not exist as a single environment variable within ${chalk.cyan(
+      'SERVICE_ACCOUNT',
+    )} or ${chalk.cyan(
+      withEnvPrefix('SERVICE_ACCOUNT'),
+    )}, checking separate environment variables...`,
+  );
+
   const clientId = envVarBasedOnCIEnv('FIREBASE_CLIENT_ID', envSlug);
   if (clientId) {
     warn(
-      '"FIREBASE_CLIENT_ID" will override FIREBASE_TOKEN for auth when calling firebase-tools - this may cause unexepected behavior',
+      `${chalk.cyan('FIREBASE_CLIENT_ID')} will override ${chalk.cyan(
+        'FIREBASE_TOKEN',
+      )} for auth when calling firebase-tools - this may cause unexepected behavior`,
     );
   }
   return {
@@ -238,9 +281,6 @@ export function getServiceAccount(envSlug: string): ServiceAccount {
 export interface RunCommandOptions {
   command: string;
   args: string[];
-  beforeMsg?: string;
-  successMsg?: string;
-  errorMsg?: string;
   pipeOutput?: boolean;
 }
 
@@ -253,15 +293,7 @@ export interface RunCommandOptions {
  * @private
  */
 export function runCommand(runOptions: RunCommandOptions): Promise<any> {
-  const {
-    beforeMsg,
-    successMsg,
-    command,
-    errorMsg,
-    args,
-    pipeOutput = true,
-  } = runOptions;
-  if (beforeMsg) info(beforeMsg);
+  const { command, args, pipeOutput = true } = runOptions;
   return new Promise((resolve, reject): void => {
     const child = spawn(command, args);
     let output: any;
@@ -289,22 +321,17 @@ export function runCommand(runOptions: RunCommandOptions): Promise<any> {
     child.on('exit', (code: number): void => {
       if (code !== 0) {
         // Resolve for npm warnings
-        if (output && output.indexOf('npm WARN') !== -1) {
-          return resolve(successMsg || output);
-        }
-        if (errorMsg) {
-          console.log(errorMsg); // eslint-disable-line no-console
+        if (output && output.includes('npm WARN')) {
+          return resolve(output);
         }
         reject(error || output);
       } else {
-        // resolve(null, stdout)
-        if (successMsg) info(successMsg);
         // Remove leading undefined from response
-        if (output && output.indexOf('undefined') === 0) {
-          resolve(successMsg || output.replace('undefined', ''));
-        } else {
-          resolve(successMsg || output);
-        }
+        resolve(
+          output && output.indexOf('undefined') === 0
+            ? output.replace('undefined', '')
+            : output,
+        );
       }
     });
   });

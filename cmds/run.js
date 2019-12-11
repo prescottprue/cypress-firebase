@@ -6,8 +6,8 @@ const createTestEnvFile = require('../lib/createTestEnvFile').default;
 
 /**
  * @name run
- * @description Build test configuration file then run cypress run command
- * @param {String} envName
+ * Build test configuration file then run cypress run command
+ * @param {string} program - Commander program
  */
 module.exports = function run(program) {
   program
