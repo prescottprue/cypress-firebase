@@ -1,16 +1,12 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-/**
- * run commander component
- * To use add require('../cmds/run.js')(program) to your commander.js based node executable before program.parse
- */
 const chalk = require('chalk');
 const { runCommand } = require('../lib/node-utils');
 const logger = require('../lib/logger');
 
 /**
  * @name open
- * @description Create test environment config then open Cypress Test Runner
- * @param {String} envName
+ * Create test environment config then open Cypress Test Runner
+ * @param {string} program - Commander program
  */
 module.exports = function open(program) {
   program

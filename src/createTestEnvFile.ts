@@ -5,9 +5,10 @@ import { promisify } from 'util';
 import {
   envVarBasedOnCIEnv,
   getServiceAccount,
-  getEnvPrefix,
   readJsonFile,
   getCypressConfigPath,
+  withEnvPrefix,
+  getEnvironmentSlug,
 } from './node-utils';
 import { to } from './utils';
 import { DEFAULT_TEST_ENV_FILE_NAME } from './constants';
@@ -31,21 +32,21 @@ const writeFilePromise = promisify(writeFile);
 export default async function createTestEnvFile(
   envName: string,
 ): Promise<string> {
-  /* eslint-disable no-irregular-whitespace */
-  const envPrefix = getEnvPrefix(envName);
   // Get UID from environment (falls back to cypress/config.json for local)
-  const uid = envVarBasedOnCIEnv('TEST_UID', envName);
-  const varName = `${envPrefix}TEST_UID`;
+  const varName = 'TEST_UID';
+  const uid = envVarBasedOnCIEnv(varName, envName);
   // Throw if UID is missing in environment
   if (!uid) {
     const errMsg = `${chalk.cyan(
-      'TEST_UID',
-    )} is missing from environment. Confirm that ${chalk.cyan(
-      TEST_ENV_FILE_PATH,
-    )} or ${chalk.cyan(getCypressConfigPath())} contains either ${chalk.cyan(
       varName,
-    )} or ${chalk.cyan('TEST_UID')}.`;
-    return Promise.reject(new Error(errMsg));
+    )} is missing from environment. Confirm that either ${chalk.cyan(
+      withEnvPrefix(varName),
+    )} or ${chalk.cyan(
+      varName,
+    )} are set within environment variables, ${chalk.cyan(
+      DEFAULT_TEST_ENV_FILE_NAME,
+    )}, or ${chalk.cyan(getCypressConfigPath())}.`;
+    throw new Error(errMsg);
   }
 
   // Get project from .firebaserc
@@ -53,14 +54,15 @@ export default async function createTestEnvFile(
 
   const currentCypressEnvSettings = readJsonFile(TEST_ENV_FILE_PATH);
 
+  const envSlug = envName || getEnvironmentSlug();
+
   const FIREBASE_PROJECT_ID =
-    get(currentCypressEnvSettings, 'FIREBASE_PROJECT_ID') ||
-    envVarBasedOnCIEnv('FIREBASE_PROJECT_ID', envName) ||
-    get(
-      firebaserc,
-      `projects.${envName}`,
-      get(firebaserc, 'projects.default', ''),
-    );
+    get(currentCypressEnvSettings, 'FIREBASE_PROJECT_ID') || // FIREBASE_PROJECT_ID already in cypress config
+    envVarBasedOnCIEnv('FIREBASE_PROJECT_ID', envSlug) || // FIREBASE_PROJECT_ID Environment variables
+    envVarBasedOnCIEnv('FIREBASE_PROJECT', envSlug) || // FIREBASE_PROJECT Environment variables
+    get(firebaserc, `ci.createConfig.${envSlug}.firebase.projectId`) || // CI createConfig projectId based on branch
+    get(firebaserc, `projects.${envSlug}`) || // project by branch name
+    get(firebaserc, 'projects.default', '');
 
   logger.info(
     `Generating custom auth token for Firebase project with projectId: ${chalk.cyan(
@@ -84,6 +86,9 @@ export default async function createTestEnvFile(
   // Remove firebase- prefix (was added to database names for a short period of time)
   const cleanedProjectId = FIREBASE_PROJECT_ID.replace('firebase-', '');
 
+  // TODO: Look into if inline require is still needed
+  // It used to be associated with an error in utils when loaded in browser
+  // environment (the reason why node-utils exists).
   const admin = require('firebase-admin'); // eslint-disable-line @typescript-eslint/no-var-requires, global-require
 
   // Initialize Firebase app with service account
@@ -133,20 +138,13 @@ export default async function createTestEnvFile(
     FIREBASE_PROJECT_ID,
     FIREBASE_API_KEY:
       envVarBasedOnCIEnv('FIREBASE_API_KEY', envName) ||
-      get(firebaserc, `ci.createConfig.${envName}.firebase.apiKey`),
+      get(
+        firebaserc,
+        `ci.createConfig.${envSlug}.firebase.apiKey`,
+        get(firebaserc, `ci.createConfig.master.firebase.apiKey`),
+      ),
     FIREBASE_AUTH_JWT: customToken,
   };
-
-  const stageProjectId = envVarBasedOnCIEnv(
-    'STAGE_FIREBASE_PROJECT_ID',
-    envName,
-  );
-  const stageApiKey = envVarBasedOnCIEnv('STAGE_FIREBASE_API_KEY', envName);
-
-  if (stageProjectId) {
-    newCypressConfig.STAGE_FIREBASE_PROJECT_ID = stageProjectId;
-    newCypressConfig.STAGE_FIREBASE_API_KEY = stageApiKey;
-  }
 
   // Write config file to cypress.env.json
   await writeFilePromise(

@@ -76,5 +76,3 @@ export function addDefaultArgs(
   }
   return newArgs;
 }
-
-process.env.FORCE_COLOR = 'true';
