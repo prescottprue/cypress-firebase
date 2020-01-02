@@ -6,8 +6,8 @@ const addSpy = sinon.spy()
 const envSpy = sinon.spy()
 const Cypress = { Commands: { add: addSpy }, env: envSpy }
 
-const firebaseExtraPath = '$(npm bin)/firebase-extra'
-const firebaseToolsPath = '$(npm bin)/firebase'
+const firebaseExtraPath = 'npx firebase-extra'
+const firebaseToolsPath = 'npx firebase'
 
 describe('buildFirestoreCommand', () => {
   describe('get', () => {
