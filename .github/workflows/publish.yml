@@ -87,23 +87,23 @@ jobs:
           name: build
 
       - name: Publish
-        run: npm publish $(if [ ${{github.ref}} == 'refs/heads/master' ]; then echo '--tag next';fi;)
+        run: npm publish $(if [ ${{github.ref}} == 'refs/heads/next' ]; then echo '--tag next';fi;)
 
-  publish-gpr:
-    needs: build
-    runs-on: ubuntu-latest
-    if: steps.semantic.outputs.new_release_published == 'true'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v1
+  # publish-gpr:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   if: steps.semantic.outputs.new_release_published == 'true'
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v1
 
-      - name: Setup Node
-        uses: actions/setup-node@v1
-        with:
-          node-version: 12
-          registry-url: https://registry.npmjs.org/
+  #     - name: Setup Node
+  #       uses: actions/setup-node@v1
+  #       with:
+  #         node-version: 12
+  #         registry-url: https://registry.npmjs.org/
 
-      - name: Publish To Github
-        run: npm publish $(if [ ${{github.ref}} == 'refs/heads/master' ]; then echo '--tag next';fi;)
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+  #     - name: Publish To Github
+  #       run: npm publish $(if [ ${{github.ref}} == 'refs/heads/master' ]; then echo '--tag next';fi;)
+  #       env:
+  #         NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
