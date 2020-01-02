@@ -87,6 +87,8 @@ jobs:
           name: build
 
       - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
         run: npm publish $(if [ ${{github.ref}} == 'refs/heads/next' ]; then echo '--tag next';fi;)
 
   # publish-gpr:
