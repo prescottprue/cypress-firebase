@@ -52,6 +52,7 @@ export default async function createTestEnvFile(
   // Get project from .firebaserc
   const firebaserc = readJsonFile(FIREBASE_CONFIG_FILE_PATH);
 
+  // Get current Cypress settings
   const currentCypressEnvSettings = readJsonFile(TEST_ENV_FILE_PATH);
 
   const envSlug = envName || getEnvironmentSlug();
@@ -69,16 +70,10 @@ export default async function createTestEnvFile(
     throw new Error(errMsg);
   }
 
+  // Get projectId from service account (handling multiple types)
   const FIREBASE_PROJECT_ID =
-    get(serviceAccount, 'project_id') ||
-    get(currentCypressEnvSettings, 'FIREBASE_PROJECT_ID') || // FIREBASE_PROJECT_ID already in cypress config
-    envVarBasedOnCIEnv('FIREBASE_PROJECT_ID', envSlug) || // FIREBASE_PROJECT_ID Environment variables
-    envVarBasedOnCIEnv('FIREBASE_PROJECT', envSlug) || // FIREBASE_PROJECT Environment variables
-    get(firebaserc, `ci.createConfig.${envSlug}.firebase.projectId`) || // CI createConfig projectId based on branch
-    get(firebaserc, `projects.${envSlug}`) || // project by branch name
-    get(firebaserc, 'ci.createConfig.master.firebase.projectId') || // CI createConfig projectId based on branch
-    get(firebaserc, 'projects.master') ||
-    get(firebaserc, 'projects.default', '');
+    serviceAccount &&
+    (serviceAccount.project_id || (serviceAccount as any).projectId);
 
   logger.info(
     `Generating custom auth token for Firebase project with projectId: ${chalk.cyan(
