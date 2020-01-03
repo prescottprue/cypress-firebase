@@ -1,6 +1,6 @@
 {
   "name": "cypress-firebase",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -32,7 +32,7 @@
     "chalk": "^3.0.0",
     "commander": "^4.0.1",
     "figures": "^3.1.0",
-    "firebase-admin": "^8.8.0",
+    "firebase-admin": "^8.9.0",
     "firebase-tools-extra": "0.3.0",
     "lodash": "^4.17.15"
   },
@@ -48,15 +48,15 @@
     "chai": "^4.2.0",
     "codecov": "^3.6.1",
     "cross-env": "^6.0.3",
-    "eslint": "^6.6.0",
+    "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.5.0",
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-jsdoc": "^18.1.2",
+    "eslint-plugin-jsdoc": "^19.2.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.1",
-    "firebase-tools": "^7.8.0",
+    "firebase-tools": "^7.11.0",
     "husky": "^3.1.0",
     "mocha": "^6.2.2",
     "nyc": "^14.1.1",
@@ -66,7 +66,7 @@
     "sinon-chai": "^3.3.0",
     "source-map-support": "^0.5.16",
     "ts-node": "^8.5.2",
-    "typescript": "^3.7.2"
+    "typescript": "^3.7.4"
   },
   "keywords": [
     "cypress",

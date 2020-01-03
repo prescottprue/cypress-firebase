@@ -86,24 +86,43 @@ jobs:
         with:
           name: build
 
-      - name: Publish
-        run: npm publish $(if [ ${{github.ref}} == 'refs/heads/master' ]; then echo '--tag next';fi;)
+      - name: Get yarn cache
+        id: yarn-cache
+        run: echo "::set-output name=dir::$(yarn cache dir)"
 
-  publish-gpr:
-    needs: build
-    runs-on: ubuntu-latest
-    if: steps.semantic.outputs.new_release_published == 'true'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v1
-
-      - name: Setup Node
-        uses: actions/setup-node@v1
+      - uses: actions/cache@v1
         with:
-          node-version: 12
-          registry-url: https://registry.npmjs.org/
+          path: ${{ steps.yarn-cache.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
-      - name: Publish To Github
-        run: npm publish $(if [ ${{github.ref}} == 'refs/heads/master' ]; then echo '--tag next';fi;)
+      - name: Install Dependencies
         env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          CI: true
+        run: |
+          yarn install --frozen-lockfile
+
+      - name: Publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: npm publish $(if [ ${{github.ref}} == 'refs/heads/next' ]; then echo '--tag next';fi;)
+
+  # publish-gpr:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   if: steps.semantic.outputs.new_release_published == 'true'
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v1
+
+  #     - name: Setup Node
+  #       uses: actions/setup-node@v1
+  #       with:
+  #         node-version: 12
+  #         registry-url: https://registry.npmjs.org/
+
+  #     - name: Publish To Github
+  #       run: npm publish $(if [ ${{github.ref}} == 'refs/heads/master' ]; then echo '--tag next';fi;)
+  #       env:
+  #         NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

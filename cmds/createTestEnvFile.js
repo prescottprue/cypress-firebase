@@ -8,8 +8,7 @@ const createTestEnvFile = require('../lib/createTestEnvFile').default;
 /**
  * @name createTestEnvFile
  * @description Deploy to Firebase only on build branches (master, stage, prod)
- * @param {String} only - Only flag can be passed to deploy only specified
- * targets (e.g hosting, storage)
+ * @param {object} program - Commander program
  * @example <caption>Basic</caption>
  * # make sure you serviceAccount.json exists
  * cypress-firebase createEnv
