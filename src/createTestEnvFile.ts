@@ -52,23 +52,10 @@ export default async function createTestEnvFile(
   // Get project from .firebaserc
   const firebaserc = readJsonFile(FIREBASE_CONFIG_FILE_PATH);
 
+  // Get current Cypress settings
   const currentCypressEnvSettings = readJsonFile(TEST_ENV_FILE_PATH);
 
   const envSlug = envName || getEnvironmentSlug();
-
-  const FIREBASE_PROJECT_ID =
-    get(currentCypressEnvSettings, 'FIREBASE_PROJECT_ID') || // FIREBASE_PROJECT_ID already in cypress config
-    envVarBasedOnCIEnv('FIREBASE_PROJECT_ID', envSlug) || // FIREBASE_PROJECT_ID Environment variables
-    envVarBasedOnCIEnv('FIREBASE_PROJECT', envSlug) || // FIREBASE_PROJECT Environment variables
-    get(firebaserc, `ci.createConfig.${envSlug}.firebase.projectId`) || // CI createConfig projectId based on branch
-    get(firebaserc, `projects.${envSlug}`) || // project by branch name
-    get(firebaserc, 'projects.default', '');
-
-  logger.info(
-    `Generating custom auth token for Firebase project with projectId: ${chalk.cyan(
-      FIREBASE_PROJECT_ID,
-    )}`,
-  );
 
   // Get service account from local file falling back to environment variables
   const serviceAccount = getServiceAccount(envName);
@@ -82,6 +69,17 @@ export default async function createTestEnvFile(
     ).join(', ')}`;
     throw new Error(errMsg);
   }
+
+  // Get projectId from service account (handling multiple types)
+  const FIREBASE_PROJECT_ID =
+    serviceAccount &&
+    (serviceAccount.project_id || (serviceAccount as any).projectId);
+
+  logger.info(
+    `Generating custom auth token for Firebase project with projectId: ${chalk.cyan(
+      FIREBASE_PROJECT_ID,
+    )}`,
+  );
 
   // Remove firebase- prefix (was added to database names for a short period of time)
   const cleanedProjectId = FIREBASE_PROJECT_ID.replace('firebase-', '');
