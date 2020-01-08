@@ -1,6 +1,6 @@
 import chalk from 'chalk';
 import { writeFile } from 'fs';
-import { pickBy, get, isUndefined } from 'lodash';
+import { pickBy, get, isUndefined, find } from 'lodash';
 import { promisify } from 'util';
 import {
   envVarBasedOnCIEnv,
@@ -136,11 +136,17 @@ export default async function createTestEnvFile(
     FIREBASE_PROJECT_ID,
     FIREBASE_API_KEY:
       envVarBasedOnCIEnv('FIREBASE_API_KEY', envName) ||
+      // firebase.apiKey from createConfig with firebase.projectId matching service account project_id
       get(
-        firebaserc,
-        `ci.createConfig.${envSlug}.firebase.apiKey`,
-        get(firebaserc, `ci.createConfig.master.firebase.apiKey`),
-      ),
+        find(
+          get(firebaserc, 'ci.createConfig'),
+          branchConfig =>
+            get(branchConfig, 'firebase.projectId') === FIREBASE_PROJECT_ID,
+        ),
+        'firebase.apiKey',
+      ) ||
+      get(firebaserc, `ci.createConfig.${envSlug}.firebase.apiKey`) ||
+      get(firebaserc, `ci.createConfig.master.firebase.apiKey`),
     FIREBASE_AUTH_JWT: customToken,
   };
 
