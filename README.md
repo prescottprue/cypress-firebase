@@ -35,7 +35,6 @@ If you are interested in what drove the need for this checkout [the why section]
 1. Add the following to your `.gitignore`:
     ```
     serviceAccount.json
-    cypress/config.json
     cypress.env.json
     ```
 
@@ -49,20 +48,19 @@ If you are interested in what drove the need for this checkout [the why section]
 
     ```json
     "build:testConfig": "cypress-firebase createTestEnvFile",
-    "test": "npm run build:testConfig cypress run",
-    "test:open": "npm run build:testConfig cypress open",
+    "test": "npm run build:testConfig && cypress run",
+    "test:open": "npm run build:testConfig && cypress open",
     "test:stage": "npm run test -- --env envName=stage",
     "test:open:stage": "npm run test:open -- --env envName=stage"
     ```
 
     Environment variables can be passed through `--env`. `envName` points to the firebase project within the projects section of `.firebaserc`.
 
-1. Add your config info to your environment variables or `cypress/config.json` (make sure this is in you `.gitignore`)
+1. Add your config info to your environment variables (for CI) or `cypress.env.json` when running locally (make sure this is in you `.gitignore`)
   
     ```js
     {
       "TEST_UID": "<- uid of the user you want to test as ->",
-      "FIREBASE_PROJECT_ID": "<- projectId of your project ->",
       "FIREBASE_API_KEY": "<- browser apiKey of your project ->"
     }
     ```
@@ -80,7 +78,7 @@ If you are interested in what drove the need for this checkout [the why section]
       // Your config from Firebase Console
     };
 
-    firebase.initializeApp(fbConfig);
+    window.fbInstance = firebase.initializeApp(fbConfig);
 
     attachCustomCommands({ Cypress, cy, firebase })
     ```
@@ -100,6 +98,27 @@ If you are interested in what drove the need for this checkout [the why section]
     ```
 
     The plugin sets `baseUrl` and loads config from `.firebaserc`
+1. Add support for loading the authed Firebase instance (passed through `window.fbInstance`) within your application:
+
+    ```js
+    // Import parts of Firebase you are using
+    import firebase from 'firebase/app'
+    import 'firebase/auth'
+    import 'firebase/firestore'
+    import 'firebase/database'
+
+    const fbConfig = {
+      // Your config from Firebase Console
+    };
+
+    // Initialize Firebase only if an fbInstance was not passed to the window (tests)
+    if (!window.fbInstance) {
+      firebase.initializeApp(config.firebase)
+    }
+
+    // Make sure to use the instance from the window if it exists
+    const fbInstance = window.fbInstance || firebase
+    ```
 
 ### Running
 
@@ -154,6 +173,8 @@ jobs:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           TEST_UID: ${{ secrets.TEST_UID }}
           SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_REF: ${{ github.ref }}
         run: |
           $(npm bin)/cypress-firebase createTestEnvFile $TEST_ENV
 
@@ -169,6 +190,7 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_KEY }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_REF: ${{ github.ref }}
 ```
 
 **Using Start For Local**
@@ -199,6 +221,8 @@ jobs:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
           TEST_UID: ${{ secrets.TEST_UID }}
           SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_REF: ${{ github.ref }}
         run: |
           $(npm bin)/cypress-firebase createTestEnvFile $TEST_ENV
 
@@ -458,11 +482,8 @@ Instead of a cli tool, the plugin that is included could maybe use `firebase-adm
 [fireadmin-source]: https://github.com/prescottprue/fireadmin
 [npm-image]: https://img.shields.io/npm/v/cypress-firebase.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/cypress-firebase
-[build-status-image]: https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fprescottprue%2Fcypress-firebase%2Fbadge&label=build&style=flat-square
-[build-status-image-next]: https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Fprescottprue%2Fcypress-firebase%2Fbadge%3Fref%3Dnext&label=build&style=flat-square
-[build-status-url]: https://github.com/prescottprue/cypress-firebase/workflows/publish.yml/badge.svg?branch=next
-[daviddm-image]: https://img.shields.io/david/prescottprue/cypress-firebase.svg?style=flat-square
-[daviddm-url]: https://david-dm.org/prescottprue/cypress-firebase
+[build-status-image]: https://img.shields.io/github/workflow/status/prescottprue/cypress-firebase/NPM%20Package%20Publish?style=flat-square
+[build-status-url]: https://github.com/prescottprue/cypress-firebase/actions
 [climate-image]: https://img.shields.io/codeclimate/github/prescottprue/cypress-firebase.svg?style=flat-square
 [climate-url]: https://codeclimate.com/github/prescottprue/cypress-firebase
 [license-image]: https://img.shields.io/npm/l/cypress-firebase.svg?style=flat-square

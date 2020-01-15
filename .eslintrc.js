@@ -35,6 +35,7 @@ module.exports = {
     'jsdoc/newline-after-description': 0,
     'jsdoc/require-returns-type': 0,
     'jsdoc/require-param-type': 0,
+    'import/extensions': 0,
     'prettier/prettier': [
       'error',
       {
