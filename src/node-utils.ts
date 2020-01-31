@@ -75,7 +75,9 @@ export function getEnvironmentSlug(): string {
  */
 export function getEnvPrefix(envName?: string): string {
   const envSlug = envName || getEnvironmentSlug();
-  return `${envSlug.toUpperCase()}_`;
+  // Replace "-" with "_" to support secrets containing branch names with "-".
+  // Needed since Github Actions doesn't support "-" within secrets
+  return `${envSlug.toUpperCase().replace(/-/g, '_')}_`;
 }
 
 /**
