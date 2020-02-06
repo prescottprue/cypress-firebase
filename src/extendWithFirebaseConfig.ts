@@ -79,9 +79,23 @@ export default function extendWithFirebaseConfig(
   cypressConfig: CypressConfig,
   settings: ExtendWithFirebaseConfigSettings = {},
 ): ExtendedCypressConfig {
+  let newEnv: any = {};
+  if (cypressConfig && cypressConfig.env) {
+    newEnv = cypressConfig.env;
+  }
+  const {
+    FIREBASE_DATABASE_EMULATOR_HOST,
+    FIRESTORE_EMULATOR_HOST,
+  } = process.env;
+  if (FIRESTORE_EMULATOR_HOST) {
+    newEnv.FIRESTORE_EMULATOR_HOST = FIRESTORE_EMULATOR_HOST;
+  }
+  if (FIREBASE_DATABASE_EMULATOR_HOST) {
+    newEnv.FIREBASE_DATABASE_EMULATOR_HOST = FIREBASE_DATABASE_EMULATOR_HOST;
+  }
   // Return original config if baseUrl is already set (so it is not runover)
   if (cypressConfig.baseUrl) {
-    return cypressConfig;
+    return { ...cypressConfig, env: newEnv };
   }
   const { localBaseUrl, localHostPort = '3000' } = settings as any;
   const envName = getEnvNameFromConfig(cypressConfig);
@@ -90,6 +104,7 @@ export default function extendWithFirebaseConfig(
   return {
     ...cypressConfig,
     FIREBASE_PROJECT_ID,
+    env: newEnv,
     baseUrl:
       envName === 'local'
         ? localBaseUrl || `http://localhost:${localHostPort}`
