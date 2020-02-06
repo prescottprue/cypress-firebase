@@ -1,7 +1,7 @@
 import { isObject, isBoolean } from 'lodash';
 import { FixtureData } from './buildFirestoreCommand';
 import { addDefaultArgs, getArgsString } from './utils';
-import { FIREBASE_TOOLS_BASE_COMMAND } from './constants';
+import { FIREBASE_TOOLS_BASE_COMMAND, FIREBASE_EXTRA_PATH } from './constants';
 
 /**
  * Action for Real Time Database
@@ -180,11 +180,17 @@ export default function buildRtdbCommand(
   const cleanActionPath = actionPath.startsWith('/')
     ? actionPath
     : `/${actionPath}`;
+  // Call to firebase-tools-extra if using emulator since firebase-tools does not support
+  // calling emulator through database commands. See this issue for
+  // more detail: https://github.com/firebase/firebase-tools/issues/1957
+  const commandPath = Cypress.env('FIREBASE_DATABASE_EMULATOR_HOST')
+    ? FIREBASE_EXTRA_PATH
+    : FIREBASE_TOOLS_BASE_COMMAND;
   switch (action) {
     case 'remove':
-      return `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} ${cleanActionPath}${argsStr}`;
+      return `${commandPath} database:${action} ${cleanActionPath}${argsStr}`;
     case 'delete':
-      return `${FIREBASE_TOOLS_BASE_COMMAND} database:remove ${cleanActionPath}${argsStr}`;
+      return `${commandPath} database:remove ${cleanActionPath}${argsStr}`;
     case 'get': {
       const getDataArgsWithDefaults = generageRtdbGetArgs(
         Cypress,
@@ -192,10 +198,10 @@ export default function buildRtdbCommand(
         options,
       );
       const getDataArgsStr = getArgsString(getDataArgsWithDefaults);
-      return `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} ${cleanActionPath}${getDataArgsStr}`;
+      return `${commandPath} database:${action} ${cleanActionPath}${getDataArgsStr}`;
     }
     default: {
-      const commandString = `${FIREBASE_TOOLS_BASE_COMMAND} database:${action} ${cleanActionPath}`;
+      const commandString = `${commandPath} database:${action} ${cleanActionPath}`;
       if (!isObject(fixturePath)) {
         return `${commandString} ${fixturePath}${argsStr}`;
       }

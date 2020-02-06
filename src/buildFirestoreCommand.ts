@@ -74,7 +74,13 @@ export default function buildFirestoreCommand(
         recursive ? '-r' : '--shallow',
       );
       const deleteArgsStr = getArgsString(finalDeleteArgs);
-      return `${FIREBASE_TOOLS_BASE_COMMAND} firestore:${action} ${actionPath}${deleteArgsStr}`;
+      // Call to firebase-tools-extra if using emulator since firebase-tools does not support
+      // calling emulator through database commands. See this issue for
+      // more detail: https://github.com/firebase/firebase-tools/issues/1957
+      const commandPath = Cypress.env('FIRESTORE_EMULATOR_HOST')
+        ? FIREBASE_EXTRA_PATH
+        : FIREBASE_TOOLS_BASE_COMMAND;
+      return `${commandPath} firestore:${action} ${actionPath}${deleteArgsStr}`;
     }
     case 'get': {
       return `${FIREBASE_EXTRA_PATH} firestore ${action} ${actionPath}`;

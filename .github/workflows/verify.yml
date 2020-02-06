@@ -30,11 +30,15 @@ jobs:
       - name: Install Dependencies
         env:
           CI: true
-        run: |
-          yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile
 
       - name: Run Build
         run: yarn build
+
+      - name: Check For Lint
+        env:
+          CI: true
+        run: yarn lint
 
       - name: Run Unit Tests + Coverage
         if: success()
@@ -45,7 +49,6 @@ jobs:
         env:
           CI: true
           CODE_COV: ${{ secrets.CODE_COV }}
-        run: |
-          # Upload to codecov.io. Curl used in place of codecov/codecov-action
-          # due to long build time. See https://github.com/codecov/codecov-action/issues/21
-          curl -s https://codecov.io/bash | bash -s -- -t $CODE_COV
+        # Upload to codecov.io. Curl used in place of codecov/codecov-action
+        # due to long build time. See https://github.com/codecov/codecov-action/issues/21
+        run: curl -s https://codecov.io/bash | bash -s -- -t $CODE_COV

@@ -10,27 +10,33 @@
     "test:ui": "npm run build:testConfig && cross-env CYPRESS_baseUrl=http://localhost:3000 cypress open"
   },
   "dependencies": {
-    "firebase": "^5.8.3",
-    "lodash": "^4.17.11",
-    "react": "^16.8.2",
-    "react-dom": "^16.8.2"
+    "firebase": "^7.8.0",
+    "lodash": "^4.17.15",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0"
   },
   "devDependencies": {
     "cross-env": "^5.2.0",
-    "cypress": "^3.1.5",
+    "cypress": "^3.8.3",
     "cypress-firebase": "*",
     "eslint-plugin-cypress": "^2.0.1",
-    "react-scripts": "2.1.5",
-    "firebase-tools": "^6.3.1"
+    "react-scripts": "3.3.1",
+    "firebase-tools": "^7.12.1"
   },
   "eslintConfig": {
     "extends": "react-app"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ],
-  "private": true
+  "private": true,
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }
