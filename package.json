@@ -33,7 +33,7 @@
     "commander": "^4.1.0",
     "figures": "^3.1.0",
     "firebase-admin": "^8.9.2",
-    "firebase-tools-extra": "0.4.0",
+    "firebase-tools-extra": "0.5.0",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
