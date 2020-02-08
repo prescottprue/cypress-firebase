@@ -189,7 +189,7 @@ declare module "attachCustomCommands" {
                 /**
                  * Call Real Time Database path with some specified action. Authentication is through
                  * `FIREBASE_TOKEN` (CI token) since firebase-tools is used under the hood, allowing
-                 * for adming privileges.
+                 * for admin privileges.
                  * @param action - The action type to call with (set, push, update, remove)
                  * @param actionPath - Path within RTDB that action should be applied
                  * @param opts - Options

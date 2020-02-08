@@ -41,7 +41,7 @@ declare global {
       /**
        * Call Real Time Database path with some specified action. Authentication is through
        * `FIREBASE_TOKEN` (CI token) since firebase-tools is used under the hood, allowing
-       * for adming privileges.
+       * for admin privileges.
        * @param action - The action type to call with (set, push, update, remove)
        * @param actionPath - Path within RTDB that action should be applied
        * @param opts - Options
@@ -110,6 +110,28 @@ declare global {
 }
 
 /**
+ * @param firebase - firebase instance
+ * @param customToken - Custom token to use for login
+ * @returns Promise which resolves with the user auth object
+ */
+function loginWithCustomToken(
+  firebase: any,
+  customToken: string,
+): Promise<any> {
+  return new Promise((resolve, reject): any => {
+    firebase.auth().onAuthStateChanged((auth: any) => {
+      if (auth) {
+        resolve(auth);
+      }
+    });
+    firebase
+      .auth()
+      .signInWithCustomToken(customToken)
+      .catch(reject);
+  });
+}
+
+/**
  * Attach custom commands including cy.login, cy.logout, cy.callRtdb,
  * @param commandParams - List of params to provide scope during
  * custom command attachment
@@ -125,26 +147,40 @@ export default function attachCustomCommands(
    * during test:buildConfig phase.
    * @name cy.login
    */
-  Cypress.Commands.add('login', (): any => {
+  Cypress.Commands.add('login', (uid?: string): any => {
+    // Generate a custom token then login if a UID is passed
+    const currentUid =
+      firebase.auth().currentUser && firebase.auth().currentUser.uid;
+
+    if (uid) {
+      if (currentUid && currentUid === uid) {
+        cy.log('Authed user already exists, login complete.');
+      }
+      return cy
+        .exec(`npx firebase-extra createCustomToken ${uid}`, {
+          timeout: 100000,
+        })
+        .then((out: any) => {
+          const { stdout, stderr } = out;
+          // Reject with Error if error in firestoreCommand call
+          if (stderr) {
+            // cy.log(`Error in Firestore Command:\n${stderr}`);
+            return Promise.reject(stderr);
+          }
+          // cy.log('Custom token generated!', stdout);
+          return loginWithCustomToken(firebase, stdout);
+        });
+    }
+
     /** Log in using token * */
     if (!Cypress.env('FIREBASE_AUTH_JWT')) {
       cy.log(
         'FIREBASE_AUTH_JWT must be set to cypress environment in order to login',
       );
-    } else if (firebase.auth().currentUser) {
+    } else if (currentUid) {
       cy.log('Authed user already exists, login complete.');
     } else {
-      return new Promise((resolve, reject): any => {
-        firebase.auth().onAuthStateChanged((auth: any) => {
-          if (auth) {
-            resolve(auth);
-          }
-        });
-        firebase
-          .auth()
-          .signInWithCustomToken(Cypress.env('FIREBASE_AUTH_JWT'))
-          .catch(reject);
-      });
+      return loginWithCustomToken(firebase, Cypress.env('FIREBASE_AUTH_JWT'));
     }
   });
 
