@@ -28,7 +28,7 @@ declare global {
        * @example
        * cy.login()
        */
-      login: () => Chainable;
+      login: (uid?: string) => Chainable;
 
       /**
        * Log out of Firebase instance
@@ -41,7 +41,7 @@ declare global {
       /**
        * Call Real Time Database path with some specified action. Authentication is through
        * `FIREBASE_TOKEN` (CI token) since firebase-tools is used under the hood, allowing
-       * for adming privileges.
+       * for admin privileges.
        * @param action - The action type to call with (set, push, update, remove)
        * @param actionPath - Path within RTDB that action should be applied
        * @param opts - Options
@@ -110,6 +110,28 @@ declare global {
 }
 
 /**
+ * @param firebase - firebase instance
+ * @param customToken - Custom token to use for login
+ * @returns Promise which resolves with the user auth object
+ */
+function loginWithCustomToken(
+  firebase: any,
+  customToken: string,
+): Promise<any> {
+  return new Promise((resolve, reject): any => {
+    firebase.auth().onAuthStateChanged((auth: any) => {
+      if (auth) {
+        resolve(auth);
+      }
+    });
+    firebase
+      .auth()
+      .signInWithCustomToken(customToken)
+      .catch(reject);
+  });
+}
+
+/**
  * Attach custom commands including cy.login, cy.logout, cy.callRtdb,
  * @param commandParams - List of params to provide scope during
  * custom command attachment
@@ -120,32 +142,56 @@ export default function attachCustomCommands(
   const { Cypress, cy, firebase } = commandParams;
 
   /**
-   * Login to Firebase auth using FIREBASE_AUTH_JWT environment variable
-   * which is generated using firebase-admin authenticated with serviceAccount
-   * during test:buildConfig phase.
+   * Login to Firebase auth using either a passed uid or the FIREBASE_AUTH_JWT
+   * environment variable which is generated using firebase-admin authenticated
+   * with serviceAccount during call to createTestEnvFile.
    * @name cy.login
    */
-  Cypress.Commands.add('login', (): any => {
-    /** Log in using token * */
-    if (!Cypress.env('FIREBASE_AUTH_JWT')) {
-      cy.log(
-        'FIREBASE_AUTH_JWT must be set to cypress environment in order to login',
-      );
-    } else if (firebase.auth().currentUser) {
-      cy.log('Authed user already exists, login complete.');
-    } else {
-      return new Promise((resolve, reject): any => {
-        firebase.auth().onAuthStateChanged((auth: any) => {
-          if (auth) {
-            resolve(auth);
+  Cypress.Commands.add('login', (uid?: string): any => {
+    // Handle UID which is passed in
+    if (uid) {
+      // Resolve with current user if they already exist
+      if (
+        firebase.auth().currentUser &&
+        uid === firebase.auth().currentUser.uid
+      ) {
+        cy.log('Authed user already exists, login complete.');
+        return undefined;
+      }
+      // Generate a custom token then login if a UID is passed
+      return cy
+        .exec(`npx firebase-extra createCustomToken ${uid}`, {
+          timeout: 100000,
+        })
+        .then((out: any) => {
+          const { stdout, stderr } = out;
+          // Reject with Error if error in firestoreCommand call
+          if (stderr) {
+            return Promise.reject(new Error(stderr));
           }
+          return loginWithCustomToken(firebase, stdout);
         });
-        firebase
-          .auth()
-          .signInWithCustomToken(Cypress.env('FIREBASE_AUTH_JWT'))
-          .catch(reject);
-      });
     }
+
+    // Throw if JWT not within environment (passed uid case handled above)
+    if (!Cypress.env('FIREBASE_AUTH_JWT')) {
+      /** Log in using token * */
+      const errMsg =
+        'uid must be passed to cy.login or FIREBASE_AUTH_JWT must be set to cypress environment in order to login';
+      cy.log(errMsg);
+      throw new Error(errMsg);
+    }
+
+    // Resolve with currentUser if they exist
+    if (firebase.auth().currentUser) {
+      cy.log('Authed user already exists, login complete.');
+      // Undefined is returned to prevent Cypress error:
+      // "Cypress detected that you invoked one or more cy commands in a custom command but returned a different value."
+      return undefined;
+    }
+
+    // Otherwise, login with Token from environment
+    return loginWithCustomToken(firebase, Cypress.env('FIREBASE_AUTH_JWT'));
   });
 
   /**

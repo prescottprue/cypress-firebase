@@ -178,7 +178,7 @@ declare module "attachCustomCommands" {
                  * @example
                  * cy.login()
                  */
-                login: () => Chainable;
+                login: (uid?: string) => Chainable;
                 /**
                  * Log out of Firebase instance
                  * @see https://github.com/prescottprue/cypress-firebase#cylogout
@@ -189,7 +189,7 @@ declare module "attachCustomCommands" {
                 /**
                  * Call Real Time Database path with some specified action. Authentication is through
                  * `FIREBASE_TOKEN` (CI token) since firebase-tools is used under the hood, allowing
-                 * for adming privileges.
+                 * for admin privileges.
                  * @param action - The action type to call with (set, push, update, remove)
                  * @param actionPath - Path within RTDB that action should be applied
                  * @param opts - Options
@@ -406,7 +406,7 @@ declare module "extendWithFirebaseConfig" {
      * @param config - Cypress config object
      * @returns Id of firbase project
      */
-    export function getFirebaseProjectIdFromConfig(config: CypressConfig): string;
+    export function getFirebaseProjectIdFromConfig(config: CypressConfig): string | undefined;
     /**
      * Load config for Cypress from .firebaserc.
      * @param cypressConfig - Existing Cypress config

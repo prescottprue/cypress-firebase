@@ -26,11 +26,19 @@ export interface ExtendWithFirebaseConfigSettings {
   localHostPort?: string | number;
 }
 
+interface FirebaseRcProjects {
+  [name: string]: string;
+}
+
+interface FirebaseRc {
+  projects?: FirebaseRcProjects;
+}
+
 /**
  * Load .firebaserc file
  * @returns Contents of .firebaserc file parsed as JSON
  */
-function loadFirebaseRc(): string {
+function loadFirebaseRc(): FirebaseRc {
   const rcFilePath = `${process.cwd()}/${FIREBASE_CONFIG_FILE_NAME}`;
   if (!existsSync(rcFilePath)) {
     throw new Error(`${FIREBASE_CONFIG_FILE_NAME} file not found`);
@@ -56,16 +64,20 @@ function getEnvNameFromConfig(cypressConfig: CypressConfig): string {
  * @param config - Cypress config object
  * @returns Id of firbase project
  */
-export function getFirebaseProjectIdFromConfig(config: CypressConfig): string {
+export function getFirebaseProjectIdFromConfig(
+  config: CypressConfig,
+): string | undefined {
   const projectIdFromConfig = get(config, 'env.firebaseProjectId');
   if (projectIdFromConfig) {
     return projectIdFromConfig;
   }
-  const firbaseRcConfig = loadFirebaseRc();
+  const firebaseRcConfig = loadFirebaseRc();
   const envName = getEnvNameFromConfig(config);
-  const projectsConfig = get(firbaseRcConfig, 'projects');
+  const projectsConfig = firebaseRcConfig && firebaseRcConfig.projects;
   const firebaseProjectId =
-    projectsConfig[envName] || projectsConfig.master || projectsConfig.default;
+    (projectsConfig && projectsConfig[envName]) ||
+    projectsConfig?.master ||
+    projectsConfig?.default;
   return firebaseProjectId;
 }
 
