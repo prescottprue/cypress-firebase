@@ -17,7 +17,7 @@ export default function getFirebaseInstance(initialState, history) {
 
   // Initialize firebase instance if it doesn't already exist
   if (!firebaseInstance) {
-    const shouldUseEmulator = window.Cypress || window.location.hostname === 'localhost'
+    const shouldUseEmulator = process.env.REACT_APP_USE_DB_EMULATORS
 
     if (shouldUseEmulator) { // or window.location.hostname === 'localhost' if you want
       console.log('Using RTDB emulator')

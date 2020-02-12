@@ -178,7 +178,7 @@ declare module "attachCustomCommands" {
                  * @example
                  * cy.login()
                  */
-                login: () => Chainable;
+                login: (uid?: string) => Chainable;
                 /**
                  * Log out of Firebase instance
                  * @see https://github.com/prescottprue/cypress-firebase#cylogout
@@ -406,7 +406,7 @@ declare module "extendWithFirebaseConfig" {
      * @param config - Cypress config object
      * @returns Id of firbase project
      */
-    export function getFirebaseProjectIdFromConfig(config: CypressConfig): string;
+    export function getFirebaseProjectIdFromConfig(config: CypressConfig): string | undefined;
     /**
      * Load config for Cypress from .firebaserc.
      * @param cypressConfig - Existing Cypress config
