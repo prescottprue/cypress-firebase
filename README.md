@@ -24,47 +24,15 @@ If you are interested in what drove the need for this checkout [the why section]
 
 **Note**: Skip cypress install if it already exists within your project
 
-1. Log into your Firebase console for the first time.
-1. Go to Auth tab of Firebase and create a user for testing purpose
-1. Get the UID of created account. This will be the account which you use to login while running tests (we will call this UID `TEST_UID`)
-1. Go to project setting on firebase console and generate new private key. See how to do [here](https://sites.google.com/site/scriptsexamples/new-connectors-to-google-services/firebase/tutorials/authenticate-with-a-service-account)
-1. Save the downloaded file as `serviceAccount.json` in the root of your project (for local dev)
-1. Set service account as the `SERVICE_ACCOUNT` environment variable within your CI
 1. Install Cypress and add it to your package file: `npm i --save-dev cypress`
-1. Add cypress folder by calling `cypress open`
-1. Add the following to your `.gitignore`:
-    ```
-    serviceAccount.json
-    cypress.env.json
-    ```
+1. Make sure you have a `cypress` folder containing cypress tests (or create one by calling `cypress open`)
 
 ### Setup
 
 **Note:** These instructions assume your tests are in the `cypress` folder (cypress' default). See the [folders section below](#folders) for more info about other supported folders.
 
-1. Make sure you have `firebase-tools` installed (globally and within project). It is used to call to database when using `cy.callRtdb` and `cy.callFirestore`.
 1. Install using `npm i cypress-firebase --save-dev`
-1. Add the following to the `scripts` section of your `package.json`:
-
-    ```json
-    "build:testConfig": "cypress-firebase createTestEnvFile",
-    "test": "npm run build:testConfig && cypress run",
-    "test:open": "npm run build:testConfig && cypress open",
-    "test:stage": "npm run test -- --env envName=stage",
-    "test:open:stage": "npm run test:open -- --env envName=stage"
-    ```
-
-    Environment variables can be passed through `--env`. `envName` points to the firebase project within the projects section of `.firebaserc`.
-
-1. Add your config info to your environment variables (for CI) or `cypress.env.json` when running locally (make sure this is in you `.gitignore`)
-  
-    ```js
-    {
-      "TEST_UID": "<- uid of the user you want to test as ->",
-      "FIREBASE_API_KEY": "<- browser apiKey of your project ->"
-    }
-    ```
-
+1. Make sure you have `firebase-tools` installed (globally and within project). It is used to call to database when using `cy.callRtdb` and `cy.callFirestore`.
 1. Add the following your custom commands file (`cypress/support/commands.js`):
 
     ```js
@@ -78,7 +46,7 @@ If you are interested in what drove the need for this checkout [the why section]
       // Your config from Firebase Console
     };
 
-    window.fbInstance = firebase.initializeApp(fbConfig);
+    firebase.initializeApp(fbConfig);
 
     attachCustomCommands({ Cypress, cy, firebase })
     ```
@@ -98,165 +66,38 @@ If you are interested in what drove the need for this checkout [the why section]
     ```
 
     The plugin sets `baseUrl` and loads config from `.firebaserc`
-1. Add support for loading the authed Firebase instance (passed through `window.fbInstance`) within your application:
+1. If you plan to authenticate the user in your tests, continue to the next section which covers Auth
 
-    ```js
-    // Import parts of Firebase you are using
-    import firebase from 'firebase/app'
-    import 'firebase/auth'
-    import 'firebase/firestore'
-    import 'firebase/database'
+#### Auth
 
-    const fbConfig = {
-      // Your config from Firebase Console
-    };
-
-    // Initialize Firebase only if an fbInstance was not passed to the window (tests)
-    if (!window.fbInstance) {
-      firebase.initializeApp(config.firebase)
-    }
-
-    // Make sure to use the instance from the window if it exists
-    const fbInstance = window.fbInstance || firebase
+1. Log into your Firebase console for the first time.
+1. Go to Auth tab of Firebase and create a user for testing purpose
+1. Get the UID of created account. This will be the account which you use to login while running tests (we will call this UID `TEST_UID`)
+1. Add the following to your `.gitignore`:
     ```
+    serviceAccount.json
+    cypress.env.json
+    ```
+1. Go to project setting on firebase console and generate new private key. See how to do [here](https://sites.google.com/site/scriptsexamples/new-connectors-to-google-services/firebase/tutorials/authenticate-with-a-service-account)
+1. Save the downloaded file as `serviceAccount.json` in the root of your project (make sure that it is .gitignored)
+1. Add the UID of the user you created earlier to your cypress environment file (`cypress.env.json`) when running locally (make sure this is in you `.gitignore`):
+  
+    ```js
+    {
+      "TEST_UID": "<- uid of the user you want to test as ->"
+    }
+    ```
+  
+  In CI this will instead be loaded from the `TEST_UID` environment variable
+
+1. Pass the UID when logging in: `cy.login(Cypress.env('TEST_UID'))`
+
+**NOTE**: If you are running tests within your CI provider you will want to set the `SERVICE_ACCOUNT` environment variable as the service account object and the `TEST_UID` environment variable as the UID of your test user
 
 ### Running
 
 1. Start your local dev server (usually `npm start`) - for faster alternative checkout the [test built version section](#test-built-version)
 1. Open cypress test running by running `npm run test:open` in another terminal window
-
-#### Test Built Version
-
-Tests will run faster locally if you tests against the build version of your app instead of your dev version (with hot module reloading and other dev tools). You can do that by:
-
-1. Adding the following npm script:
-
-    ```json
-    "start:dist": "npm run build && firebase serve --only hosting -p 3000",
-    ```
-
-1. Run `npm run start:dist` to build your app and serve it with firebase
-1. In another terminal window, run a test command such as `npm run test:open`
-
-### CI
-
-1. Run `firebase login:ci` to generate a CI token for `firebase-tools` (this will give your `cy.callRtdb` and `cy.callFirestore` commands admin access to the DB)
-1. Set `FIREBASE_TOKEN` within CI environment variables
-
-#### Github Actions Examples
-
-**Separate Install**
-
-```yml
-name: Test Build
-
-on: [pull_request]
-
-jobs:
-  ui-tests:
-    name: UI Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v1
-
-      # Install is run separatley from test so that dependencies are available
-      # for other steps
-      - name: Install Dependencies
-        uses: cypress-io/github-action@v1
-        with:
-          # just perform install
-          runTests: false
-
-      - name: Build Test Environment Config
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          TEST_UID: ${{ secrets.TEST_UID }}
-          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
-          GITHUB_HEAD_REF: ${{ github.head_ref }}
-          GITHUB_REF: ${{ github.ref }}
-        run: |
-          $(npm bin)/cypress-firebase createTestEnvFile $TEST_ENV
-
-      # Cypress action manages installing/caching npm dependencies and Cypress binary.
-      - name: Cypress Run
-        uses: cypress-io/github-action@v1
-        with:
-          # we have already installed all dependencies above
-          install: false
-          group: 'E2E Tests'
-        env:
-          # pass the Dashboard record key as an environment variable
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_KEY }}
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          GITHUB_HEAD_REF: ${{ github.head_ref }}
-          GITHUB_REF: ${{ github.ref }}
-```
-
-**Using Start For Local**
-
-```yml
-name: Test Hosted
-
-on: [pull_request]
-
-jobs:
-  ui-tests:
-    name: UI Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Repo
-        uses: actions/checkout@v1
-
-      # Install is run separatley from test so that dependencies are available
-      # for other steps
-      - name: Install Dependencies
-        uses: cypress-io/github-action@v1
-        with:
-          # just perform install
-          runTests: false
-
-      - name: Build Test Environment Config
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          TEST_UID: ${{ secrets.TEST_UID }}
-          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
-          GITHUB_HEAD_REF: ${{ github.head_ref }}
-          GITHUB_REF: ${{ github.ref }}
-        run: |
-          $(npm bin)/cypress-firebase createTestEnvFile $TEST_ENV
-
-      # Cypress action manages installing/caching npm dependencies and Cypress binary.
-      - name: Cypress Run
-        uses: cypress-io/github-action@v1
-        with:
-          # we have already installed all dependencies above
-          install: false
-          group: 'E2E Tests'
-          start: npm start
-          wait-on: http://localhost:3000
-        env:
-          # pass the Dashboard record key as an environment variable
-          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_KEY }}
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          GITHUB_REF: ${{ github.head_ref }}
-```
-
-### Folders
-
-`cypress` is the default folder where config is loaded from, but you can use another folder by specifiying a different setting for the `integrationFolder` parameter in `cypress.json`:
-
-```json
-{
-  "projectId": "<- your project id ->",
-  "fixturesFolder": "test/e2e/fixtures",
-  "integrationFolder": "test/e2e/integration",
-  "pluginsFile": "test/e2e/plugins/index.js",
-  "screenshotsFolder": "test/e2e/screenshots",
-  "videosFolder": "test/e2e/videos",
-  "supportFile": "test/e2e/support/index.js"
-}
-```
 
 ## Docs
 
@@ -434,6 +275,149 @@ describe('Test firestore', () => {
     cy.log('Ended test');
   });
 });
+```
+
+## Recipes
+
+### Generate JWT Before Run
+
+1. Add the following to the `scripts` section of your `package.json`:
+
+    ```json
+    "build:testConfig": "cypress-firebase createTestEnvFile",
+    "test": "npm run build:testConfig && cypress run",
+    "test:open": "npm run build:testConfig && cypress open",
+    ```
+1. Add your config info to your environment variables (for CI) or `cypress.env.json` when running locally (make sure this is in you `.gitignore`)
+  
+    ```js
+    {
+      "TEST_UID": "<- uid of the user you want to test as ->",
+      "FIREBASE_API_KEY": "<- browser apiKey of your project ->"
+    }
+    ```
+
+### Testing Different Environments
+
+Environment variables can be passed through `--env`. `envName` points to the firebase project within the projects section of `.firebaserc`.
+
+### Test Built Version
+
+Tests will run faster locally if you tests against the build version of your app instead of your dev version (with hot module reloading and other dev tools). You can do that by:
+
+1. Adding the following npm script:
+
+    ```json
+    "start:dist": "npm run build && firebase serve --only hosting -p 3000",
+    ```
+
+1. Run `npm run start:dist` to build your app and serve it with firebase
+1. In another terminal window, run a test command such as `npm run test:open`
+
+### CI
+
+1. Run `firebase login:ci` to generate a CI token for `firebase-tools` (this will give your `cy.callRtdb` and `cy.callFirestore` commands admin access to the DB)
+1. Set `FIREBASE_TOKEN` within CI environment variables
+
+## Examples
+
+### Github Actions
+
+**Separate Install**
+
+```yml
+name: Test Build
+
+on: [pull_request]
+
+jobs:
+  ui-tests:
+    name: UI Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v1
+
+      # Install is run separatley from test so that dependencies are available
+      # for other steps
+      - name: Install Dependencies
+        uses: cypress-io/github-action@v1
+        with:
+          # just perform install
+          runTests: false
+
+      - name: Build Test Environment Config
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          TEST_UID: ${{ secrets.TEST_UID }}
+          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_REF: ${{ github.ref }}
+        run: |
+          $(npm bin)/cypress-firebase createTestEnvFile $TEST_ENV
+
+      # Cypress action manages installing/caching npm dependencies and Cypress binary.
+      - name: Cypress Run
+        uses: cypress-io/github-action@v1
+        with:
+          # we have already installed all dependencies above
+          install: false
+          group: 'E2E Tests'
+        env:
+          # pass the Dashboard record key as an environment variable
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_KEY }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_REF: ${{ github.ref }}
+```
+
+**Using Start For Local**
+
+```yml
+name: Test Hosted
+
+on: [pull_request]
+
+jobs:
+  ui-tests:
+    name: UI Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v1
+
+      # Install is run separatley from test so that dependencies are available
+      # for other steps
+      - name: Install Dependencies
+        uses: cypress-io/github-action@v1
+        with:
+          # just perform install
+          runTests: false
+
+      - name: Build Test Environment Config
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          TEST_UID: ${{ secrets.TEST_UID }}
+          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_REF: ${{ github.ref }}
+        run: |
+          $(npm bin)/cypress-firebase createTestEnvFile $TEST_ENV
+
+      # Cypress action manages installing/caching npm dependencies and Cypress binary.
+      - name: Cypress Run
+        uses: cypress-io/github-action@v1
+        with:
+          # we have already installed all dependencies above
+          install: false
+          group: 'E2E Tests'
+          start: npm start
+          wait-on: http://localhost:3000
+        env:
+          # pass the Dashboard record key as an environment variable
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_KEY }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          GITHUB_REF: ${{ github.head_ref }}
 ```
 
 ## Why?
