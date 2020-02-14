@@ -4,21 +4,31 @@ import 'firebase/database';
 import 'firebase/firestore';
 import { attachCustomCommands } from 'cypress-firebase';
 
+
 const fbConfig = {
   apiKey: "AIzaSyCTUERDM-Pchn_UDTsfhVPiwM4TtNIxots",
   authDomain: "redux-firebasev3.firebaseapp.com",
-  // databaseURL: "https://redux-firebasev3.firebaseio.com",
-  datbaseURL: `http://localhost:9000?ns=redux-firebasev3`,
+  databaseURL: "https://redux-firebasev3.firebaseio.com",
   projectId: "redux-firebasev3",
   storageBucket: "redux-firebasev3.appspot.com",
   messagingSenderId: "823357791673"
 }
 
-window.fbInstance = firebase.initializeApp(fbConfig);
+// Emulate RTDB if Env variable is passed
+const rtdbEmulatorHost = Cypress.env('FIREBASE_DATABASE_EMULATOR_HOST')
+if (rtdbEmulatorHost) {
+  fbConfig.databaseURL = `http://${rtdbEmulatorHost}?ns=redux-firebasev3`
+}
 
-firebase.firestore().settings({
-  host: 'localhost:8080',
-  ssl: false
-})
+firebase.initializeApp(fbConfig);
+
+// Emulate Firestore if Env variable is passed
+const firestoreEmulatorHost = Cypress.env('FIRESTORE_EMULATOR_HOST')
+if (firestoreEmulatorHost) {
+  firebase.firestore().settings({
+    host: firestoreEmulatorHost,
+    ssl: false
+  })
+}
 
 attachCustomCommands({ Cypress, cy, firebase })
