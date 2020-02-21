@@ -332,6 +332,9 @@ export default function attachCustomCommands(
           (typeof stdout === 'string' || stdout instanceof String)
         ) {
           try {
+            if (stdout === '') {
+              return null;
+            }
             return JSON.parse(
               stdout instanceof String ? stdout.toString() : stdout,
             );

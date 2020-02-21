@@ -281,14 +281,16 @@ describe('Test firestore', () => {
 
 ### Using Database Emulators
 
+1. Install cross-env for cross system environment variable support: `npm i --save-dev cross-env`
 1. Add the following to the `scripts` section of your `package.json`:
 
     ```json
     "emulators": "firebase emulators:start --only database,firestore",
     "test": "cross-env CYPRESS_baseUrl=http://localhost:3000 cypress run",
     "test:open": "cross-env CYPRESS_baseUrl=http://localhost:3000 cypress open",
-    "test:emulate": "cross-env CYPRESS_FIREBASE_DATABASE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.database.port)\" CYPRESS_FIRESTORE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.firestore.port)\" yarn test:open"
+    "test:emulate": "cross-env FIREBASE_DATABASE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.database.port)\" FIRESTORE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.firestore.port)\" yarn test:open"
     ```
+
 1. Add support in your application for connecting to the emulators:
 
     ```js
@@ -353,9 +355,9 @@ describe('Test firestore', () => {
     attachCustomCommands({ Cypress, cy, firebase })
     ```
 
-1. Start emulators using `npm run emulators`
-1. In another terminal window, boot up the application using `npm start`
-1. In another terminal window, boot up tests with emulator settings using `npm run test:emulate`
+1. Start emulators: `npm run emulators`
+1. In another terminal window, start the application: `npm start`
+1. In another terminal window, open test runner with emulator settings: `npm run test:emulate`
 
 **NOTE**: If you are using react-scripts or other environment management, you can use environment variables to pass settings into your app:
 
