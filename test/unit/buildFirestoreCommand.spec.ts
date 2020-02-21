@@ -106,7 +106,7 @@ describe('buildFirestoreCommand', () => {
             recursive: true,
           },
         ),
-      ).to.equal(`npx firebase-extra firestore:delete ${actionPath} -y -r`);
+      ).to.equal(`npx firebase-extra firestore delete ${actionPath} -y -r`);
     });
   });
 });

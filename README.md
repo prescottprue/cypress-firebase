@@ -279,6 +279,116 @@ describe('Test firestore', () => {
 
 ## Recipes
 
+### Using Database Emulators
+
+1. Install cross-env for cross system environment variable support: `npm i --save-dev cross-env`
+1. Add the following to the `scripts` section of your `package.json`:
+
+    ```json
+    "emulators": "firebase emulators:start --only database,firestore",
+    "test": "cross-env CYPRESS_baseUrl=http://localhost:3000 cypress run",
+    "test:open": "cross-env CYPRESS_baseUrl=http://localhost:3000 cypress open",
+    "test:emulate": "cross-env FIREBASE_DATABASE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.database.port)\" FIRESTORE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.firestore.port)\" yarn test:open"
+    ```
+
+1. Add support in your application for connecting to the emulators:
+
+    ```js
+    const shouldUseEmulator = window.location.hostname === 'localhost' // or other logic to determine when to use
+    // Emulate RTDB
+    if (shouldUseEmulator) {
+      console.log('Using RTDB emulator')
+      fbConfig.databaseURL = `http://localhost:9000?ns=${fbConfig.projectId}`
+    }
+
+    // Initialize Firebase instance
+    firebase.initializeApp(fbConfig)
+
+    // Emulate Firestore
+    if (shouldUseEmulator) {
+      console.log('Using Firestore emulator')
+      const firestoreSettings = {
+        host: 'localhost:8080',
+        ssl: false,
+      };
+
+      // Pass long polling setting to Firestore when running in Cypress
+      if (window.Cypress) {
+        // Needed for Firestore support in Cypress (see https://github.com/cypress-io/cypress/issues/6350)
+        firestoreSettings.experimentalForceLongPolling = true;
+      }
+
+      firebase.firestore().settings(firestoreSettings)
+    }
+    ```
+
+1. Make sure you also have matching init logic in `cypress/support/commands.js` or `cypress/support/index.js`:
+    
+    ```js
+    import firebase from 'firebase/app';
+    import 'firebase/auth';
+    import 'firebase/database';
+    import 'firebase/firestore';
+    import { attachCustomCommands } from 'cypress-firebase';
+
+    const fbConfig = {
+      // Your Firebase Config
+    }
+
+    // Emulate RTDB if Env variable is passed
+    const rtdbEmulatorHost = Cypress.env('FIREBASE_DATABASE_EMULATOR_HOST')
+    if (rtdbEmulatorHost) {
+      fbConfig.databaseURL = `http://${rtdbEmulatorHost}?ns=${fbConfig.projectId}`
+    }
+
+    firebase.initializeApp(fbConfig);
+
+    // Emulate Firestore if Env variable is passed
+    const firestoreEmulatorHost = Cypress.env('FIRESTORE_EMULATOR_HOST')
+    if (firestoreEmulatorHost) {
+      firebase.firestore().settings({
+        host: firestoreEmulatorHost,
+        ssl: false
+      })
+    }
+
+    attachCustomCommands({ Cypress, cy, firebase })
+    ```
+
+1. Start emulators: `npm run emulators`
+1. In another terminal window, start the application: `npm start`
+1. In another terminal window, open test runner with emulator settings: `npm run test:emulate`
+
+**NOTE**: If you are using react-scripts or other environment management, you can use environment variables to pass settings into your app:
+
+```js
+const { REACT_APP_FIREBASE_DATABASE_EMULATOR_HOST, REACT_APP_FIRESTORE_EMULATOR_HOST } = process.env
+// Emulate RTDB if REACT_APP_FIREBASE_DATABASE_EMULATOR_HOST exists in environment
+if (REACT_APP_FIREBASE_DATABASE_EMULATOR_HOST) {
+  console.log('Using RTDB emulator')
+  fbConfig.databaseURL = `http://${REACT_APP_FIREBASE_DATABASE_EMULATOR_HOST}?ns=${fbConfig.projectId}`
+}
+
+// Initialize Firebase instance
+firebase.initializeApp(fbConfig)
+
+// Emulate RTDB if REACT_APP_FIRESTORE_EMULATOR_HOST exists in environment
+if (REACT_APP_FIRESTORE_EMULATOR_HOST) {
+  console.log('Using Firestore emulator')
+  const firestoreSettings = {
+    host: REACT_APP_FIRESTORE_EMULATOR_HOST,
+    ssl: false,
+  };
+
+  if (window.Cypress) {
+    // Needed for Firestore support in Cypress (see https://github.com/cypress-io/cypress/issues/6350)
+    firestoreSettings.experimentalForceLongPolling = true;
+  }
+
+  firebase.firestore().settings(firestoreSettings)
+}
+```
+
 ### Generate JWT Before Run
 
 1. Add the following to the `scripts` section of your `package.json`:
@@ -288,12 +398,12 @@ describe('Test firestore', () => {
     "test": "npm run build:testConfig && cypress run",
     "test:open": "npm run build:testConfig && cypress open",
     ```
+
 1. Add your config info to your environment variables (for CI) or `cypress.env.json` when running locally (make sure this is in you `.gitignore`)
   
     ```js
     {
-      "TEST_UID": "<- uid of the user you want to test as ->",
-      "FIREBASE_API_KEY": "<- browser apiKey of your project ->"
+      "TEST_UID": "<- uid of the user you want to test as ->"
     }
     ```
 

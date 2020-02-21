@@ -27,10 +27,16 @@ export default function getFirebaseInstance(initialState, history) {
     firebase.initializeApp(fbConfig)
     if (shouldUseEmulator) { // or window.location.hostname === 'localhost' if you want
       console.log('Using Firestore emulator')
-      firebase.firestore().settings({
+      const firestoreSettings = {
         host: 'localhost:8080',
-        ssl: false
-      })
+        ssl: false,
+      };
+  
+      if (window.Cypress) {
+        // Needed for Firestore support in Cypress (see https://github.com/cypress-io/cypress/issues/6350)
+        firestoreSettings.experimentalForceLongPolling = true;
+      }
+      firebase.firestore().settings(firestoreSettings)
     }
     firebaseInstance = firebase
   }
