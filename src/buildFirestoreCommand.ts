@@ -35,6 +35,7 @@ export interface FirestoreCommandOptions {
    * and subcollections
    */
   recursive?: boolean;
+  merge?: boolean;
 }
 
 /**

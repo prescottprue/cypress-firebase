@@ -112,15 +112,6 @@ export default function extendWithFirebaseConfig(
   const { localBaseUrl, localHostPort = '3000' } = settings as any;
   const envName = getEnvNameFromConfig(cypressConfig);
   const FIREBASE_PROJECT_ID = getFirebaseProjectIdFromConfig(cypressConfig);
-  console.log('extended config:', {
-    ...cypressConfig,
-    FIREBASE_PROJECT_ID,
-    env: newEnv,
-    baseUrl:
-      envName === 'local'
-        ? localBaseUrl || `http://localhost:${localHostPort}`
-        : `https://${FIREBASE_PROJECT_ID}.firebaseapp.com`,
-  });
   // Extend Firebase config with new config
   return {
     ...cypressConfig,

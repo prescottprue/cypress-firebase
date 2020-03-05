@@ -247,7 +247,12 @@ export default function attachCustomCommands(
       if (Cypress.env('useCypressFirebaseTasks') === true) {
         return cy.task(
           'callRtdb',
-          { action, path: actionPath, dataOrOptions: data },
+          {
+            action,
+            path: actionPath,
+            data: dataToWrite,
+            options: opts || data,
+          },
           { timeout: 100000 },
         );
       }
@@ -302,13 +307,13 @@ export default function attachCustomCommands(
       action: FirestoreAction,
       actionPath: string,
       data: any,
-      opts: FirestoreCommandOptions = {},
+      opts: FirestoreCommandOptions,
     ): void => {
       // If data is an object, create a copy to original object is not modified
       const dataToWrite = isObject(data) ? { ...data } : data;
 
       // Add metadata to dataToWrite if specified by options
-      if (isObject(data) && opts && opts.withMeta) {
+      if (isObject(data) && opts?.withMeta) {
         if (!dataToWrite.createdBy) {
           dataToWrite.createdBy = Cypress.env('TEST_UID');
         }
@@ -320,7 +325,12 @@ export default function attachCustomCommands(
       if (Cypress.env('useCypressFirebaseTasks') === true) {
         return cy.task(
           'callFirestore',
-          { action, path: actionPath, dataOrOptions: dataToWrite },
+          {
+            action,
+            path: actionPath,
+            data: dataToWrite,
+            options: opts || data,
+          },
           { timeout: 100000 },
         );
       }
