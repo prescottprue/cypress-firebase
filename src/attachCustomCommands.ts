@@ -244,6 +244,14 @@ export default function attachCustomCommands(
         dataToWrite.createdAt = firebase.database.ServerValue.TIMESTAMP;
       }
 
+      if (Cypress.env('useCypressFirebaseTasks') === true) {
+        return cy.task(
+          'callRtdb',
+          { action, path: actionPath, dataOrOptions: data },
+          { timeout: 100000 },
+        );
+      }
+
       // Build command to pass to firebase-tools-extra
       const rtdbCommand = buildRtdbCommand(
         Cypress,
@@ -307,6 +315,14 @@ export default function attachCustomCommands(
         if (!dataToWrite.createdAt) {
           dataToWrite.createdAt = new Date().toISOString();
         }
+      }
+
+      if (Cypress.env('useCypressFirebaseTasks') === true) {
+        return cy.task(
+          'callFirestore',
+          { action, path: actionPath, dataOrOptions: dataToWrite },
+          { timeout: 100000 },
+        );
       }
 
       const firestoreCommand = buildFirestoreCommand(

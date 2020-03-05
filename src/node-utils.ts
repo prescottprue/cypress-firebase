@@ -182,7 +182,7 @@ export function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any {
  * getParsedEnvVar('FIREBASE_PRIVATE_KEY_ID')
  * // => 'fireadmin-stage' (parsed value of 'STAGE_FIREBASE_PRIVATE_KEY_ID' environment var)
  */
-function getParsedEnvVar(varNameRoot: string, envName: string): any {
+function getParsedEnvVar(varNameRoot: string, envName?: string): any {
   const val = envVarBasedOnCIEnv(varNameRoot, envName);
   const combinedVar = withEnvPrefix(varNameRoot, envName);
   if (!val) {
@@ -221,7 +221,7 @@ interface ServiceAccount {
  * @param envSlug - Environment option
  * @returns Service account object
  */
-export function getServiceAccount(envSlug: string): ServiceAccount {
+export function getServiceAccount(envSlug?: string): ServiceAccount {
   const serviceAccountPath = getServiceAccountPath(envSlug);
   // Check for local service account file (Local dev)
   if (existsSync(serviceAccountPath)) {
