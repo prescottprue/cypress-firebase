@@ -350,7 +350,7 @@ declare module "node-utils" {
      * @param envSlug - Environment option
      * @returns Service account object
      */
-    export function getServiceAccount(envSlug: string): ServiceAccount;
+    export function getServiceAccount(envSlug?: string): ServiceAccount;
     export interface RunCommandOptions {
         command: string;
         args: string[];
@@ -415,9 +415,66 @@ declare module "extendWithFirebaseConfig" {
      */
     export default function extendWithFirebaseConfig(cypressConfig: CypressConfig, settings?: ExtendWithFirebaseConfigSettings): ExtendedCypressConfig;
 }
+declare module "firebase-utils" {
+    import * as admin from 'firebase-admin';
+    /**
+     * Check whether a value is a string or not
+     * @param valToCheck - Value to check
+     * @returns Whether or not value is a string
+     */
+    export function isString(valToCheck: any): boolean;
+    /**
+     * Initialize Firebase instance from service account (from either local
+     * serviceAccount.json or environment variables)
+     * @returns Initialized Firebase instance
+     * @param adminInstance
+     * @param firebaseInstance
+     */
+    export function initializeFirebase(adminInstance: any): any;
+    /**
+     * Convert slash path to Firestore reference
+     * @param firestoreInstance - Instance on which to
+     * create ref
+     * @param slashPath - Path to convert into firestore refernce
+     * @param options - Options object
+     * @returns Ref at slash path
+     */
+    export function slashPathToFirestoreRef(firestoreInstance: any, slashPath: string, options?: any): admin.firestore.CollectionReference | admin.firestore.DocumentReference | admin.firestore.Query;
+}
+declare module "tasks" {
+    import { FixtureData, FirestoreAction, FirestoreCommandOptions } from "buildFirestoreCommand";
+    import { RTDBAction, RTDBCommandOptions } from "buildRtdbCommand";
+    /**
+     * @param adminInstance - firebase-admin instance
+     * @param action - Action to run
+     * @param actionPath - Path in RTDB
+     * @param dataOrOptions - Data or options
+     * @returns Promsie which resolves with results of calling RTDB
+     */
+    export function callRtdb(adminInstance: any, action: RTDBAction, actionPath: string, dataOrOptions: FixtureData | RTDBCommandOptions): Promise<any>;
+    /**
+     * @param adminInstance - firebase-admin instance
+     * @param action - Action to run
+     * @param actionPath - Path to collection or document within Firestore
+     * @param dataOrOptions - Data or options
+     * @returns Promise which resolves with results of calling Firestore
+     */
+    export function callFirestore(adminInstance: any, action: FirestoreAction, actionPath: string, dataOrOptions: FixtureData | FirestoreCommandOptions): Promise<any>;
+}
+declare module "pluginWithTasks" {
+    import { ExtendedCypressConfig } from "extendWithFirebaseConfig";
+    /**
+     * @param cypressOnFunc - on function from cypress plugins file
+     * @param cypressConfig - Cypress config
+     * @param adminInstance - firebase-admin instance
+     * @returns Extended Cypress config
+     */
+    export default function pluginWithTasks(cypressOnFunc: Function, cypressConfig: any, adminInstance: any): ExtendedCypressConfig;
+}
 declare module "index" {
     import attachCustomCommands from "attachCustomCommands";
     import extendWithFirebaseConfig from "extendWithFirebaseConfig";
+    import pluginWithTasks from "pluginWithTasks";
     export const plugin: typeof extendWithFirebaseConfig;
-    export { attachCustomCommands, extendWithFirebaseConfig };
+    export { attachCustomCommands, extendWithFirebaseConfig, pluginWithTasks };
 }
