@@ -76,16 +76,23 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
       // Initialize RTDB with databaseURL from FIREBASE_DATABASE_EMULATOR_HOST to allow for RTDB actions
       // within Emulator
       if (process.env.FIREBASE_DATABASE_EMULATOR_HOST) {
-        const [, portStr] = process.env.FIREBASE_DATABASE_EMULATOR_HOST.split(
-          ':',
-        );
-        fbConfig.databaseURL = `http://localhost:${portStr ||
-          '9000'}?ns=${fbConfig.projectId || 'local'}`;
+        fbConfig.databaseURL = `http://${
+          process.env.FIREBASE_DATABASE_EMULATOR_HOST
+        }?ns=${fbConfig.projectId || 'local'}`;
+        /* eslint-disable no-console */
+        console.log('Using RTDB emulator with DB URL:', fbConfig.databaseURL);
+        /* eslint-enable no-console */
       }
 
       fbInstance = adminInstance.initializeApp(fbConfig);
       if (process.env.FIRESTORE_EMULATOR_HOST) {
         const firestoreSettings = firestoreSettingsFromEnv();
+        /* eslint-disable no-console */
+        console.log(
+          'Using Firestore emulator with settings:',
+          firestoreSettings,
+        );
+        /* eslint-enable no-console */
         adminInstance.firestore().settings(firestoreSettings);
       }
     } else {
@@ -102,7 +109,11 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
         'firebase-top-agent-int',
         'top-agent-int',
       );
-
+      /* eslint-disable no-console */
+      console.log(
+        `Initialized with Service Account for project "${cleanProjectId}"`,
+      );
+      /* eslint-enable no-console */
       fbInstance = adminInstance.initializeApp({
         credential: adminInstance.credential.cert(serviceAccount as any),
         databaseURL: `https://${cleanProjectId}.firebaseio.com`,
@@ -117,12 +128,6 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
     /* eslint-enable no-console */
     throw err;
   }
-}
-
-interface FirestoreOptions {
-  limit?: number;
-  limitToLast?: number;
-  where?: any[];
 }
 
 /**

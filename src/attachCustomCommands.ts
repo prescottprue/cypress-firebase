@@ -245,16 +245,22 @@ export default function attachCustomCommands(
       }
 
       if (Cypress.env('useCypressFirebaseTasks') === true) {
-        return cy.task(
-          'callRtdb',
-          {
-            action,
-            path: actionPath,
-            data: dataToWrite,
-            options: opts || data,
-          },
-          { timeout: 100000 },
-        );
+        const taskSettings: any = {
+          action,
+          path: actionPath,
+        };
+        // Add data only for write actions
+        if (['set', 'update', 'push'].includes(action)) {
+          taskSettings.data = dataToWrite;
+        }
+        // Use third argument as options for get action
+        if (action === 'get') {
+          taskSettings.options = data;
+        } else if (opts) {
+          // Attach options if they exist
+          taskSettings.options = opts;
+        }
+        return cy.task('callRtdb', taskSettings, { timeout: 100000 });
       }
 
       // Build command to pass to firebase-tools-extra
@@ -323,16 +329,22 @@ export default function attachCustomCommands(
       }
 
       if (Cypress.env('useCypressFirebaseTasks') === true) {
-        return cy.task(
-          'callFirestore',
-          {
-            action,
-            path: actionPath,
-            data: dataToWrite,
-            options: opts || data,
-          },
-          { timeout: 100000 },
-        );
+        const taskSettings: any = {
+          action,
+          path: actionPath,
+        };
+        // Add data only for write actions
+        if (['set', 'update', 'add'].includes(action)) {
+          taskSettings.data = dataToWrite;
+        }
+        // Use third argument as options for get action
+        if (action === 'get') {
+          taskSettings.options = data;
+        } else if (opts) {
+          // Attach options if they exist
+          taskSettings.options = opts;
+        }
+        return cy.task('callFirestore', taskSettings, { timeout: 100000 });
       }
 
       const firestoreCommand = buildFirestoreCommand(
