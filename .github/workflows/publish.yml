@@ -5,6 +5,7 @@ on:
     branches:
       - master
       - next
+      - alpha
 
 jobs:
   publish-npm:
@@ -54,7 +55,8 @@ jobs:
       - name: Publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
-        run: npm publish $(if [ ${{github.ref}} == 'refs/heads/next' ]; then echo '--tag next';fi;)
+        run:
+          npm publish $(if [ ${{ github.ref }} != 'refs/heads/master' ]; then echo '--tag ${GITHUB_REF##*/}'; fi;)
 
       - name: Archive Build Artifact
         uses: actions/upload-artifact@master
