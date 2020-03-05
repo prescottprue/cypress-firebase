@@ -109,7 +109,11 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
         'firebase-top-agent-int',
         'top-agent-int',
       );
-
+      /* eslint-disable no-console */
+      console.log(
+        `Initialized with Service Account for project "${cleanProjectId}"`,
+      );
+      /* eslint-enable no-console */
       fbInstance = adminInstance.initializeApp({
         credential: adminInstance.credential.cert(serviceAccount as any),
         databaseURL: `https://${cleanProjectId}.firebaseio.com`,
@@ -124,12 +128,6 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
     /* eslint-enable no-console */
     throw err;
   }
-}
-
-interface FirestoreOptions {
-  limit?: number;
-  limitToLast?: number;
-  where?: any[];
 }
 
 /**
