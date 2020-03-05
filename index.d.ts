@@ -467,7 +467,7 @@ declare module "pluginWithTasks" {
      * @param cypressOnFunc - on function from cypress plugins file
      * @param cypressConfig - Cypress config
      * @param adminInstance - firebase-admin instance
-     * @returns Extended Firebase instance
+     * @returns Extended Cypress config
      */
     export default function pluginWithTasks(cypressOnFunc: Function, cypressConfig: any, adminInstance: any): ExtendedCypressConfig;
 }
