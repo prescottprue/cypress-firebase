@@ -21,12 +21,13 @@ export default function pluginWithTasks(
   const tasksWithFirebase: Record<string, any> = {};
   Object.keys(tasks).forEach(taskName => {
     tasksWithFirebase[taskName] = (taskSettings: any): any => {
-      const { action, path: actionPath, dataOrOptions } = taskSettings;
+      const { action, path: actionPath, options = {}, data } = taskSettings;
       return (tasks as any)[taskName](
         adminInstance,
         action,
         actionPath,
-        dataOrOptions,
+        options,
+        data,
       );
     };
   });

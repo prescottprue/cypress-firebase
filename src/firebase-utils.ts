@@ -50,16 +50,15 @@ function firestoreSettingsFromEnv(): FirebaseFirestore.Settings {
   };
 }
 
-let fbInstance: any;
+let fbInstance: admin.app.App;
 
 /**
  * Initialize Firebase instance from service account (from either local
  * serviceAccount.json or environment variables)
  * @returns Initialized Firebase instance
- * @param adminInstance
- * @param firebaseInstance
+ * @param adminInstance - firebase-admin instance to initialize
  */
-export function initializeFirebase(adminInstance: any): any {
+export function initializeFirebase(adminInstance: any): admin.app.App {
   if (fbInstance) {
     return fbInstance;
   }
@@ -109,6 +108,7 @@ export function initializeFirebase(adminInstance: any): any {
         databaseURL: `https://${cleanProjectId}.firebaseio.com`,
       });
     }
+    return fbInstance;
   } catch (err) {
     /* eslint-disable no-console */
     console.error(
@@ -146,31 +146,27 @@ export function slashPathToFirestoreRef(
   }
   const isDocPath = slashPath.split('/').length % 2;
 
-  const ref = isDocPath
+  let ref = isDocPath
     ? firestoreInstance.collection(slashPath)
     : firestoreInstance.doc(slashPath);
-  // admin
-  //   .firestore()
-  //   .collection()
-  //   .orderBy()
-  //   .limitToLast();
+
   // Apply orderBy to query if it exists
   if (options?.orderBy && typeof ref.orderBy === 'function') {
-    return ref.orderBy(options.orderBy);
+    ref = ref.orderBy(options.orderBy);
   }
   // Apply where to query if it exists
   if (options?.where && typeof ref.where === 'function') {
-    return ref.where(...options.where);
+    ref = ref.where(...options.where);
   }
 
   // Apply limit to query if it exists
   if (options?.limit && typeof ref.limit === 'function') {
-    return ref.limit(options.limit);
+    ref = ref.limit(options.limit);
   }
 
   // Apply limitToLast to query if it exists
   if (options?.limitToLast && typeof ref.limitToLast === 'function') {
-    return ref.limitToLast(options.limitToLast);
+    ref = ref.limitToLast(options.limitToLast);
   }
 
   return ref;

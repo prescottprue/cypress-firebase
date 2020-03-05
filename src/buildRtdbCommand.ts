@@ -6,7 +6,13 @@ import { FIREBASE_TOOLS_BASE_COMMAND, FIREBASE_EXTRA_PATH } from './constants';
 /**
  * Action for Real Time Database
  */
-export type RTDBAction = 'remove' | 'set' | 'update' | 'delete' | 'get';
+export type RTDBAction =
+  | 'push'
+  | 'remove'
+  | 'set'
+  | 'update'
+  | 'delete'
+  | 'get';
 
 /**
  * Options for callRtdb commands

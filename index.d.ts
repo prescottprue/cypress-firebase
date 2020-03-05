@@ -68,6 +68,7 @@ declare module "buildFirestoreCommand" {
          * and subcollections
          */
         recursive?: boolean;
+        merge?: boolean;
     }
     /**
      * Build Command to run Firestore action. Commands call either firebase-extra
@@ -90,7 +91,7 @@ declare module "buildRtdbCommand" {
     /**
      * Action for Real Time Database
      */
-    export type RTDBAction = 'remove' | 'set' | 'update' | 'delete' | 'get';
+    export type RTDBAction = 'push' | 'remove' | 'set' | 'update' | 'delete' | 'get';
     /**
      * Options for callRtdb commands
      */
@@ -430,7 +431,7 @@ declare module "firebase-utils" {
      * @param adminInstance
      * @param firebaseInstance
      */
-    export function initializeFirebase(adminInstance: any): any;
+    export function initializeFirebase(adminInstance: any): admin.app.App;
     /**
      * Convert slash path to Firestore reference
      * @param firestoreInstance - Instance on which to
@@ -448,18 +449,22 @@ declare module "tasks" {
      * @param adminInstance - firebase-admin instance
      * @param action - Action to run
      * @param actionPath - Path in RTDB
+     * @param options
+     * @param data
      * @param dataOrOptions - Data or options
      * @returns Promsie which resolves with results of calling RTDB
      */
-    export function callRtdb(adminInstance: any, action: RTDBAction, actionPath: string, dataOrOptions: FixtureData | RTDBCommandOptions): Promise<any>;
+    export function callRtdb(adminInstance: any, action: RTDBAction, actionPath: string, options?: RTDBCommandOptions, data?: FixtureData): Promise<any>;
     /**
      * @param adminInstance - firebase-admin instance
      * @param action - Action to run
      * @param actionPath - Path to collection or document within Firestore
+     * @param options
+     * @param data
      * @param dataOrOptions - Data or options
      * @returns Promise which resolves with results of calling Firestore
      */
-    export function callFirestore(adminInstance: any, action: FirestoreAction, actionPath: string, dataOrOptions: FixtureData | FirestoreCommandOptions): Promise<any>;
+    export function callFirestore(adminInstance: any, action: FirestoreAction, actionPath: string, options?: FirestoreCommandOptions, data?: FixtureData): Promise<any>;
 }
 declare module "pluginWithTasks" {
     import { ExtendedCypressConfig } from "extendWithFirebaseConfig";
