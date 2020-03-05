@@ -428,8 +428,7 @@ declare module "firebase-utils" {
      * Initialize Firebase instance from service account (from either local
      * serviceAccount.json or environment variables)
      * @returns Initialized Firebase instance
-     * @param adminInstance
-     * @param firebaseInstance
+     * @param adminInstance - firebase-admin instance to initialize
      */
     export function initializeFirebase(adminInstance: any): admin.app.App;
     /**
@@ -449,9 +448,8 @@ declare module "tasks" {
      * @param adminInstance - firebase-admin instance
      * @param action - Action to run
      * @param actionPath - Path in RTDB
-     * @param options
-     * @param data
-     * @param dataOrOptions - Data or options
+     * @param options - Query options
+     * @param data - Data to pass to action
      * @returns Promsie which resolves with results of calling RTDB
      */
     export function callRtdb(adminInstance: any, action: RTDBAction, actionPath: string, options?: RTDBCommandOptions, data?: FixtureData): Promise<any>;
@@ -459,9 +457,8 @@ declare module "tasks" {
      * @param adminInstance - firebase-admin instance
      * @param action - Action to run
      * @param actionPath - Path to collection or document within Firestore
-     * @param options
-     * @param data
-     * @param dataOrOptions - Data or options
+     * @param options - Query options
+     * @param data - Data to pass to action
      * @returns Promise which resolves with results of calling Firestore
      */
     export function callFirestore(adminInstance: any, action: FirestoreAction, actionPath: string, options?: FirestoreCommandOptions, data?: FixtureData): Promise<any>;
