@@ -1,6 +1,9 @@
 import * as admin from 'firebase-admin';
 import { get } from 'lodash';
-import { getServiceAccount } from './node-utils';
+import {
+  getServiceAccount,
+  getServiceAccountWithoutWarning,
+} from './node-utils';
 
 /**
  * Check whether a value is a string or not
@@ -21,9 +24,12 @@ export function isString(valToCheck: any): boolean {
  */
 function getEmulatedProjectId(): string {
   // Get service account from local file falling back to environment variables
-  const serviceAccount = getServiceAccount();
-  const projectIdFromSA = get(serviceAccount, 'project_id');
-  return projectIdFromSA || 'test';
+  const { GCLOUD_PROJECT } = process.env;
+  if (GCLOUD_PROJECT) {
+    return GCLOUD_PROJECT;
+  }
+  const serviceAccount = getServiceAccountWithoutWarning();
+  return serviceAccount?.project_id || 'test';
 }
 
 /**
@@ -72,7 +78,23 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
       // usage of clearFirestoreData (see https://github.com/prescottprue/cypress-firebase/issues/73 for more info)
       const projectId = getEmulatedProjectId();
 
-      const fbConfig: any = { projectId };
+      const fbConfig: any = {
+        projectId,
+      };
+      const serviceAccount = getServiceAccountWithoutWarning();
+      if (serviceAccount && process.env.CYPRESS_FIREBASE_USE_SA) {
+        /* eslint-disable no-console */
+        console.log(
+          'Service Account exists - adding to credential even though emulators are being used',
+        );
+        /* eslint-enable no-console */
+        fbConfig.credential = adminInstance.credential.cert(serviceAccount);
+      } else {
+        /* eslint-disable no-console */
+        console.log('Using application default credentials');
+        /* eslint-enable no-console */
+        fbConfig.credential = adminInstance.credential.applicationDefault();
+      }
       // Initialize RTDB with databaseURL from FIREBASE_DATABASE_EMULATOR_HOST to allow for RTDB actions
       // within Emulator
       if (process.env.FIREBASE_DATABASE_EMULATOR_HOST) {

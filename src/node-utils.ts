@@ -280,6 +280,40 @@ export function getServiceAccount(envSlug?: string): ServiceAccount {
   };
 }
 
+/**
+ * Get service account from either local file or environment variables
+ * @param envSlug - Environment option
+ * @returns Service account object
+ */
+export function getServiceAccountWithoutWarning(
+  envSlug?: string,
+): ServiceAccount | null {
+  const serviceAccountPath = getServiceAccountPath(envSlug);
+  // Check for local service account file (Local dev)
+  if (existsSync(serviceAccountPath)) {
+    return readJsonFile(serviceAccountPath); // eslint-disable-line global-require, import/no-dynamic-require
+  }
+
+  // Use environment variables (CI)
+  const serviceAccountEnvVar = envVarBasedOnCIEnv('SERVICE_ACCOUNT', envSlug);
+  if (serviceAccountEnvVar) {
+    if (typeof serviceAccountEnvVar === 'string') {
+      try {
+        return JSON.parse(serviceAccountEnvVar);
+      } catch (err) {
+        warn(
+          `Issue parsing ${chalk.cyan(
+            'SERVICE_ACCOUNT',
+          )} environment variable from string to object, returning string`,
+        );
+      }
+    }
+    return serviceAccountEnvVar;
+  }
+
+  return null;
+}
+
 export interface RunCommandOptions {
   command: string;
   args: string[];
