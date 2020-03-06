@@ -81,20 +81,7 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
       const fbConfig: any = {
         projectId,
       };
-      const serviceAccount = getServiceAccountWithoutWarning();
-      if (serviceAccount && process.env.CYPRESS_FIREBASE_USE_SA) {
-        /* eslint-disable no-console */
-        console.log(
-          'Service Account exists - adding to credential even though emulators are being used',
-        );
-        /* eslint-enable no-console */
-        fbConfig.credential = adminInstance.credential.cert(serviceAccount);
-      } else {
-        /* eslint-disable no-console */
-        console.log('Using application default credentials');
-        /* eslint-enable no-console */
-        fbConfig.credential = adminInstance.credential.applicationDefault();
-      }
+
       // Initialize RTDB with databaseURL from FIREBASE_DATABASE_EMULATOR_HOST to allow for RTDB actions
       // within Emulator
       if (process.env.FIREBASE_DATABASE_EMULATOR_HOST) {

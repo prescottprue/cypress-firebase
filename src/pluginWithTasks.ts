@@ -15,10 +15,13 @@ export default function pluginWithTasks(
   cypressConfig: any,
   adminInstance: any,
 ): ExtendedCypressConfig {
+  // Only initailize admin instance if it hasn't already been initialized
+  if (adminInstance.apps.length === 0) {
+    initializeFirebase(adminInstance);
+  }
   // Parse single argument from task into arguments for task methods while
   // also passing the admin instance
-  initializeFirebase(adminInstance);
-  const tasksWithFirebase: Record<string, any> = {};
+  const tasksWithFirebase: Record<string, Function> = {};
   Object.keys(tasks).forEach(taskName => {
     tasksWithFirebase[taskName] = (taskSettings: any): any => {
       const { action, path: actionPath, options = {}, data } = taskSettings;

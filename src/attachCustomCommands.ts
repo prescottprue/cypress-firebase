@@ -173,6 +173,14 @@ export default function attachCustomCommands(
         });
     }
 
+    // Resolve with currentUser if they exist
+    if (firebase.auth().currentUser) {
+      cy.log('Authed user already exists, login complete.');
+      // Undefined is returned to prevent Cypress error:
+      // "Cypress detected that you invoked one or more cy commands in a custom command but returned a different value."
+      return undefined;
+    }
+
     // Throw if JWT not within environment (passed uid case handled above)
     if (!Cypress.env('FIREBASE_AUTH_JWT')) {
       /** Log in using token * */
@@ -180,14 +188,6 @@ export default function attachCustomCommands(
         'uid must be passed to cy.login or FIREBASE_AUTH_JWT must be set to cypress environment in order to login';
       cy.log(errMsg);
       throw new Error(errMsg);
-    }
-
-    // Resolve with currentUser if they exist
-    if (firebase.auth().currentUser) {
-      cy.log('Authed user already exists, login complete.');
-      // Undefined is returned to prevent Cypress error:
-      // "Cypress detected that you invoked one or more cy commands in a custom command but returned a different value."
-      return undefined;
     }
 
     // Otherwise, login with Token from environment
