@@ -57,7 +57,8 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
           GITHUB_REF: ${{ github.ref }}
         run:
-          npm publish $(if [ $GITHUB_REF != 'refs/heads/master' ]; then echo '--tag ${GITHUB_REF##*/}'; fi;)
+          echo "::set-env name=GIT_BRANCH::${GITHUB_REF##*/}"
+          npm publish $(if [ $GITHUB_REF != 'refs/heads/master' ]; then echo '--tag $GIT_BRANCH'; fi;)
 
       - name: Archive Build Artifact
         uses: actions/upload-artifact@master

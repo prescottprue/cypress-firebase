@@ -72,7 +72,10 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
       // usage of clearFirestoreData (see https://github.com/prescottprue/cypress-firebase/issues/73 for more info)
       const projectId = getEmulatedProjectId();
 
-      const fbConfig: any = { projectId };
+      const fbConfig: any = {
+        projectId,
+        credential: adminInstance.credential.applicationDefault(),
+      };
       // Initialize RTDB with databaseURL from FIREBASE_DATABASE_EMULATOR_HOST to allow for RTDB actions
       // within Emulator
       if (process.env.FIREBASE_DATABASE_EMULATOR_HOST) {
