@@ -352,6 +352,12 @@ declare module "node-utils" {
      * @returns Service account object
      */
     export function getServiceAccount(envSlug?: string): ServiceAccount;
+    /**
+     * Get service account from either local file or environment variables
+     * @param envSlug - Environment option
+     * @returns Service account object
+     */
+    export function getServiceAccountWithoutWarning(envSlug?: string): ServiceAccount | null;
     export interface RunCommandOptions {
         command: string;
         args: string[];
