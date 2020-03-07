@@ -93,6 +93,10 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
         /* eslint-enable no-console */
       }
 
+      const serviceAccount = getServiceAccountWithoutWarning();
+      if (serviceAccount) {
+        fbConfig.credential = adminInstance.credential.cert(serviceAccount);
+      }
       fbInstance = adminInstance.initializeApp(fbConfig);
       if (process.env.FIRESTORE_EMULATOR_HOST) {
         const firestoreSettings = firestoreSettingsFromEnv();
