@@ -1,3 +1,7 @@
 examples
 lib
 lib-esm
+node_modules
+coverage
+.nyc_output
+.github

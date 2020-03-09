@@ -1,6 +1,6 @@
 {
   "name": "cypress-firebase",
-  "version": "0.10.2",
+  "version": "0.11.0-beta",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -8,19 +8,18 @@
   "types": "./index.d.ts",
   "scripts": {
     "clean": "rimraf lib lib-esm",
-    "build": "npm run build:lib && npm run build:esm && npm run build:typefile",
+    "build": "yarn build:lib && yarn build:esm && yarn build:typefile",
     "build:typefile": "tsc --declaration --outFile index.d.ts --emitDeclarationOnly",
     "build:lib": "tsc",
-    "build:esm": "tsc && tsc -m es6 --outDir lib-esm",
-    "watch": "npm run build:commonjs -- --watch",
-    "watch:es": "npm run build:es -- --watch",
+    "build:esm": "tsc -m es6 --outDir lib-esm",
+    "watch": "yarn build:lib -- --watch",
+    "watch:es": "yarn build:es -- --watch",
     "lint": "eslint src/**.ts --ext .ts",
-    "lint:fix": "npm run lint -- --fix",
+    "lint:fix": "yarn lint -- --fix",
     "test": "mocha",
-    "test:cov": "nyc --reporter=lcov --reporter=html npm run test",
+    "test:cov": "nyc --reporter=lcov --reporter=html yarn test",
     "codecov": "cat coverage/lcov.info | codecov",
-    "prepare": "npm run clean && npm run build",
-    "prepush": "npm run lint"
+    "prepare": "yarn clean && yarn build"
   },
   "bin": {
     "cypress-firebase": "./bin/cypress-firebase"
@@ -31,42 +30,43 @@
   "dependencies": {
     "chalk": "^3.0.0",
     "commander": "^4.1.0",
-    "figures": "^3.1.0",
+    "figures": "^3.2.0",
     "firebase-admin": "^8.9.2",
     "firebase-tools-extra": "0.5.2",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
-    "@types/chai": "^4.2.7",
+    "@types/chai": "^4.2.10",
     "@types/lodash": "^4.14.149",
-    "@types/mocha": "^7.0.1",
-    "@types/node": "^13.7.0",
+    "@types/mocha": "^7.0.2",
+    "@types/node": "^13.9.0",
     "@types/sinon-chai": "^3.2.3",
-    "@typescript-eslint/eslint-plugin": "^2.18.0",
-    "@typescript-eslint/parser": "^2.18.0",
+    "@typescript-eslint/eslint-plugin": "^2.23.0",
+    "@typescript-eslint/parser": "^2.23.0",
     "chai": "^4.2.0",
-    "codecov": "^3.6.1",
-    "cross-env": "^7.0.0",
+    "codecov": "^3.6.5",
+    "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-import": "^2.20.0",
-    "eslint-plugin-jsdoc": "^20.3.0",
+    "eslint-plugin-jsdoc": "^22.0.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.2",
-    "firebase-tools": "^7.12.1",
-    "husky": "^4.2.1",
-    "mocha": "^7.0.0",
+    "firebase-tools": "^7.14.0",
+    "husky": "^4.2.3",
+    "lint-staged": "^10.0.8",
+    "mocha": "^7.1.0",
     "nyc": "^15.0.0",
     "prettier": "^1.19.1",
     "rimraf": "^3.0.0",
-    "sinon": "^8.1.1",
+    "sinon": "^9.0.0",
     "sinon-chai": "^3.4.0",
     "source-map-support": "^0.5.16",
     "ts-node": "^8.6.2",
-    "typescript": "^3.7.5"
+    "typescript": "^3.8.3"
   },
   "keywords": [
     "cypress",
@@ -93,5 +93,15 @@
     "lib",
     "lib-esm",
     "index.d.ts"
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{ts}": [
+      "eslint --fix"
+    ]
+  }
 }
