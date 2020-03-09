@@ -57,7 +57,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
           GITHUB_REF: ${{ github.ref }}
         run: |
-          echo "::set-env name=GIT_BRANCH::${GITHUB_REF##*/}"
+          export GIT_BRANCH=${GITHUB_REF##*/}
           export PUBLISH_FLAG=$(if [ "$GITHUB_REF" != 'refs/heads/master' ]; then eval echo '--tag $GIT_BRANCH'; else echo ''; fi;)
           npm publish $PUBLISH_FLAG
 
