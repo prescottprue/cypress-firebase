@@ -75,11 +75,14 @@ export function callRtdb(
       })
       .catch(handleError);
   }
-
+  const actionNameMap = {
+    delete: 'remove',
+  };
+  const cleanedActionName = (actionNameMap as any)[action] || action;
   return adminInstance
     .database()
     .ref(actionPath)
-    [action](data)
+    [cleanedActionName](data)
     .then(() => {
       // Prevents Cypress error with message:
       // "You must return a promise, a value, or null to indicate that the task was handled."
@@ -139,7 +142,7 @@ export function callFirestore(
     ) as any)
       .get()
       .then((snap: any) => {
-        if (typeof snap.docs?.map === 'function') {
+        if (snap && typeof snap.docs?.map === 'function') {
           return snap.docs.map(
             (docSnap: FirebaseFirestore.DocumentSnapshot) => ({
               ...docSnap.data(),
@@ -147,10 +150,9 @@ export function callFirestore(
             }),
           );
         }
-        const dataVal = snap.data();
         // Falling back to null in the case of falsey value prevents Cypress error with message:
         // "You must return a promise, a value, or null to indicate that the task was handled."
-        return dataVal || null;
+        return snap?.data() || null;
       })
       .catch(handleError);
   }
