@@ -5,7 +5,7 @@ import { FIREBASE_TOOLS_BASE_COMMAND, FIREBASE_EXTRA_PATH } from './constants';
 /**
  * Action for Firestore
  */
-export type FirestoreAction = 'delete' | 'set' | 'update' | 'get';
+export type FirestoreAction = 'get' | 'add' | 'set' | 'update' | 'delete';
 
 /**
  * Data from loaded fixture

@@ -40,7 +40,7 @@ declare module "buildFirestoreCommand" {
     /**
      * Action for Firestore
      */
-    export type FirestoreAction = 'delete' | 'set' | 'update' | 'get';
+    export type FirestoreAction = 'get' | 'add' | 'set' | 'update' | 'delete';
     /**
      * Data from loaded fixture
      */
@@ -438,6 +438,12 @@ declare module "firebase-utils" {
      */
     export function initializeFirebase(adminInstance: any): admin.app.App;
     /**
+     * Check with or not a slash path is the path of a document
+     * @param slashPath - Path to check for whether or not it is a doc
+     * @returns Whether or not slash path is a document path
+     */
+    export function isDocPath(slashPath: string): boolean;
+    /**
      * Convert slash path to Firestore reference
      * @param firestoreInstance - Instance on which to
      * create ref
@@ -446,9 +452,16 @@ declare module "firebase-utils" {
      * @returns Ref at slash path
      */
     export function slashPathToFirestoreRef(firestoreInstance: any, slashPath: string, options?: any): admin.firestore.CollectionReference | admin.firestore.DocumentReference | admin.firestore.Query;
+    /**
+     * @param db - Firestore instance
+     * @param collectionPath - Path of collection
+     * @param batchSize - Size of delete batch
+     * @returns Promise which resolves with results of deleting batch
+     */
+    export function deleteCollection(db: any, collectionPath: string, batchSize?: number): Promise<any>;
 }
 declare module "tasks" {
-    import { FixtureData, FirestoreAction, FirestoreCommandOptions } from "buildFirestoreCommand";
+    import { FixtureData, FirestoreAction } from "buildFirestoreCommand";
     import { RTDBAction, RTDBCommandOptions } from "buildRtdbCommand";
     /**
      * @param adminInstance - firebase-admin instance
@@ -460,6 +473,17 @@ declare module "tasks" {
      */
     export function callRtdb(adminInstance: any, action: RTDBAction, actionPath: string, options?: RTDBCommandOptions, data?: FixtureData): Promise<any>;
     /**
+     * Options for building Firestore commands
+     */
+    export interface CallFirestoreOptions {
+        /**
+         * Whether or not to include createdAt and createdBy
+         */
+        withMeta?: boolean;
+        merge?: boolean;
+        batchSize?: number;
+    }
+    /**
      * @param adminInstance - firebase-admin instance
      * @param action - Action to run
      * @param actionPath - Path to collection or document within Firestore
@@ -467,7 +491,7 @@ declare module "tasks" {
      * @param data - Data to pass to action
      * @returns Promise which resolves with results of calling Firestore
      */
-    export function callFirestore(adminInstance: any, action: FirestoreAction, actionPath: string, options?: FirestoreCommandOptions, data?: FixtureData): Promise<any>;
+    export function callFirestore(adminInstance: any, action: FirestoreAction, actionPath: string, options?: CallFirestoreOptions, data?: FixtureData): Promise<any>;
 }
 declare module "pluginWithTasks" {
     import { ExtendedCypressConfig } from "extendWithFirebaseConfig";

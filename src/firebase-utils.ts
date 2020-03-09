@@ -93,10 +93,6 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
         /* eslint-enable no-console */
       }
 
-      const serviceAccount = getServiceAccountWithoutWarning();
-      if (serviceAccount) {
-        fbConfig.credential = adminInstance.credential.cert(serviceAccount);
-      }
       fbInstance = adminInstance.initializeApp(fbConfig);
       if (process.env.FIRESTORE_EMULATOR_HOST) {
         const firestoreSettings = firestoreSettingsFromEnv();
@@ -144,6 +140,15 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
 }
 
 /**
+ * Check with or not a slash path is the path of a document
+ * @param slashPath - Path to check for whether or not it is a doc
+ * @returns Whether or not slash path is a document path
+ */
+export function isDocPath(slashPath: string): boolean {
+  return !(slashPath.replace(/^\/|\/$/g, '').split('/').length % 2);
+}
+
+/**
  * Convert slash path to Firestore reference
  * @param firestoreInstance - Instance on which to
  * create ref
@@ -162,11 +167,10 @@ export function slashPathToFirestoreRef(
   if (!slashPath) {
     throw new Error('Path is required to make Firestore Reference');
   }
-  const isDocPath = slashPath.split('/').length % 2;
 
-  let ref = isDocPath
-    ? firestoreInstance.collection(slashPath)
-    : firestoreInstance.doc(slashPath);
+  let ref = isDocPath(slashPath)
+    ? firestoreInstance.doc(slashPath)
+    : firestoreInstance.collection(slashPath);
 
   // Apply orderBy to query if it exists
   if (options?.orderBy && typeof ref.orderBy === 'function') {
@@ -188,4 +192,68 @@ export function slashPathToFirestoreRef(
   }
 
   return ref;
+}
+
+/**
+ * @param db - Firestore instance
+ * @param query - Query which is limited to batch size
+ * @param resolve - Resolve function
+ * @param reject - Reject function
+ */
+function deleteQueryBatch(
+  db: any,
+  query: any,
+  resolve: Function,
+  reject: Function,
+): void {
+  query
+    .get()
+    .then((snapshot: any) => {
+      // When there are no documents left, we are done
+      if (snapshot.size === 0) {
+        return 0;
+      }
+
+      // Delete documents in a batch
+      const batch = db.batch();
+      snapshot.docs.forEach((doc: any) => {
+        batch.delete(doc.ref);
+      });
+
+      return batch.commit().then(() => {
+        return snapshot.size;
+      });
+    })
+    .then((numDeleted: number) => {
+      if (numDeleted === 0) {
+        resolve();
+        return;
+      }
+
+      // Recurse on the next process tick, to avoid
+      // exploding the stack.
+      process.nextTick(() => {
+        deleteQueryBatch(db, query, resolve, reject);
+      });
+    })
+    .catch(reject);
+}
+
+/**
+ * @param db - Firestore instance
+ * @param collectionPath - Path of collection
+ * @param batchSize - Size of delete batch
+ * @returns Promise which resolves with results of deleting batch
+ */
+export function deleteCollection(
+  db: any,
+  collectionPath: string,
+  batchSize?: number,
+): Promise<any> {
+  const collectionRef = db.collection(collectionPath);
+  const query = collectionRef.orderBy('__name__').limit(batchSize || 500);
+
+  return new Promise((resolve, reject) => {
+    deleteQueryBatch(db, query, resolve, reject);
+  });
 }

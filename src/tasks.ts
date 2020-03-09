@@ -1,10 +1,10 @@
-import {
-  FixtureData,
-  FirestoreAction,
-  FirestoreCommandOptions,
-} from './buildFirestoreCommand';
+import { FixtureData, FirestoreAction } from './buildFirestoreCommand';
 import { RTDBAction, RTDBCommandOptions } from './buildRtdbCommand';
-import { slashPathToFirestoreRef } from './firebase-utils';
+import {
+  slashPathToFirestoreRef,
+  deleteCollection,
+  isDocPath,
+} from './firebase-utils';
 
 /**
  * @param baseRef - Base RTDB reference
@@ -81,9 +81,26 @@ export function callRtdb(
     .ref(actionPath)
     [action](data)
     .then(() => {
+      // Prevents Cypress error with message:
+      // "You must return a promise, a value, or null to indicate that the task was handled."
       return null;
     })
     .catch(handleError);
+}
+
+/**
+ * Options for building Firestore commands
+ */
+export interface CallFirestoreOptions {
+  /**
+   * Whether or not to include createdAt and createdBy
+   */
+  withMeta?: boolean;
+  merge?: boolean;
+  /*
+   * Size of batch to use while deleting
+   */
+  batchSize?: number;
 }
 
 /**
@@ -98,9 +115,22 @@ export function callFirestore(
   adminInstance: any,
   action: FirestoreAction,
   actionPath: string,
-  options?: FirestoreCommandOptions,
+  options?: CallFirestoreOptions,
   data?: FixtureData,
 ): Promise<any> {
+  /**
+   * @param err - Error to handle
+   * @returns Promise which rejects
+   */
+  function handleError(err: Error): Promise<any> {
+    /* eslint-disable no-console */
+    console.error(
+      `Error with Firestore "${action}" at path "${actionPath}" :`,
+      err,
+    );
+    /* eslint-enable no-console */
+    return Promise.reject(err);
+  }
   if (action === 'get') {
     return (slashPathToFirestoreRef(
       adminInstance.firestore(),
@@ -109,7 +139,7 @@ export function callFirestore(
     ) as any)
       .get()
       .then((snap: any) => {
-        if (typeof snap.docs !== 'undefined') {
+        if (typeof snap.docs?.map === 'function') {
           return snap.docs.map(
             (docSnap: FirebaseFirestore.DocumentSnapshot) => ({
               ...docSnap.data(),
@@ -117,17 +147,12 @@ export function callFirestore(
             }),
           );
         }
-        return snap.data();
+        const dataVal = snap.data();
+        // Falling back to null in the case of falsey value prevents Cypress error with message:
+        // "You must return a promise, a value, or null to indicate that the task was handled."
+        return dataVal || null;
       })
-      .catch((err: Error) => {
-        /* eslint-disable no-console */
-        console.error(
-          `Error with Firestore "${action}" at path "${actionPath}" :`,
-          err,
-        );
-        /* eslint-enable no-console */
-        return Promise.reject(err);
-      });
+      .catch(handleError);
   }
 
   if (action === 'set') {
@@ -135,29 +160,36 @@ export function callFirestore(
       .firestore()
       .doc(actionPath)
       [action](data, options?.merge ? { merge: options?.merge } : undefined)
-      .catch((err: Error) => {
-        /* eslint-disable no-console */
-        console.error(
-          `Error with Firestore "${action}" at path "${actionPath}" :`,
-          err,
-        );
-        /* eslint-enable no-console */
-        return Promise.reject(err);
-      });
+      .catch(handleError);
   }
+
+  if (action === 'delete') {
+    // Handle deleting of collections & sub-collections if not a doc path
+    const deletePromise = isDocPath(actionPath)
+      ? (slashPathToFirestoreRef(
+          adminInstance.firestore(),
+          actionPath,
+          options,
+        ) as FirebaseFirestore.DocumentReference).delete()
+      : deleteCollection(
+          adminInstance.firestore(),
+          actionPath,
+          options?.batchSize,
+        );
+    return (
+      deletePromise
+        // Returning null in the case of falsey value prevents Cypress error with message:
+        // "You must return a promise, a value, or null to indicate that the task was handled."
+        .then(() => null)
+        .catch(handleError)
+    );
+  }
+  // "update" action
   return (slashPathToFirestoreRef(
     adminInstance.firestore(),
     actionPath,
     options,
   ) as any)
     [action](data)
-    .catch((err: Error) => {
-      /* eslint-disable no-console */
-      console.error(
-        `Error with Firestore "${action}" at path "${actionPath}" :`,
-        err,
-      );
-      /* eslint-enable no-console */
-      return Promise.reject(err);
-    });
+    .catch(handleError);
 }
