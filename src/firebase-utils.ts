@@ -93,7 +93,15 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
         /* eslint-enable no-console */
       }
 
+      // Add service account credential if it exists so that custom auth tokens can be generated
+      const serviceAccount = getServiceAccountWithoutWarning();
+      if (serviceAccount) {
+        fbConfig.credential = adminInstance.credential.cert(serviceAccount);
+      }
+
       fbInstance = adminInstance.initializeApp(fbConfig);
+
+      // Initialize Firestore with emulator host settings
       if (process.env.FIRESTORE_EMULATOR_HOST) {
         const firestoreSettings = firestoreSettingsFromEnv();
         /* eslint-disable no-console */

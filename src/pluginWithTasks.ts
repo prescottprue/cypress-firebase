@@ -24,6 +24,13 @@ export default function pluginWithTasks(
   const tasksWithFirebase: Record<string, Function> = {};
   Object.keys(tasks).forEach(taskName => {
     tasksWithFirebase[taskName] = (taskSettings: any): any => {
+      if (taskSettings?.uid) {
+        return tasks.createCustomToken(
+          adminInstance,
+          taskSettings.uid,
+          taskSettings,
+        );
+      }
       const { action, path: actionPath, options = {}, data } = taskSettings;
       return (tasks as any)[taskName](
         adminInstance,

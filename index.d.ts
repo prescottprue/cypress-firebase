@@ -492,6 +492,14 @@ declare module "tasks" {
      * @returns Promise which resolves with results of calling Firestore
      */
     export function callFirestore(adminInstance: any, action: FirestoreAction, actionPath: string, options?: CallFirestoreOptions, data?: FixtureData): Promise<any>;
+    /**
+     * Create a custom token
+     * @param adminInstance - Admin SDK instance
+     * @param uid - UID of user for which the custom token will be generated
+     * @param settings - Settings object
+     * @returns Promise which resolves with a custom Firebase Auth token
+     */
+    export function createCustomToken(adminInstance: any, uid: string, settings?: any): Promise<string>;
 }
 declare module "pluginWithTasks" {
     import { ExtendedCypressConfig } from "extendWithFirebaseConfig";

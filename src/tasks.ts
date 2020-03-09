@@ -193,3 +193,22 @@ export function callFirestore(
     [action](data)
     .catch(handleError);
 }
+
+/**
+ * Create a custom token
+ * @param adminInstance - Admin SDK instance
+ * @param uid - UID of user for which the custom token will be generated
+ * @param settings - Settings object
+ * @returns Promise which resolves with a custom Firebase Auth token
+ */
+export function createCustomToken(
+  adminInstance: any,
+  uid: string,
+  settings?: any,
+): Promise<string> {
+  // Use custom claims or default to { isTesting: true }
+  const customClaims = settings?.customClaims || { isTesting: true };
+
+  // Create auth token
+  return adminInstance.auth().createCustomToken(uid, customClaims);
+}

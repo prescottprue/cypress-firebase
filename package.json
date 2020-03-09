@@ -1,6 +1,6 @@
 {
   "name": "cypress-firebase",
-  "version": "0.11.0-alpha.8",
+  "version": "0.11.0-alpha.9",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -8,18 +8,18 @@
   "types": "./index.d.ts",
   "scripts": {
     "clean": "rimraf lib lib-esm",
-    "build": "npm run build:lib && npm run build:esm && npm run build:typefile",
+    "build": "yarn build:lib && yarn build:esm && yarn build:typefile",
     "build:typefile": "tsc --declaration --outFile index.d.ts --emitDeclarationOnly",
     "build:lib": "tsc",
-    "build:esm": "tsc && tsc -m es6 --outDir lib-esm",
-    "watch": "npm run build:commonjs -- --watch",
-    "watch:es": "npm run build:es -- --watch",
+    "build:esm": "tsc -m es6 --outDir lib-esm",
+    "watch": "yarn build:lib -- --watch",
+    "watch:es": "yarn build:es -- --watch",
     "lint": "eslint src/**.ts --ext .ts",
-    "lint:fix": "npm run lint -- --fix",
+    "lint:fix": "yarn lint -- --fix",
     "test": "mocha",
-    "test:cov": "nyc --reporter=lcov --reporter=html npm run test",
+    "test:cov": "nyc --reporter=lcov --reporter=html yarn test",
     "codecov": "cat coverage/lcov.info | codecov",
-    "prepare": "npm run clean && npm run build"
+    "prepare": "yarn clean && yarn build"
   },
   "bin": {
     "cypress-firebase": "./bin/cypress-firebase"
