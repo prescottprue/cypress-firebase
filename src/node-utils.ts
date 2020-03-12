@@ -182,7 +182,7 @@ export function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any {
  * getParsedEnvVar('FIREBASE_PRIVATE_KEY_ID')
  * // => 'fireadmin-stage' (parsed value of 'STAGE_FIREBASE_PRIVATE_KEY_ID' environment var)
  */
-function getParsedEnvVar(varNameRoot: string, envName: string): any {
+function getParsedEnvVar(varNameRoot: string, envName?: string): any {
   const val = envVarBasedOnCIEnv(varNameRoot, envName);
   const combinedVar = withEnvPrefix(varNameRoot, envName);
   if (!val) {
@@ -221,7 +221,7 @@ interface ServiceAccount {
  * @param envSlug - Environment option
  * @returns Service account object
  */
-export function getServiceAccount(envSlug: string): ServiceAccount {
+export function getServiceAccount(envSlug?: string): ServiceAccount {
   const serviceAccountPath = getServiceAccountPath(envSlug);
   // Check for local service account file (Local dev)
   if (existsSync(serviceAccountPath)) {
@@ -278,6 +278,40 @@ export function getServiceAccount(envSlug: string): ServiceAccount {
     auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
     client_x509_cert_url: envVarBasedOnCIEnv('FIREBASE_CERT_URL', envSlug),
   };
+}
+
+/**
+ * Get service account from either local file or environment variables
+ * @param envSlug - Environment option
+ * @returns Service account object
+ */
+export function getServiceAccountWithoutWarning(
+  envSlug?: string,
+): ServiceAccount | null {
+  const serviceAccountPath = getServiceAccountPath(envSlug);
+  // Check for local service account file (Local dev)
+  if (existsSync(serviceAccountPath)) {
+    return readJsonFile(serviceAccountPath); // eslint-disable-line global-require, import/no-dynamic-require
+  }
+
+  // Use environment variables (CI)
+  const serviceAccountEnvVar = envVarBasedOnCIEnv('SERVICE_ACCOUNT', envSlug);
+  if (serviceAccountEnvVar) {
+    if (typeof serviceAccountEnvVar === 'string') {
+      try {
+        return JSON.parse(serviceAccountEnvVar);
+      } catch (err) {
+        warn(
+          `Issue parsing ${chalk.cyan(
+            'SERVICE_ACCOUNT',
+          )} environment variable from string to object, returning string`,
+        );
+      }
+    }
+    return serviceAccountEnvVar;
+  }
+
+  return null;
 }
 
 export interface RunCommandOptions {

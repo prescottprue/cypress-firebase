@@ -31,8 +31,7 @@ If you are interested in what drove the need for this checkout [the why section]
 
 **Note:** These instructions assume your tests are in the `cypress` folder (cypress' default). See the [folders section below](#folders) for more info about other supported folders.
 
-1. Install using `npm i cypress-firebase --save-dev`
-1. Make sure you have `firebase-tools` installed (globally and within project). It is used to call to database when using `cy.callRtdb` and `cy.callFirestore`.
+1. Install cypress-firebase and firebase-admin both: `npm i cypress-firebase firebase-admin --save-dev`
 1. Add the following your custom commands file (`cypress/support/commands.js`):
 
     ```js
@@ -54,19 +53,23 @@ If you are interested in what drove the need for this checkout [the why section]
 1. Setup plugin adding following your plugins file (`cypress/plugins/index.js`):
 
     ```js
-    const cypressFirebasePlugin = require('cypress-firebase').plugin
+    const admin = require('firebase-admin')
+    const cypressFirebasePlugin = require('cypress-firebase').pluginWithTasks
 
     module.exports = (on, config) => {
-      // `on` is used to hook into various events Cypress emits
-      // `config` is the resolved Cypress config
-
-      // Return extended config (with settings from .firebaserc)
-      return cypressFirebasePlugin(config)
+      // Pass on function, config, and admin instance. Returns extended config
+      return cypressFirebasePlugin(on, config, admin)
     }
     ```
 
-    The plugin sets `baseUrl` and loads config from `.firebaserc`
-1. If you plan to authenticate the user in your tests, continue to the next section which covers Auth
+#### Old Method (using firebase-tools-extra cli)
+
+1. Same steps as above but make the following change of import in plugins file (`cypress/plugins/index.js`):
+
+```diff
++ const cypressFirebasePlugin = require('cypress-firebase').plugin
+- const cypressFirebasePlugin = require('cypress-firebase').pluginWithTasks
+```
 
 #### Auth
 
