@@ -1,5 +1,9 @@
-import { FixtureData, FirestoreAction } from './buildFirestoreCommand';
-import { RTDBAction, RTDBCommandOptions } from './buildRtdbCommand';
+import {
+  FixtureData,
+  FirestoreAction,
+  RTDBAction,
+  RTDBCommandOptions,
+} from './attachCustomCommands';
 import {
   slashPathToFirestoreRef,
   deleteCollection,

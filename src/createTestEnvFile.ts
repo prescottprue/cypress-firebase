@@ -32,6 +32,9 @@ const writeFilePromise = promisify(writeFile);
 export default async function createTestEnvFile(
   envName: string,
 ): Promise<string> {
+  logger.warn(
+    'createTestEnvFile is deprecated and will be removed in the next major version.',
+  );
   // Get UID from environment (falls back to cypress/config.json for local)
   const varName = 'TEST_UID';
   const uid = envVarBasedOnCIEnv(varName, envName);

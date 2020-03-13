@@ -1,5 +1,4 @@
 import * as admin from 'firebase-admin';
-import { get } from 'lodash';
 import {
   getServiceAccount,
   getServiceAccountWithoutWarning,
@@ -115,7 +114,7 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
     } else {
       // Get service account from local file falling back to environment variables
       const serviceAccount = getServiceAccount();
-      const projectId = get(serviceAccount, 'project_id');
+      const projectId = serviceAccount?.project_id;
       if (!isString(projectId)) {
         const missingProjectIdErr =
           'Error project_id from service account to initialize Firebase.';

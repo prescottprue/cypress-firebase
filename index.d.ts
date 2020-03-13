@@ -1,42 +1,9 @@
-declare module "constants" {
-    export const DEFAULT_TEST_FOLDER_PATH = "cypress";
-    export const DEFAULT_SERVICE_ACCOUNT_PATH = "serviceAccount.json";
-    export const DEFAULT_TEST_ENV_FILE_NAME = "cypress.env.json";
-    export const DEFAULT_TEST_CONFIG_FILE_NAME = "cypress.json";
-    export const DEFAULT_CONFIG_FILE_NAME = "config.json";
-    export const FIREBASE_CONFIG_FILE_NAME = ".firebaserc";
-    export const FIREBASE_TOOLS_BASE_COMMAND = "npx firebase";
-    export const FIREBASE_EXTRA_PATH = "npx firebase-extra";
-    export const FIREBASE_TOOLS_YES_ARGUMENT = "-y";
-}
-declare module "utils" {
-    /**
-     * Async await wrapper for easy error handling
-     * @param promise - Promise to wrap responses of in array
-     * @param errorExt - Extension for error
-     * @returns Resolves and rejects with an array
-     */
-    export function to<T, U = Error>(promise: Promise<T>, errorExt?: object): Promise<[U | null, T | undefined]>;
-    /**
-     * Create command arguments string from an array of arguments by joining them
-     * with a space including a leading space. If no args provided, empty string
-     * is returned
-     * @param args - Command arguments to convert into a string
-     * @returns Arguments section of command string
-     */
-    export function getArgsString(args: string[] | any): string;
-    /**
-     * Add default Firebase arguments to arguments array.
-     * @param Cypress - Cypress object
-     * @param args - arguments array
-     * @param [opts={}] - Options object
-     * @param opts.token - Firebase CI token to pass as the token argument
-     * @param [opts.disableYes=false] - Whether or not to disable the yes argument
-     * @returns Default args list
-     */
-    export function addDefaultArgs(Cypress: any, args: string[], opts?: any): string[];
-}
-declare module "buildFirestoreCommand" {
+declare module "attachCustomCommands" {
+    export interface AttachCustomCommandParams {
+        Cypress: any;
+        cy: any;
+        firebase: any;
+    }
     /**
      * Action for Firestore
      */
@@ -70,24 +37,6 @@ declare module "buildFirestoreCommand" {
         recursive?: boolean;
         merge?: boolean;
     }
-    /**
-     * Build Command to run Firestore action. Commands call either firebase-extra
-     * (in bin/firebaseExtra.js) or firebase-tools directly. FIREBASE_TOKEN must
-     * exist in environment if running commands that call firebase-tools.
-     * @param Cypress - Cypress object
-     * @param action - action to run on Firstore (i.e. "add", "delete")
-     * @param actionPath - Firestore path where action should be run
-     * @param fixturePathOrData - Path to fixture. If object is passed,
-     * it is used as options.
-     * @param [opts={}] - Options object
-     * @param opts.args - Extra arguments to be passed with command
-     * @param opts.token - Firebase CI token to pass as the token argument
-     * @returns Command string to be used with cy.exec
-     */
-    export default function buildFirestoreCommand(Cypress: any, action: FirestoreAction, actionPath: string, fixturePathOrData?: FixtureData | string | FirestoreCommandOptions, opts?: FirestoreCommandOptions): string;
-}
-declare module "buildRtdbCommand" {
-    import { FixtureData } from "buildFirestoreCommand";
     /**
      * Action for Real Time Database
      */
@@ -146,28 +95,6 @@ declare module "buildRtdbCommand" {
          * Use the database <instance>.firebaseio.com (if omitted, use default database instance)
          */
         instance?: string;
-    }
-    /**
-     * Build Command to run Real Time Database action. All commands call
-     * firebase-tools directly, so FIREBASE_TOKEN must exist in environment.
-     * @param Cypress - Cypress object
-     * @param action - action to run on Firstore (i.e. "add", "delete")
-     * @param actionPath - Firestore path where action should be run
-     * @param fixturePath - Path to fixture. If object is passed,
-     * it is used as options.
-     * @param [opts={}] - Options object
-     * @param opts.args - Extra arguments to be passed with command
-     * @returns Command string to be used with cy.exec
-     */
-    export default function buildRtdbCommand(Cypress: any, action: RTDBAction, actionPath: string, fixturePath?: FixtureData | RTDBCommandOptions | any, opts?: RTDBCommandOptions): string;
-}
-declare module "attachCustomCommands" {
-    import { FirestoreAction, FirestoreCommandOptions, FixtureData } from "buildFirestoreCommand";
-    import { RTDBAction, RTDBCommandOptions } from "buildRtdbCommand";
-    export interface AttachCustomCommandParams {
-        Cypress: any;
-        cy: any;
-        firebase: any;
     }
     global {
         namespace Cypress {
@@ -255,6 +182,17 @@ declare module "attachCustomCommands" {
      * custom command attachment
      */
     export default function attachCustomCommands(commandParams: AttachCustomCommandParams): void;
+}
+declare module "constants" {
+    export const DEFAULT_TEST_FOLDER_PATH = "cypress";
+    export const DEFAULT_SERVICE_ACCOUNT_PATH = "serviceAccount.json";
+    export const DEFAULT_TEST_ENV_FILE_NAME = "cypress.env.json";
+    export const DEFAULT_TEST_CONFIG_FILE_NAME = "cypress.json";
+    export const DEFAULT_CONFIG_FILE_NAME = "config.json";
+    export const FIREBASE_CONFIG_FILE_NAME = ".firebaserc";
+    export const FIREBASE_TOOLS_BASE_COMMAND = "npx firebase";
+    export const FIREBASE_EXTRA_PATH = "npx firebase-extra";
+    export const FIREBASE_TOOLS_YES_ARGUMENT = "-y";
 }
 declare module "filePaths" {
     export const FIREBASE_CONFIG_FILE_PATH: string;
@@ -376,6 +314,33 @@ declare module "node-utils" {
      */
     export function runCommand(runOptions: RunCommandOptions): Promise<any>;
 }
+declare module "utils" {
+    /**
+     * Async await wrapper for easy error handling
+     * @param promise - Promise to wrap responses of in array
+     * @param errorExt - Extension for error
+     * @returns Resolves and rejects with an array
+     */
+    export function to<T, U = Error>(promise: Promise<T>, errorExt?: object): Promise<[U | null, T | undefined]>;
+    /**
+     * Create command arguments string from an array of arguments by joining them
+     * with a space including a leading space. If no args provided, empty string
+     * is returned
+     * @param args - Command arguments to convert into a string
+     * @returns Arguments section of command string
+     */
+    export function getArgsString(args: string[] | any): string;
+    /**
+     * Add default Firebase arguments to arguments array.
+     * @param Cypress - Cypress object
+     * @param args - arguments array
+     * @param [opts={}] - Options object
+     * @param opts.token - Firebase CI token to pass as the token argument
+     * @param [opts.disableYes=false] - Whether or not to disable the yes argument
+     * @returns Default args list
+     */
+    export function addDefaultArgs(Cypress: any, args: string[], opts?: any): string[];
+}
 declare module "createTestEnvFile" {
     /**
      * Create test environment file (cypress.env.json). Uses admin.auth().createCustomToken
@@ -464,8 +429,7 @@ declare module "firebase-utils" {
     export function deleteCollection(db: any, collectionPath: string, batchSize?: number): Promise<any>;
 }
 declare module "tasks" {
-    import { FixtureData, FirestoreAction } from "buildFirestoreCommand";
-    import { RTDBAction, RTDBCommandOptions } from "buildRtdbCommand";
+    import { FixtureData, FirestoreAction, RTDBAction, RTDBCommandOptions } from "attachCustomCommands";
     /**
      * @param adminInstance - firebase-admin instance
      * @param action - Action to run
@@ -504,7 +468,7 @@ declare module "tasks" {
      */
     export function createCustomToken(adminInstance: any, uid: string, settings?: any): Promise<string>;
 }
-declare module "pluginWithTasks" {
+declare module "plugin" {
     import { ExtendedCypressConfig } from "extendWithFirebaseConfig";
     /**
      * @param cypressOnFunc - on function from cypress plugins file
@@ -516,8 +480,6 @@ declare module "pluginWithTasks" {
 }
 declare module "index" {
     import attachCustomCommands from "attachCustomCommands";
-    import extendWithFirebaseConfig from "extendWithFirebaseConfig";
-    import pluginWithTasks from "pluginWithTasks";
-    export const plugin: typeof extendWithFirebaseConfig;
-    export { attachCustomCommands, extendWithFirebaseConfig, pluginWithTasks };
+    import plugin from "plugin";
+    export { attachCustomCommands, plugin };
 }
