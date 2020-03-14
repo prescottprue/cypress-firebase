@@ -124,7 +124,7 @@ declare global {
        * @see https://github.com/prescottprue/cypress-firebase#cylogin
        * @param uid - UID of user to login as
        * @param customClaims - Custom claims to attach to the custom token
-       * @example <caption>Env Based Login (TEST_UID or FIREBASE_AUTH_JWT)</caption>
+       * @example <caption>Env Based Login (TEST_UID)</caption>
        * cy.login()
        * @example <caption>Passed UID</caption>
        * cy.login('123SOMEUID')
@@ -183,18 +183,10 @@ declare global {
        * cy.callFirestore('get', 'projects/test-project').then((project) => {
        *   cy.log('Project:', project)
        * })
-       * @example <caption>Recursive Delete</caption>
-       * const opts = { recursive: true }
-       * cy.callFirestore('delete', 'project/test-project', opts)
-       * @example <caption>Manually Loading Fixture</caption>
+       * @example <caption>Passing A Fixture</caption>
        * cy.fixture('fakeProject.json').then((project) => {
        *   cy.callFirestore('add', 'projects', project)
        * })
-       * @example <caption>Fixture Path</caption>
-       * cy.callFirestore('set', 'project/test-project', 'fakeProject.json')
-       * @example <caption>Other Args</caption>
-       * const opts = { args: ['-r'] }
-       * cy.callFirestore('delete', 'project/test-project', opts)
        */
       callFirestore: (
         action: FirestoreAction,
@@ -246,48 +238,30 @@ export default function attachCustomCommands(
    */
   Cypress.Commands.add('login', (uid?: string, customClaims?: any): any => {
     const userUid = uid || Cypress.env('TEST_UID');
-    // Handle UID which is passed in
-    if (userUid) {
-      // Resolve with current user if they already exist
-      if (
-        firebase.auth().currentUser &&
-        userUid === firebase.auth().currentUser.uid
-      ) {
-        cy.log('Authed user already exists, login complete.');
-        return undefined;
-      }
-      cy.log('Creating custom token for login...');
-
-      // Generate a custom token using createCustomToken task (if tasks are enabled) then login
-      if (Cypress.env('useCypressFirebaseTasks')) {
-        cy.log('Calling create customToken task', userUid);
-        return cy
-          .task('createCustomToken', { uid: userUid, customClaims })
-          .then((customToken: string) =>
-            loginWithCustomToken(firebase, customToken),
-          );
-      }
-    }
-
-    // Resolve with currentUser if they exist
-    if (firebase.auth().currentUser) {
+    // Resolve with current user if they already exist
+    if (
+      firebase.auth().currentUser &&
+      userUid === firebase.auth().currentUser.uid
+    ) {
       cy.log('Authed user already exists, login complete.');
-      // Undefined is returned to prevent Cypress error:
-      // "Cypress detected that you invoked one or more cy commands in a custom command but returned a different value."
       return undefined;
     }
 
-    // Throw if JWT not within environment (passed uid case handled above)
-    if (!Cypress.env('FIREBASE_AUTH_JWT')) {
-      /** Log in using token * */
-      const errMsg =
-        'uid must be passed to cy.login or FIREBASE_AUTH_JWT must be set to cypress environment in order to login';
-      cy.log(errMsg);
-      throw new Error(errMsg);
+    // Handle UID which is passed in
+    if (!userUid) {
+      throw new Error(
+        'uid must be passed or TEST_UID set within environment to login',
+      );
     }
 
-    // Otherwise, login with Token from environment
-    return loginWithCustomToken(firebase, Cypress.env('FIREBASE_AUTH_JWT'));
+    cy.log('Creating custom token for login...');
+
+    // Generate a custom token using createCustomToken task (if tasks are enabled) then login
+    return cy
+      .task('createCustomToken', { uid: userUid, customClaims })
+      .then((customToken: string) =>
+        loginWithCustomToken(firebase, customToken),
+      );
   });
 
   /**

@@ -108,7 +108,7 @@ declare module "attachCustomCommands" {
                  * @see https://github.com/prescottprue/cypress-firebase#cylogin
                  * @param uid - UID of user to login as
                  * @param customClaims - Custom claims to attach to the custom token
-                 * @example <caption>Env Based Login (TEST_UID or FIREBASE_AUTH_JWT)</caption>
+                 * @example <caption>Env Based Login (TEST_UID)</caption>
                  * cy.login()
                  * @example <caption>Passed UID</caption>
                  * cy.login('123SOMEUID')
@@ -159,18 +159,10 @@ declare module "attachCustomCommands" {
                  * cy.callFirestore('get', 'projects/test-project').then((project) => {
                  *   cy.log('Project:', project)
                  * })
-                 * @example <caption>Recursive Delete</caption>
-                 * const opts = { recursive: true }
-                 * cy.callFirestore('delete', 'project/test-project', opts)
-                 * @example <caption>Manually Loading Fixture</caption>
+                 * @example <caption>Passing A Fixture</caption>
                  * cy.fixture('fakeProject.json').then((project) => {
                  *   cy.callFirestore('add', 'projects', project)
                  * })
-                 * @example <caption>Fixture Path</caption>
-                 * cy.callFirestore('set', 'project/test-project', 'fakeProject.json')
-                 * @example <caption>Other Args</caption>
-                 * const opts = { args: ['-r'] }
-                 * cy.callFirestore('delete', 'project/test-project', opts)
                  */
                 callFirestore: (action: FirestoreAction, actionPath: string, fixtureDataOrPath?: FixtureData | string, opts?: FirestoreCommandOptions) => Chainable;
             }
@@ -183,22 +175,38 @@ declare module "attachCustomCommands" {
      */
     export default function attachCustomCommands(commandParams: AttachCustomCommandParams): void;
 }
-declare module "constants" {
-    export const DEFAULT_TEST_FOLDER_PATH = "cypress";
-    export const DEFAULT_SERVICE_ACCOUNT_PATH = "serviceAccount.json";
-    export const DEFAULT_TEST_ENV_FILE_NAME = "cypress.env.json";
-    export const DEFAULT_TEST_CONFIG_FILE_NAME = "cypress.json";
-    export const DEFAULT_CONFIG_FILE_NAME = "config.json";
-    export const FIREBASE_CONFIG_FILE_NAME = ".firebaserc";
-    export const FIREBASE_TOOLS_BASE_COMMAND = "npx firebase";
-    export const FIREBASE_EXTRA_PATH = "npx firebase-extra";
-    export const FIREBASE_TOOLS_YES_ARGUMENT = "-y";
-}
-declare module "filePaths" {
-    export const FIREBASE_CONFIG_FILE_PATH: string;
-    export const TEST_CONFIG_FILE_PATH: string;
-    export const TEST_ENV_FILE_PATH: string;
-    export const LOCAL_CONFIG_FILE_PATH: string;
+declare module "extendWithFirebaseConfig" {
+    export interface CypressEnvironmentOptions {
+        envName?: string;
+        firebaseProjectId?: string;
+        [k: string]: any;
+    }
+    export interface CypressConfig {
+        env?: CypressEnvironmentOptions;
+        baseUrl: string;
+        [k: string]: any;
+    }
+    export interface ExtendedCypressConfigEnv {
+        [k: string]: any;
+        FIRESTORE_EMULATOR_HOST?: string;
+        FIREBASE_DATABASE_EMULATOR_HOST?: string;
+        GCLOUD_PROJECT?: string;
+    }
+    export interface ExtendedCypressConfig {
+        [k: string]: any;
+        env: ExtendedCypressConfigEnv;
+    }
+    export interface ExtendWithFirebaseConfigSettings {
+        localBaseUrl?: string;
+        localHostPort?: string | number;
+    }
+    /**
+     * Load config for Cypress from .firebaserc.
+     * @param cypressConfig - Existing Cypress config
+     * @param settings - Settings
+     * @returns Cypress config extended with FIREBASE_PROJECT_ID and baseUrl
+     */
+    export default function extendWithFirebaseConfig(cypressConfig: CypressConfig): ExtendedCypressConfig;
 }
 declare module "node-utils" {
     /**
@@ -226,11 +234,6 @@ declare module "node-utils" {
      * @returns Environment var name with prefix
      */
     export function withEnvPrefix(varNameRoot: string, envName?: string): string;
-    /**
-     * Get path to cypress config file
-     * @returns Path to cypress config file
-     */
-    export function getCypressConfigPath(): string;
     /**
      * Get environment variable based on the current CI environment
      * @param varNameRoot - variable name without the environment prefix
@@ -265,41 +268,6 @@ declare module "node-utils" {
      * @returns Service account object
      */
     export function getServiceAccountWithoutWarning(envSlug?: string): ServiceAccount | null;
-}
-declare module "extendWithFirebaseConfig" {
-    export interface CypressEnvironmentOptions {
-        envName?: string;
-        firebaseProjectId?: string;
-        [k: string]: any;
-    }
-    export interface CypressConfig {
-        env?: CypressEnvironmentOptions;
-        baseUrl: string;
-        [k: string]: any;
-    }
-    export interface ExtendedCypressConfig {
-        [k: string]: any;
-        FIREBASE_PROJECT_ID?: string;
-        baseUrl: string;
-    }
-    export interface ExtendWithFirebaseConfigSettings {
-        localBaseUrl?: string;
-        localHostPort?: string | number;
-    }
-    /**
-     * Get Firebase project id using Cypress config and config
-     * loaded from .firebaserc
-     * @param config - Cypress config object
-     * @returns Id of firbase project
-     */
-    export function getFirebaseProjectIdFromConfig(config: CypressConfig): string | undefined;
-    /**
-     * Load config for Cypress from .firebaserc.
-     * @param cypressConfig - Existing Cypress config
-     * @param settings - Settings
-     * @returns Cypress config extended with FIREBASE_PROJECT_ID and baseUrl
-     */
-    export default function extendWithFirebaseConfig(cypressConfig: CypressConfig, settings?: ExtendWithFirebaseConfigSettings): ExtendedCypressConfig;
 }
 declare module "firebase-utils" {
     import * as admin from 'firebase-admin';
@@ -393,31 +361,4 @@ declare module "index" {
     import attachCustomCommands from "attachCustomCommands";
     import plugin from "plugin";
     export { attachCustomCommands, plugin };
-}
-declare module "utils" {
-    /**
-     * Async await wrapper for easy error handling
-     * @param promise - Promise to wrap responses of in array
-     * @param errorExt - Extension for error
-     * @returns Resolves and rejects with an array
-     */
-    export function to<T, U = Error>(promise: Promise<T>, errorExt?: object): Promise<[U | null, T | undefined]>;
-    /**
-     * Create command arguments string from an array of arguments by joining them
-     * with a space including a leading space. If no args provided, empty string
-     * is returned
-     * @param args - Command arguments to convert into a string
-     * @returns Arguments section of command string
-     */
-    export function getArgsString(args: string[] | any): string;
-    /**
-     * Add default Firebase arguments to arguments array.
-     * @param Cypress - Cypress object
-     * @param args - arguments array
-     * @param [opts={}] - Options object
-     * @param opts.token - Firebase CI token to pass as the token argument
-     * @param [opts.disableYes=false] - Whether or not to disable the yes argument
-     * @returns Default args list
-     */
-    export function addDefaultArgs(Cypress: any, args: string[], opts?: any): string[];
 }

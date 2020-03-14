@@ -1,14 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { get } from 'lodash';
-import path from 'path';
 import { existsSync, readFileSync } from 'fs';
-import { TEST_CONFIG_FILE_PATH, TEST_ENV_FILE_PATH } from './filePaths';
-import {
-  DEFAULT_TEST_FOLDER_PATH,
-  DEFAULT_CONFIG_FILE_NAME,
-} from './constants';
-
-const DEFAULT_BASE_PATH = process.cwd();
 
 /**
  * Get settings from firebaserc file
@@ -91,51 +82,6 @@ export function withEnvPrefix(varNameRoot: string, envName?: string): string {
 }
 
 /**
- * Get path to local service account
- * @param envName - Environment option
- * @returns Path to service account
- */
-function getServiceAccountPath(envName?: string): string {
-  const withSuffix = path.join(
-    DEFAULT_BASE_PATH,
-    `serviceAccount-${envName || ''}.json`,
-  );
-  if (existsSync(withSuffix)) {
-    return withSuffix;
-  }
-  return path.join(DEFAULT_BASE_PATH, 'serviceAccount.json');
-}
-
-/**
- * Get cypress folder path from cypress.json config file or fallback to
- * default folder path ('cypress')
- * @returns Path of folder containing cypress folders like "integration"
- */
-function getCypressFolderPath(): string {
-  const cypressConfig = readJsonFile(TEST_CONFIG_FILE_PATH); // eslint-disable-line no-use-before-define
-  const integrationTestsFolderPath = get(cypressConfig, 'integrationFolder');
-  return integrationTestsFolderPath
-    ? integrationTestsFolderPath
-        .split('/')
-        .slice(0, -1) // Drop last item (equivalent to dropRight)
-        .join('/')
-    : DEFAULT_TEST_FOLDER_PATH;
-}
-
-/**
- * Get path to cypress config file
- * @returns Path to cypress config file
- */
-export function getCypressConfigPath(): string {
-  const cypressFolderPath = getCypressFolderPath();
-  const cypressConfigFilePath = path.join(
-    cypressFolderPath,
-    DEFAULT_CONFIG_FILE_NAME,
-  );
-  return cypressConfigFilePath;
-}
-
-/**
  * Get environment variable based on the current CI environment
  * @param varNameRoot - variable name without the environment prefix
  * @param envName - Environment option
@@ -146,17 +92,7 @@ export function getCypressConfigPath(): string {
  */
 export function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any {
   const combined = withEnvPrefix(varNameRoot, envName);
-  const localConfigFilePath = getCypressConfigPath();
-
-  // Config file used for environment (local, containers) from main test path ({integrationFolder}/config.json)
-  if (existsSync(localConfigFilePath)) {
-    const localConfigObj = readJsonFile(localConfigFilePath);
-    const valueFromLocalConfig =
-      localConfigObj[combined] || localConfigObj[varNameRoot];
-    if (valueFromLocalConfig) {
-      return valueFromLocalConfig;
-    }
-  }
+  const TEST_ENV_FILE_PATH = `${process.cwd()}/cypress.env.json`;
 
   // Config file used for environment from main cypress environment file (cypress.env.json)
   if (existsSync(TEST_ENV_FILE_PATH)) {
@@ -221,7 +157,7 @@ interface ServiceAccount {
  * @returns Service account object
  */
 export function getServiceAccount(envSlug?: string): ServiceAccount {
-  const serviceAccountPath = getServiceAccountPath(envSlug);
+  const serviceAccountPath = `${process.cwd()}/serviceAccount.json`;
   // Check for local service account file (Local dev)
   if (existsSync(serviceAccountPath)) {
     return readJsonFile(serviceAccountPath); // eslint-disable-line global-require, import/no-dynamic-require
@@ -230,7 +166,7 @@ export function getServiceAccount(envSlug?: string): ServiceAccount {
   /* eslint-disable no-console */
   console.log(
     `cypress-firebase: Service account does not exist at path: "${serviceAccountPath.replace(
-      `${DEFAULT_BASE_PATH}/`,
+      `${process.cwd()}/`,
       '',
     )}" falling back to environment variables...`,
   );
@@ -291,7 +227,7 @@ export function getServiceAccount(envSlug?: string): ServiceAccount {
 export function getServiceAccountWithoutWarning(
   envSlug?: string,
 ): ServiceAccount | null {
-  const serviceAccountPath = getServiceAccountPath(envSlug);
+  const serviceAccountPath = `${process.cwd()}/serviceAccount.json`;
   // Check for local service account file (Local dev)
   if (existsSync(serviceAccountPath)) {
     return readJsonFile(serviceAccountPath); // eslint-disable-line global-require, import/no-dynamic-require
