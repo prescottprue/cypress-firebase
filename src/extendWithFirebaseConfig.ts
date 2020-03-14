@@ -6,7 +6,7 @@ export interface CypressEnvironmentOptions {
 
 export interface CypressConfig {
   env?: CypressEnvironmentOptions;
-  baseUrl: string;
+  baseUrl?: string;
   [k: string]: any;
 }
 
@@ -45,13 +45,16 @@ export default function extendWithFirebaseConfig(
     FIRESTORE_EMULATOR_HOST,
     GCLOUD_PROJECT,
   } = process.env;
-  if (FIRESTORE_EMULATOR_HOST) {
+  if (FIRESTORE_EMULATOR_HOST && !newEnv.FIRESTORE_EMULATOR_HOST) {
     newEnv.FIRESTORE_EMULATOR_HOST = FIRESTORE_EMULATOR_HOST;
   }
-  if (FIREBASE_DATABASE_EMULATOR_HOST) {
+  if (
+    FIREBASE_DATABASE_EMULATOR_HOST &&
+    !newEnv.FIREBASE_DATABASE_EMULATOR_HOST
+  ) {
     newEnv.FIREBASE_DATABASE_EMULATOR_HOST = FIREBASE_DATABASE_EMULATOR_HOST;
   }
-  if (GCLOUD_PROJECT) {
+  if (GCLOUD_PROJECT && !newEnv.GCLOUD_PROJECT) {
     newEnv.GCLOUD_PROJECT = GCLOUD_PROJECT;
   }
   // Return original config if baseUrl is already set (so it is not runover)

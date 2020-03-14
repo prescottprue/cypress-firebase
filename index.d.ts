@@ -183,7 +183,7 @@ declare module "extendWithFirebaseConfig" {
     }
     export interface CypressConfig {
         env?: CypressEnvironmentOptions;
-        baseUrl: string;
+        baseUrl?: string;
         [k: string]: any;
     }
     export interface ExtendedCypressConfigEnv {
