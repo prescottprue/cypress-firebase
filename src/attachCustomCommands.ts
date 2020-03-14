@@ -1,18 +1,112 @@
 import { isObject } from 'lodash';
-import buildFirestoreCommand, {
-  FirestoreAction,
-  FirestoreCommandOptions,
-  FixtureData, // eslint-disable-line @typescript-eslint/no-unused-vars
-} from './buildFirestoreCommand';
-import buildRtdbCommand, {
-  RTDBAction,
-  RTDBCommandOptions,
-} from './buildRtdbCommand';
 
 export interface AttachCustomCommandParams {
   Cypress: any;
   cy: any;
   firebase: any;
+}
+
+/**
+ * Action for Firestore
+ */
+export type FirestoreAction = 'get' | 'add' | 'set' | 'update' | 'delete';
+
+/**
+ * Data from loaded fixture
+ */
+export interface FixtureData {
+  [k: string]: any;
+}
+
+/**
+ * Options for building Firestore commands
+ */
+export interface FirestoreCommandOptions {
+  /**
+   * Whether or not to include createdAt and createdBy
+   */
+  withMeta?: boolean;
+  /**
+   * Extra command line arguments to add to command
+   */
+  args?: string[];
+  /**
+   * firebase-tools CI token
+   */
+  token?: string;
+  /**
+   * Whether or not to run recursive delete of collections
+   * and subcollections
+   */
+  recursive?: boolean;
+  merge?: boolean;
+}
+
+/**
+ * Action for Real Time Database
+ */
+export type RTDBAction =
+  | 'push'
+  | 'remove'
+  | 'set'
+  | 'update'
+  | 'delete'
+  | 'get';
+
+/**
+ * Options for callRtdb commands
+ */
+export interface RTDBCommandOptions {
+  /**
+   * Whether or not to include meta data
+   */
+  withMeta?: boolean;
+  /**
+   * Extra arguments
+   */
+  args?: string[];
+  /**
+   * CI Token
+   */
+  token?: string;
+  /**
+   * Limit to the last <num> results. If true is passed
+   * than query is limited to last 1 item.
+   */
+  limitToLast?: boolean | number;
+  /**
+   * Limit to the first <num> results. If true is passed
+   * than query is limited to last 1 item.
+   */
+  limitToFirst?: boolean | number;
+  /**
+   * Select a child key by which to order results
+   */
+  orderByChild?: string;
+  /**
+   * Order by key name
+   */
+  orderByKey?: boolean;
+  /**
+   * Order by primitive value
+   */
+  orderByValue?: boolean;
+  /**
+   * Start results at <val> (based on specified ordering)
+   */
+  startAt?: any;
+  /**
+   * End results at <val> (based on specified ordering)
+   */
+  endAt?: any;
+  /**
+   * Restrict results to <val> (based on specified ordering)
+   */
+  equalTo?: any;
+  /**
+   * Use the database <instance>.firebaseio.com (if omitted, use default database instance)
+   */
+  instance?: string;
 }
 
 // Add custom commands to the existing Cypress interface
@@ -30,7 +124,7 @@ declare global {
        * @see https://github.com/prescottprue/cypress-firebase#cylogin
        * @param uid - UID of user to login as
        * @param customClaims - Custom claims to attach to the custom token
-       * @example <caption>Env Based Login (TEST_UID or FIREBASE_AUTH_JWT)</caption>
+       * @example <caption>Env Based Login (TEST_UID)</caption>
        * cy.login()
        * @example <caption>Passed UID</caption>
        * cy.login('123SOMEUID')
@@ -89,18 +183,10 @@ declare global {
        * cy.callFirestore('get', 'projects/test-project').then((project) => {
        *   cy.log('Project:', project)
        * })
-       * @example <caption>Recursive Delete</caption>
-       * const opts = { recursive: true }
-       * cy.callFirestore('delete', 'project/test-project', opts)
-       * @example <caption>Manually Loading Fixture</caption>
+       * @example <caption>Passing A Fixture</caption>
        * cy.fixture('fakeProject.json').then((project) => {
        *   cy.callFirestore('add', 'projects', project)
        * })
-       * @example <caption>Fixture Path</caption>
-       * cy.callFirestore('set', 'project/test-project', 'fakeProject.json')
-       * @example <caption>Other Args</caption>
-       * const opts = { args: ['-r'] }
-       * cy.callFirestore('delete', 'project/test-project', opts)
        */
       callFirestore: (
         action: FirestoreAction,
@@ -152,65 +238,30 @@ export default function attachCustomCommands(
    */
   Cypress.Commands.add('login', (uid?: string, customClaims?: any): any => {
     const userUid = uid || Cypress.env('TEST_UID');
-    // Handle UID which is passed in
-    if (userUid) {
-      // Resolve with current user if they already exist
-      if (
-        firebase.auth().currentUser &&
-        userUid === firebase.auth().currentUser.uid
-      ) {
-        cy.log('Authed user already exists, login complete.');
-        return undefined;
-      }
-      cy.log('Creating custom token for login...');
-
-      // Generate a custom token using createCustomToken task (if tasks are enabled) then login
-      if (Cypress.env('useCypressFirebaseTasks')) {
-        cy.log('Calling create customToken task', userUid);
-        return cy
-          .task('createCustomToken', { uid: userUid, customClaims })
-          .then((customToken: string) =>
-            loginWithCustomToken(firebase, customToken),
-          );
-      }
-
-      // Only use CLI login for passed UID (preserves backwards compatability for non-plugin verison)
-      if (uid) {
-        // Generate a custom token using firebase-tools-extra (cli) then login
-        return cy
-          .exec(`npx firebase-extra createCustomToken ${uid}`, {
-            timeout: 100000,
-          })
-          .then((out: any) => {
-            const { stdout, stderr } = out;
-            // Reject with Error if error in firestoreCommand call
-            if (stderr) {
-              return Promise.reject(new Error(stderr));
-            }
-            return loginWithCustomToken(firebase, stdout);
-          });
-      }
-    }
-
-    // Resolve with currentUser if they exist
-    if (firebase.auth().currentUser) {
+    // Resolve with current user if they already exist
+    if (
+      firebase.auth().currentUser &&
+      userUid === firebase.auth().currentUser.uid
+    ) {
       cy.log('Authed user already exists, login complete.');
-      // Undefined is returned to prevent Cypress error:
-      // "Cypress detected that you invoked one or more cy commands in a custom command but returned a different value."
       return undefined;
     }
 
-    // Throw if JWT not within environment (passed uid case handled above)
-    if (!Cypress.env('FIREBASE_AUTH_JWT')) {
-      /** Log in using token * */
-      const errMsg =
-        'uid must be passed to cy.login or FIREBASE_AUTH_JWT must be set to cypress environment in order to login';
-      cy.log(errMsg);
-      throw new Error(errMsg);
+    // Handle UID which is passed in
+    if (!userUid) {
+      throw new Error(
+        'uid must be passed or TEST_UID set within environment to login',
+      );
     }
 
-    // Otherwise, login with Token from environment
-    return loginWithCustomToken(firebase, Cypress.env('FIREBASE_AUTH_JWT'));
+    cy.log('Creating custom token for login...');
+
+    // Generate a custom token using createCustomToken task (if tasks are enabled) then login
+    return cy
+      .task('createCustomToken', { uid: userUid, customClaims })
+      .then((customToken: string) =>
+        loginWithCustomToken(firebase, customToken),
+      );
   });
 
   /**
@@ -263,57 +314,22 @@ export default function attachCustomCommands(
         dataToWrite.createdAt = firebase.database.ServerValue.TIMESTAMP;
       }
 
-      if (Cypress.env('useCypressFirebaseTasks') === true) {
-        const taskSettings: any = {
-          action,
-          path: actionPath,
-        };
-        // Add data only for write actions
-        if (['set', 'update', 'push'].includes(action)) {
-          taskSettings.data = dataToWrite;
-        }
-        // Use third argument as options for get action
-        if (action === 'get') {
-          taskSettings.options = data;
-        } else if (opts) {
-          // Attach options if they exist
-          taskSettings.options = opts;
-        }
-        return cy.task('callRtdb', taskSettings, { timeout: 100000 });
-      }
-
-      // Build command to pass to firebase-tools-extra
-      const rtdbCommand = buildRtdbCommand(
-        Cypress,
+      const taskSettings: any = {
         action,
-        actionPath,
-        dataToWrite,
-        opts,
-      );
-      cy.log(`Calling RTDB command:\n${rtdbCommand}`);
-
-      // Call firebase-tools-extra command
-      return cy.exec(rtdbCommand).then((out: any) => {
-        const { stdout, stderr } = out;
-        // Reject with Error if error in rtdbCommand call
-        if (stderr) {
-          cy.log(`Error in Firestore Command:\n${stderr}`);
-          return Promise.reject(stderr);
-        }
-
-        // Parse result if using get action so that data can be verified
-        if (action === 'get' && typeof stdout === 'string') {
-          try {
-            return JSON.parse(stdout);
-          } catch (err) {
-            cy.log('Error parsing data from callRtdb response', out);
-            return Promise.reject(err);
-          }
-        }
-
-        // Otherwise return unparsed output
-        return stdout;
-      });
+        path: actionPath,
+      };
+      // Add data only for write actions
+      if (['set', 'update', 'push'].includes(action)) {
+        taskSettings.data = dataToWrite;
+      }
+      // Use third argument as options for get action
+      if (action === 'get') {
+        taskSettings.options = data;
+      } else if (opts) {
+        // Attach options if they exist
+        taskSettings.options = opts;
+      }
+      return cy.task('callRtdb', taskSettings);
     },
   );
 
@@ -347,63 +363,22 @@ export default function attachCustomCommands(
         }
       }
 
-      if (Cypress.env('useCypressFirebaseTasks') === true) {
-        const taskSettings: any = {
-          action,
-          path: actionPath,
-        };
-        // Add data only for write actions
-        if (['set', 'update', 'add'].includes(action)) {
-          taskSettings.data = dataToWrite;
-        }
-        // Use third argument as options for get action
-        if (action === 'get') {
-          taskSettings.options = data;
-        } else if (opts) {
-          // Attach options if they exist
-          taskSettings.options = opts;
-        }
-        return cy.task('callFirestore', taskSettings, { timeout: 100000 });
-      }
-
-      const firestoreCommand = buildFirestoreCommand(
-        Cypress,
+      const taskSettings: any = {
         action,
-        actionPath,
-        dataToWrite,
-        opts,
-      );
-
-      cy.log(`Calling Firestore command:\n${firestoreCommand}`);
-
-      return cy.exec(firestoreCommand, { timeout: 100000 }).then((out: any) => {
-        const { stdout, stderr } = out;
-        // Reject with Error if error in firestoreCommand call
-        if (stderr) {
-          cy.log(`Error in Firestore Command:\n${stderr}`);
-          return Promise.reject(stderr);
-        }
-        // Parse result if using get action so that data can be verified
-        if (
-          action === 'get' &&
-          (typeof stdout === 'string' || stdout instanceof String)
-        ) {
-          try {
-            if (stdout === '') {
-              return null;
-            }
-            return JSON.parse(
-              stdout instanceof String ? stdout.toString() : stdout,
-            );
-          } catch (err) {
-            cy.log('Error parsing data from callFirestore response', out);
-            return Promise.reject(err);
-          }
-        }
-
-        // Otherwise return unparsed output
-        return stdout;
-      });
+        path: actionPath,
+      };
+      // Add data only for write actions
+      if (['set', 'update', 'add'].includes(action)) {
+        taskSettings.data = dataToWrite;
+      }
+      // Use third argument as options for get action
+      if (action === 'get') {
+        taskSettings.options = data;
+      } else if (opts) {
+        // Attach options if they exist
+        taskSettings.options = opts;
+      }
+      return cy.task('callFirestore', taskSettings);
     },
   );
 }

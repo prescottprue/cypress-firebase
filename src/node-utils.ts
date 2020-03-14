@@ -1,18 +1,5 @@
 /* eslint-disable @typescript-eslint/camelcase */
-import { get } from 'lodash';
-import path from 'path';
-import chalk from 'chalk';
-import stream from 'stream';
-import { spawn } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
-import { TEST_CONFIG_FILE_PATH, TEST_ENV_FILE_PATH } from './filePaths';
-import {
-  DEFAULT_TEST_FOLDER_PATH,
-  DEFAULT_CONFIG_FILE_NAME,
-} from './constants';
-import { info, error, warn } from './logger';
-
-const DEFAULT_BASE_PATH = process.cwd();
 
 /**
  * Get settings from firebaserc file
@@ -28,11 +15,14 @@ export function readJsonFile(filePath: string): any {
     const fileBuffer = readFileSync(filePath, 'utf8');
     return JSON.parse(fileBuffer.toString());
   } catch (err) {
-    error(
-      `Unable to parse ${chalk.cyan(
-        filePath.replace(DEFAULT_BASE_PATH, ''),
+    /* eslint-disable no-console */
+    console.error(
+      `cypress-firebase: Unable to parse ${filePath.replace(
+        process.cwd(),
+        '',
       )} - JSON is most likely not valid`,
     );
+    /* eslint-enable no-console */
     return {};
   }
 }
@@ -92,51 +82,6 @@ export function withEnvPrefix(varNameRoot: string, envName?: string): string {
 }
 
 /**
- * Get path to local service account
- * @param envName - Environment option
- * @returns Path to service account
- */
-function getServiceAccountPath(envName?: string): string {
-  const withSuffix = path.join(
-    DEFAULT_BASE_PATH,
-    `serviceAccount-${envName || ''}.json`,
-  );
-  if (existsSync(withSuffix)) {
-    return withSuffix;
-  }
-  return path.join(DEFAULT_BASE_PATH, 'serviceAccount.json');
-}
-
-/**
- * Get cypress folder path from cypress.json config file or fallback to
- * default folder path ('cypress')
- * @returns Path of folder containing cypress folders like "integration"
- */
-function getCypressFolderPath(): string {
-  const cypressConfig = readJsonFile(TEST_CONFIG_FILE_PATH); // eslint-disable-line no-use-before-define
-  const integrationTestsFolderPath = get(cypressConfig, 'integrationFolder');
-  return integrationTestsFolderPath
-    ? integrationTestsFolderPath
-        .split('/')
-        .slice(0, -1) // Drop last item (equivalent to dropRight)
-        .join('/')
-    : DEFAULT_TEST_FOLDER_PATH;
-}
-
-/**
- * Get path to cypress config file
- * @returns Path to cypress config file
- */
-export function getCypressConfigPath(): string {
-  const cypressFolderPath = getCypressFolderPath();
-  const cypressConfigFilePath = path.join(
-    cypressFolderPath,
-    DEFAULT_CONFIG_FILE_NAME,
-  );
-  return cypressConfigFilePath;
-}
-
-/**
  * Get environment variable based on the current CI environment
  * @param varNameRoot - variable name without the environment prefix
  * @param envName - Environment option
@@ -147,17 +92,7 @@ export function getCypressConfigPath(): string {
  */
 export function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any {
   const combined = withEnvPrefix(varNameRoot, envName);
-  const localConfigFilePath = getCypressConfigPath();
-
-  // Config file used for environment (local, containers) from main test path ({integrationFolder}/config.json)
-  if (existsSync(localConfigFilePath)) {
-    const localConfigObj = readJsonFile(localConfigFilePath);
-    const valueFromLocalConfig =
-      localConfigObj[combined] || localConfigObj[varNameRoot];
-    if (valueFromLocalConfig) {
-      return valueFromLocalConfig;
-    }
-  }
+  const TEST_ENV_FILE_PATH = `${process.cwd()}/cypress.env.json`;
 
   // Config file used for environment from main cypress environment file (cypress.env.json)
   if (existsSync(TEST_ENV_FILE_PATH)) {
@@ -186,11 +121,11 @@ function getParsedEnvVar(varNameRoot: string, envName?: string): any {
   const val = envVarBasedOnCIEnv(varNameRoot, envName);
   const combinedVar = withEnvPrefix(varNameRoot, envName);
   if (!val) {
-    error(
-      `${chalk.cyan(
-        combinedVar,
-      )} not found, make sure it is set within environment variables.`,
+    /* eslint-disable no-console */
+    console.error(
+      `cypress-firebase: ${combinedVar} not found, make sure it is set within environment variables.`,
     );
+    /* eslint-enable no-console */
   }
   try {
     if (typeof val === 'string') {
@@ -198,7 +133,7 @@ function getParsedEnvVar(varNameRoot: string, envName?: string): any {
     }
     return val;
   } catch (err) {
-    error(`Error parsing ${combinedVar}`);
+    console.error(`cypress-firebase: Error parsing ${combinedVar}`); // eslint-disable-line no-console
     return val;
   }
 }
@@ -222,16 +157,20 @@ interface ServiceAccount {
  * @returns Service account object
  */
 export function getServiceAccount(envSlug?: string): ServiceAccount {
-  const serviceAccountPath = getServiceAccountPath(envSlug);
+  const serviceAccountPath = `${process.cwd()}/serviceAccount.json`;
   // Check for local service account file (Local dev)
   if (existsSync(serviceAccountPath)) {
     return readJsonFile(serviceAccountPath); // eslint-disable-line global-require, import/no-dynamic-require
   }
-  info(
-    `Service account does not exist at path: "${chalk.cyan(
-      serviceAccountPath.replace(`${DEFAULT_BASE_PATH}/`, ''),
+
+  /* eslint-disable no-console */
+  console.log(
+    `cypress-firebase: Service account does not exist at path: "${serviceAccountPath.replace(
+      `${process.cwd()}/`,
+      '',
     )}" falling back to environment variables...`,
   );
+  /* eslint-enable no-console */
 
   // Use environment variables (CI)
   const serviceAccountEnvVar = envVarBasedOnCIEnv('SERVICE_ACCOUNT', envSlug);
@@ -240,31 +179,31 @@ export function getServiceAccount(envSlug?: string): ServiceAccount {
       try {
         return JSON.parse(serviceAccountEnvVar);
       } catch (err) {
-        warn(
-          `Issue parsing ${chalk.cyan(
-            'SERVICE_ACCOUNT',
-          )} environment variable from string to object, returning string`,
+        /* eslint-disable no-console */
+        console.warn(
+          `cypress-firebase: Issue parsing 'SERVICE_ACCOUNT' environment variable from string to object, returning string`,
         );
+        /* eslint-enable no-console */
       }
     }
     return serviceAccountEnvVar;
   }
 
-  info(
-    `Service account does not exist as a single environment variable within ${chalk.cyan(
+  /* eslint-disable no-console */
+  console.info(
+    `cypress-firebase: Service account does not exist as a single environment variable within 'SERVICE_ACCOUNT' or ${withEnvPrefix(
       'SERVICE_ACCOUNT',
-    )} or ${chalk.cyan(
-      withEnvPrefix('SERVICE_ACCOUNT'),
     )}, checking separate environment variables...`,
   );
+  /* eslint-enable no-console */
 
   const clientId = envVarBasedOnCIEnv('FIREBASE_CLIENT_ID', envSlug);
   if (clientId) {
-    warn(
-      `${chalk.cyan('FIREBASE_CLIENT_ID')} will override ${chalk.cyan(
-        'FIREBASE_TOKEN',
-      )} for auth when calling firebase-tools - this may cause unexepected behavior`,
+    /* eslint-disable no-console */
+    console.warn(
+      "cypress-firebase: 'FIREBASE_CLIENT_ID' will override 'FIREBASE_TOKEN' for auth when calling firebase-tools - this may cause unexepected behavior",
     );
+    /* eslint-enable no-console */
   }
   return {
     type: 'service_account',
@@ -288,7 +227,7 @@ export function getServiceAccount(envSlug?: string): ServiceAccount {
 export function getServiceAccountWithoutWarning(
   envSlug?: string,
 ): ServiceAccount | null {
-  const serviceAccountPath = getServiceAccountPath(envSlug);
+  const serviceAccountPath = `${process.cwd()}/serviceAccount.json`;
   // Check for local service account file (Local dev)
   if (existsSync(serviceAccountPath)) {
     return readJsonFile(serviceAccountPath); // eslint-disable-line global-require, import/no-dynamic-require
@@ -301,11 +240,11 @@ export function getServiceAccountWithoutWarning(
       try {
         return JSON.parse(serviceAccountEnvVar);
       } catch (err) {
-        warn(
-          `Issue parsing ${chalk.cyan(
-            'SERVICE_ACCOUNT',
-          )} environment variable from string to object, returning string`,
+        /* eslint-disable no-console */
+        console.warn(
+          `cypress-firebase: Issue parsing 'SERVICE_ACCOUNT' environment variable from string to object, returning string`,
         );
+        /* eslint-enable no-console */
       }
     }
     return serviceAccountEnvVar;
@@ -313,64 +252,3 @@ export function getServiceAccountWithoutWarning(
 
   return null;
 }
-
-export interface RunCommandOptions {
-  command: string;
-  args: string[];
-  pipeOutput?: boolean;
-}
-
-/**
- * Run a bash command using spawn pipeing the results to the main process
- * @param runOptions - Options for command run
- * @param runOptions.command - Command to be executed
- * @param runOptions.args - Command arguments
- * @returns Resolves with results of running the command
- * @private
- */
-export function runCommand(runOptions: RunCommandOptions): Promise<any> {
-  const { command, args, pipeOutput = true } = runOptions;
-  return new Promise((resolve, reject): void => {
-    const child = spawn(command, args);
-    let output: any;
-    let error: any;
-    const customStream = new stream.Writable();
-    const customErrorStream = new stream.Writable();
-    /* eslint-disable no-underscore-dangle */
-    customStream._write = (data, ...argv): void => {
-      output += data;
-      if (pipeOutput) {
-        process.stdout._write(data, ...argv);
-      }
-    };
-    customErrorStream._write = (data, ...argv): void => {
-      error += data;
-      if (pipeOutput) {
-        process.stderr._write(data, ...argv);
-      }
-    };
-    /* eslint-enable no-underscore-dangle */
-    // Pipe errors and console output to main process
-    child.stdout.pipe(customStream);
-    child.stderr.pipe(customErrorStream);
-    // When child exits resolve or reject based on code
-    child.on('exit', (code: number): void => {
-      if (code !== 0) {
-        // Resolve for npm warnings
-        if (output && output.includes('npm WARN')) {
-          return resolve(output);
-        }
-        reject(error || output);
-      } else {
-        // Remove leading undefined from response
-        resolve(
-          output && output.indexOf('undefined') === 0
-            ? output.replace('undefined', '')
-            : output,
-        );
-      }
-    });
-  });
-}
-
-process.env.FORCE_COLOR = 'true';

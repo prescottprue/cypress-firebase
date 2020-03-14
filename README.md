@@ -54,7 +54,7 @@ If you are interested in what drove the need for this checkout [the why section]
 
     ```js
     const admin = require('firebase-admin')
-    const cypressFirebasePlugin = require('cypress-firebase').pluginWithTasks
+    const cypressFirebasePlugin = require('cypress-firebase').plugin
 
     module.exports = (on, config) => {
       // Pass on function, config, and admin instance. Returns extended config
@@ -62,38 +62,31 @@ If you are interested in what drove the need for this checkout [the why section]
     }
     ```
 
-#### Old Method (using firebase-tools-extra cli)
-
-1. Same steps as above but make the following change of import in plugins file (`cypress/plugins/index.js`):
-
-```diff
-+ const cypressFirebasePlugin = require('cypress-firebase').plugin
-- const cypressFirebasePlugin = require('cypress-firebase').pluginWithTasks
-```
-
 #### Auth
 
 1. Log into your Firebase console for the first time.
 1. Go to Auth tab of Firebase and create a user for testing purpose
 1. Get the UID of created account. This will be the account which you use to login while running tests (we will call this UID `TEST_UID`)
 1. Add the following to your `.gitignore`:
+
     ```
     serviceAccount.json
     cypress.env.json
     ```
+
 1. Go to project setting on firebase console and generate new private key. See how to do [here](https://sites.google.com/site/scriptsexamples/new-connectors-to-google-services/firebase/tutorials/authenticate-with-a-service-account)
 1. Save the downloaded file as `serviceAccount.json` in the root of your project (make sure that it is .gitignored)
-1. Add the UID of the user you created earlier to your cypress environment file (`cypress.env.json`) when running locally (make sure this is in you `.gitignore`):
-  
-    ```js
-    {
-      "TEST_UID": "<- uid of the user you want to test as ->"
-    }
-    ```
-  
-  In CI this will instead be loaded from the `TEST_UID` environment variable
+1. Set the UID of the user you created earlier to the cypress environment. You can do this using a number of methods:
+    1. Adding `CYPRESS_TEST_UID` to `.env` file which is gitignored
+    1. Adding `TEST_UID` to `cypress.env.json`
+    1. Adding as part of your npm script to run tests with a tool such as `cross-env`:
 
-1. Pass the UID when logging in: `cy.login(Cypress.env('TEST_UID'))`
+      ```json
+      "test": "cross-env CYPRESS_TEST_UID=your-uid cypress open"
+      ```
+
+1. Make sure to set `CYPRESS_TEST_UID` environment variable in your CI settings if you are running tests in CI
+1. Call `cy.login()` with the `before` or `beforeEach` sections of your tests
 
 **NOTE**: If you are running tests within your CI provider you will want to set the `SERVICE_ACCOUNT` environment variable as the service account object and the `TEST_UID` environment variable as the UID of your test user
 
@@ -108,6 +101,7 @@ If you are interested in what drove the need for this checkout [the why section]
 
 #### createTestEnvFile {#createTestEnvFile}
 
+**NOTE**: This command is deprecated and will be removed in the next major version. It is suggested that you use `CYPRESS_` prefixed environment variables instead
 Create test environment file (`cypress.env.json`) which contains custom auth token generated using `firebase-admin` SDK and `serviceAccount.json`.
 
 ##### Requirements

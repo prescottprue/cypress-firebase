@@ -1,5 +1,9 @@
-import { FixtureData, FirestoreAction } from './buildFirestoreCommand';
-import { RTDBAction, RTDBCommandOptions } from './buildRtdbCommand';
+import {
+  FixtureData,
+  FirestoreAction,
+  RTDBAction,
+  RTDBCommandOptions,
+} from './attachCustomCommands';
 import {
   slashPathToFirestoreRef,
   deleteCollection,
@@ -52,7 +56,10 @@ export function callRtdb(
    */
   function handleError(err: Error): Promise<any> {
     /* eslint-disable no-console */
-    console.error(`Error with RTDB "${action}" at path "${actionPath}" :`, err);
+    console.error(
+      `cypress-firebase: Error with RTDB "${action}" at path "${actionPath}" :`,
+      err,
+    );
     /* eslint-enable no-console */
     return Promise.reject(err);
   }
@@ -128,7 +135,7 @@ export function callFirestore(
   function handleError(err: Error): Promise<any> {
     /* eslint-disable no-console */
     console.error(
-      `Error with Firestore "${action}" at path "${actionPath}" :`,
+      `cypress-firebase: Error with Firestore "${action}" at path "${actionPath}" :`,
       err,
     );
     /* eslint-enable no-console */
