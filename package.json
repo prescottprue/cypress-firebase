@@ -12,31 +12,26 @@
     "build:typefile": "tsc --declaration --outFile index.d.ts --emitDeclarationOnly",
     "build:lib": "tsc",
     "build:esm": "tsc -m es6 --outDir lib-esm",
-    "watch": "yarn build:lib -- --watch",
-    "watch:es": "yarn build:es -- --watch",
+    "watch": "yarn build:lib --watch",
+    "watch:es": "yarn build:esm --watch",
     "lint": "eslint src/**.ts --ext .ts",
-    "lint:fix": "yarn lint -- --fix",
+    "lint:fix": "yarn lint --fix",
     "test": "mocha",
     "test:cov": "nyc --reporter=lcov --reporter=html yarn test",
     "codecov": "cat coverage/lcov.info | codecov",
     "prepare": "yarn clean && yarn build"
   },
-  "bin": {
-    "cypress-firebase": "./bin/cypress-firebase"
-  },
   "peerDependencies": {
     "firebase-tools": "^6 || ^7"
   },
   "dependencies": {
-    "chalk": "^3.0.0",
-    "commander": "^4.1.0",
-    "figures": "^3.2.0",
-    "firebase-admin": "^8.9.2",
+    "firebase-admin": "^8.10.0",
     "lodash": "^4.17.15"
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/chai": "^4.2.10",
+    "@types/debug": "^4.1.5",
     "@types/lodash": "^4.14.149",
     "@types/mocha": "^7.0.2",
     "@types/node": "^13.9.0",

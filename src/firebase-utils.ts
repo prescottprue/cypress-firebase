@@ -88,7 +88,10 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
           process.env.FIREBASE_DATABASE_EMULATOR_HOST
         }?ns=${fbConfig.projectId || 'local'}`;
         /* eslint-disable no-console */
-        console.log('Using RTDB emulator with DB URL:', fbConfig.databaseURL);
+        console.log(
+          'cypress-firebase: Using RTDB emulator with DB URL:',
+          fbConfig.databaseURL,
+        );
         /* eslint-enable no-console */
       }
 
@@ -105,7 +108,7 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
         const firestoreSettings = firestoreSettingsFromEnv();
         /* eslint-disable no-console */
         console.log(
-          'Using Firestore emulator with settings:',
+          'cypress-firebase: Using Firestore emulator with settings:',
           firestoreSettings,
         );
         /* eslint-enable no-console */
@@ -118,7 +121,7 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
       if (!isString(projectId)) {
         const missingProjectIdErr =
           'Error project_id from service account to initialize Firebase.';
-        console.error(missingProjectIdErr); // eslint-disable-line no-console
+        console.error(`cypress-firebase: ${missingProjectIdErr}`); // eslint-disable-line no-console
         throw new Error(missingProjectIdErr);
       }
       const cleanProjectId = projectId.replace(
@@ -127,7 +130,7 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
       );
       /* eslint-disable no-console */
       console.log(
-        `Initialized with Service Account for project "${cleanProjectId}"`,
+        `cypress-firebase: Initialized with Service Account for project "${cleanProjectId}"`,
       );
       /* eslint-enable no-console */
       fbInstance = adminInstance.initializeApp({
@@ -139,7 +142,7 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
   } catch (err) {
     /* eslint-disable no-console */
     console.error(
-      'Error initializing firebase-admin instance from service account.',
+      'cypress-firebase: Error initializing firebase-admin instance from service account.',
     );
     /* eslint-enable no-console */
     throw err;

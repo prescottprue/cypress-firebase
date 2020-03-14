@@ -200,40 +200,6 @@ declare module "filePaths" {
     export const TEST_ENV_FILE_PATH: string;
     export const LOCAL_CONFIG_FILE_PATH: string;
 }
-declare module "logger" {
-    export const log: {
-        (message?: any, ...optionalParams: any[]): void;
-        (message?: any, ...optionalParams: any[]): void;
-    };
-    /**
-     * Log info within console
-     * @param message - Message containing info to log
-     * @param other - Other values to pass to info
-     * @returns undefined
-     */
-    export function info(message: string, other?: any): void;
-    /**
-     * Log a success within console (colorized with green)
-     * @param message - Success message to log
-     * @param other - Other values to pass to info
-     * @returns undefined
-     */
-    export function success(message: string, other?: any): void;
-    /**
-     * Log a warning within the console (colorized with yellow)
-     * @param message - Warning message to log
-     * @param other - Other values to pass to info
-     * @returns undefined
-     */
-    export function warn(message: string, other?: any): void;
-    /**
-     * Log an error within console (colorized with red)
-     * @param message - Error message to log
-     * @param other - Other values to pass to info
-     * @returns undefined
-     */
-    export function error(message: string, other?: any): void;
-}
 declare module "node-utils" {
     /**
      * Get settings from firebaserc file
@@ -299,61 +265,6 @@ declare module "node-utils" {
      * @returns Service account object
      */
     export function getServiceAccountWithoutWarning(envSlug?: string): ServiceAccount | null;
-    export interface RunCommandOptions {
-        command: string;
-        args: string[];
-        pipeOutput?: boolean;
-    }
-    /**
-     * Run a bash command using spawn pipeing the results to the main process
-     * @param runOptions - Options for command run
-     * @param runOptions.command - Command to be executed
-     * @param runOptions.args - Command arguments
-     * @returns Resolves with results of running the command
-     * @private
-     */
-    export function runCommand(runOptions: RunCommandOptions): Promise<any>;
-}
-declare module "utils" {
-    /**
-     * Async await wrapper for easy error handling
-     * @param promise - Promise to wrap responses of in array
-     * @param errorExt - Extension for error
-     * @returns Resolves and rejects with an array
-     */
-    export function to<T, U = Error>(promise: Promise<T>, errorExt?: object): Promise<[U | null, T | undefined]>;
-    /**
-     * Create command arguments string from an array of arguments by joining them
-     * with a space including a leading space. If no args provided, empty string
-     * is returned
-     * @param args - Command arguments to convert into a string
-     * @returns Arguments section of command string
-     */
-    export function getArgsString(args: string[] | any): string;
-    /**
-     * Add default Firebase arguments to arguments array.
-     * @param Cypress - Cypress object
-     * @param args - arguments array
-     * @param [opts={}] - Options object
-     * @param opts.token - Firebase CI token to pass as the token argument
-     * @param [opts.disableYes=false] - Whether or not to disable the yes argument
-     * @returns Default args list
-     */
-    export function addDefaultArgs(Cypress: any, args: string[], opts?: any): string[];
-}
-declare module "createTestEnvFile" {
-    /**
-     * Create test environment file (cypress.env.json). Uses admin.auth().createCustomToken
-     * from firebase-admin authenticated with a Service Account which is loaded from environment
-     * variables or config.json in test folder. Parameters which are added/copied:
-     * - `TEST_UID`
-     * - `FIREBASE_API_KEY`
-     * - `FIREBASE_PROJECT_ID`
-     * - `FIREBASE_AUTH_JWT`
-     * @param envName - Environment name
-     * @returns Promise which resolves with the contents of the test env file
-     */
-    export default function createTestEnvFile(envName: string): Promise<string>;
 }
 declare module "extendWithFirebaseConfig" {
     export interface CypressEnvironmentOptions {
@@ -482,4 +393,31 @@ declare module "index" {
     import attachCustomCommands from "attachCustomCommands";
     import plugin from "plugin";
     export { attachCustomCommands, plugin };
+}
+declare module "utils" {
+    /**
+     * Async await wrapper for easy error handling
+     * @param promise - Promise to wrap responses of in array
+     * @param errorExt - Extension for error
+     * @returns Resolves and rejects with an array
+     */
+    export function to<T, U = Error>(promise: Promise<T>, errorExt?: object): Promise<[U | null, T | undefined]>;
+    /**
+     * Create command arguments string from an array of arguments by joining them
+     * with a space including a leading space. If no args provided, empty string
+     * is returned
+     * @param args - Command arguments to convert into a string
+     * @returns Arguments section of command string
+     */
+    export function getArgsString(args: string[] | any): string;
+    /**
+     * Add default Firebase arguments to arguments array.
+     * @param Cypress - Cypress object
+     * @param args - arguments array
+     * @param [opts={}] - Options object
+     * @param opts.token - Firebase CI token to pass as the token argument
+     * @param [opts.disableYes=false] - Whether or not to disable the yes argument
+     * @returns Default args list
+     */
+    export function addDefaultArgs(Cypress: any, args: string[], opts?: any): string[];
 }
