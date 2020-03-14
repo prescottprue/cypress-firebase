@@ -45,7 +45,6 @@
     "@typescript-eslint/parser": "^2.23.0",
     "chai": "^4.2.0",
     "codecov": "^3.6.5",
-    "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-prettier": "^6.10.0",
@@ -54,7 +53,7 @@
     "eslint-plugin-jsdoc": "^22.0.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.2",
-    "firebase-tools": "^7.14.0",
+    "firebase-tools": "^7.15.0",
     "husky": "^4.2.3",
     "lint-staged": "^10.0.8",
     "mocha": "^7.1.0",
@@ -95,11 +94,14 @@
   ],
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "yarn build:typefile && git add . && lint-staged"
     }
   },
   "lint-staged": {
-    "*.{ts}": [
+    "*.{json,md}": [
+      "prettier --write"
+    ],
+    "*.{js,ts}": [
       "eslint --fix"
     ]
   }

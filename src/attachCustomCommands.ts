@@ -355,7 +355,7 @@ export default function attachCustomCommands(
         // Attach options if they exist
         taskSettings.options = opts;
       }
-      return cy.task('callRtdb', taskSettings, { timeout: 100000 });
+      return cy.task('callRtdb', taskSettings);
     },
   );
 
@@ -404,7 +404,7 @@ export default function attachCustomCommands(
         // Attach options if they exist
         taskSettings.options = opts;
       }
-      return cy.task('callFirestore', taskSettings, { timeout: 100000 });
+      return cy.task('callFirestore', taskSettings);
     },
   );
 }
