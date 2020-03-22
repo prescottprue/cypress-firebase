@@ -146,7 +146,7 @@ export function callFirestore(
     ) as any)
       .get()
       .then((snap: any) => {
-        if (snap && typeof snap.docs?.map === 'function') {
+        if (snap && snap.docs?.length && typeof snap.docs.map === 'function') {
           return snap.docs.map(
             (docSnap: FirebaseFirestore.DocumentSnapshot) => ({
               ...docSnap.data(),

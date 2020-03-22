@@ -336,8 +336,12 @@ export default function attachCustomCommands(
 
         // Add metadata to dataToWrite if specified by options
         if (dataIsObject && opts?.withMeta) {
-          dataToWrite.createdBy = Cypress.env('TEST_UID');
-          dataToWrite.createdAt = firebase.database.ServerValue.TIMESTAMP;
+          if (!dataToWrite.createdBy) {
+            dataToWrite.createdBy = Cypress.env('TEST_UID');
+          }
+          if (!dataToWrite.createdAt) {
+            dataToWrite.createdAt = firebase.database.ServerValue.TIMESTAMP;
+          }
         }
         taskSettings.data = dataToWrite;
       }
