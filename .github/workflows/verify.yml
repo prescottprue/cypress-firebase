@@ -6,14 +6,17 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x]
     steps:
       - name: Checkout code
         uses: actions/checkout@v1
 
-      - name: Setup Node
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: ${{ matrix.node-version }}
 
       - name: Get yarn cache
         id: yarn-cache
@@ -24,8 +27,6 @@ jobs:
         with:
           path: ${{ steps.yarn-cache.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
 
       - name: Install Dependencies
         env:

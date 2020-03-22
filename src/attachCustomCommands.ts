@@ -1,5 +1,3 @@
-import { isObject } from 'lodash';
-
 export interface AttachCustomCommandParams {
   Cypress: any;
   cy: any;
@@ -198,6 +196,33 @@ declare global {
   }
 }
 
+type TypeStr =
+  | 'array'
+  | 'date'
+  | 'object'
+  | 'string'
+  | 'number'
+  | 'bigint'
+  | 'boolean'
+  | 'symbol'
+  | 'undefined'
+  | 'function';
+
+/**
+ * Get String representing the type for the provided value
+ * @param value - Value for which to get type string
+ * @returns String representing a type
+ */
+function getTypeStr(value: any): TypeStr {
+  if (Array.isArray(value)) {
+    return 'array';
+  }
+  if (typeof value === 'object' && value instanceof Date) {
+    return 'date';
+  }
+  return typeof value;
+}
+
 /**
  * @param firebase - firebase instance
  * @param customToken - Custom token to use for login
@@ -213,10 +238,7 @@ function loginWithCustomToken(
         resolve(auth);
       }
     });
-    firebase
-      .auth()
-      .signInWithCustomToken(customToken)
-      .catch(reject);
+    firebase.auth().signInWithCustomToken(customToken).catch(reject);
   });
 }
 
@@ -280,10 +302,7 @@ export default function attachCustomCommands(
             resolve();
           }
         });
-        firebase
-          .auth()
-          .signOut()
-          .catch(reject);
+        firebase.auth().signOut().catch(reject);
       });
     },
   );
@@ -305,21 +324,21 @@ export default function attachCustomCommands(
       data?: any,
       opts?: RTDBCommandOptions,
     ) => {
-      // If data is an object, create a copy to original object is not modified
-      const dataToWrite = isObject(data) ? { ...data } : data;
-
-      // Add metadata to dataToWrite if specified by options
-      if (isObject(data) && opts && opts.withMeta) {
-        dataToWrite.createdBy = Cypress.env('TEST_UID');
-        dataToWrite.createdAt = firebase.database.ServerValue.TIMESTAMP;
-      }
-
       const taskSettings: any = {
         action,
         path: actionPath,
       };
       // Add data only for write actions
       if (['set', 'update', 'push'].includes(action)) {
+        // If exists, create a copy to original object is not modified
+        const dataIsObject = getTypeStr(data) === 'object';
+        const dataToWrite = dataIsObject ? { ...data } : data;
+
+        // Add metadata to dataToWrite if specified by options
+        if (dataIsObject && opts?.withMeta) {
+          dataToWrite.createdBy = Cypress.env('TEST_UID');
+          dataToWrite.createdAt = firebase.database.ServerValue.TIMESTAMP;
+        }
         taskSettings.data = dataToWrite;
       }
       // Use third argument as options for get action
@@ -350,25 +369,25 @@ export default function attachCustomCommands(
       data: any,
       opts: FirestoreCommandOptions,
     ): void => {
-      // If data is an object, create a copy to original object is not modified
-      const dataToWrite = isObject(data) ? { ...data } : data;
-
-      // Add metadata to dataToWrite if specified by options
-      if (isObject(data) && opts?.withMeta) {
-        if (!dataToWrite.createdBy) {
-          dataToWrite.createdBy = Cypress.env('TEST_UID');
-        }
-        if (!dataToWrite.createdAt) {
-          dataToWrite.createdAt = new Date().toISOString();
-        }
-      }
-
       const taskSettings: any = {
         action,
         path: actionPath,
       };
       // Add data only for write actions
       if (['set', 'update', 'add'].includes(action)) {
+        // If data is an object, create a copy to original object is not modified
+        const dataIsObject = getTypeStr(data) === 'object';
+        const dataToWrite = dataIsObject ? { ...data } : data;
+
+        // Add metadata to dataToWrite if specified by options
+        if (dataIsObject && opts?.withMeta) {
+          if (!dataToWrite.createdBy) {
+            dataToWrite.createdBy = Cypress.env('TEST_UID');
+          }
+          if (!dataToWrite.createdAt) {
+            dataToWrite.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          }
+        }
         taskSettings.data = dataToWrite;
       }
       // Use third argument as options for get action

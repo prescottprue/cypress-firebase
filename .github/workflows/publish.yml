@@ -19,7 +19,7 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      - name: Setup Node
+      - name: Use Node 12
         uses: actions/setup-node@v1
         with:
           node-version: 12
