@@ -71,10 +71,7 @@ export function callRtdb(
   }
 
   if (action === 'push') {
-    const pushRef = adminInstance
-      .database()
-      .ref(actionPath)
-      .push();
+    const pushRef = adminInstance.database().ref(actionPath).push();
     return pushRef
       .set(data)
       .then(() => {

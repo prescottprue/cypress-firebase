@@ -30,7 +30,6 @@ export interface ExtendWithFirebaseConfigSettings {
 /**
  * Load config for Cypress from .firebaserc.
  * @param cypressConfig - Existing Cypress config
- * @param settings - Settings
  * @returns Cypress config extended with FIREBASE_PROJECT_ID and baseUrl
  */
 export default function extendWithFirebaseConfig(
