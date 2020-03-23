@@ -12,14 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Check package version
         uses: technote-space/package-version-check-action@v1
         with:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      - name: Setup Node
+      - name: Use Node 12
         uses: actions/setup-node@v1
         with:
           node-version: 12

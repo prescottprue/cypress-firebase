@@ -1,8 +1,5 @@
 import * as admin from 'firebase-admin';
-import {
-  getServiceAccount,
-  getServiceAccountWithoutWarning,
-} from './node-utils';
+import { getServiceAccount } from './node-utils';
 
 /**
  * Check whether a value is a string or not
@@ -11,24 +8,6 @@ import {
  */
 export function isString(valToCheck: any): boolean {
   return typeof valToCheck === 'string' || valToCheck instanceof String;
-}
-
-/**
- * Get projectId for emulated project. Attempts to load from
- * FIREBASE_PROJECT or FIREBASE_PROJECT_ID from environment variables
- * within node environment or from the cypress environment. If not
- * found within environment, falls back to serviceAccount.json file
- * then defaults to "test".
- * @returns projectId for emulated project
- */
-function getEmulatedProjectId(): string {
-  // Get service account from local file falling back to environment variables
-  const { GCLOUD_PROJECT } = process.env;
-  if (GCLOUD_PROJECT) {
-    return GCLOUD_PROJECT;
-  }
-  const serviceAccount = getServiceAccountWithoutWarning();
-  return serviceAccount?.project_id || 'test';
 }
 
 /**
@@ -75,8 +54,12 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
     ) {
       // TODO: Look into using @firebase/testing in place of admin here to allow for
       // usage of clearFirestoreData (see https://github.com/prescottprue/cypress-firebase/issues/73 for more info)
-      const projectId = getEmulatedProjectId();
-
+      const serviceAccount = getServiceAccount();
+      const projectId =
+        process.env.GCLOUD_PROJECT ||
+        process.env.FIREBASE_PROJECT ||
+        process.env.FIREBASE_PROJECT_ID ||
+        serviceAccount?.project_id;
       const fbConfig: any = {
         projectId,
       };
@@ -96,7 +79,6 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
       }
 
       // Add service account credential if it exists so that custom auth tokens can be generated
-      const serviceAccount = getServiceAccountWithoutWarning();
       if (serviceAccount) {
         fbConfig.credential = adminInstance.credential.cert(serviceAccount);
       }
@@ -114,30 +96,30 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
         /* eslint-enable no-console */
         adminInstance.firestore().settings(firestoreSettings);
       }
-    } else {
-      // Get service account from local file falling back to environment variables
-      const serviceAccount = getServiceAccount();
-      const projectId = serviceAccount?.project_id;
-      if (!isString(projectId)) {
-        const missingProjectIdErr =
-          'Error project_id from service account to initialize Firebase.';
-        console.error(`cypress-firebase: ${missingProjectIdErr}`); // eslint-disable-line no-console
-        throw new Error(missingProjectIdErr);
-      }
-      const cleanProjectId = projectId.replace(
-        'firebase-top-agent-int',
-        'top-agent-int',
-      );
-      /* eslint-disable no-console */
-      console.log(
-        `cypress-firebase: Initialized with Service Account for project "${cleanProjectId}"`,
-      );
-      /* eslint-enable no-console */
-      fbInstance = adminInstance.initializeApp({
-        credential: adminInstance.credential.cert(serviceAccount as any),
-        databaseURL: `https://${cleanProjectId}.firebaseio.com`,
-      });
     }
+    // Get service account from local file falling back to environment variables
+    const serviceAccount = getServiceAccount();
+    const projectId = serviceAccount?.project_id;
+    if (!isString(projectId)) {
+      const missingProjectIdErr =
+        'Error project_id from service account to initialize Firebase.';
+      console.error(`cypress-firebase: ${missingProjectIdErr}`); // eslint-disable-line no-console
+      throw new Error(missingProjectIdErr);
+    }
+    const cleanProjectId = (projectId as string).replace(
+      'firebase-top-agent-int',
+      'top-agent-int',
+    );
+    /* eslint-disable no-console */
+    console.log(
+      `cypress-firebase: Initialized with Service Account for project "${cleanProjectId}"`,
+    );
+    /* eslint-enable no-console */
+    fbInstance = adminInstance.initializeApp({
+      credential: adminInstance.credential.cert(serviceAccount as any),
+      databaseURL: `https://${cleanProjectId}.firebaseio.com`,
+    });
+
     return fbInstance;
   } catch (err) {
     /* eslint-disable no-console */

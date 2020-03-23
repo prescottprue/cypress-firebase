@@ -201,49 +201,22 @@ declare module "extendWithFirebaseConfig" {
         localHostPort?: string | number;
     }
     /**
-     * Load config for Cypress from .firebaserc.
+     * Load config for Cypress from environment variables. Loads
+     * FIRESTORE_EMULATOR_HOST, FIREBASE_DATABASE_EMULATOR_HOST, and
+     * GCLOUD_PROJECT variable values from environment to pass to
+     * Cypress environment
      * @param cypressConfig - Existing Cypress config
-     * @param settings - Settings
-     * @returns Cypress config extended with FIREBASE_PROJECT_ID and baseUrl
+     * @returns Cypress config extended with environment variables
      */
     export default function extendWithFirebaseConfig(cypressConfig: CypressConfig): ExtendedCypressConfig;
 }
 declare module "node-utils" {
     /**
-     * Get settings from firebaserc file
+     * Read a file from the filesystem and JSON.parse contents
      * @param filePath - Path for file
      * @returns Firebase settings object
      */
     export function readJsonFile(filePath: string): any;
-    /**
-     * Get environment slug
-     * @returns Environment slug
-     */
-    export function getEnvironmentSlug(): string;
-    /**
-     * Get prefix for current environment based on environment vars available
-     * within CI. Falls back to staging (i.e. STAGE)
-     * @param envName - Environment option
-     * @returns Environment prefix string
-     */
-    export function getEnvPrefix(envName?: string): string;
-    /**
-     * Create a variable name string with environment prefix (i.e. STAGE_SERVICE_ACCOUNT)
-     * @param varNameRoot - Root of environment variable name
-     * @param envName - Environment option
-     * @returns Environment var name with prefix
-     */
-    export function withEnvPrefix(varNameRoot: string, envName?: string): string;
-    /**
-     * Get environment variable based on the current CI environment
-     * @param varNameRoot - variable name without the environment prefix
-     * @param envName - Environment option
-     * @returns Value of the environment variable
-     * @example
-     * envVarBasedOnCIEnv('FIREBASE_PROJECT_ID')
-     * // => 'fireadmin-stage' (value of 'STAGE_FIREBASE_PROJECT_ID' environment var)
-     */
-    export function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any;
     interface ServiceAccount {
         type: string;
         project_id: string;
@@ -261,13 +234,7 @@ declare module "node-utils" {
      * @param envSlug - Environment option
      * @returns Service account object
      */
-    export function getServiceAccount(envSlug?: string): ServiceAccount;
-    /**
-     * Get service account from either local file or environment variables
-     * @param envSlug - Environment option
-     * @returns Service account object
-     */
-    export function getServiceAccountWithoutWarning(envSlug?: string): ServiceAccount | null;
+    export function getServiceAccount(envSlug?: string): ServiceAccount | null;
 }
 declare module "firebase-utils" {
     import * as admin from 'firebase-admin';

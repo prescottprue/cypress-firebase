@@ -28,10 +28,12 @@ export interface ExtendWithFirebaseConfigSettings {
 }
 
 /**
- * Load config for Cypress from .firebaserc.
+ * Load config for Cypress from environment variables. Loads
+ * FIRESTORE_EMULATOR_HOST, FIREBASE_DATABASE_EMULATOR_HOST, and
+ * GCLOUD_PROJECT variable values from environment to pass to
+ * Cypress environment
  * @param cypressConfig - Existing Cypress config
- * @param settings - Settings
- * @returns Cypress config extended with FIREBASE_PROJECT_ID and baseUrl
+ * @returns Cypress config extended with environment variables
  */
 export default function extendWithFirebaseConfig(
   cypressConfig: CypressConfig,
