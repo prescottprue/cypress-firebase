@@ -36,40 +36,40 @@ jobs:
       - name: Check For Lint
         run: yarn lint
 
-    - name: Expose Test Environment Variables
-      env:
-        SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
-        GITHUB_HEAD_REF: ${{ github.head_ref }}
-        GITHUB_REF: ${{ github.ref }}
-      # Generate Service Account file required to prevent credential error (jq used to format)
-      run: |
-        echo "Generating Service Account File..."
-        echo "$(echo $SERVICE_ACCOUNT | jq .)" > $HOME/serviceAccount.json
-        echo "::set-env name=GOOGLE_APPLICATION_CREDENTIALS::$HOME/serviceAccount.json"
+      - name: Expose Test Environment Variables
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_REF: ${{ github.ref }}
+        # Generate Service Account file required to prevent credential error (jq used to format)
+        run: |
+          echo "Generating Service Account File..."
+          echo "$(echo $SERVICE_ACCOUNT | jq .)" > $HOME/serviceAccount.json
+          echo "::set-env name=GOOGLE_APPLICATION_CREDENTIALS::$HOME/serviceAccount.json"
 
-    - name: Run Unit Tests + Coverage
-      if: success()
-      run: yarn test:cov
+      - name: Run Unit Tests + Coverage
+        if: success()
+        run: yarn test:cov
 
-    - name: Run Build
-      run: yarn build
+      - name: Run Build
+        run: yarn build
 
-    # Skipped since yarn isn't supported
-    # - name: Size Check
-    #   uses: andresz1/size-limit-action@v1.0.0
-    #   env:
-    #     CI_JOB_NUMBER: 1
-    #   with:
-    #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      # Skipped since yarn isn't supported
+      # - name: Size Check
+      #   uses: andresz1/size-limit-action@v1.0.0
+      #   env:
+      #     CI_JOB_NUMBER: 1
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Size Check
-      run: yarn size
+      - name: Size Check
+        run: yarn size
 
-    - name: Upload Coverage
-      if: success()
-      env:
-        CI: true
-        CODE_COV: ${{ secrets.CODE_COV }}
-      # Upload to codecov.io. Curl used in place of codecov/codecov-action
-      # due to long build time. See https://github.com/codecov/codecov-action/issues/21
-      run: curl -s https://codecov.io/bash | bash -s -- -t $CODE_COV
+      - name: Upload Coverage
+        if: success()
+        env:
+          CI: true
+          CODE_COV: ${{ secrets.CODE_COV }}
+        # Upload to codecov.io. Curl used in place of codecov/codecov-action
+        # due to long build time. See https://github.com/codecov/codecov-action/issues/21
+        run: curl -s https://codecov.io/bash | bash -s -- -t $CODE_COV
