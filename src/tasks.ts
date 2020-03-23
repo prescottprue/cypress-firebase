@@ -156,7 +156,7 @@ export function callFirestore(
         }
         // Falling back to null in the case of falsey value prevents Cypress error with message:
         // "You must return a promise, a value, or null to indicate that the task was handled."
-        return snap?.data() || null;
+        return (typeof snap?.data === 'function' && snap.data()) || null;
       })
       .catch(handleError);
   }
