@@ -284,7 +284,7 @@ declare module "tasks" {
      * @param data - Data to pass to action
      * @returns Promsie which resolves with results of calling RTDB
      */
-    export function callRtdb(adminInstance: any, action: RTDBAction, actionPath: string, options?: RTDBCommandOptions, data?: FixtureData): Promise<any>;
+    export function callRtdb(adminInstance: any, action: RTDBAction, actionPath: string, options?: RTDBCommandOptions, data?: FixtureData | string | boolean): Promise<any>;
     /**
      * Options for building Firestore commands
      */

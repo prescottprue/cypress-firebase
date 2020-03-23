@@ -16,8 +16,12 @@
     "watch:es": "yarn build:esm --watch",
     "lint": "eslint src/**.ts --ext .ts",
     "lint:fix": "yarn lint --fix",
-    "test": "mocha ./test/unit/**/*.spec.ts",
-    "test:cov": "nyc --reporter=lcov --reporter=html yarn test",
+    "test:base": "mocha ./test/unit/**/*.spec.ts",
+    "test:cov:base": "nyc --reporter=lcov --reporter=html yarn test:base",
+    "test:watch": "yarn test:base --watch",
+    "emulators": "firebase emulators:start --only firestore,database",
+    "test": "firebase emulators:exec --only firestore,database \"yarn test:base\"",
+    "test:cov": "firebase emulators:exec --only firestore,database \"yarn test:cov:base\"",
     "size": "yarn build && size-limit",
     "prepare": "yarn clean && yarn build"
   },
@@ -25,6 +29,7 @@
     "firebase-admin": "^8"
   },
   "devDependencies": {
+    "@firebase/testing": "^0.17.1",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@size-limit/preset-small-lib": "^4.4.1",
     "@types/chai": "^4.2.10",
