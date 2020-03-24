@@ -33,17 +33,37 @@ jobs:
           CI: true
         run: yarn install --frozen-lockfile
 
-      - name: Run Build
-        run: yarn build
-
       - name: Check For Lint
-        env:
-          CI: true
         run: yarn lint
+
+      - name: Expose Test Environment Variables
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_REF: ${{ github.ref }}
+        # Generate Service Account file required to prevent credential error (jq used to format)
+        run: |
+          echo "Generating Service Account File..."
+          echo "$(echo $SERVICE_ACCOUNT | jq .)" > $HOME/serviceAccount.json
+          echo "::set-env name=GOOGLE_APPLICATION_CREDENTIALS::$HOME/serviceAccount.json"
 
       - name: Run Unit Tests + Coverage
         if: success()
         run: yarn test:cov
+
+      - name: Run Build
+        run: yarn build
+
+      # Skipped since yarn isn't supported
+      # - name: Size Check
+      #   uses: andresz1/size-limit-action@v1.0.0
+      #   env:
+      #     CI_JOB_NUMBER: 1
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Size Check
+        run: yarn size
 
       - name: Upload Coverage
         if: success()

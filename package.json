@@ -1,6 +1,6 @@
 {
   "name": "cypress-firebase",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -16,15 +16,22 @@
     "watch:es": "yarn build:esm --watch",
     "lint": "eslint src/**.ts --ext .ts",
     "lint:fix": "yarn lint --fix",
-    "test": "mocha ./test/unit/**/*.spec.ts",
-    "test:cov": "nyc --reporter=lcov --reporter=html yarn test",
+    "test:base": "mocha ./test/unit/**/*.spec.ts --exit",
+    "test:cov:base": "nyc --reporter=lcov --reporter=html yarn test:base",
+    "test:watch": "yarn test:base --watch",
+    "emulators": "firebase emulators:start --only firestore,database",
+    "test": "firebase emulators:exec --only firestore,database \"yarn test:base\"",
+    "test:cov": "firebase emulators:exec --only firestore,database \"yarn test:cov:base\"",
+    "size": "yarn build && size-limit",
     "prepare": "yarn clean && yarn build"
   },
   "peerDependencies": {
     "firebase-admin": "^8"
   },
   "devDependencies": {
+    "@firebase/testing": "^0.17.1",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@size-limit/preset-small-lib": "^4.4.1",
     "@types/chai": "^4.2.10",
     "@types/mocha": "^7.0.2",
     "@types/node": "^13.9.3",
@@ -42,7 +49,7 @@
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.2",
     "firebase-admin": "^8.10.0",
-    "firebase-tools": "^7.15.0",
+    "firebase-tools": "^7.16.0",
     "husky": "^4.2.3",
     "lint-staged": "^10.0.8",
     "mocha": "^7.1.0",
@@ -51,6 +58,7 @@
     "rimraf": "^3.0.0",
     "sinon": "^9.0.0",
     "sinon-chai": "^3.5.0",
+    "size-limit": "^4.4.1",
     "source-map-support": "^0.5.16",
     "ts-node": "^8.8.1",
     "typescript": "^3.8.3"
@@ -93,5 +101,19 @@
     "*.{js,ts}": [
       "eslint --fix"
     ]
-  }
+  },
+  "size-limit": [
+    {
+      "name": "CommonJS",
+      "path": "lib/*.js",
+      "limit": "9kb",
+      "webpack": false
+    },
+    {
+      "name": "ESM",
+      "path": "lib-esm/*.js",
+      "limit": "8.5kb",
+      "webpack": false
+    }
+  ]
 }

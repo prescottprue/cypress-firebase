@@ -45,15 +45,6 @@ export default function pluginWithTasks(
   // Attach tasks to Cypress using on function
   cypressOnFunc('task', tasksWithFirebase);
 
-  // Enable cypress-firebase tasks support in custom commands
-  const modifiedConfig = {
-    ...cypressConfig,
-    env: {
-      ...(cypressConfig.env || {}),
-      useCypressFirebaseTasks: true,
-    },
-  };
-
   // Return extended config
-  return extendWithFirebaseConfig(modifiedConfig);
+  return extendWithFirebaseConfig(cypressConfig);
 }
