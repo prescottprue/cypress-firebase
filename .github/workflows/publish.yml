@@ -44,16 +44,16 @@ jobs:
           CI: true
         run: yarn lint
 
-    - name: Expose Test Environment Variables
-      env:
-        SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
-        GITHUB_HEAD_REF: ${{ github.head_ref }}
-        GITHUB_REF: ${{ github.ref }}
-      # Generate Service Account file required to prevent credential error (jq used to format)
-      run: |
-        echo "Generating Service Account File..."
-        echo "$(echo $SERVICE_ACCOUNT | jq .)" > $HOME/serviceAccount.json
-        echo "::set-env name=GOOGLE_APPLICATION_CREDENTIALS::$HOME/serviceAccount.json"
+      - name: Expose Test Environment Variables
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_REF: ${{ github.ref }}
+        # Generate Service Account file required to prevent credential error (jq used to format)
+        run: |
+          echo "Generating Service Account File..."
+          echo "$(echo $SERVICE_ACCOUNT | jq .)" > $HOME/serviceAccount.json
+          echo "::set-env name=GOOGLE_APPLICATION_CREDENTIALS::$HOME/serviceAccount.json"
 
       - name: Run Unit Tests + Coverage
         env:
