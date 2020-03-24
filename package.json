@@ -16,7 +16,7 @@
     "watch:es": "yarn build:esm --watch",
     "lint": "eslint src/**.ts --ext .ts",
     "lint:fix": "yarn lint --fix",
-    "test:base": "mocha ./test/unit/**/*.spec.ts",
+    "test:base": "mocha ./test/unit/**/*.spec.ts --exit",
     "test:cov:base": "nyc --reporter=lcov --reporter=html yarn test:base",
     "test:watch": "yarn test:base --watch",
     "emulators": "firebase emulators:start --only firestore,database",
