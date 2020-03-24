@@ -48,7 +48,7 @@ export function callRtdb(
   action: RTDBAction,
   actionPath: string,
   options?: RTDBCommandOptions,
-  data?: FixtureData,
+  data?: FixtureData | string | boolean,
 ): Promise<any> {
   /**
    * @param err - Error to handle
