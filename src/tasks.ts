@@ -2,7 +2,8 @@ import {
   FixtureData,
   FirestoreAction,
   RTDBAction,
-  RTDBCommandOptions,
+  CallRtdbOptions,
+  CallFirestoreOptions,
 } from './attachCustomCommands';
 import {
   slashPathToFirestoreRef,
@@ -15,7 +16,7 @@ import {
  * @param options - Options for ref
  * @returns RTDB Reference
  */
-function optionsToRtdbRef(baseRef: any, options?: RTDBCommandOptions): any {
+function optionsToRtdbRef(baseRef: any, options?: CallRtdbOptions): any {
   let newRef = baseRef;
   const optionsToAdd = [
     'orderByChild',
@@ -27,6 +28,7 @@ function optionsToRtdbRef(baseRef: any, options?: RTDBCommandOptions): any {
     'startAt',
     'endAt',
   ];
+  // TODO: Switch to reduce over options keys with baseRef as acc
   optionsToAdd.forEach((optionName: string) => {
     if (options && (options as any)[optionName]) {
       newRef = newRef[optionName]((options as any)[optionName]);
@@ -41,13 +43,13 @@ function optionsToRtdbRef(baseRef: any, options?: RTDBCommandOptions): any {
  * @param actionPath - Path in RTDB
  * @param options - Query options
  * @param data - Data to pass to action
- * @returns Promsie which resolves with results of calling RTDB
+ * @returns Promise which resolves with results of calling RTDB
  */
 export function callRtdb(
   adminInstance: any,
   action: RTDBAction,
   actionPath: string,
-  options?: RTDBCommandOptions,
+  options?: CallRtdbOptions,
   data?: FixtureData | string | boolean,
 ): Promise<any> {
   /**
@@ -79,6 +81,8 @@ export function callRtdb(
       })
       .catch(handleError);
   }
+
+  // Delete action
   const actionNameMap = {
     delete: 'remove',
   };
@@ -93,21 +97,6 @@ export function callRtdb(
       return null;
     })
     .catch(handleError);
-}
-
-/**
- * Options for building Firestore commands
- */
-export interface CallFirestoreOptions {
-  /**
-   * Whether or not to include createdAt and createdBy
-   */
-  withMeta?: boolean;
-  merge?: boolean;
-  /*
-   * Size of batch to use while deleting
-   */
-  batchSize?: number;
 }
 
 /**

@@ -1,3 +1,7 @@
+/**
+ * Params for attachCustomCommand function for
+ * attaching custom commands.
+ */
 export interface AttachCustomCommandParams {
   Cypress: any;
   cy: any;
@@ -16,28 +20,41 @@ export interface FixtureData {
   [k: string]: any;
 }
 
+type WhereOptions = [string, FirebaseFirestore.WhereFilterOp, any];
+
 /**
- * Options for building Firestore commands
+ * Options for callFirestore custom Cypress command.
  */
-export interface FirestoreCommandOptions {
+export interface CallFirestoreOptions {
   /**
    * Whether or not to include createdAt and createdBy
    */
   withMeta?: boolean;
   /**
-   * Extra command line arguments to add to command
+   * Merge during set
    */
-  args?: string[];
-  /**
-   * firebase-tools CI token
-   */
-  token?: string;
-  /**
-   * Whether or not to run recursive delete of collections
-   * and subcollections
-   */
-  recursive?: boolean;
   merge?: boolean;
+  /*
+   * Size of batch to use while deleting
+   */
+  batchSize?: number;
+  /**
+   * Filter documents by the specified field and the value should satisfy
+   * the relation constraint provided
+   */
+  where?: WhereOptions | WhereOptions[];
+  /**
+   * Order documents
+   */
+  orderBy?: string | [string, FirebaseFirestore.OrderByDirection];
+  /**
+   * Limit to n number of documents
+   */
+  limit?: number;
+  /**
+   * Limit to last n number of documents
+   */
+  limitToLast?: number;
 }
 
 /**
@@ -54,19 +71,11 @@ export type RTDBAction =
 /**
  * Options for callRtdb commands
  */
-export interface RTDBCommandOptions {
+export interface CallRtdbOptions {
   /**
    * Whether or not to include meta data
    */
   withMeta?: boolean;
-  /**
-   * Extra arguments
-   */
-  args?: string[];
-  /**
-   * CI Token
-   */
-  token?: string;
   /**
    * Limit to the last <num> results. If true is passed
    * than query is limited to last 1 item.
@@ -101,10 +110,6 @@ export interface RTDBCommandOptions {
    * Restrict results to <val> (based on specified ordering)
    */
   equalTo?: any;
-  /**
-   * Use the database <instance>.firebaseio.com (if omitted, use default database instance)
-   */
-  instance?: string;
 }
 
 // Add custom commands to the existing Cypress interface
@@ -143,8 +148,8 @@ declare global {
        * for admin privileges.
        * @param action - The action type to call with (set, push, update, remove)
        * @param actionPath - Path within RTDB that action should be applied
-       * @param opts - Options
-       * @param opts.args - Command line args to be passed
+       * @param dataOrOptions - Data to be used in write action or options to be used for query
+       * @param options - Options object
        * @see https://github.com/prescottprue/cypress-firebase#cycallrtdb
        * @example <caption>Set Data</caption>
        * const fakeProject = { some: 'data' }
@@ -157,8 +162,8 @@ declare global {
       callRtdb: (
         action: RTDBAction,
         actionPath: string,
-        fixtureDataOrPath?: FixtureData | string,
-        opts?: RTDBCommandOptions,
+        dataOrOptions?: FixtureData | string | boolean | CallRtdbOptions,
+        options?: CallRtdbOptions,
       ) => Chainable;
 
       /**
@@ -168,8 +173,8 @@ declare global {
        * firebase-tools is used (instead of firebaseExtra).
        * @param action - The action type to call with (set, push, update, remove)
        * @param actionPath - Path within RTDB that action should be applied
-       * @param opts - Options
-       * @param opts.args - Command line args to be passed
+       * @param dataOrOptions - Data to be used in write action or options to be used for query
+       * @param options - Options object
        * @see https://github.com/prescottprue/cypress-firebase#cycallfirestore
        * @example <caption>Set Data</caption>
        * const project = { some: 'data' }
@@ -189,8 +194,8 @@ declare global {
       callFirestore: (
         action: FirestoreAction,
         actionPath: string,
-        fixtureDataOrPath?: FixtureData | string,
-        opts?: FirestoreCommandOptions,
+        dataOrOptions?: FixtureData | string | boolean | CallFirestoreOptions,
+        options?: CallFirestoreOptions,
       ) => Chainable;
     }
   }
@@ -312,8 +317,8 @@ export default function attachCustomCommands(
    * FIREBASE_TOKEN since firebase-tools is used (instead of firebaseExtra).
    * @param action - The action type to call with (set, push, update, remove)
    * @param actionPath - Path within RTDB that action should be applied
-   * @param opts - Options
-   * @param opts.args - Command line args to be passed
+   * @param options - Options
+   * @param options.args - Command line args to be passed
    * @name cy.callRtdb
    */
   Cypress.Commands.add(
@@ -321,8 +326,8 @@ export default function attachCustomCommands(
     (
       action: RTDBAction,
       actionPath: string,
-      data?: any,
-      opts?: RTDBCommandOptions,
+      dataOrOptions?: any,
+      options?: CallRtdbOptions,
     ) => {
       const taskSettings: any = {
         action,
@@ -331,11 +336,11 @@ export default function attachCustomCommands(
       // Add data only for write actions
       if (['set', 'update', 'push'].includes(action)) {
         // If exists, create a copy to original object is not modified
-        const dataIsObject = getTypeStr(data) === 'object';
-        const dataToWrite = dataIsObject ? { ...data } : data;
+        const dataIsObject = getTypeStr(dataOrOptions) === 'object';
+        const dataToWrite = dataIsObject ? { ...dataOrOptions } : dataOrOptions;
 
         // Add metadata to dataToWrite if specified by options
-        if (dataIsObject && opts?.withMeta) {
+        if (dataIsObject && options?.withMeta) {
           if (!dataToWrite.createdBy) {
             dataToWrite.createdBy = Cypress.env('TEST_UID');
           }
@@ -347,10 +352,10 @@ export default function attachCustomCommands(
       }
       // Use third argument as options for get action
       if (action === 'get') {
-        taskSettings.options = data;
-      } else if (opts) {
+        taskSettings.options = dataOrOptions;
+      } else if (options) {
         // Attach options if they exist
-        taskSettings.options = opts;
+        taskSettings.options = options;
       }
       return cy.task('callRtdb', taskSettings);
     },
@@ -361,8 +366,8 @@ export default function attachCustomCommands(
    * level. If using delete, auth is through `FIREBASE_TOKEN` since firebase-tools is used (instead of firebaseExtra).
    * @param action - The action type to call with (set, push, update, remove)
    * @param actionPath - Path within RTDB that action should be applied
-   * @param opts - Options
-   * @param opts.args - Command line args to be passed
+   * @param options - Options
+   * @param options.args - Command line args to be passed
    * @name cy.callFirestore
    */
   Cypress.Commands.add(
@@ -370,8 +375,8 @@ export default function attachCustomCommands(
     (
       action: FirestoreAction,
       actionPath: string,
-      data: any,
-      opts: FirestoreCommandOptions,
+      dataOrOptions: any,
+      options: CallFirestoreOptions,
     ): void => {
       const taskSettings: any = {
         action,
@@ -380,11 +385,11 @@ export default function attachCustomCommands(
       // Add data only for write actions
       if (['set', 'update', 'add'].includes(action)) {
         // If data is an object, create a copy to original object is not modified
-        const dataIsObject = getTypeStr(data) === 'object';
-        const dataToWrite = dataIsObject ? { ...data } : data;
+        const dataIsObject = getTypeStr(dataOrOptions) === 'object';
+        const dataToWrite = dataIsObject ? { ...dataOrOptions } : dataOrOptions;
 
         // Add metadata to dataToWrite if specified by options
-        if (dataIsObject && opts?.withMeta) {
+        if (dataIsObject && options?.withMeta) {
           if (!dataToWrite.createdBy) {
             dataToWrite.createdBy = Cypress.env('TEST_UID');
           }
@@ -396,10 +401,10 @@ export default function attachCustomCommands(
       }
       // Use third argument as options for get action
       if (action === 'get') {
-        taskSettings.options = data;
-      } else if (opts) {
+        taskSettings.options = dataOrOptions;
+      } else if (options) {
         // Attach options if they exist
-        taskSettings.options = opts;
+        taskSettings.options = options;
       }
       return cy.task('callFirestore', taskSettings);
     },

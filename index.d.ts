@@ -1,4 +1,8 @@
 declare module "attachCustomCommands" {
+    /**
+     * Params for attachCustomCommand function for
+     * attaching custom commands.
+     */
     export interface AttachCustomCommandParams {
         Cypress: any;
         cy: any;
@@ -14,28 +18,37 @@ declare module "attachCustomCommands" {
     export interface FixtureData {
         [k: string]: any;
     }
+    type WhereOptions = [string, FirebaseFirestore.WhereFilterOp, any];
     /**
-     * Options for building Firestore commands
+     * Options for callFirestore custom Cypress command.
      */
-    export interface FirestoreCommandOptions {
+    export interface CallFirestoreOptions {
         /**
          * Whether or not to include createdAt and createdBy
          */
         withMeta?: boolean;
         /**
-         * Extra command line arguments to add to command
+         * Merge during set
          */
-        args?: string[];
-        /**
-         * firebase-tools CI token
-         */
-        token?: string;
-        /**
-         * Whether or not to run recursive delete of collections
-         * and subcollections
-         */
-        recursive?: boolean;
         merge?: boolean;
+        batchSize?: number;
+        /**
+         * Filter documents by the specified field and the value should satisfy
+         * the relation constraint provided
+         */
+        where?: WhereOptions | WhereOptions[];
+        /**
+         * Order documents
+         */
+        orderBy?: string | [string, FirebaseFirestore.OrderByDirection];
+        /**
+         * Limit to n number of documents
+         */
+        limit?: number;
+        /**
+         * Limit to last n number of documents
+         */
+        limitToLast?: number;
     }
     /**
      * Action for Real Time Database
@@ -44,19 +57,11 @@ declare module "attachCustomCommands" {
     /**
      * Options for callRtdb commands
      */
-    export interface RTDBCommandOptions {
+    export interface CallRtdbOptions {
         /**
          * Whether or not to include meta data
          */
         withMeta?: boolean;
-        /**
-         * Extra arguments
-         */
-        args?: string[];
-        /**
-         * CI Token
-         */
-        token?: string;
         /**
          * Limit to the last <num> results. If true is passed
          * than query is limited to last 1 item.
@@ -91,10 +96,6 @@ declare module "attachCustomCommands" {
          * Restrict results to <val> (based on specified ordering)
          */
         equalTo?: any;
-        /**
-         * Use the database <instance>.firebaseio.com (if omitted, use default database instance)
-         */
-        instance?: string;
     }
     global {
         namespace Cypress {
@@ -127,8 +128,8 @@ declare module "attachCustomCommands" {
                  * for admin privileges.
                  * @param action - The action type to call with (set, push, update, remove)
                  * @param actionPath - Path within RTDB that action should be applied
-                 * @param opts - Options
-                 * @param opts.args - Command line args to be passed
+                 * @param dataOrOptions - Data to be used in write action or options to be used for query
+                 * @param options - Options object
                  * @see https://github.com/prescottprue/cypress-firebase#cycallrtdb
                  * @example <caption>Set Data</caption>
                  * const fakeProject = { some: 'data' }
@@ -138,7 +139,7 @@ declare module "attachCustomCommands" {
                  * // Adds createdAt and createdBy (current user's uid) on data
                  * cy.callRtdb('set', 'projects/ABC123', fakeProject, { withMeta: true })
                  */
-                callRtdb: (action: RTDBAction, actionPath: string, fixtureDataOrPath?: FixtureData | string, opts?: RTDBCommandOptions) => Chainable;
+                callRtdb: (action: RTDBAction, actionPath: string, dataOrOptions?: FixtureData | string | boolean | CallRtdbOptions, options?: CallRtdbOptions) => Chainable;
                 /**
                  * Call Firestore instance with some specified action. Authentication is through
                  * serviceAccount.json since it is at the base
@@ -146,8 +147,8 @@ declare module "attachCustomCommands" {
                  * firebase-tools is used (instead of firebaseExtra).
                  * @param action - The action type to call with (set, push, update, remove)
                  * @param actionPath - Path within RTDB that action should be applied
-                 * @param opts - Options
-                 * @param opts.args - Command line args to be passed
+                 * @param dataOrOptions - Data to be used in write action or options to be used for query
+                 * @param options - Options object
                  * @see https://github.com/prescottprue/cypress-firebase#cycallfirestore
                  * @example <caption>Set Data</caption>
                  * const project = { some: 'data' }
@@ -164,7 +165,7 @@ declare module "attachCustomCommands" {
                  *   cy.callFirestore('add', 'projects', project)
                  * })
                  */
-                callFirestore: (action: FirestoreAction, actionPath: string, fixtureDataOrPath?: FixtureData | string, opts?: FirestoreCommandOptions) => Chainable;
+                callFirestore: (action: FirestoreAction, actionPath: string, dataOrOptions?: FixtureData | string | boolean | CallFirestoreOptions, options?: CallFirestoreOptions) => Chainable;
             }
         }
     }
@@ -238,6 +239,7 @@ declare module "node-utils" {
 }
 declare module "firebase-utils" {
     import * as admin from 'firebase-admin';
+    import { CallFirestoreOptions } from "attachCustomCommands";
     /**
      * Check whether a value is a string or not
      * @param valToCheck - Value to check
@@ -265,7 +267,7 @@ declare module "firebase-utils" {
      * @param options - Options object
      * @returns Ref at slash path
      */
-    export function slashPathToFirestoreRef(firestoreInstance: any, slashPath: string, options?: any): admin.firestore.CollectionReference | admin.firestore.DocumentReference | admin.firestore.Query;
+    export function slashPathToFirestoreRef(firestoreInstance: any, slashPath: string, options?: CallFirestoreOptions): admin.firestore.CollectionReference | admin.firestore.DocumentReference | admin.firestore.Query;
     /**
      * @param db - Firestore instance
      * @param collectionPath - Path of collection
@@ -275,27 +277,16 @@ declare module "firebase-utils" {
     export function deleteCollection(db: any, collectionPath: string, batchSize?: number): Promise<any>;
 }
 declare module "tasks" {
-    import { FixtureData, FirestoreAction, RTDBAction, RTDBCommandOptions } from "attachCustomCommands";
+    import { FixtureData, FirestoreAction, RTDBAction, CallRtdbOptions, CallFirestoreOptions } from "attachCustomCommands";
     /**
      * @param adminInstance - firebase-admin instance
      * @param action - Action to run
      * @param actionPath - Path in RTDB
      * @param options - Query options
      * @param data - Data to pass to action
-     * @returns Promsie which resolves with results of calling RTDB
+     * @returns Promise which resolves with results of calling RTDB
      */
-    export function callRtdb(adminInstance: any, action: RTDBAction, actionPath: string, options?: RTDBCommandOptions, data?: FixtureData | string | boolean): Promise<any>;
-    /**
-     * Options for building Firestore commands
-     */
-    export interface CallFirestoreOptions {
-        /**
-         * Whether or not to include createdAt and createdBy
-         */
-        withMeta?: boolean;
-        merge?: boolean;
-        batchSize?: number;
-    }
+    export function callRtdb(adminInstance: any, action: RTDBAction, actionPath: string, options?: CallRtdbOptions, data?: FixtureData | string | boolean): Promise<any>;
     /**
      * @param adminInstance - firebase-admin instance
      * @param action - Action to run

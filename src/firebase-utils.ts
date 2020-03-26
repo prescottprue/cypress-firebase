@@ -1,5 +1,6 @@
 import * as admin from 'firebase-admin';
 import { getServiceAccount } from './node-utils';
+import { CallFirestoreOptions } from './attachCustomCommands';
 
 /**
  * Check whether a value is a string or not
@@ -153,7 +154,7 @@ export function isDocPath(slashPath: string): boolean {
 export function slashPathToFirestoreRef(
   firestoreInstance: any,
   slashPath: string,
-  options?: any,
+  options?: CallFirestoreOptions,
 ):
   | admin.firestore.CollectionReference
   | admin.firestore.DocumentReference
@@ -168,11 +169,23 @@ export function slashPathToFirestoreRef(
 
   // Apply orderBy to query if it exists
   if (options?.orderBy && typeof ref.orderBy === 'function') {
-    ref = ref.orderBy(options.orderBy);
+    if (Array.isArray(options.orderBy)) {
+      ref = ref.orderBy(...options.orderBy);
+    } else {
+      ref = ref.orderBy(options.orderBy);
+    }
   }
   // Apply where to query if it exists
-  if (options?.where && typeof ref.where === 'function') {
-    ref = ref.where(...options.where);
+  if (
+    options?.where &&
+    Array.isArray(options.where) &&
+    typeof ref.where === 'function'
+  ) {
+    if (Array.isArray(options.where[0])) {
+      ref = ref.where(...options.where[0]).where(...options.where[1]);
+    } else {
+      ref = ref.where(...options.where);
+    }
   }
 
   // Apply limit to query if it exists
@@ -196,13 +209,13 @@ export function slashPathToFirestoreRef(
  */
 function deleteQueryBatch(
   db: any,
-  query: any,
+  query: admin.firestore.CollectionReference,
   resolve: Function,
-  reject: Function,
+  reject: any,
 ): void {
   query
     .get()
-    .then((snapshot: any) => {
+    .then((snapshot: admin.firestore.QuerySnapshot) => {
       // When there are no documents left, we are done
       if (snapshot.size === 0) {
         return 0;
@@ -210,7 +223,7 @@ function deleteQueryBatch(
 
       // Delete documents in a batch
       const batch = db.batch();
-      snapshot.docs.forEach((doc: any) => {
+      snapshot.docs.forEach((doc: admin.firestore.QueryDocumentSnapshot) => {
         batch.delete(doc.ref);
       });
 

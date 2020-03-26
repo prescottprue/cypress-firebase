@@ -1,6 +1,6 @@
 {
   "name": "cypress-firebase",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -54,8 +54,8 @@
     "lint-staged": "^10.0.8",
     "mocha": "^7.1.0",
     "nyc": "^15.0.0",
-    "prettier": "^2.0.1",
-    "rimraf": "^3.0.0",
+    "prettier": "^2.0.2",
+    "rimraf": "^3.0.2",
     "sinon": "^9.0.0",
     "sinon-chai": "^3.5.0",
     "size-limit": "^4.4.1",
