@@ -179,6 +179,7 @@ describe('tasks', () => {
       it('updates a document', async () => {
         const testValue = 'updatetest';
         await projectFirestoreRef.set(testProject);
+        await projectsFirestoreRef.add({ some: 'other' });
         await tasks.callFirestore(
           admin,
           'update',
