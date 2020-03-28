@@ -1,7 +1,9 @@
 # cypress-firebase
 
 [![NPM version][npm-image]][npm-url]
+[![NPM downloads][npm-downloads-image]][npm-url]
 [![Build Status][build-status-image]][build-status-url]
+[![Coverage][coverage-image]][coverage-url]
 [![License][license-image]][license-url]
 [![Code Style][code-style-image]][code-style-url]
 
@@ -523,10 +525,11 @@ When testing, tests should have admin read/write access to the database for seed
 [fireadmin-source]: https://github.com/prescottprue/fireadmin
 [npm-image]: https://img.shields.io/npm/v/cypress-firebase.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/cypress-firebase
+[npm-downloads-image]: https://img.shields.io/npm/dm/cypress-firebase.svg?style=flat-square
 [build-status-image]: https://img.shields.io/github/workflow/status/prescottprue/cypress-firebase/NPM%20Package%20Publish?style=flat-square
 [build-status-url]: https://github.com/prescottprue/cypress-firebase/actions
-[climate-image]: https://img.shields.io/codeclimate/github/prescottprue/cypress-firebase.svg?style=flat-square
-[climate-url]: https://codeclimate.com/github/prescottprue/cypress-firebase
+[coverage-image]: https://img.shields.io/codecov/c/gh/prescottprue/cypress-firebase?style=flat-square
+[coverage-url]: https://codecov.io/gh/prescottprue/cypress-firebase
 [license-image]: https://img.shields.io/npm/l/cypress-firebase.svg?style=flat-square
 [license-url]: https://github.com/prescottprue/cypress-firebase/blob/master/LICENSE
 [code-style-image]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square
