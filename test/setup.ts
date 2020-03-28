@@ -1,13 +1,20 @@
 /* eslint-disable no-unused-vars */
 import chai from 'chai';
-import sinon from 'sinon';
 import sinonChai from 'sinon-chai';
 
+const projectId = 'test-project';
+const databaseEmulatorPort = 9000;
+const firstoreEmulatorPort = 8080;
+const databaseURL = `http://localhost:${databaseEmulatorPort}?ns=${projectId}`;
+
+// Set environment variables
 process.env.NODE_ENV = 'test';
+process.env.GCLOUD_PROJECT = projectId;
+process.env.FIREBASE_DATABASE_EMULATOR_HOST = `localhost:${databaseEmulatorPort}`;
+process.env.FIRESTORE_EMULATOR_HOST = `localhost:${firstoreEmulatorPort}`;
 
 chai.use(sinonChai);
 
-// globals
-(global as any).expect = chai.expect;
-(global as any).sinon = sinon;
-(global as any).chai = chai;
+// Set global variables
+(global as any).projectId = projectId;
+(global as any).databaseURL = databaseURL;

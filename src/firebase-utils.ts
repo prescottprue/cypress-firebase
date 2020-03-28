@@ -1,9 +1,6 @@
 import * as admin from 'firebase-admin';
-import { get } from 'lodash';
-import {
-  getServiceAccount,
-  getServiceAccountWithoutWarning,
-} from './node-utils';
+import { getServiceAccount } from './node-utils';
+import { CallFirestoreOptions } from './attachCustomCommands';
 
 /**
  * Check whether a value is a string or not
@@ -12,24 +9,6 @@ import {
  */
 export function isString(valToCheck: any): boolean {
   return typeof valToCheck === 'string' || valToCheck instanceof String;
-}
-
-/**
- * Get projectId for emulated project. Attempts to load from
- * FIREBASE_PROJECT or FIREBASE_PROJECT_ID from environment variables
- * within node environment or from the cypress environment. If not
- * found within environment, falls back to serviceAccount.json file
- * then defaults to "test".
- * @returns projectId for emulated project
- */
-function getEmulatedProjectId(): string {
-  // Get service account from local file falling back to environment variables
-  const { GCLOUD_PROJECT } = process.env;
-  if (GCLOUD_PROJECT) {
-    return GCLOUD_PROJECT;
-  }
-  const serviceAccount = getServiceAccountWithoutWarning();
-  return serviceAccount?.project_id || 'test';
 }
 
 /**
@@ -76,8 +55,12 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
     ) {
       // TODO: Look into using @firebase/testing in place of admin here to allow for
       // usage of clearFirestoreData (see https://github.com/prescottprue/cypress-firebase/issues/73 for more info)
-      const projectId = getEmulatedProjectId();
-
+      const serviceAccount = getServiceAccount();
+      const projectId =
+        process.env.GCLOUD_PROJECT ||
+        process.env.FIREBASE_PROJECT ||
+        process.env.FIREBASE_PROJECT_ID ||
+        serviceAccount?.project_id;
       const fbConfig: any = {
         projectId,
       };
@@ -89,12 +72,14 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
           process.env.FIREBASE_DATABASE_EMULATOR_HOST
         }?ns=${fbConfig.projectId || 'local'}`;
         /* eslint-disable no-console */
-        console.log('Using RTDB emulator with DB URL:', fbConfig.databaseURL);
+        console.log(
+          'cypress-firebase: Using RTDB emulator with DB URL:',
+          fbConfig.databaseURL,
+        );
         /* eslint-enable no-console */
       }
 
       // Add service account credential if it exists so that custom auth tokens can be generated
-      const serviceAccount = getServiceAccountWithoutWarning();
       if (serviceAccount) {
         fbConfig.credential = adminInstance.credential.cert(serviceAccount);
       }
@@ -106,7 +91,7 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
         const firestoreSettings = firestoreSettingsFromEnv();
         /* eslint-disable no-console */
         console.log(
-          'Using Firestore emulator with settings:',
+          'cypress-firebase: Using Firestore emulator with settings:',
           firestoreSettings,
         );
         /* eslint-enable no-console */
@@ -115,20 +100,20 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
     } else {
       // Get service account from local file falling back to environment variables
       const serviceAccount = getServiceAccount();
-      const projectId = get(serviceAccount, 'project_id');
+      const projectId = serviceAccount?.project_id;
       if (!isString(projectId)) {
         const missingProjectIdErr =
           'Error project_id from service account to initialize Firebase.';
-        console.error(missingProjectIdErr); // eslint-disable-line no-console
+        console.error(`cypress-firebase: ${missingProjectIdErr}`); // eslint-disable-line no-console
         throw new Error(missingProjectIdErr);
       }
-      const cleanProjectId = projectId.replace(
+      const cleanProjectId = (projectId as string).replace(
         'firebase-top-agent-int',
         'top-agent-int',
       );
       /* eslint-disable no-console */
       console.log(
-        `Initialized with Service Account for project "${cleanProjectId}"`,
+        `cypress-firebase: Initialized with Service Account for project "${cleanProjectId}"`,
       );
       /* eslint-enable no-console */
       fbInstance = adminInstance.initializeApp({
@@ -136,11 +121,13 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
         databaseURL: `https://${cleanProjectId}.firebaseio.com`,
       });
     }
+
     return fbInstance;
   } catch (err) {
     /* eslint-disable no-console */
     console.error(
-      'Error initializing firebase-admin instance from service account.',
+      'cypress-firebase: Error initializing firebase-admin instance:',
+      err.message,
     );
     /* eslint-enable no-console */
     throw err;
@@ -167,7 +154,7 @@ export function isDocPath(slashPath: string): boolean {
 export function slashPathToFirestoreRef(
   firestoreInstance: any,
   slashPath: string,
-  options?: any,
+  options?: CallFirestoreOptions,
 ):
   | admin.firestore.CollectionReference
   | admin.firestore.DocumentReference
@@ -182,11 +169,23 @@ export function slashPathToFirestoreRef(
 
   // Apply orderBy to query if it exists
   if (options?.orderBy && typeof ref.orderBy === 'function') {
-    ref = ref.orderBy(options.orderBy);
+    if (Array.isArray(options.orderBy)) {
+      ref = ref.orderBy(...options.orderBy);
+    } else {
+      ref = ref.orderBy(options.orderBy);
+    }
   }
   // Apply where to query if it exists
-  if (options?.where && typeof ref.where === 'function') {
-    ref = ref.where(...options.where);
+  if (
+    options?.where &&
+    Array.isArray(options.where) &&
+    typeof ref.where === 'function'
+  ) {
+    if (Array.isArray(options.where[0])) {
+      ref = ref.where(...options.where[0]).where(...options.where[1]);
+    } else {
+      ref = ref.where(...options.where);
+    }
   }
 
   // Apply limit to query if it exists
@@ -210,13 +209,13 @@ export function slashPathToFirestoreRef(
  */
 function deleteQueryBatch(
   db: any,
-  query: any,
+  query: admin.firestore.CollectionReference,
   resolve: Function,
-  reject: Function,
+  reject: any,
 ): void {
   query
     .get()
-    .then((snapshot: any) => {
+    .then((snapshot: admin.firestore.QuerySnapshot) => {
       // When there are no documents left, we are done
       if (snapshot.size === 0) {
         return 0;
@@ -224,7 +223,7 @@ function deleteQueryBatch(
 
       // Delete documents in a batch
       const batch = db.batch();
-      snapshot.docs.forEach((doc: any) => {
+      snapshot.docs.forEach((doc: admin.firestore.QueryDocumentSnapshot) => {
         batch.delete(doc.ref);
       });
 

@@ -12,17 +12,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Check package version
         uses: technote-space/package-version-check-action@v1
         with:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
-      - name: Setup Node
+      - name: Use Node 12
         uses: actions/setup-node@v1
         with:
           node-version: 12
+          registry-url: https://registry.npmjs.org/
 
       - name: Get yarn cache
         id: yarn-cache
@@ -43,15 +44,40 @@ jobs:
           CI: true
         run: yarn lint
 
+      - name: Expose Test Environment Variables
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_REF: ${{ github.ref }}
+        # Generate Service Account file required to prevent credential error (jq used to format)
+        run: |
+          echo "Generating Service Account File..."
+          echo "$(echo $SERVICE_ACCOUNT | jq .)" > $HOME/serviceAccount.json
+          echo "::set-env name=GOOGLE_APPLICATION_CREDENTIALS::$HOME/serviceAccount.json"
+
       - name: Run Unit Tests + Coverage
         env:
           CI: true
           CODE_CLIMATE: ${{ secrets.CODE_CLIMATE }}
         run: yarn test:cov && yarn codecov
 
+      - name: Run Build
+        run: yarn build
+
+      # Skipped since yarn isn't supported
+      # - name: Size Check
+      #   uses: andresz1/size-limit-action@v1.0.0
+      #   env:
+      #     CI_JOB_NUMBER: 1
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Size Check
+        run: yarn size
+
       - name: Publish
         env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_REF: ${{ github.ref }}
         run: |
           export GIT_BRANCH=${GITHUB_REF##*/}

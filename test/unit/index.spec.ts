@@ -1,5 +1,6 @@
-import { attachCustomCommands, extendWithFirebaseConfig } from '../../src';
 import { expect } from 'chai';
+import { attachCustomCommands } from '../../src';
+import extendWithFirebaseConfig from '../../src/extendWithFirebaseConfig';
 
 describe('Main index', () => {
   it('Should export "attachCustomCommands" function', () => {

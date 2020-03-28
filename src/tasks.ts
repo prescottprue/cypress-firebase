@@ -1,5 +1,11 @@
-import { FixtureData, FirestoreAction } from './buildFirestoreCommand';
-import { RTDBAction, RTDBCommandOptions } from './buildRtdbCommand';
+import * as admin from 'firebase-admin'; // NOTE: Only used for types
+import {
+  FixtureData,
+  FirestoreAction,
+  RTDBAction,
+  CallRtdbOptions,
+  CallFirestoreOptions,
+} from './attachCustomCommands';
 import {
   slashPathToFirestoreRef,
   deleteCollection,
@@ -11,7 +17,7 @@ import {
  * @param options - Options for ref
  * @returns RTDB Reference
  */
-function optionsToRtdbRef(baseRef: any, options?: RTDBCommandOptions): any {
+function optionsToRtdbRef(baseRef: any, options?: CallRtdbOptions): any {
   let newRef = baseRef;
   const optionsToAdd = [
     'orderByChild',
@@ -23,6 +29,7 @@ function optionsToRtdbRef(baseRef: any, options?: RTDBCommandOptions): any {
     'startAt',
     'endAt',
   ];
+  // TODO: Switch to reduce over options keys with baseRef as acc
   optionsToAdd.forEach((optionName: string) => {
     if (options && (options as any)[optionName]) {
       newRef = newRef[optionName]((options as any)[optionName]);
@@ -37,14 +44,14 @@ function optionsToRtdbRef(baseRef: any, options?: RTDBCommandOptions): any {
  * @param actionPath - Path in RTDB
  * @param options - Query options
  * @param data - Data to pass to action
- * @returns Promsie which resolves with results of calling RTDB
+ * @returns Promise which resolves with results of calling RTDB
  */
 export function callRtdb(
   adminInstance: any,
   action: RTDBAction,
   actionPath: string,
-  options?: RTDBCommandOptions,
-  data?: FixtureData,
+  options?: CallRtdbOptions,
+  data?: FixtureData | string | boolean,
 ): Promise<any> {
   /**
    * @param err - Error to handle
@@ -52,22 +59,22 @@ export function callRtdb(
    */
   function handleError(err: Error): Promise<any> {
     /* eslint-disable no-console */
-    console.error(`Error with RTDB "${action}" at path "${actionPath}" :`, err);
+    console.error(
+      `cypress-firebase: Error with RTDB "${action}" at path "${actionPath}" :`,
+      err,
+    );
     /* eslint-enable no-console */
     return Promise.reject(err);
   }
   if (action === 'get') {
     return optionsToRtdbRef(adminInstance.database().ref(actionPath), options)
       .once('value')
-      .then((snap: any): any => snap.val())
+      .then((snap: admin.database.DataSnapshot): any => snap.val())
       .catch(handleError);
   }
 
   if (action === 'push') {
-    const pushRef = adminInstance
-      .database()
-      .ref(actionPath)
-      .push();
+    const pushRef = adminInstance.database().ref(actionPath).push();
     return pushRef
       .set(data)
       .then(() => {
@@ -75,6 +82,8 @@ export function callRtdb(
       })
       .catch(handleError);
   }
+
+  // Delete action
   const actionNameMap = {
     delete: 'remove',
   };
@@ -89,21 +98,6 @@ export function callRtdb(
       return null;
     })
     .catch(handleError);
-}
-
-/**
- * Options for building Firestore commands
- */
-export interface CallFirestoreOptions {
-  /**
-   * Whether or not to include createdAt and createdBy
-   */
-  withMeta?: boolean;
-  merge?: boolean;
-  /*
-   * Size of batch to use while deleting
-   */
-  batchSize?: number;
 }
 
 /**
@@ -128,7 +122,7 @@ export function callFirestore(
   function handleError(err: Error): Promise<any> {
     /* eslint-disable no-console */
     console.error(
-      `Error with Firestore "${action}" at path "${actionPath}" :`,
+      `cypress-firebase: Error with Firestore "${action}" at path "${actionPath}" :`,
       err,
     );
     /* eslint-enable no-console */
@@ -142,7 +136,7 @@ export function callFirestore(
     ) as any)
       .get()
       .then((snap: any) => {
-        if (snap && typeof snap.docs?.map === 'function') {
+        if (snap && snap.docs?.length && typeof snap.docs.map === 'function') {
           return snap.docs.map(
             (docSnap: FirebaseFirestore.DocumentSnapshot) => ({
               ...docSnap.data(),
@@ -152,7 +146,7 @@ export function callFirestore(
         }
         // Falling back to null in the case of falsey value prevents Cypress error with message:
         // "You must return a promise, a value, or null to indicate that the task was handled."
-        return snap?.data() || null;
+        return (snap && typeof snap.data === 'function' && snap.data()) || null;
       })
       .catch(handleError);
   }

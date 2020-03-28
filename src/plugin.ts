@@ -22,7 +22,7 @@ export default function pluginWithTasks(
   // Parse single argument from task into arguments for task methods while
   // also passing the admin instance
   const tasksWithFirebase: Record<string, Function> = {};
-  Object.keys(tasks).forEach(taskName => {
+  Object.keys(tasks).forEach((taskName) => {
     tasksWithFirebase[taskName] = (taskSettings: any): any => {
       if (taskSettings?.uid) {
         return tasks.createCustomToken(
@@ -45,15 +45,6 @@ export default function pluginWithTasks(
   // Attach tasks to Cypress using on function
   cypressOnFunc('task', tasksWithFirebase);
 
-  // Enable cypress-firebase tasks support in custom commands
-  const modifiedConfig = {
-    ...cypressConfig,
-    env: {
-      ...(cypressConfig.env || {}),
-      useCypressFirebaseTasks: true,
-    },
-  };
-
   // Return extended config
-  return extendWithFirebaseConfig(modifiedConfig);
+  return extendWithFirebaseConfig(cypressConfig);
 }

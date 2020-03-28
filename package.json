@@ -1,6 +1,6 @@
 {
   "name": "cypress-firebase",
-  "version": "0.11.0",
+  "version": "1.0.0",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -12,60 +12,55 @@
     "build:typefile": "tsc --declaration --outFile index.d.ts --emitDeclarationOnly",
     "build:lib": "tsc",
     "build:esm": "tsc -m es6 --outDir lib-esm",
-    "watch": "yarn build:lib -- --watch",
-    "watch:es": "yarn build:es -- --watch",
+    "watch": "yarn build:lib --watch",
+    "watch:es": "yarn build:esm --watch",
     "lint": "eslint src/**.ts --ext .ts",
-    "lint:fix": "yarn lint -- --fix",
-    "test": "mocha",
-    "test:cov": "nyc --reporter=lcov --reporter=html yarn test",
-    "codecov": "cat coverage/lcov.info | codecov",
+    "lint:fix": "yarn lint --fix",
+    "test:base": "mocha ./test/unit/**/*.spec.ts",
+    "test:cov:base": "nyc --reporter=lcov --reporter=html yarn test:base",
+    "test:watch": "yarn test:base --watch",
+    "emulators": "firebase emulators:start --only firestore,database",
+    "test": "firebase emulators:exec --only firestore,database \"yarn test:base\"",
+    "test:cov": "firebase emulators:exec --only firestore,database \"yarn test:cov:base\"",
+    "size": "yarn build && size-limit",
     "prepare": "yarn clean && yarn build"
   },
-  "bin": {
-    "cypress-firebase": "./bin/cypress-firebase"
-  },
   "peerDependencies": {
-    "firebase-tools": "^6 || ^7"
-  },
-  "dependencies": {
-    "chalk": "^3.0.0",
-    "commander": "^4.1.0",
-    "figures": "^3.2.0",
-    "firebase-admin": "^8.9.2",
-    "firebase-tools-extra": "0.5.2",
-    "lodash": "^4.17.15"
+    "firebase-admin": "^8"
   },
   "devDependencies": {
+    "@firebase/testing": "^0.17.1",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@size-limit/preset-small-lib": "^4.4.1",
     "@types/chai": "^4.2.10",
-    "@types/lodash": "^4.14.149",
     "@types/mocha": "^7.0.2",
-    "@types/node": "^13.9.0",
+    "@types/node": "^13.9.3",
     "@types/sinon-chai": "^3.2.3",
-    "@typescript-eslint/eslint-plugin": "^2.23.0",
-    "@typescript-eslint/parser": "^2.23.0",
+    "@typescript-eslint/eslint-plugin": "^2.24.0",
+    "@typescript-eslint/parser": "^2.24.0",
     "chai": "^4.2.0",
     "codecov": "^3.6.5",
-    "cross-env": "^7.0.2",
     "eslint": "^6.8.0",
-    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-airbnb-base": "^14.1.0",
     "eslint-config-prettier": "^6.10.0",
     "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-import": "^2.20.0",
-    "eslint-plugin-jsdoc": "^22.0.0",
+    "eslint-plugin-jsdoc": "^22.1.0",
     "eslint-plugin-jsx-a11y": "^6.2.3",
     "eslint-plugin-prettier": "^3.1.2",
-    "firebase-tools": "^7.14.0",
+    "firebase-admin": "^8.10.0",
+    "firebase-tools": "^7.16.0",
     "husky": "^4.2.3",
     "lint-staged": "^10.0.8",
     "mocha": "^7.1.0",
     "nyc": "^15.0.0",
-    "prettier": "^1.19.1",
-    "rimraf": "^3.0.0",
+    "prettier": "^2.0.2",
+    "rimraf": "^3.0.2",
     "sinon": "^9.0.0",
-    "sinon-chai": "^3.4.0",
+    "sinon-chai": "^3.5.0",
+    "size-limit": "^4.4.1",
     "source-map-support": "^0.5.16",
-    "ts-node": "^8.6.2",
+    "ts-node": "^8.8.1",
     "typescript": "^3.8.3"
   },
   "keywords": [
@@ -96,12 +91,29 @@
   ],
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "yarn build:typefile && git add . && lint-staged"
     }
   },
   "lint-staged": {
-    "*.{ts}": [
+    "*.{json,md}": [
+      "prettier --write"
+    ],
+    "*.{js,ts}": [
       "eslint --fix"
     ]
-  }
+  },
+  "size-limit": [
+    {
+      "name": "CommonJS",
+      "path": "lib/*.js",
+      "limit": "9kb",
+      "webpack": false
+    },
+    {
+      "name": "ESM",
+      "path": "lib-esm/*.js",
+      "limit": "8.5kb",
+      "webpack": false
+    }
+  ]
 }

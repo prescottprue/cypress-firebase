@@ -1,7 +1,4 @@
 import attachCustomCommands from './attachCustomCommands';
-import extendWithFirebaseConfig from './extendWithFirebaseConfig';
-import pluginWithTasks from './pluginWithTasks';
+import plugin from './plugin';
 
-export const plugin = extendWithFirebaseConfig;
-
-export { attachCustomCommands, extendWithFirebaseConfig, pluginWithTasks }; // eslint-disable-line import/prefer-default-export
+export { attachCustomCommands, plugin }; // eslint-disable-line import/prefer-default-export
