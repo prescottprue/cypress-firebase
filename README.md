@@ -78,18 +78,21 @@ If you are interested in what drove the need for this checkout [the why section]
 1. Save the downloaded file as `serviceAccount.json` in the root of your project (make sure that it is .gitignored)
 1. Set the UID of the user you created earlier to the cypress environment. You can do this using a number of methods:
 
-   1. Adding `CYPRESS_TEST_UID` to `.env` file which is gitignored
-   1. Adding `TEST_UID` to `cypress.env.json`
-   1. Adding as part of your npm script to run tests with a tool such as `cross-env`:
+- Adding `CYPRESS_TEST_UID` to a `.env` file which is gitignored
+- Adding `TEST_UID` to `cypress.env.json`
+- Adding as part of your npm script to run tests with a tool such as `cross-env`:
 
-   ```json
-   "test": "cross-env CYPRESS_TEST_UID=your-uid cypress open"
-   ```
+```json
+"test": "cross-env CYPRESS_TEST_UID=your-uid cypress open"
+```
 
 1. Make sure to set `CYPRESS_TEST_UID` environment variable in your CI settings if you are running tests in CI
 1. Call `cy.login()` with the `before` or `beforeEach` sections of your tests
 
-**NOTE**: If you are running tests within your CI provider you will want to set the `SERVICE_ACCOUNT` environment variable as the service account object and the `TEST_UID` environment variable as the UID of your test user
+**NOTE**: If you are running tests within your CI provider you will want to set the following environment variables:
+
+- `CYPRESS_TEST_UID` - UID of your test user
+- `SERVICE_ACCOUNT` - service account object and the
 
 ### Running
 
@@ -97,23 +100,6 @@ If you are interested in what drove the need for this checkout [the why section]
 1. Open cypress test running by running `npm run test:open` in another terminal window
 
 ## Docs
-
-### CLI Commands
-
-#### createTestEnvFile {#createTestEnvFile}
-
-**NOTE**: This command is deprecated and will be removed in the next major version. It is suggested that you use `CYPRESS_` prefixed environment variables instead
-Create test environment file (`cypress.env.json`) which contains custom auth token generated using `firebase-admin` SDK and `serviceAccount.json`.
-
-##### Requirements
-
-A service account must be provided. This can be done by setting `serviceAccount.json` in the root of the project (often used locally since service accounts should be in gitignore), or by setting the `SERVICE_ACCOUNT` enviroment variable. For different environmets you can prefix with the environment name such as `STAGE_SERVICE_ACCOUNT`.
-
-##### Examples
-
-```bash
-cypress-firebase createTestEnvFile
-```
 
 ### Custom Cypress Commands
 
@@ -132,14 +118,21 @@ cypress-firebase createTestEnvFile
 
 #### cy.login
 
-Login to Firebase auth using `FIREBASE_AUTH_JWT` environment variable
-which is generated using `firebase-admin` authenticated with serviceAccount
-during `build:testConfig` phase.
+Login to Firebase using custom auth token
 
 ##### Examples
 
+Loading `TEST_UID` automatically from Cypress env:
+
 ```javascript
 cy.login();
+```
+
+Passing a UID
+
+```javascript
+const uid = "123SomeUid";
+cy.login(uid);
 ```
 
 #### cy.logout
@@ -160,17 +153,15 @@ Call Real Time Database path with some specified action. Authentication is throu
 
 - `action` **[String][11]** The action type to call with (set, push, update, remove)
 - `actionPath` **[String][11]** Path within RTDB that action should be applied
-- `opts` **[object][12]** Options
-  - `opts.limitToFirst` **[number|boolean][13]** Limit to the first `<num>` results. If true is passed than query is limited to last 1 item.
-  - `opts.limitToLast` **[number|boolean][13]** Limit to the last `<num>` results. If true is passed than query is limited to last 1 item.
-  - `opts.orderByKey` **[boolean][13]** Order by key name
-  - `opts.orderByValue` **[boolean][13]** Order by primitive value
-  - `opts.orderByChild` **[string][11]** Select a child key by which to order results
-  - `opts.equalTo` **[string][11]** Restrict results to `<val>` (based on specified ordering)
-  - `opts.startAt` **[string][11]** Start results at `<val>` (based on specified ordering)
-  - `opts.endAt` **[string][11]** End results at `<val>` (based on specified ordering)
-  - `opts.instance` **[string][11]** Use the database `<instance>.firebaseio.com` (if omitted, use default database instance)
-  - `opts.args` **[Array][13]** Command line args to be passed
+- `options` **[object][12]** Options
+  - `options.limitToFirst` **[number|boolean][13]** Limit to the first `<num>` results. If true is passed than query is limited to last 1 item.
+  - `options.limitToLast` **[number|boolean][13]** Limit to the last `<num>` results. If true is passed than query is limited to last 1 item.
+  - `options.orderByKey` **[boolean][13]** Order by key name
+  - `options.orderByValue` **[boolean][13]** Order by primitive value
+  - `options.orderByChild` **[string][11]** Select a child key by which to order results
+  - `options.equalTo` **[string][11]** Restrict results to `<val>` (based on specified ordering)
+  - `options.startAt` **[string][11]** Start results at `<val>` (based on specified ordering)
+  - `options.endAt` **[string][11]** End results at `<val>` (based on specified ordering)
 
 ##### Examples
 
@@ -215,8 +206,9 @@ level. If using delete, auth is through FIREBASE_TOKEN since firebase-tools is u
 
 - `action` **[String][11]** The action type to call with (set, push, update, remove)
 - `actionPath` **[String][11]** Path within RTDB that action should be applied
-- `opts` **[Object][12]** Options
-  - `opts.args` **[Array][13]** Command line args to be passed
+- `dataOrOptions` **[String][11]** Data for write actions or options for get action
+- `options` **[Object][12]** Options
+  - `options.args` **[Array][13]** Command line args to be passed
 
 ##### Examples
 
@@ -248,7 +240,7 @@ describe("Test firestore", () => {
   const mockAge = 8;
 
   beforeEach(() => {
-    cy.visit("http://localhost:4200");
+    cy.visit("/");
   });
 
   it("read/write test", () => {
@@ -276,10 +268,23 @@ describe("Test firestore", () => {
 
    ```json
    "emulators": "firebase emulators:start --only database,firestore",
-   "test": "cross-env CYPRESS_baseUrl=http://localhost:3000 cypress run",
-   "test:open": "cross-env CYPRESS_baseUrl=http://localhost:3000 cypress open",
+   "test": "cypress run",
+   "test:open": "cypress open",
    "test:emulate": "cross-env FIREBASE_DATABASE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.database.port)\" FIRESTORE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.firestore.port)\" yarn test:open"
    ```
+
+1. Add emulator ports to `firebase.json`:
+
+```json
+"emulators": {
+  "database": {
+    "port": 9000
+  },
+  "firestore": {
+    "port": 8080
+  }
+}
+```
 
 1. Add support in your application for connecting to the emulators:
 
@@ -287,32 +292,31 @@ describe("Test firestore", () => {
    const shouldUseEmulator = window.location.hostname === "localhost"; // or other logic to determine when to use
    // Emulate RTDB
    if (shouldUseEmulator) {
-     console.log("Using RTDB emulator");
      fbConfig.databaseURL = `http://localhost:9000?ns=${fbConfig.projectId}`;
+     console.debug(`Using RTDB emulator: ${fbConfig.databaseURL}`);
    }
 
    // Initialize Firebase instance
    firebase.initializeApp(fbConfig);
 
+   const firestoreSettings = {};
+   // Pass long polling setting to Firestore when running in Cypress
+   if (window.Cypress) {
+     // Needed for Firestore support in Cypress (see https://github.com/cypress-io/cypress/issues/6350)
+     firestoreSettings.experimentalForceLongPolling = true;
+   }
+
    // Emulate Firestore
    if (shouldUseEmulator) {
-     console.log("Using Firestore emulator");
-     const firestoreSettings = {
-       host: "localhost:8080",
-       ssl: false,
-     };
-
-     // Pass long polling setting to Firestore when running in Cypress
-     if (window.Cypress) {
-       // Needed for Firestore support in Cypress (see https://github.com/cypress-io/cypress/issues/6350)
-       firestoreSettings.experimentalForceLongPolling = true;
-     }
+     firestoreSettings.host = "localhost:8080";
+     firestoreSettings.ssl = false;
+     console.debug(`Using Firestore emulator: ${firestoreSettings.host}`);
 
      firebase.firestore().settings(firestoreSettings);
    }
    ```
 
-1. Make sure you also have matching init logic in `cypress/support/commands.js` or `cypress/support/index.js`:
+1. Make sure you also have init logic in `cypress/support/commands.js` or `cypress/support/index.js`:
 
    ```js
    import firebase from "firebase/app";
@@ -349,73 +353,69 @@ describe("Test firestore", () => {
 1. In another terminal window, start the application: `npm start`
 1. In another terminal window, open test runner with emulator settings: `npm run test:emulate`
 
-**NOTE**: If you are using react-scripts or other environment management, you can use environment variables to pass settings into your app:
+**NOTE**: If you are using `react-scripts` (from [create-react-app](https://reactjs.org/docs/create-a-new-react-app.html)) or other environment management, you can use environment variables to pass settings into your app:
 
 ```js
 const {
   REACT_APP_FIREBASE_DATABASE_EMULATOR_HOST,
   REACT_APP_FIRESTORE_EMULATOR_HOST,
 } = process.env;
+
 // Emulate RTDB if REACT_APP_FIREBASE_DATABASE_EMULATOR_HOST exists in environment
 if (REACT_APP_FIREBASE_DATABASE_EMULATOR_HOST) {
-  console.log("Using RTDB emulator");
+  console.debug(`Using RTDB emulator: ${fbConfig.databaseURL}`);
   fbConfig.databaseURL = `http://${REACT_APP_FIREBASE_DATABASE_EMULATOR_HOST}?ns=${fbConfig.projectId}`;
 }
 
 // Initialize Firebase instance
 firebase.initializeApp(fbConfig);
 
+const firestoreSettings = {};
+
+if (window.Cypress) {
+  // Needed for Firestore support in Cypress (see https://github.com/cypress-io/cypress/issues/6350)
+  firestoreSettings.experimentalForceLongPolling = true;
+}
+
 // Emulate RTDB if REACT_APP_FIRESTORE_EMULATOR_HOST exists in environment
 if (REACT_APP_FIRESTORE_EMULATOR_HOST) {
-  console.log("Using Firestore emulator");
-  const firestoreSettings = {
-    host: REACT_APP_FIRESTORE_EMULATOR_HOST,
-    ssl: false,
-  };
+  firestoreSettings.host = REACT_APP_FIRESTORE_EMULATOR_HOST;
+  firestoreSettings.ssl = false;
 
-  if (window.Cypress) {
-    // Needed for Firestore support in Cypress (see https://github.com/cypress-io/cypress/issues/6350)
-    firestoreSettings.experimentalForceLongPolling = true;
-  }
+  console.debug(`Using Firestore emulator: ${firestoreSettings.host}`);
 
   firebase.firestore().settings(firestoreSettings);
 }
 ```
 
-### Generate JWT Before Run
-
-1. Add the following to the `scripts` section of your `package.json`:
-
-   ```json
-   "build:testConfig": "cypress-firebase createTestEnvFile",
-   "test": "npm run build:testConfig && cypress run",
-   "test:open": "npm run build:testConfig && cypress open",
-   ```
-
-1. Add your config info to your environment variables (for CI) or `cypress.env.json` when running locally (make sure this is in you `.gitignore`)
-
-   ```js
-   {
-     "TEST_UID": "<- uid of the user you want to test as ->"
-   }
-   ```
-
-### Testing Different Environments
-
-Environment variables can be passed through `--env`. `envName` points to the firebase project within the projects section of `.firebaserc`.
-
 ### Test Built Version
 
-Tests will run faster locally if you tests against the build version of your app instead of your dev version (with hot module reloading and other dev tools). You can do that by:
+It is often required to run tests against the built version of your app instead of your dev version (with hot module reloading and other dev tools). You can do that by running a build script before spinning up the:
 
 1. Adding the following npm script:
 
-   ```json
-   "start:dist": "npm run build && firebase serve --only hosting -p 3000",
-   ```
+```json
+"start:dist": "npm run build && firebase emulators:start --only hosting",
+```
+
+1. Add the emulator port to `firebase.json`:
+
+```json
+"emulators": {
+  "hosting": {
+    "port": 3000
+  }
+}
+```
 
 1. Run `npm run start:dist` to build your app and serve it with firebase
 1. In another terminal window, run a test command such as `npm run test:open`
+
+NOTE: You can also use `firebase serve`:
+
+```json
+"start:dist": "npm run build && firebase serve --only hosting -p 3000",
+```
 
 ### CI
 
@@ -436,40 +436,24 @@ on: [pull_request]
 jobs:
   ui-tests:
     name: UI Tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-16.04
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v1
-
-      # Install is run separatley from test so that dependencies are available
-      # for other steps
-      - name: Install Dependencies
-        uses: cypress-io/github-action@v1
-        with:
-          # just perform install
-          runTests: false
-
-      - name: Build Test Environment Config
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          TEST_UID: ${{ secrets.TEST_UID }}
-          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
-          GITHUB_HEAD_REF: ${{ github.head_ref }}
-          GITHUB_REF: ${{ github.ref }}
-        run: |
-          $(npm bin)/cypress-firebase createTestEnvFile $TEST_ENV
+        uses: actions/checkout@v2
 
       # Cypress action manages installing/caching npm dependencies and Cypress binary.
       - name: Cypress Run
         uses: cypress-io/github-action@v1
         with:
-          # we have already installed all dependencies above
-          install: false
           group: "E2E Tests"
         env:
           # pass the Dashboard record key as an environment variable
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_KEY }}
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          # UID of User to login as during tests
+          CYPRESS_TEST_UID: ${{ secrets.TEST_UID }}
+          # Service Account (used for creating custom auth tokens)
+          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+          # Branch settings
           GITHUB_HEAD_REF: ${{ github.head_ref }}
           GITHUB_REF: ${{ github.ref }}
 ```
@@ -477,7 +461,7 @@ jobs:
 **Using Start For Local**
 
 ```yml
-name: Test Hosted
+name: Test
 
 on: [pull_request]
 
@@ -487,45 +471,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
-      # Install is run separatley from test so that dependencies are available
-      # for other steps
-      - name: Install Dependencies
-        uses: cypress-io/github-action@v1
-        with:
-          # just perform install
-          runTests: false
-
-      - name: Build Test Environment Config
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          TEST_UID: ${{ secrets.TEST_UID }}
-          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
-          GITHUB_HEAD_REF: ${{ github.head_ref }}
-          GITHUB_REF: ${{ github.ref }}
-        run: |
-          $(npm bin)/cypress-firebase createTestEnvFile $TEST_ENV
-
-      # Cypress action manages installing/caching npm dependencies and Cypress binary.
+      # Cypress action manages installing/caching npm dependencies and Cypress binary
       - name: Cypress Run
         uses: cypress-io/github-action@v1
+        runs-on: ubuntu-16.04
         with:
-          # we have already installed all dependencies above
-          install: false
           group: "E2E Tests"
           start: npm start
           wait-on: http://localhost:3000
         env:
           # pass the Dashboard record key as an environment variable
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_KEY }}
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          GITHUB_REF: ${{ github.head_ref }}
+          # UID of User to login as during tests
+          CYPRESS_TEST_UID: ${{ secrets.TEST_UID }}
+          # Service Account (used for creating custom auth tokens)
+          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+          # Branch settings
+          GITHUB_HEAD_REF: ${{ github.head_ref }}
+          GITHUB_REF: ${{ github.ref }}
 ```
 
 ## Why?
 
-It isn't currently possible to use Firebase's `firebase-admin` SDK directly within Cypress tests due to dependencies not being able to be loaded into the Browser environment. Since the admin SDK is nessesary to generate custom tokens and interact with Real Time Database and Firestore, this library provides convience methods (`cy.callRtdb`, `cy.callFirestore`, `cy.login`, etc...) which call custom tasks which have access to the node environment.
+When testing, tests should have admin read/write access to the database for seeding/verifying data. It isn't currently possible to use Firebase's `firebase-admin` SDK directly within Cypress tests due to dependencies not being able to be loaded into the Browser environment. Since the admin SDK is nessesary to generate custom tokens and interact with Real Time Database and Firestore with admin privileges, this library provides convience methods (`cy.callRtdb`, `cy.callFirestore`, `cy.login`, etc...) which call custom tasks which have access to the node environment.
 
 ## Projects Using It
 
