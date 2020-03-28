@@ -1,3 +1,4 @@
+import * as admin from 'firebase-admin'; // NOTE: Only used for types
 import {
   FixtureData,
   FirestoreAction,
@@ -68,7 +69,7 @@ export function callRtdb(
   if (action === 'get') {
     return optionsToRtdbRef(adminInstance.database().ref(actionPath), options)
       .once('value')
-      .then((snap: any): any => snap.val())
+      .then((snap: admin.database.DataSnapshot): any => snap.val())
       .catch(handleError);
   }
 
@@ -145,7 +146,7 @@ export function callFirestore(
         }
         // Falling back to null in the case of falsey value prevents Cypress error with message:
         // "You must return a promise, a value, or null to indicate that the task was handled."
-        return (typeof snap?.data === 'function' && snap.data()) || null;
+        return (snap && typeof snap.data === 'function' && snap.data()) || null;
       })
       .catch(handleError);
   }

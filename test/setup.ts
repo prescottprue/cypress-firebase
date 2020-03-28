@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 import chai from 'chai';
 import sinonChai from 'sinon-chai';
-import * as admin from 'firebase-admin';
 
 const projectId = 'test-project';
 const databaseEmulatorPort = 9000;
@@ -19,16 +18,3 @@ chai.use(sinonChai);
 // Set global variables
 (global as any).projectId = projectId;
 (global as any).databaseURL = databaseURL;
-
-// Initialize admin SDK with emulator settings for RTDB
-admin.initializeApp({
-  projectId,
-  databaseURL,
-  // credential: admin.credential.applicationDefault(),
-});
-
-// Initialize Firestore with emulator settings
-admin.firestore().settings({
-  servicePath: 'localhost',
-  port: firstoreEmulatorPort,
-});
