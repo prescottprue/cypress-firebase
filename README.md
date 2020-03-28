@@ -526,9 +526,9 @@ When testing, tests should have admin read/write access to the database for seed
 [npm-image]: https://img.shields.io/npm/v/cypress-firebase.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/cypress-firebase
 [npm-downloads-image]: https://img.shields.io/npm/dm/cypress-firebase.svg?style=flat-square
-[build-status-image]: https://img.shields.io/github/workflow/status/prescottprue/cypress-firebase/NPM%20Package%20Publish?style=flat-square
+[build-status-image]: https://img.shields.io/github/workflow/status/prescottprue/cypress-firebase/NPM%20Package%20Publish?style=flat-square&logo=github
 [build-status-url]: https://github.com/prescottprue/cypress-firebase/actions
-[coverage-image]: https://img.shields.io/codecov/c/gh/prescottprue/cypress-firebase?style=flat-square
+[coverage-image]: https://img.shields.io/codecov/c/gh/prescottprue/cypress-firebase?style=flat-square&logo=codecov
 [coverage-url]: https://codecov.io/gh/prescottprue/cypress-firebase
 [license-image]: https://img.shields.io/npm/l/cypress-firebase.svg?style=flat-square
 [license-url]: https://github.com/prescottprue/cypress-firebase/blob/master/LICENSE
