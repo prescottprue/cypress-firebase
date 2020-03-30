@@ -82,7 +82,7 @@ If you are interested in what drove the need for this checkout [the why section]
 
 - Adding `CYPRESS_TEST_UID` to a `.env` file which is gitignored
 - Adding `TEST_UID` to `cypress.env.json`
-- Adding as part of your npm script to run tests with a tool such as `cross-env`:
+- Adding as part of your npm script to run tests with a tool such as `cross-env` [here](https://github.com/kentcdodds/cross-env):
 
 ```json
 "test": "cross-env CYPRESS_TEST_UID=your-uid cypress open"
