@@ -275,26 +275,26 @@ describe("Test firestore", () => {
    "test:emulate": "cross-env FIREBASE_DATABASE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.database.port)\" FIRESTORE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.firestore.port)\" yarn test:open"
    ```
 
-1. Add emulator ports to `firebase.json`:
+1. If not already put there by `firebase init`, add emulator ports to `firebase.json`:
 
-```json
-"emulators": {
-  "database": {
-    "port": 9000
-  },
-  "firestore": {
-    "port": 8080
-  }
-}
-```
-
-1. Add support in your application for connecting to the emulators:
+   ```json
+   "emulators": {
+     "database": {
+       "port": 9000
+     },
+     "firestore": {
+       "port": 8080
+     }
+   }
+   ```
+   
+1. Update your application code to connect to the emulators (where your code calls `firebase.initializeApp(...)`), , updating the localhost ports as appropriate from the `emulators` values in the previous step:
 
    ```js
    const shouldUseEmulator = window.location.hostname === "localhost"; // or other logic to determine when to use
    // Emulate RTDB
    if (shouldUseEmulator) {
-     fbConfig.databaseURL = `http://localhost:9000?ns=${fbConfig.projectId}`;
+     fbConfig.databaseURL = `http://localhost:_9000_?ns=${fbConfig.projectId}`;
      console.debug(`Using RTDB emulator: ${fbConfig.databaseURL}`);
    }
 
@@ -310,7 +310,7 @@ describe("Test firestore", () => {
 
    // Emulate Firestore
    if (shouldUseEmulator) {
-     firestoreSettings.host = "localhost:8080";
+     firestoreSettings.host = "localhost:_8080_";
      firestoreSettings.ssl = false;
      console.debug(`Using Firestore emulator: ${firestoreSettings.host}`);
 
