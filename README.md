@@ -294,7 +294,7 @@ describe("Test firestore", () => {
    const shouldUseEmulator = window.location.hostname === "localhost"; // or other logic to determine when to use
    // Emulate RTDB
    if (shouldUseEmulator) {
-     fbConfig.databaseURL = `http://localhost:_9000_?ns=${fbConfig.projectId}`;
+     fbConfig.databaseURL = `http://localhost:9000?ns=${fbConfig.projectId}`;
      console.debug(`Using RTDB emulator: ${fbConfig.databaseURL}`);
    }
 
@@ -310,7 +310,7 @@ describe("Test firestore", () => {
 
    // Emulate Firestore
    if (shouldUseEmulator) {
-     firestoreSettings.host = "localhost:_8080_";
+     firestoreSettings.host = "localhost:8080";
      firestoreSettings.ssl = false;
      console.debug(`Using Firestore emulator: ${firestoreSettings.host}`);
 
