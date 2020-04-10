@@ -100,10 +100,11 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
     } else {
       // Get service account from local file falling back to environment variables
       const serviceAccount = getServiceAccount();
-      const projectId = serviceAccount?.project_id;
+      const projectId =
+        process.env.GCLOUD_PROJECT || serviceAccount?.project_id;
       if (!isString(projectId)) {
         const missingProjectIdErr =
-          'Error project_id from service account to initialize Firebase.';
+          'Error GCLOUD_PROJECT environment variable or project_id from service account to initialize Firebase.';
         console.error(`cypress-firebase: ${missingProjectIdErr}`); // eslint-disable-line no-console
         throw new Error(missingProjectIdErr);
       }
@@ -111,15 +112,23 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
         'firebase-top-agent-int',
         'top-agent-int',
       );
+
+      const appSettings: any = {
+        databaseURL: `https://${cleanProjectId}.firebaseio.com`,
+      };
+
+      if (serviceAccount) {
+        appSettings.credential = adminInstance.credential.cert(
+          serviceAccount as any,
+        );
+      }
+
+      fbInstance = adminInstance.initializeApp(appSettings);
       /* eslint-disable no-console */
       console.log(
-        `cypress-firebase: Initialized with Service Account for project "${cleanProjectId}"`,
+        `cypress-firebase: Initialized app with project "${cleanProjectId}"`,
       );
       /* eslint-enable no-console */
-      fbInstance = adminInstance.initializeApp({
-        credential: adminInstance.credential.cert(serviceAccount as any),
-        databaseURL: `https://${cleanProjectId}.firebaseio.com`,
-      });
     }
 
     return fbInstance;
