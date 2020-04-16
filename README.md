@@ -24,16 +24,17 @@ If you are interested in what drove the need for this checkout [the why section]
 
 ### Pre-Setup
 
-**Note**: Skip cypress install if it already exists within your project
-
-1. Install Cypress and add it to your package file: `npm i --save-dev cypress`
-1. Make sure you have a `cypress` folder containing cypress tests (or create one by calling `cypress open`)
+1. If you do not already have it installed, install Cypress and add it to your package file: `npm i --save-dev cypress` or `yarn add -D cypress`
+1. Make sure you have a `cypress` folder containing Cypress tests (or create one by calling `cypress open`)
 
 ### Setup
 
 **Note:** These instructions assume your tests are in the `cypress` folder (cypress' default). See the [folders section below](#folders) for more info about other supported folders.
 
-1. Install cypress-firebase and firebase-admin both: `npm i cypress-firebase firebase-admin --save-dev`
+1. Install `cypress-firebase` and [`firebase-admin`](https://www.npmjs.org/package/firebase-admin) both: `npm i --save-dev cypress-firebase firebase-admin` or `yarn add -D cypress-firebase firebase-admin --save-dev`
+1. Go to project setting on firebase console and generate new private key. See how to do so [in the Google Docs](https://sites.google.com/site/scriptsexamples/new-connectors-to-google-services/firebase/tutorials/authenticate-with-a-service-account).
+1. Add `serviceAccount.json` to your `.gitignore` (THIS IS VERY IMPORTANT TO KEEPING YOUR INFORMATION SECURE!)
+1. Save the downloaded file as `serviceAccount.json` in the root of your project (make sure that it is .gitignored) - needed for `firebase-admin` to have read/write access to your DB from within your tests
 1. Add the following your custom commands file (`cypress/support/commands.js`):
 
    ```js
@@ -64,42 +65,46 @@ If you are interested in what drove the need for this checkout [the why section]
    };
    ```
 
+1. To confirm things are working, add a cypress-firebase custom command (such as `cy.callFirestore`) to one of your tests:
+
+   ```js
+   describe("Some Test", () => {
+     it("Adds document to test_hello_world collection of Firestore", () => {
+       cy.callFirestore("add", "test_hello_world", { some: "value" });
+     });
+   });
+   ```
+
+1. Look in the `test_hello_world` collection of your Firestore instance (or whichever collection you write in your test) to confirm that a document was added
+1. Pat yourself on the back, you are all setup to access Firebase/Firestore from within your tests!
+
 #### Auth
 
-1. Log into your Firebase console for the first time.
-1. Go to Auth tab of Firebase and create a user for testing purpose
-1. Get the UID of created account. This will be the account which you use to login while running tests (we will call this UID `TEST_UID`)
-1. Add the following to your `.gitignore`:
+1. Go to Authentication page of the Firebase Console and select an existing user to use as the testing account or create a new user. This will be the account which you use to login while running tests.
+1. Get the UID of the account you have selected, we will call this UID `TEST_UID`
+1. Set the UID of the user you created earlier to the Cypress environment. You can do this using a number of methods:
 
-   ```
-   serviceAccount.json
-   cypress.env.json
-   ```
+   - Adding `CYPRESS_TEST_UID` to a `.env` file which is gitignored
+   - Adding `TEST_UID` to `cypress.env.json` (make sure you place this within your `.gitignore`)
+   - Adding as part of your npm script to run tests with a tool such as `cross-env` [here](https://github.com/kentcdodds/cross-env):
 
-1. Go to project setting on firebase console and generate new private key. See how to do [here](https://sites.google.com/site/scriptsexamples/new-connectors-to-google-services/firebase/tutorials/authenticate-with-a-service-account)
-1. Save the downloaded file as `serviceAccount.json` in the root of your project (make sure that it is .gitignored)
-1. Set the UID of the user you created earlier to the cypress environment. You can do this using a number of methods:
+     ```json
+     "test": "cross-env CYPRESS_TEST_UID=your-uid cypress open"
+     ```
 
-- Adding `CYPRESS_TEST_UID` to a `.env` file which is gitignored
-- Adding `TEST_UID` to `cypress.env.json`
-- Adding as part of your npm script to run tests with a tool such as `cross-env` [here](https://github.com/kentcdodds/cross-env):
-
-```json
-"test": "cross-env CYPRESS_TEST_UID=your-uid cypress open"
-```
-
-1. Make sure to set `CYPRESS_TEST_UID` environment variable in your CI settings if you are running tests in CI
 1. Call `cy.login()` with the `before` or `beforeEach` sections of your tests
-
-**NOTE**: If you are running tests within your CI provider you will want to set the following environment variables:
-
-- `CYPRESS_TEST_UID` - UID of your test user
-- `SERVICE_ACCOUNT` - service account object and the
 
 ### Running
 
 1. Start your local dev server (usually `npm start`) - for faster alternative checkout the [test built version section](#test-built-version)
 1. Open cypress test running by running `npm run test:open` in another terminal window
+
+### Considerations For CI
+
+1. Add the following environment variables in your CI:
+
+   - `CYPRESS_TEST_UID` - UID of your test user
+   - `SERVICE_ACCOUNT` - service account object
 
 ## Docs
 
@@ -287,7 +292,7 @@ describe("Test firestore", () => {
      }
    }
    ```
-   
+
 1. Modify your application code to connect to the emulators (where your code calls `firebase.initializeApp(...)`), updating the localhost ports as appropriate from the `emulators` values in the previous step:
 
    ```js
@@ -497,15 +502,12 @@ jobs:
 
 ## Why?
 
-When testing, tests should have admin read/write access to the database for seeding/verifying data. It isn't currently possible to use Firebase's `firebase-admin` SDK directly within Cypress tests due to dependencies not being able to be loaded into the Browser environment. Since the admin SDK is nessesary to generate custom tokens and interact with Real Time Database and Firestore with admin privileges, this library provides convience methods (`cy.callRtdb`, `cy.callFirestore`, `cy.login`, etc...) which call custom tasks which have access to the node environment.
+When testing, tests should have admin read/write access to the database for seeding/verifying data. It isn't currently possible to use Firebase's `firebase-admin` SDK directly within Cypress tests due to dependencies not being able to be loaded into the Browser environment. Since the admin SDK is necessary to generate custom tokens and interact with Real Time Database and Firestore with admin privileges, this library provides convenience methods (`cy.callRtdb`, `cy.callFirestore`, `cy.login`, etc...) which call custom tasks which have access to the node environment.
 
 ## Projects Using It
 
-[fireadmin.io][fireadmin-url] - A Firebase project management tool ([here is the source][fireadmin-source])
-
-## Roadmap
-
-- Fix issue where auth token goes bad after test suite has been open a long time
+- [fireadmin.io][fireadmin-url] - A Firebase project management tool ([here is the source][fireadmin-source])
+- [cv19assist.com](https://cv19assist.com) - App for connecting volunteers with at-health-risk population during the coronavirus pandemic. ([here is the source](https://github.com/CV19Assist/app))
 
 [1]: #cylogin
 [2]: #examples
