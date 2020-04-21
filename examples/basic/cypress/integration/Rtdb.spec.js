@@ -1,12 +1,22 @@
+const PROJECTS_PATH = 'projects'
+
 describe('Projects View', () => {
-  it('Loads RTDB projects', () => {
-    cy.callRtdb('get', 'projects', { limitToLast: 1 }).then(results => {
+  beforeEach(() => {
+    cy.callRtdb('remove', PROJECTS_PATH)
+  })
+  
+  it('get action Loads RTDB data', () => {
+    cy.callRtdb('set', PROJECTS_PATH, { ABC123: { name: 'pushed project' } })
+    .then(() => cy.callRtdb('get', PROJECTS_PATH, { limitToLast: 1 }))
+    .then(results => {
       cy.log('results:', results);
       expect(results).to.exist;
     });
   });
+
   it('Limit to last 1', () => {
-    cy.callRtdb('get', 'projects', { limitToLast: 1 }).then(results => {
+    cy.callRtdb('set', PROJECTS_PATH, { ABC123: { name: 'pushed project' }, BCD234: { name: 'other' } })
+    cy.callRtdb('get', PROJECTS_PATH, { limitToLast: 1 }).then(results => {
       cy.log('results:', results);
       expect(Object.keys(results)).to.have.length(1);
     });
@@ -15,31 +25,31 @@ describe('Projects View', () => {
   it('set', () => {
     cy.callRtdb('set', 'projects/123abc', { name: 'set project' }).then(() => {
       cy.callRtdb('get', 'projects/123abc').then(result => {
-        expect(result).to.have.exist;
+        expect(result).to.exist;
       });
     });
   });
 
   it('push', () => {
-    cy.callRtdb('push', 'projects', { name: 'pushed project' }).then(
-      () => {
-        cy.callRtdb('get', 'projects/123abc').then(result => {
-          expect(result).to.have.exist;
-        });
-      },
-    );
+    cy.callRtdb('push', PROJECTS_PATH, { name: 'pushed project' }).then(
+      () => cy.callRtdb('get', PROJECTS_PATH),
+    ).then(result => {
+      expect(result).to.exist;
+      expect(result).to.be.an('object');
+      expect(Object.keys(result)).to.have.length(1)
+    });
   });
 
   it('push with meta', () => {
     cy.callRtdb(
       'push',
-      'projects',
+      PROJECTS_PATH,
       { name: 'pushed project' },
       { withMeta: true },
-    ).then(results => {
-      cy.log('results:', results);
-      cy.callRtdb('get', 'projects/123abc').then(result => {
-        expect(result).to.have.exist;
+    ).then(pushKey => {
+      cy.log('results:', pushKey);
+      cy.callRtdb('get', `projects/${pushKey}`).then(result => {
+        expect(result).to.exist;
         expect(result).to.have.property('createdBy');
       });
     });
@@ -48,7 +58,7 @@ describe('Projects View', () => {
   it('works with tasks', () => {
     cy.task(
       'callRtdb',
-      { action: 'get', actionPath: 'projects' },
+      { action: 'get', actionPath: PROJECTS_PATH },
       { timeout: 80000 },
     ).then(result => {
       cy.log('result', result);

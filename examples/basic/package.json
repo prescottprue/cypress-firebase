@@ -1,33 +1,36 @@
 {
-  "name": "basic",
+  "name": "cypress-firebase-basic-example",
   "version": "0.1.0",
   "scripts": {
     "start": "react-scripts start",
-    "dev": "cross-env REACT_APP_USE_DB_EMULATORS=true yarn start",
-    "emulators": "firebase emulators:start --only database",
+    "start:emulate": "cross-env REACT_APP_USE_DB_EMULATORS=true yarn start",
+    "dev": "yarn start:emulate",
     "build": "react-scripts build",
     "eject": "react-scripts eject",
-    "build:testConfig": "cypress-firebase createTestEnvFile",
+    "lint": "eslint src/**.js",
+    "lint:fix": "yarn lint --fix",
+    "emulate": "firebase emulators:start --only database,firestore",
     "test": "cross-env CYPRESS_baseUrl=http://localhost:3000 cypress run",
     "test:open": "cross-env CYPRESS_baseUrl=http://localhost:3000 cypress open",
     "test:emulate": "cross-env FIREBASE_DATABASE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.database.port)\" FIRESTORE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.firestore.port)\" yarn test:open"
   },
   "dependencies": {
-    "firebase": "^7.8.0",
+    "firebase": "^7.14.0",
     "lodash": "^4.17.15",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0"
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0"
   },
   "devDependencies": {
-    "cross-env": "^7.0.0",
-    "cypress": "^4.0.2",
-    "cypress-firebase": "*",
+    "cross-env": "^7.0.2",
+    "cypress": "^4.4.1",
+    "cypress-firebase": "^1.1.0",
+    "eslint-plugin-chai-friendly": "^0.5.0",
     "eslint-plugin-cypress": "^2.10.3",
-    "firebase-tools": "^7.12.1",
-    "react-scripts": "3.3.1"
+    "firebase-tools": "^8.1.1",
+    "react-scripts": "3.4.1"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": "./.eslintrc.js"
   },
   "private": true,
   "browserslist": {

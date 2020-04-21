@@ -2,10 +2,11 @@ describe('Typescript', () => {
   it('works', () => {
     // note TypeScript definition
     const x: number = 42
+    cy.log('x value worked', x)
   })
 
   it('checks shape of an object', () => {
-    const object = {
+    const object: any = {
       age: 21,
       name: 'Joe',
     }

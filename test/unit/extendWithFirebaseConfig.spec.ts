@@ -61,14 +61,14 @@ describe('extendWithFirebaseConfig', () => {
     );
   });
 
-  it('does not run over existing FIRESTORE_EMMLATOR_HOST', () => {
-    const emulatorHost = 'localhost:8080';
-    process.env.FIRESTORE_EMMLATOR_HOST = emulatorHost;
+  it('does not run over existing FIRESTORE_EMULATOR_HOST', () => {
+    const emulatorHost = 'localhost:8081';
+    process.env.FIRESTORE_EMULATOR_HOST = emulatorHost;
     const originalConfig = {
-      env: { FIRESTORE_EMMLATOR_HOST: emulatorHost },
+      env: { FIRESTORE_EMULATOR_HOST: emulatorHost },
     };
     expect(extendWithFirebaseConfig(originalConfig)).to.have.nested.property(
-      'env.FIRESTORE_EMMLATOR_HOST',
+      'env.FIRESTORE_EMULATOR_HOST',
       emulatorHost,
     );
   });

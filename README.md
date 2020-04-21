@@ -53,6 +53,14 @@ If you are interested in what drove the need for this checkout [the why section]
    attachCustomCommands({ Cypress, cy, firebase });
    ```
 
+1. Make sure that you load the custom commands file in an `cypress/support/index.js` like so:
+
+   ```js
+   import "./commands";
+   ```
+
+   **NOTE**: This is a pattern which is setup by default by Cypress, so this file may already exist
+
 1. Setup plugin adding following your plugins file (`cypress/plugins/index.js`):
 
    ```js

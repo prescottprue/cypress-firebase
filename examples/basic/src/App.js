@@ -1,6 +1,7 @@
 import React from 'react';
 import initFirebase from './initFirebase'
 import RTDBProjects from './RTDBProjects'
+import NewProject from './NewProject'
 // import FirestoreProjects from './FirestoreProjects'
 import './App.css';
 
@@ -12,6 +13,7 @@ function App() {
       <header className="App-header">
         <h2>Data From RTDB</h2>
         <RTDBProjects />
+        <NewProject />
         {/* Skipped since emulated Firestore does not
             currently work with Cypress.
             See: https://github.com/cypress-io/cypress/issues/6350

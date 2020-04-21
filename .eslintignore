@@ -6,3 +6,5 @@ coverage
 .nyc_output
 .github
 index.d.ts
+# Skipped since linting lives within each project
+examples/**

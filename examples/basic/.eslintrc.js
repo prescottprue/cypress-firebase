@@ -1,7 +1,8 @@
 module.exports = {
+  extends: ['react-app'],
   env: {
     mocha: true,
-    'cypress/globals': true
+    // 'cypress/globals': true
   },
   plugins: [
     'cypress',
