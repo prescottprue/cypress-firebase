@@ -437,6 +437,18 @@ NOTE: You can also use `firebase serve`:
 1. Run `firebase login:ci` to generate a CI token for `firebase-tools` (this will give your `cy.callRtdb` and `cy.callFirestore` commands admin access to the DB)
 1. Set `FIREBASE_TOKEN` within CI environment variables
 
+### Webpack File Preprocessing
+
+If you are using a file preprocessor which is building for the browser environment, such as Webpack, you will need to make sure usage of `fs` is handled since it is used within the cypress-firebase plugin. To do this with webpack, add the following to your config:
+
+```js
+node: {
+  fs: "empty";
+}
+```
+
+See [#120](https://github.com/prescottprue/cypress-firebase/issues/120) for more info
+
 ## Examples
 
 ### Github Actions
