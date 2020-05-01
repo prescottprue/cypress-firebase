@@ -10,8 +10,8 @@
     "lint": "eslint src/**.js",
     "lint:fix": "yarn lint --fix",
     "emulate": "firebase emulators:start --only database,firestore",
-    "test": "cross-env CYPRESS_baseUrl=http://localhost:3000 cypress run",
-    "test:open": "cross-env CYPRESS_baseUrl=http://localhost:3000 cypress open",
+    "test": "cross-env GCLOUD_PROJECT=redux-firebasev3 CYPRESS_baseUrl=http://localhost:3000 cypress run",
+    "test:open": "cross-env GCLOUD_PROJECT=redux-firebasev3 CYPRESS_baseUrl=http://localhost:3000 cypress open",
     "test:emulate": "cross-env FIREBASE_DATABASE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.database.port)\" FIRESTORE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.firestore.port)\" yarn test:open"
   },
   "dependencies": {
@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.2",
-    "cypress": "^4.4.1",
+    "cypress": "^4.5.0",
     "cypress-firebase": "^1.1.0",
     "eslint-plugin-chai-friendly": "^0.5.0",
     "eslint-plugin-cypress": "^2.10.3",

@@ -15,7 +15,7 @@ export default function pluginWithTasks(
   cypressConfig: any,
   adminInstance: any,
 ): ExtendedCypressConfig {
-  // Only initailize admin instance if it hasn't already been initialized
+  // Only initialize admin instance if it hasn't already been initialized
   if (adminInstance.apps.length === 0) {
     initializeFirebase(adminInstance);
   }

@@ -166,12 +166,22 @@ declare module "attachCustomCommands" {
             }
         }
     }
+    interface CommandNamespacesConfig {
+        login?: string;
+        logout?: string;
+        callRtdb?: string;
+        callFirestore?: string;
+    }
+    interface CustomCommandOptions {
+        commandNamespaces?: CommandNamespacesConfig;
+    }
     /**
      * Attach custom commands including cy.login, cy.logout, cy.callRtdb,
-     * @param commandParams - List of params to provide scope during
+     * @param context - Context values passed from Cypress environment
      * custom command attachment
+     * @param options - Custom command options
      */
-    export default function attachCustomCommands(commandParams: AttachCustomCommandParams): void;
+    export default function attachCustomCommands(context: AttachCustomCommandParams, options: CustomCommandOptions): void;
 }
 declare module "extendWithFirebaseConfig" {
     export interface CypressEnvironmentOptions {
