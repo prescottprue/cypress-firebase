@@ -263,7 +263,7 @@ interface CustomCommandOptions {
  */
 export default function attachCustomCommands(
   context: AttachCustomCommandParams,
-  options: CustomCommandOptions,
+  options?: CustomCommandOptions,
 ): void {
   const { Cypress, cy, firebase } = context;
 
