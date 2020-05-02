@@ -139,7 +139,8 @@ describe('tasks', () => {
         expect(result[0]).to.have.property('name', testProject.name);
       });
 
-      it('supports orderBy', async () => {
+      it('supports orderBy', async function () {
+        this.retries(3);
         const secondProject = { name: 'aaaa' };
         await projectsFirestoreRef.add({ name: 'zzzzz' });
         await projectsFirestoreRef.add(secondProject);
