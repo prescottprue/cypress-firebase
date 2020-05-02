@@ -14,37 +14,42 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Check package version
-        uses: technote-space/package-version-check-action@v1
-        with:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: Check if version has been updated
+        id: check
+        uses: EndBug/version-check@v1
 
       - name: Use Node 12
+        if: steps.check.outputs.changed == 'true'
         uses: actions/setup-node@v1
         with:
           node-version: 12
           registry-url: https://registry.npmjs.org/
 
       - name: Get yarn cache
+        if: steps.check.outputs.changed == 'true'
         id: yarn-cache
         run: echo "::set-output name=dir::$(yarn cache dir)"
 
       - uses: actions/cache@v1
+        if: steps.check.outputs.changed == 'true'
         with:
           path: ${{ steps.yarn-cache.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }}
 
       - name: Install Dependencies
+        if: steps.check.outputs.changed == 'true'
         env:
           CI: true
         run: yarn install --frozen-lockfile
 
       - name: Check For Lint
+        if: steps.check.outputs.changed == 'true'
         env:
           CI: true
         run: yarn lint
 
       - name: Expose Test Environment Variables
+        if: steps.check.outputs.changed == 'true'
         env:
           SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
           GITHUB_HEAD_REF: ${{ github.head_ref }}
@@ -56,12 +61,14 @@ jobs:
           echo "::set-env name=GOOGLE_APPLICATION_CREDENTIALS::$HOME/serviceAccount.json"
 
       - name: Run Unit Tests + Coverage
+        if: steps.check.outputs.changed == 'true'
         env:
           CI: true
           CODE_CLIMATE: ${{ secrets.CODE_CLIMATE }}
-        run: yarn test:cov && yarn codecov
+        run: yarn test:cov
 
       - name: Run Build
+        if: steps.check.outputs.changed == 'true'
         run: yarn build
 
       # Skipped since yarn isn't supported
@@ -73,9 +80,11 @@ jobs:
       #     github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Size Check
-        run: yarn size
+        if: steps.check.outputs.changed == 'true'
+        run: $(yarn bin)/size-limit
 
       - name: Publish
+        if: steps.check.outputs.changed == 'true'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_REF: ${{ github.ref }}
@@ -85,14 +94,14 @@ jobs:
           npm publish $PUBLISH_FLAG
 
       - name: Archive Build Artifact
+        if: steps.check.outputs.changed == 'true'
         uses: actions/upload-artifact@master
-        if: success()
         with:
           name: build
           path: lib
 
       - name: Upload Coverage
-        if: success()
+        if: steps.check.outputs.changed == 'true'
         env:
           CI: true
           CODE_COV: ${{ secrets.CODE_COV }}

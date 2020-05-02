@@ -244,15 +244,29 @@ function loginWithCustomToken(
   });
 }
 
+interface CommandNamespacesConfig {
+  login?: string;
+  logout?: string;
+  callRtdb?: string;
+  callFirestore?: string;
+  getAuthUser?: string;
+}
+
+interface CustomCommandOptions {
+  commandNames?: CommandNamespacesConfig;
+}
+
 /**
  * Attach custom commands including cy.login, cy.logout, cy.callRtdb,
- * @param commandParams - List of params to provide scope during
+ * @param context - Context values passed from Cypress environment
  * custom command attachment
+ * @param options - Custom command options
  */
 export default function attachCustomCommands(
-  commandParams: AttachCustomCommandParams,
+  context: AttachCustomCommandParams,
+  options?: CustomCommandOptions,
 ): void {
-  const { Cypress, cy, firebase } = commandParams;
+  const { Cypress, cy, firebase } = context;
 
   /**
    * Login to Firebase auth as a user with either a passed uid or the TEST_UID
@@ -260,33 +274,36 @@ export default function attachCustomCommands(
    * authenticated with serviceAccount.json or SERVICE_ACCOUNT env var.
    * @name cy.login
    */
-  Cypress.Commands.add('login', (uid?: string, customClaims?: any): any => {
-    const userUid = uid || Cypress.env('TEST_UID');
-    // Resolve with current user if they already exist
-    if (
-      firebase.auth().currentUser &&
-      userUid === firebase.auth().currentUser.uid
-    ) {
-      cy.log('Authed user already exists, login complete.');
-      return undefined;
-    }
+  Cypress.Commands.add(
+    options?.commandNames?.login || 'login',
+    (uid?: string, customClaims?: any): any => {
+      const userUid = uid || Cypress.env('TEST_UID');
+      // Resolve with current user if they already exist
+      if (
+        firebase.auth().currentUser &&
+        userUid === firebase.auth().currentUser.uid
+      ) {
+        cy.log('Authed user already exists, login complete.');
+        return undefined;
+      }
 
-    // Handle UID which is passed in
-    if (!userUid) {
-      throw new Error(
-        'uid must be passed or TEST_UID set within environment to login',
-      );
-    }
+      // Handle UID which is passed in
+      if (!userUid) {
+        throw new Error(
+          'uid must be passed or TEST_UID set within environment to login',
+        );
+      }
 
-    cy.log('Creating custom token for login...');
+      cy.log('Creating custom token for login...');
 
-    // Generate a custom token using createCustomToken task (if tasks are enabled) then login
-    return cy
-      .task('createCustomToken', { uid: userUid, customClaims })
-      .then((customToken: string) =>
-        loginWithCustomToken(firebase, customToken),
-      );
-  });
+      // Generate a custom token using createCustomToken task (if tasks are enabled) then login
+      return cy
+        .task('createCustomToken', { uid: userUid, customClaims })
+        .then((customToken: string) =>
+          loginWithCustomToken(firebase, customToken),
+        );
+    },
+  );
 
   /**
    * Log out of Firebase instance
@@ -296,7 +313,7 @@ export default function attachCustomCommands(
    * cy.logout()
    */
   Cypress.Commands.add(
-    'logout',
+    options?.commandNames?.logout || 'logout',
     (): Promise<any> => {
       return new Promise((resolve: Function, reject: Function): any => {
         firebase.auth().onAuthStateChanged((auth: any) => {
@@ -319,7 +336,7 @@ export default function attachCustomCommands(
    * @name cy.callRtdb
    */
   Cypress.Commands.add(
-    'callRtdb',
+    options?.commandNames?.callRtdb || 'callRtdb',
     (
       action: RTDBAction,
       actionPath: string,
@@ -368,7 +385,7 @@ export default function attachCustomCommands(
    * @name cy.callFirestore
    */
   Cypress.Commands.add(
-    'callFirestore',
+    options?.commandNames?.callFirestore || 'callFirestore',
     (
       action: FirestoreAction,
       actionPath: string,
@@ -404,6 +421,20 @@ export default function attachCustomCommands(
         taskSettings.options = options;
       }
       return cy.task('callFirestore', taskSettings);
+    },
+  );
+
+  /**
+   * Get Firebase auth user by UID
+   * @name cy.getAuthUser
+   * @see https://github.com/prescottprue/cypress-firebase#cygetauthuser
+   * @example
+   * cy.getAuthUser()
+   */
+  Cypress.Commands.add(
+    options?.commandNames?.getAuthUser || 'getAuthUser',
+    (uid: string): Promise<any> => {
+      return cy.task('getAuthUser', uid);
     },
   );
 }

@@ -166,12 +166,23 @@ declare module "attachCustomCommands" {
             }
         }
     }
+    interface CommandNamespacesConfig {
+        login?: string;
+        logout?: string;
+        callRtdb?: string;
+        callFirestore?: string;
+        getAuthUser?: string;
+    }
+    interface CustomCommandOptions {
+        commandNames?: CommandNamespacesConfig;
+    }
     /**
      * Attach custom commands including cy.login, cy.logout, cy.callRtdb,
-     * @param commandParams - List of params to provide scope during
+     * @param context - Context values passed from Cypress environment
      * custom command attachment
+     * @param options - Custom command options
      */
-    export default function attachCustomCommands(commandParams: AttachCustomCommandParams): void;
+    export default function attachCustomCommands(context: AttachCustomCommandParams, options?: CustomCommandOptions): void;
 }
 declare module "extendWithFirebaseConfig" {
     export interface CypressEnvironmentOptions {
@@ -274,6 +285,7 @@ declare module "firebase-utils" {
     export function deleteCollection(db: any, collectionPath: string, batchSize?: number): Promise<any>;
 }
 declare module "tasks" {
+    import * as admin from 'firebase-admin';
     import { FixtureData, FirestoreAction, RTDBAction, CallRtdbOptions, CallFirestoreOptions } from "attachCustomCommands";
     /**
      * @param adminInstance - firebase-admin instance
@@ -301,6 +313,13 @@ declare module "tasks" {
      * @returns Promise which resolves with a custom Firebase Auth token
      */
     export function createCustomToken(adminInstance: any, uid: string, settings?: any): Promise<string>;
+    /**
+     * Get Firebase Auth user based on UID
+     * @param adminInstance - Admin SDK instance
+     * @param uid - UID of user for which the custom token will be generated
+     * @returns Promise which resolves with a custom Firebase Auth token
+     */
+    export function getAuthUser(adminInstance: any, uid: string): Promise<admin.auth.UserRecord>;
 }
 declare module "plugin" {
     import { ExtendedCypressConfig } from "extendWithFirebaseConfig";

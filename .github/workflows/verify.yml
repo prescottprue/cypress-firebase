@@ -63,7 +63,7 @@ jobs:
       #     github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Size Check
-        run: yarn size
+        run: $(yarn bin)/size-limit
 
       - name: Upload Coverage
         if: success()
