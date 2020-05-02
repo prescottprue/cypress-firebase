@@ -46,12 +46,6 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['test/unit/**.spec.ts'],
-      rules: {
-        'func-names': 0
-      }
-    },
-    {
       files: ['cmds/**'],
       rules: {
         'comma-dangle': ['error', { 'functions': 'never' }],
