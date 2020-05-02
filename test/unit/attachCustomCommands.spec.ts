@@ -141,9 +141,9 @@ describe('attachCustomCommands', () => {
     });
 
     it('Aliases login command', () => {
-      const commandNamespaces = { login: 'testing' };
-      attachCustomCommands({ cy, Cypress, firebase }, { commandNamespaces });
-      expect(addSpy).to.have.been.calledWith(commandNamespaces.login);
+      const commandNames = { login: 'testing' };
+      attachCustomCommands({ cy, Cypress, firebase }, { commandNames });
+      expect(addSpy).to.have.been.calledWith(commandNames.login);
       expect(addSpy).to.have.been.calledWith('logout');
       expect(addSpy).to.have.been.calledWith('callRtdb');
       expect(addSpy).to.have.been.calledWith('callFirestore');
@@ -151,9 +151,9 @@ describe('attachCustomCommands', () => {
     });
 
     it('Aliases logout command', () => {
-      const commandNamespaces = { logout: 'testing' };
-      attachCustomCommands({ cy, Cypress, firebase }, { commandNamespaces });
-      expect(addSpy).to.have.been.calledWith(commandNamespaces.logout);
+      const commandNames = { logout: 'testing' };
+      attachCustomCommands({ cy, Cypress, firebase }, { commandNames });
+      expect(addSpy).to.have.been.calledWith(commandNames.logout);
       expect(addSpy).to.have.been.calledWith('login');
       expect(addSpy).to.have.been.calledWith('callRtdb');
       expect(addSpy).to.have.been.calledWith('callFirestore');
@@ -161,9 +161,9 @@ describe('attachCustomCommands', () => {
     });
 
     it('Aliases callRtdb command', () => {
-      const commandNamespaces = { callRtdb: 'testing' };
-      attachCustomCommands({ cy, Cypress, firebase }, { commandNamespaces });
-      expect(addSpy).to.have.been.calledWith(commandNamespaces.callRtdb);
+      const commandNames = { callRtdb: 'testing' };
+      attachCustomCommands({ cy, Cypress, firebase }, { commandNames });
+      expect(addSpy).to.have.been.calledWith(commandNames.callRtdb);
       expect(addSpy).to.have.been.calledWith('login');
       expect(addSpy).to.have.been.calledWith('logout');
       expect(addSpy).to.have.been.calledWith('callFirestore');
@@ -171,9 +171,9 @@ describe('attachCustomCommands', () => {
     });
 
     it('Aliases callFirestore command', () => {
-      const commandNamespaces = { callFirestore: 'testing' };
-      attachCustomCommands({ cy, Cypress, firebase }, { commandNamespaces });
-      expect(addSpy).to.have.been.calledWith(commandNamespaces.callFirestore);
+      const commandNames = { callFirestore: 'testing' };
+      attachCustomCommands({ cy, Cypress, firebase }, { commandNames });
+      expect(addSpy).to.have.been.calledWith(commandNames.callFirestore);
       expect(addSpy).to.have.been.calledWith('login');
       expect(addSpy).to.have.been.calledWith('logout');
       expect(addSpy).to.have.been.calledWith('callRtdb');
@@ -181,9 +181,9 @@ describe('attachCustomCommands', () => {
     });
 
     it('Aliases getAuthUser command', () => {
-      const commandNamespaces = { getAuthUser: 'testing' };
-      attachCustomCommands({ cy, Cypress, firebase }, { commandNamespaces });
-      expect(addSpy).to.have.been.calledWith(commandNamespaces.getAuthUser);
+      const commandNames = { getAuthUser: 'testing' };
+      attachCustomCommands({ cy, Cypress, firebase }, { commandNames });
+      expect(addSpy).to.have.been.calledWith(commandNames.getAuthUser);
       expect(addSpy).to.have.been.calledWith('login');
       expect(addSpy).to.have.been.calledWith('logout');
       expect(addSpy).to.have.been.calledWith('callRtdb');

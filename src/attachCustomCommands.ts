@@ -253,7 +253,7 @@ interface CommandNamespacesConfig {
 }
 
 interface CustomCommandOptions {
-  commandNamespaces?: CommandNamespacesConfig;
+  commandNames?: CommandNamespacesConfig;
 }
 
 /**
@@ -275,7 +275,7 @@ export default function attachCustomCommands(
    * @name cy.login
    */
   Cypress.Commands.add(
-    options?.commandNamespaces?.login || 'login',
+    options?.commandNames?.login || 'login',
     (uid?: string, customClaims?: any): any => {
       const userUid = uid || Cypress.env('TEST_UID');
       // Resolve with current user if they already exist
@@ -313,7 +313,7 @@ export default function attachCustomCommands(
    * cy.logout()
    */
   Cypress.Commands.add(
-    options?.commandNamespaces?.logout || 'logout',
+    options?.commandNames?.logout || 'logout',
     (): Promise<any> => {
       return new Promise((resolve: Function, reject: Function): any => {
         firebase.auth().onAuthStateChanged((auth: any) => {
@@ -336,7 +336,7 @@ export default function attachCustomCommands(
    * @name cy.callRtdb
    */
   Cypress.Commands.add(
-    options?.commandNamespaces?.callRtdb || 'callRtdb',
+    options?.commandNames?.callRtdb || 'callRtdb',
     (
       action: RTDBAction,
       actionPath: string,
@@ -385,7 +385,7 @@ export default function attachCustomCommands(
    * @name cy.callFirestore
    */
   Cypress.Commands.add(
-    options?.commandNamespaces?.callFirestore || 'callFirestore',
+    options?.commandNames?.callFirestore || 'callFirestore',
     (
       action: FirestoreAction,
       actionPath: string,
@@ -432,7 +432,7 @@ export default function attachCustomCommands(
    * cy.getAuthUser()
    */
   Cypress.Commands.add(
-    options?.commandNamespaces?.getAuthUser || 'getAuthUser',
+    options?.commandNames?.getAuthUser || 'getAuthUser',
     (uid: string): Promise<any> => {
       return cy.task('getAuthUser', uid);
     },
