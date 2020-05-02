@@ -147,6 +147,7 @@ describe('attachCustomCommands', () => {
       expect(addSpy).to.have.been.calledWith('logout');
       expect(addSpy).to.have.been.calledWith('callRtdb');
       expect(addSpy).to.have.been.calledWith('callFirestore');
+      expect(addSpy).to.have.been.calledWith('getAuthUser');
     });
 
     it('Aliases logout command', () => {
@@ -156,6 +157,7 @@ describe('attachCustomCommands', () => {
       expect(addSpy).to.have.been.calledWith('login');
       expect(addSpy).to.have.been.calledWith('callRtdb');
       expect(addSpy).to.have.been.calledWith('callFirestore');
+      expect(addSpy).to.have.been.calledWith('getAuthUser');
     });
 
     it('Aliases callRtdb command', () => {
@@ -165,6 +167,7 @@ describe('attachCustomCommands', () => {
       expect(addSpy).to.have.been.calledWith('login');
       expect(addSpy).to.have.been.calledWith('logout');
       expect(addSpy).to.have.been.calledWith('callFirestore');
+      expect(addSpy).to.have.been.calledWith('getAuthUser');
     });
 
     it('Aliases callFirestore command', () => {
@@ -174,6 +177,17 @@ describe('attachCustomCommands', () => {
       expect(addSpy).to.have.been.calledWith('login');
       expect(addSpy).to.have.been.calledWith('logout');
       expect(addSpy).to.have.been.calledWith('callRtdb');
+      expect(addSpy).to.have.been.calledWith('getAuthUser');
+    });
+
+    it('Aliases getAuthUser command', () => {
+      const commandNamespaces = { getAuthUser: 'testing' };
+      attachCustomCommands({ cy, Cypress, firebase }, { commandNamespaces });
+      expect(addSpy).to.have.been.calledWith(commandNamespaces.getAuthUser);
+      expect(addSpy).to.have.been.calledWith('login');
+      expect(addSpy).to.have.been.calledWith('logout');
+      expect(addSpy).to.have.been.calledWith('callRtdb');
+      expect(addSpy).to.have.been.calledWith('callFirestore');
     });
   });
 });

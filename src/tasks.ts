@@ -208,3 +208,16 @@ export function createCustomToken(
   // Create auth token
   return adminInstance.auth().createCustomToken(uid, customClaims);
 }
+
+/**
+ * Get Firebase Auth user based on UID
+ * @param adminInstance - Admin SDK instance
+ * @param uid - UID of user for which the custom token will be generated
+ * @returns Promise which resolves with a custom Firebase Auth token
+ */
+export function getAuthUser(
+  adminInstance: any,
+  uid: string,
+): Promise<admin.auth.UserRecord> {
+  return adminInstance.auth().getUser(uid);
+}

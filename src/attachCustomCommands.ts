@@ -249,6 +249,7 @@ interface CommandNamespacesConfig {
   logout?: string;
   callRtdb?: string;
   callFirestore?: string;
+  getAuthUser?: string;
 }
 
 interface CustomCommandOptions {
@@ -420,6 +421,20 @@ export default function attachCustomCommands(
         taskSettings.options = options;
       }
       return cy.task('callFirestore', taskSettings);
+    },
+  );
+
+  /**
+   * Get Firebase auth user by UID
+   * @name cy.getAuthUser
+   * @see https://github.com/prescottprue/cypress-firebase#cygetauthuser
+   * @example
+   * cy.getAuthUser()
+   */
+  Cypress.Commands.add(
+    options?.commandNamespaces?.getAuthUser || 'getAuthUser',
+    (uid: string): Promise<any> => {
+      return cy.task('getAuthUser', uid);
     },
   );
 }
