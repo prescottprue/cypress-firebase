@@ -81,7 +81,7 @@ jobs:
 
       - name: Size Check
         if: steps.check.outputs.changed == 'true'
-        run: yarn size
+        run: $(yarn bin)/size-limit
 
       - name: Publish
         if: steps.check.outputs.changed == 'true'
