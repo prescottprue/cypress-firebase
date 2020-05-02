@@ -107,4 +107,73 @@ describe('attachCustomCommands', () => {
       });
     });
   });
+
+  beforeEach(() => {
+    taskSpy = sinon.spy(() => Promise.resolve());
+    envSpy = sinon.spy();
+    onAuthStateChanged = sinon.spy((authHandleFunc) => {
+      authHandleFunc({});
+    });
+    signInWithCustomToken = sinon.spy(() => Promise.resolve());
+    cy.task = taskSpy;
+    addSpy = sinon.spy((customCommandName: string, customCommandFunc: any) => {
+      loadedCustomCommands[customCommandName] = customCommandFunc;
+    });
+    Cypress = { Commands: { add: addSpy }, env: envSpy };
+    attachCustomCommands({ cy, Cypress, firebase });
+  });
+
+  describe('options', () => {
+    beforeEach(() => {
+      taskSpy = sinon.spy(() => Promise.resolve());
+      envSpy = sinon.spy();
+      onAuthStateChanged = sinon.spy((authHandleFunc) => {
+        authHandleFunc({});
+      });
+      signInWithCustomToken = sinon.spy(() => Promise.resolve());
+      cy.task = taskSpy;
+      addSpy = sinon.spy(
+        (customCommandName: string, customCommandFunc: any) => {
+          loadedCustomCommands[customCommandName] = customCommandFunc;
+        },
+      );
+      Cypress = { Commands: { add: addSpy }, env: envSpy };
+    });
+
+    it('Aliases login command', () => {
+      const commandNamespaces = { login: 'testing' };
+      attachCustomCommands({ cy, Cypress, firebase }, { commandNamespaces });
+      expect(addSpy).to.have.been.calledWith(commandNamespaces.login);
+      expect(addSpy).to.have.been.calledWith('logout');
+      expect(addSpy).to.have.been.calledWith('callRtdb');
+      expect(addSpy).to.have.been.calledWith('callFirestore');
+    });
+
+    it('Aliases logout command', () => {
+      const commandNamespaces = { logout: 'testing' };
+      attachCustomCommands({ cy, Cypress, firebase }, { commandNamespaces });
+      expect(addSpy).to.have.been.calledWith(commandNamespaces.logout);
+      expect(addSpy).to.have.been.calledWith('login');
+      expect(addSpy).to.have.been.calledWith('callRtdb');
+      expect(addSpy).to.have.been.calledWith('callFirestore');
+    });
+
+    it('Aliases callRtdb command', () => {
+      const commandNamespaces = { callRtdb: 'testing' };
+      attachCustomCommands({ cy, Cypress, firebase }, { commandNamespaces });
+      expect(addSpy).to.have.been.calledWith(commandNamespaces.callRtdb);
+      expect(addSpy).to.have.been.calledWith('login');
+      expect(addSpy).to.have.been.calledWith('logout');
+      expect(addSpy).to.have.been.calledWith('callFirestore');
+    });
+
+    it('Aliases callFirestore command', () => {
+      const commandNamespaces = { callFirestore: 'testing' };
+      attachCustomCommands({ cy, Cypress, firebase }, { commandNamespaces });
+      expect(addSpy).to.have.been.calledWith(commandNamespaces.callFirestore);
+      expect(addSpy).to.have.been.calledWith('login');
+      expect(addSpy).to.have.been.calledWith('logout');
+      expect(addSpy).to.have.been.calledWith('callRtdb');
+    });
+  });
 });
