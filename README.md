@@ -82,7 +82,7 @@ If you are interested in what drove the need for this checkout [the why section]
      });
    });
    ```
-1. From the root of your project, start Cypress with the command `./node_modules/cypress/bin/cypress open`.  In the Cypress window, click your new test (`test_hello_world.js`) to run it.
+1. From the root of your project, start Cypress with the command `$(npm bin)/cypress open`.  In the Cypress window, click your new test (`test_hello_world.js`) to run it.
 1. Look in your Firestore instance and see the `test_hello_world` collection to confirm that a document was added.
 1. Pat yourself on the back, you are all setup to access Firebase/Firestore from within your tests!
 
