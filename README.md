@@ -408,21 +408,17 @@ if (REACT_APP_FIRESTORE_EMULATOR_HOST) {
 It is often required to run tests against the built version of your app instead of your dev version (with hot module reloading and other dev tools). You can do that by running a build script before spinning up the:
 
 1. Adding the following npm script:
-
-```json
-"start:dist": "npm run build && firebase emulators:start --only hosting",
-```
-
+   ```json
+   "start:dist": "npm run build && firebase emulators:start --only hosting",
+   ```
 1. Add the emulator port to `firebase.json`:
-
-```json
-"emulators": {
-  "hosting": {
-    "port": 3000
-  }
-}
-```
-
+   ```json
+   "emulators": {
+     "hosting": {
+       "port": 3000
+     }
+   }
+   ```
 1. Run `npm run start:dist` to build your app and serve it with firebase
 1. In another terminal window, run a test command such as `npm run test:open`
 
