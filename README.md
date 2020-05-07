@@ -266,8 +266,8 @@ describe("Test firestore", () => {
       age: 8,
     });
     cy.callFirestore("get", `testCollection/${TEST_UID}`).then((r) => {
-      cy.wrap(r[0]).its("id").should("equal", TEST_UID);
-      cy.wrap(r[0]).its("data.age").should("equal", mockAge);
+      cy.log("get returned: ", r);
+      cy.wrap(r).its("data.age").should("equal", mockAge);
     });
     cy.log("Ended test");
   });
