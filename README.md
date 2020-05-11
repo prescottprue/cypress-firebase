@@ -68,8 +68,14 @@ If you are interested in what drove the need for this checkout [the why section]
    const cypressFirebasePlugin = require("cypress-firebase").plugin;
 
    module.exports = (on, config) => {
-     // Pass on function, config, and admin instance. Returns extended config
-     return cypressFirebasePlugin(on, config, admin);
+     // Pass on function, config, and admin instance
+     cypressFirebasePlugin(on, config, admin)
+     
+     // add other plugins/tasks to be registered here
+     
+     // IMPORTANT to return the config object
+     // with the any changed environment variables
+     return config
    };
    ```
 
