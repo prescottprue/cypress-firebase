@@ -304,7 +304,7 @@ declare module "tasks" {
      * @param data - Data to pass to action
      * @returns Promise which resolves with results of calling Firestore
      */
-    export function callFirestore(adminInstance: any, action: FirestoreAction, actionPath: string, options?: CallFirestoreOptions, data?: FixtureData): Promise<any>;
+    export function callFirestore(adminInstance: admin.app.App, action: FirestoreAction, actionPath: string, options?: CallFirestoreOptions, data?: FixtureData): Promise<any>;
     /**
      * Create a custom token
      * @param adminInstance - Admin SDK instance
