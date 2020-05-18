@@ -1,13 +1,15 @@
 import { expect } from 'chai';
 import * as firebase from '@firebase/testing';
 import * as tasks from '../../src/tasks';
+import * as admin from 'firebase-admin';
+import sinon from 'sinon';
 
 const PROJECTS_COLLECTION = 'projects';
 const PROJECT_ID = 'project-1';
 const PROJECT_PATH = `${PROJECTS_COLLECTION}/${PROJECT_ID}`;
 const testProject = { name: 'project 1' };
 
-const adminApp = firebase.initializeAdminApp({
+const adminApp: any = firebase.initializeAdminApp({
   projectId: process.env.GCLOUD_PROJECT,
   databaseName: process.env.GCLOUD_PROJECT,
 });
@@ -202,6 +204,78 @@ describe('tasks', () => {
         const result = resultSnap.data();
         expect(result).to.have.property('name', testProject.name);
         expect(result).to.have.property('some', extraVal.some);
+      });
+
+      describe('with timestamps', () => {
+        const app = admin.initializeApp({
+          projectId: process.env.GCLOUD_PROJECT,
+        });
+
+        it('sets a document with a timestamp FieldValue', async () => {
+          const correctTimestamp = {
+            _seconds: 1589651645,
+            _nanoseconds: 434000000,
+          };
+
+          const stub = sinon
+            .stub(admin.firestore.FieldValue, 'serverTimestamp')
+            .returns(correctTimestamp as any);
+
+          const projectFirestoreRef = app.firestore().doc(PROJECT_PATH);
+
+          // cy.task stringify's and parses the data past to it resulting in the following value
+          const stringifiedServerTimestamp = {
+            _methodName: 'FieldValue.serverTimestamp',
+          };
+
+          await tasks.callFirestore(
+            app,
+            'set',
+            PROJECT_PATH,
+            {},
+            { timeProperty: stringifiedServerTimestamp }
+          );
+
+          const resultSnap = await projectFirestoreRef.get();
+          expect(resultSnap.data()).to.deep.equal({
+            timeProperty: correctTimestamp,
+          });
+
+          stub.restore();
+        });
+
+        it('sets a document with a nested timestamp value', async () => {
+          const correctTimestamp = {
+            _seconds: 1589651645,
+            _nanoseconds: 434000000,
+          };
+
+          const stub = sinon
+            .stub(admin.firestore.FieldValue, 'serverTimestamp')
+            .returns(correctTimestamp as any);
+
+          const projectFirestoreRef = app.firestore().doc(PROJECT_PATH);
+
+          // cy.task stringify's and parses the data past to it resulting in the following value
+          const stringifiedServerTimestamp = {
+            _methodName: 'FieldValue.serverTimestamp',
+          };
+
+          await tasks.callFirestore(
+            app,
+            'set',
+            PROJECT_PATH,
+            {},
+            { time: { nested: stringifiedServerTimestamp } }
+          );
+
+          const resultSnap = await projectFirestoreRef.get();
+          expect(resultSnap.data()).to.deep.equal({
+            time: { nested: correctTimestamp },
+          });
+
+          stub.restore();
+        });
       });
     });
 

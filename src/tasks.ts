@@ -39,6 +39,35 @@ function optionsToRtdbRef(baseRef: any, options?: CallRtdbOptions): any {
 }
 
 /**
+ * @param data - Data to be set in firestore
+ * @returns Data to be set in firestore with timestamp
+ */
+function getDataWithTimestamps(data: admin.firestore.DocumentData): object {
+  /* eslint-disable no-underscore-dangle */
+  return Object.keys(data).reduce<object>((acc, currKey) => {
+    if (typeof data[currKey] === 'object' && !data[currKey]._methodName) {
+      return {
+        ...acc,
+        [currKey]: getDataWithTimestamps(data[currKey]),
+      };
+    }
+
+    const isTimestamp =
+      data[currKey]._methodName &&
+      data[currKey]._methodName === 'FieldValue.serverTimestamp';
+    const value = isTimestamp
+      ? admin.firestore.FieldValue.serverTimestamp()
+      : data[currKey];
+
+    return {
+      ...acc,
+      [currKey]: value,
+    };
+  }, {});
+  /* eslint-enable no-underscore-dangle */
+}
+
+/**
  * @param adminInstance - firebase-admin instance
  * @param action - Action to run
  * @param actionPath - Path in RTDB
@@ -109,7 +138,7 @@ export function callRtdb(
  * @returns Promise which resolves with results of calling Firestore
  */
 export function callFirestore(
-  adminInstance: any,
+  adminInstance: admin.app.App,
   action: FirestoreAction,
   actionPath: string,
   options?: CallFirestoreOptions,
@@ -152,10 +181,16 @@ export function callFirestore(
   }
 
   if (action === 'set') {
+    if (!data) {
+      throw new Error('You must define data to set in firestore.');
+    }
+
+    const dataToSet = getDataWithTimestamps(data);
+
     return adminInstance
       .firestore()
       .doc(actionPath)
-      [action](data, options?.merge ? { merge: options?.merge } : undefined)
+      .set(dataToSet, options?.merge ? { merge: options?.merge } : undefined)
       .catch(handleError);
   }
 
