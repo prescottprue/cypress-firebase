@@ -224,7 +224,7 @@ describe('tasks', () => {
         it('sets a document with a timestamp FieldValue', async () => {
           const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
 
-          // cy.task stringify's and parses the data past to it resulting in the following value
+          // cy.task stringifies and parses the data past to it resulting in the following value
           const stringifiedServerTimestamp = {
             _methodName: 'FieldValue.serverTimestamp',
           };
@@ -246,7 +246,7 @@ describe('tasks', () => {
         it('sets a document with a nested timestamp value', async () => {
           const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
 
-          // cy.task stringify's and parses the data past to it resulting in the following value
+          // cy.task stringifies and parses the data past to it resulting in the following value
           const stringifiedServerTimestamp = {
             _methodName: 'FieldValue.serverTimestamp',
           };
@@ -281,6 +281,81 @@ describe('tasks', () => {
         );
         const resultSnap = await projectFirestoreRef.get();
         expect(resultSnap.data()).to.have.property('some', testValue);
+      });
+
+      describe('with timestamps', () => {
+        let stub: sinon.SinonStub;
+        const correctTimestamp = {
+          _seconds: 1589651645,
+          _nanoseconds: 434000000,
+        };
+        beforeEach(() => {
+          stub = sinon
+            .stub(admin.firestore.FieldValue, 'serverTimestamp')
+            .returns(correctTimestamp as any);
+        });
+        afterEach(() => {
+          stub.restore();
+        });
+
+        it('updates a document with a timestamp FieldValue', async () => {
+          const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
+          await projectFirestoreRef.set({ some: 'data' });
+          // cy.task stringifies and parses the data past to it resulting in the following value
+          const stringifiedServerTimestamp = {
+            _methodName: 'FieldValue.serverTimestamp',
+          };
+
+          await tasks.callFirestore(
+            adminApp,
+            'update',
+            PROJECT_PATH,
+            {},
+            { timeProperty: stringifiedServerTimestamp },
+          );
+
+          const resultSnap = await projectFirestoreRef.get();
+          /* eslint-disable no-underscore-dangle */
+          expect(resultSnap.data()).to.have.nested.property(
+            'timeProperty._seconds',
+            correctTimestamp._seconds,
+          );
+          expect(resultSnap.data()).to.have.nested.property(
+            'timeProperty._nanoseconds',
+            correctTimestamp._nanoseconds,
+          );
+          /* eslint-enable no-underscore-dangle */
+        });
+
+        it('updates a document with a nested timestamp value', async () => {
+          const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
+          await projectFirestoreRef.set({ some: 'data' });
+
+          // cy.task stringifies and parses the data past to it resulting in the following value
+          const stringifiedServerTimestamp = {
+            _methodName: 'FieldValue.serverTimestamp',
+          };
+
+          await tasks.callFirestore(
+            adminApp,
+            'update',
+            PROJECT_PATH,
+            {},
+            { time: { nested: stringifiedServerTimestamp } },
+          );
+
+          const resultSnap = await projectFirestoreRef.get();
+          /* eslint-disable no-underscore-dangle */
+          expect(resultSnap.data()).to.have.nested.property(
+            'time.nested._seconds',
+            correctTimestamp._seconds,
+          );
+          expect(resultSnap.data()).to.have.nested.property(
+            'time.nested._nanoseconds',
+            correctTimestamp._nanoseconds,
+          );
+          /* eslint-enable no-underscore-dangle */
+        });
       });
     });
 

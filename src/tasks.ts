@@ -53,8 +53,7 @@ function getDataWithTimestamps(data: admin.firestore.DocumentData): object {
     }
 
     const isTimestamp =
-      data[currKey]._methodName &&
-      data[currKey]._methodName === 'FieldValue.serverTimestamp';
+      data[currKey]?._methodName === 'FieldValue.serverTimestamp';
     const value = isTimestamp
       ? admin.firestore.FieldValue.serverTimestamp()
       : data[currKey];
@@ -180,20 +179,6 @@ export function callFirestore(
       .catch(handleError);
   }
 
-  if (action === 'set') {
-    if (!data) {
-      throw new Error('You must define data to set in firestore.');
-    }
-
-    const dataToSet = getDataWithTimestamps(data);
-
-    return adminInstance
-      .firestore()
-      .doc(actionPath)
-      .set(dataToSet, options?.merge ? { merge: options?.merge } : undefined)
-      .catch(handleError);
-  }
-
   if (action === 'delete') {
     // Handle deleting of collections & sub-collections if not a doc path
     const deletePromise = isDocPath(actionPath)
@@ -215,13 +200,26 @@ export function callFirestore(
         .catch(handleError)
     );
   }
+
+  if (!data) {
+    throw new Error(`You must define data to run ${action} in firestore.`);
+  }
+
+  const dataToSet = getDataWithTimestamps(data);
+  if (action === 'set') {
+    return adminInstance
+      .firestore()
+      .doc(actionPath)
+      .set(dataToSet, options?.merge ? { merge: options?.merge } : undefined)
+      .catch(handleError);
+  }
   // "update" action
   return (slashPathToFirestoreRef(
     adminInstance.firestore(),
     actionPath,
     options,
   ) as any)
-    [action](data)
+    [action](dataToSet)
     .catch(handleError);
 }
 
