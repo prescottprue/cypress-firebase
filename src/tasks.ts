@@ -42,7 +42,7 @@ function optionsToRtdbRef(baseRef: any, options?: CallRtdbOptions): any {
  * @param data - Data to be set in firestore
  * @returns Data to be set in firestore with timestamp
  */
-function getDataWithTimestamps(data: { [key: string]: any }): object {
+function getDataWithTimestamps(data: admin.firestore.DocumentData): object {
   /* eslint-disable no-underscore-dangle */
   return Object.keys(data).reduce<object>((acc, currKey) => {
     if (typeof data[currKey] === 'object' && !data[currKey]._methodName) {
