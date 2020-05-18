@@ -29,7 +29,7 @@ jobs:
         id: cache-settings
         run: |
           echo "::set-output name=dir::$(yarn cache dir)"
-          echo "::set-output name=firebase-tools::$(yarn info firebase-tools version --silent)"
+          echo "::set-output name=firebase-tools::$(yarn list -s --depth=0 --pattern firebase-tools | tail -n 1 | sed 's/.*@//g')"
           
       - name: Cache Yarn Dependencies
         if: steps.check.outputs.changed == 'true'
