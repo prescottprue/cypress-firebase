@@ -4,7 +4,7 @@
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
-  "jsnext:main": "lib/index.js",
+  "jsnext:main": "lib-esm/index.js",
   "types": "./index.d.ts",
   "scripts": {
     "clean": "rimraf lib lib-esm",
@@ -105,13 +105,13 @@
     {
       "name": "CommonJS",
       "path": "lib/*.js",
-      "limit": "9kb",
+      "limit": "10kb",
       "webpack": false
     },
     {
       "name": "ESM",
       "path": "lib-esm/*.js",
-      "limit": "8.5kb",
+      "limit": "9.5kb",
       "webpack": false
     }
   ]
