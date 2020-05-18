@@ -1,8 +1,8 @@
 import { expect } from 'chai';
 import * as firebase from '@firebase/testing';
-import * as tasks from '../../src/tasks';
 import * as admin from 'firebase-admin';
 import sinon from 'sinon';
+import * as tasks from '../../src/tasks';
 
 const PROJECTS_COLLECTION = 'projects';
 const PROJECT_ID = 'project-1';
@@ -233,7 +233,7 @@ describe('tasks', () => {
             'set',
             PROJECT_PATH,
             {},
-            { timeProperty: stringifiedServerTimestamp }
+            { timeProperty: stringifiedServerTimestamp },
           );
 
           const resultSnap = await projectFirestoreRef.get();
@@ -266,7 +266,7 @@ describe('tasks', () => {
             'set',
             PROJECT_PATH,
             {},
-            { time: { nested: stringifiedServerTimestamp } }
+            { time: { nested: stringifiedServerTimestamp } },
           );
 
           const resultSnap = await projectFirestoreRef.get();
