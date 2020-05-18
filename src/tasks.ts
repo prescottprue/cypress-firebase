@@ -38,7 +38,12 @@ function optionsToRtdbRef(baseRef: any, options?: CallRtdbOptions): any {
   return newRef;
 }
 
+/**
+ * @param data - Data to be set in firestore
+ * @returns Data to be set in firestore with timestamp
+ */
 function getDataWithTimestamps(data: { [key: string]: any }): object {
+  /* eslint-disable no-underscore-dangle */
   return Object.keys(data).reduce<object>((acc, currKey) => {
     if (typeof data[currKey] === 'object' && !data[currKey]._methodName) {
       return {
@@ -59,6 +64,7 @@ function getDataWithTimestamps(data: { [key: string]: any }): object {
       [currKey]: value,
     };
   }, {});
+  /* eslint-enable no-underscore-dangle */
 }
 
 /**
@@ -175,7 +181,11 @@ export function callFirestore(
   }
 
   if (action === 'set') {
-    const dataToSet = getDataWithTimestamps(data!);
+    if (!data) {
+      throw new Error('You must define data to set in firestore.');
+    }
+
+    const dataToSet = getDataWithTimestamps(data);
 
     return adminInstance
       .firestore()
