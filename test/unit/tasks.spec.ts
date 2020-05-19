@@ -26,8 +26,8 @@ describe('tasks', () => {
   });
 
   describe('callFirestore', () => {
-    before(() => {
-      firebase.clearFirestoreData({
+    before(async () => {
+      await firebase.clearFirestoreData({
         projectId: 'test-project',
       });
     });
@@ -233,7 +233,7 @@ describe('tasks', () => {
             adminApp,
             'set',
             PROJECT_PATH,
-            {},
+            { statics: admin.firestore },
             { timeProperty: stringifiedServerTimestamp },
           );
 
@@ -255,7 +255,7 @@ describe('tasks', () => {
             adminApp,
             'set',
             PROJECT_PATH,
-            {},
+            { statics: admin.firestore },
             { time: { nested: stringifiedServerTimestamp } },
           );
 
@@ -310,7 +310,7 @@ describe('tasks', () => {
             adminApp,
             'update',
             PROJECT_PATH,
-            {},
+            { statics: admin.firestore },
             { timeProperty: stringifiedServerTimestamp },
           );
 
@@ -340,7 +340,7 @@ describe('tasks', () => {
             adminApp,
             'update',
             PROJECT_PATH,
-            {},
+            { statics: admin.firestore },
             { time: { nested: stringifiedServerTimestamp } },
           );
 

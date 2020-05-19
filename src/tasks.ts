@@ -40,22 +40,30 @@ function optionsToRtdbRef(baseRef: any, options?: CallRtdbOptions): any {
 
 /**
  * @param data - Data to be set in firestore
+ * @param firestoreStatics - Statics from Firestore object
  * @returns Data to be set in firestore with timestamp
  */
-function getDataWithTimestamps(data: admin.firestore.DocumentData): object {
-  /* eslint-disable no-underscore-dangle */
+function getDataWithTimestamps(
+  data: admin.firestore.DocumentData,
+  firestoreStatics: typeof admin.firestore,
+): object {
+  // Exit if no statics are passed
+  if (!firestoreStatics) {
+    return data;
+  }
   return Object.keys(data).reduce<object>((acc, currKey) => {
+    /* eslint-disable-next-line no-underscore-dangle */
     if (typeof data[currKey] === 'object' && !data[currKey]._methodName) {
       return {
         ...acc,
-        [currKey]: getDataWithTimestamps(data[currKey]),
+        [currKey]: getDataWithTimestamps(data[currKey], firestoreStatics),
       };
     }
 
     const isTimestamp =
       data[currKey]?._methodName === 'FieldValue.serverTimestamp';
     const value = isTimestamp
-      ? admin.firestore.FieldValue.serverTimestamp()
+      ? firestoreStatics.FieldValue.serverTimestamp()
       : data[currKey];
 
     return {
@@ -63,7 +71,6 @@ function getDataWithTimestamps(data: admin.firestore.DocumentData): object {
       [currKey]: value,
     };
   }, {});
-  /* eslint-enable no-underscore-dangle */
 }
 
 /**
@@ -205,7 +212,12 @@ export function callFirestore(
     throw new Error(`You must define data to run ${action} in firestore.`);
   }
 
-  const dataToSet = getDataWithTimestamps(data);
+  const dataToSet = getDataWithTimestamps(
+    data,
+    // Use static option if passed (tests), otherwise fallback to statics on adminInstance
+    // Tests do not have statics since they are using @firebase/testing
+    options?.statics || (adminInstance.firestore as typeof admin.firestore),
+  );
   if (action === 'set') {
     return adminInstance
       .firestore()
