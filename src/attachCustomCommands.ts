@@ -1,3 +1,5 @@
+import * as admin from 'firebase-admin';
+
 /**
  * Params for attachCustomCommand function for
  * attaching custom commands.
@@ -55,6 +57,11 @@ export interface CallFirestoreOptions {
    * Limit to last n number of documents
    */
   limitToLast?: number;
+  /**
+   * Firestore statics (i.e. admin.firestore). This should only be needed during
+   * testing due to @firebase/testing not containing statics
+   */
+  statics?: typeof admin.firestore;
 }
 
 /**

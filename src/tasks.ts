@@ -39,6 +39,41 @@ function optionsToRtdbRef(baseRef: any, options?: CallRtdbOptions): any {
 }
 
 /**
+ * @param data - Data to be set in firestore
+ * @param firestoreStatics - Statics from Firestore object
+ * @returns Data to be set in firestore with timestamp
+ */
+function getDataWithTimestamps(
+  data: admin.firestore.DocumentData,
+  firestoreStatics: typeof admin.firestore,
+): object {
+  // Exit if no statics are passed
+  if (!firestoreStatics) {
+    return data;
+  }
+  return Object.keys(data).reduce<object>((acc, currKey) => {
+    /* eslint-disable-next-line no-underscore-dangle */
+    if (typeof data[currKey] === 'object' && !data[currKey]._methodName) {
+      return {
+        ...acc,
+        [currKey]: getDataWithTimestamps(data[currKey], firestoreStatics),
+      };
+    }
+
+    const isTimestamp =
+      data[currKey]?._methodName === 'FieldValue.serverTimestamp';
+    const value = isTimestamp
+      ? firestoreStatics.FieldValue.serverTimestamp()
+      : data[currKey];
+
+    return {
+      ...acc,
+      [currKey]: value,
+    };
+  }, {});
+}
+
+/**
  * @param adminInstance - firebase-admin instance
  * @param action - Action to run
  * @param actionPath - Path in RTDB
@@ -109,7 +144,7 @@ export function callRtdb(
  * @returns Promise which resolves with results of calling Firestore
  */
 export function callFirestore(
-  adminInstance: any,
+  adminInstance: admin.app.App,
   action: FirestoreAction,
   actionPath: string,
   options?: CallFirestoreOptions,
@@ -151,14 +186,6 @@ export function callFirestore(
       .catch(handleError);
   }
 
-  if (action === 'set') {
-    return adminInstance
-      .firestore()
-      .doc(actionPath)
-      [action](data, options?.merge ? { merge: options?.merge } : undefined)
-      .catch(handleError);
-  }
-
   if (action === 'delete') {
     // Handle deleting of collections & sub-collections if not a doc path
     const deletePromise = isDocPath(actionPath)
@@ -180,13 +207,31 @@ export function callFirestore(
         .catch(handleError)
     );
   }
+
+  if (!data) {
+    throw new Error(`You must define data to run ${action} in firestore.`);
+  }
+
+  const dataToSet = getDataWithTimestamps(
+    data,
+    // Use static option if passed (tests), otherwise fallback to statics on adminInstance
+    // Tests do not have statics since they are using @firebase/testing
+    options?.statics || (adminInstance.firestore as typeof admin.firestore),
+  );
+  if (action === 'set') {
+    return adminInstance
+      .firestore()
+      .doc(actionPath)
+      .set(dataToSet, options?.merge ? { merge: options?.merge } : undefined)
+      .catch(handleError);
+  }
   // "update" action
   return (slashPathToFirestoreRef(
     adminInstance.firestore(),
     actionPath,
     options,
   ) as any)
-    [action](data)
+    [action](dataToSet)
     .catch(handleError);
 }
 

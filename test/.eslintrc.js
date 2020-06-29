@@ -1,6 +1,6 @@
 module.exports = {
   extends: '../.eslintrc.js',
-  globals:{ 
+  globals: {
     sinon: true,
     expect: true,
     after: true,
@@ -8,10 +8,10 @@ module.exports = {
     before: true,
     beforeEach: true,
     it: true,
-    describe: true
+    describe: true,
   },
   rules: {
     'no-unused-expressions': [0],
-    'func-names': 0
-  }
-}
+    'func-names': 0,
+  },
+};

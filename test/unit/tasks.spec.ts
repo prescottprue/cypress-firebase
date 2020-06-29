@@ -1,5 +1,7 @@
 import { expect } from 'chai';
 import * as firebase from '@firebase/testing';
+import * as admin from 'firebase-admin';
+import sinon from 'sinon';
 import * as tasks from '../../src/tasks';
 
 const PROJECTS_COLLECTION = 'projects';
@@ -7,7 +9,7 @@ const PROJECT_ID = 'project-1';
 const PROJECT_PATH = `${PROJECTS_COLLECTION}/${PROJECT_ID}`;
 const testProject = { name: 'project 1' };
 
-const adminApp = firebase.initializeAdminApp({
+const adminApp: any = firebase.initializeAdminApp({
   projectId: process.env.GCLOUD_PROJECT,
   databaseName: process.env.GCLOUD_PROJECT,
 });
@@ -24,8 +26,8 @@ describe('tasks', () => {
   });
 
   describe('callFirestore', () => {
-    before(() => {
-      firebase.clearFirestoreData({
+    before(async () => {
+      await firebase.clearFirestoreData({
         projectId: 'test-project',
       });
     });
@@ -203,6 +205,66 @@ describe('tasks', () => {
         expect(result).to.have.property('name', testProject.name);
         expect(result).to.have.property('some', extraVal.some);
       });
+
+      describe('with timestamps', () => {
+        let stub: sinon.SinonStub;
+        const correctTimestamp = {
+          _seconds: 1589651645,
+          _nanoseconds: 434000000,
+        };
+        beforeEach(() => {
+          stub = sinon
+            .stub(admin.firestore.FieldValue, 'serverTimestamp')
+            .returns(correctTimestamp as any);
+        });
+        afterEach(() => {
+          stub.restore();
+        });
+
+        it('sets a document with a timestamp FieldValue', async () => {
+          const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
+
+          // cy.task stringifies and parses the data past to it resulting in the following value
+          const stringifiedServerTimestamp = {
+            _methodName: 'FieldValue.serverTimestamp',
+          };
+
+          await tasks.callFirestore(
+            adminApp,
+            'set',
+            PROJECT_PATH,
+            { statics: admin.firestore },
+            { timeProperty: stringifiedServerTimestamp },
+          );
+
+          const resultSnap = await projectFirestoreRef.get();
+          expect(resultSnap.data()).to.deep.equal({
+            timeProperty: correctTimestamp,
+          });
+        });
+
+        it('sets a document with a nested timestamp value', async () => {
+          const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
+
+          // cy.task stringifies and parses the data past to it resulting in the following value
+          const stringifiedServerTimestamp = {
+            _methodName: 'FieldValue.serverTimestamp',
+          };
+
+          await tasks.callFirestore(
+            adminApp,
+            'set',
+            PROJECT_PATH,
+            { statics: admin.firestore },
+            { time: { nested: stringifiedServerTimestamp } },
+          );
+
+          const resultSnap = await projectFirestoreRef.get();
+          expect(resultSnap.data()).to.deep.equal({
+            time: { nested: correctTimestamp },
+          });
+        });
+      });
     });
 
     describe('update action', () => {
@@ -219,6 +281,81 @@ describe('tasks', () => {
         );
         const resultSnap = await projectFirestoreRef.get();
         expect(resultSnap.data()).to.have.property('some', testValue);
+      });
+
+      describe('with timestamps', () => {
+        let stub: sinon.SinonStub;
+        const correctTimestamp = {
+          _seconds: 1589651645,
+          _nanoseconds: 434000000,
+        };
+        beforeEach(() => {
+          stub = sinon
+            .stub(admin.firestore.FieldValue, 'serverTimestamp')
+            .returns(correctTimestamp as any);
+        });
+        afterEach(() => {
+          stub.restore();
+        });
+
+        it('updates a document with a timestamp FieldValue', async () => {
+          const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
+          await projectFirestoreRef.set({ some: 'data' });
+          // cy.task stringifies and parses the data past to it resulting in the following value
+          const stringifiedServerTimestamp = {
+            _methodName: 'FieldValue.serverTimestamp',
+          };
+
+          await tasks.callFirestore(
+            adminApp,
+            'update',
+            PROJECT_PATH,
+            { statics: admin.firestore },
+            { timeProperty: stringifiedServerTimestamp },
+          );
+
+          const resultSnap = await projectFirestoreRef.get();
+          /* eslint-disable no-underscore-dangle */
+          expect(resultSnap.data()).to.have.nested.property(
+            'timeProperty._seconds',
+            correctTimestamp._seconds,
+          );
+          expect(resultSnap.data()).to.have.nested.property(
+            'timeProperty._nanoseconds',
+            correctTimestamp._nanoseconds,
+          );
+          /* eslint-enable no-underscore-dangle */
+        });
+
+        it('updates a document with a nested timestamp value', async () => {
+          const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
+          await projectFirestoreRef.set({ some: 'data' });
+
+          // cy.task stringifies and parses the data past to it resulting in the following value
+          const stringifiedServerTimestamp = {
+            _methodName: 'FieldValue.serverTimestamp',
+          };
+
+          await tasks.callFirestore(
+            adminApp,
+            'update',
+            PROJECT_PATH,
+            { statics: admin.firestore },
+            { time: { nested: stringifiedServerTimestamp } },
+          );
+
+          const resultSnap = await projectFirestoreRef.get();
+          /* eslint-disable no-underscore-dangle */
+          expect(resultSnap.data()).to.have.nested.property(
+            'time.nested._seconds',
+            correctTimestamp._seconds,
+          );
+          expect(resultSnap.data()).to.have.nested.property(
+            'time.nested._nanoseconds',
+            correctTimestamp._nanoseconds,
+          );
+          /* eslint-enable no-underscore-dangle */
+        });
       });
     });
 

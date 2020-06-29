@@ -1,4 +1,5 @@
 declare module "attachCustomCommands" {
+    import * as admin from 'firebase-admin';
     /**
      * Params for attachCustomCommand function for
      * attaching custom commands.
@@ -49,6 +50,11 @@ declare module "attachCustomCommands" {
          * Limit to last n number of documents
          */
         limitToLast?: number;
+        /**
+         * Firestore statics (i.e. admin.firestore). This should only be needed during
+         * testing due to @firebase/testing not containing statics
+         */
+        statics?: typeof admin.firestore;
     }
     /**
      * Action for Real Time Database
@@ -304,7 +310,7 @@ declare module "tasks" {
      * @param data - Data to pass to action
      * @returns Promise which resolves with results of calling Firestore
      */
-    export function callFirestore(adminInstance: any, action: FirestoreAction, actionPath: string, options?: CallFirestoreOptions, data?: FixtureData): Promise<any>;
+    export function callFirestore(adminInstance: admin.app.App, action: FirestoreAction, actionPath: string, options?: CallFirestoreOptions, data?: FixtureData): Promise<any>;
     /**
      * Create a custom token
      * @param adminInstance - Admin SDK instance
