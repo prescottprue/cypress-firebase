@@ -39,6 +39,28 @@ function optionsToRtdbRef(baseRef: any, options?: CallRtdbOptions): any {
 }
 
 /**
+ * @param dataVal - Value of data
+ * @param firestoreStatics - Statics from firestore instance
+ * @returns Value converted into timestamp object if possible
+ */
+function convertValueToTimestampIfPossible(
+  dataVal: any,
+  firestoreStatics: typeof admin.firestore,
+): admin.firestore.FieldValue {
+  if (dataVal?._methodName === 'FieldValue.serverTimestamp') {
+    return firestoreStatics.FieldValue.serverTimestamp();
+  }
+  if (
+    typeof dataVal?.seconds === 'number' &&
+    typeof dataVal?.nanoseconds === 'number'
+  ) {
+    return new firestoreStatics.Timestamp(dataVal.seconds, dataVal.nanoseconds);
+  }
+
+  return dataVal;
+}
+
+/**
  * @param data - Data to be set in firestore
  * @param firestoreStatics - Statics from Firestore object
  * @returns Data to be set in firestore with timestamp
@@ -52,19 +74,22 @@ function getDataWithTimestamps(
     return data;
   }
   return Object.keys(data).reduce<object>((acc, currKey) => {
-    /* eslint-disable-next-line no-underscore-dangle */
-    if (typeof data[currKey] === 'object' && !data[currKey]._methodName) {
+    if (
+      typeof data[currKey] === 'object' &&
+      /* eslint-disable-next-line no-underscore-dangle */
+      !data[currKey]._methodName &&
+      !data[currKey].seconds
+    ) {
       return {
         ...acc,
         [currKey]: getDataWithTimestamps(data[currKey], firestoreStatics),
       };
     }
 
-    const isTimestamp =
-      data[currKey]?._methodName === 'FieldValue.serverTimestamp';
-    const value = isTimestamp
-      ? firestoreStatics.FieldValue.serverTimestamp()
-      : data[currKey];
+    const value = convertValueToTimestampIfPossible(
+      data[currKey],
+      firestoreStatics,
+    );
 
     return {
       ...acc,
@@ -218,6 +243,7 @@ export function callFirestore(
     // Tests do not have statics since they are using @firebase/testing
     options?.statics || (adminInstance.firestore as typeof admin.firestore),
   );
+
   if (action === 'set') {
     return adminInstance
       .firestore()
