@@ -68,11 +68,11 @@ If you are interested in what drove the need for this checkout [the why section]
    const cypressFirebasePlugin = require("cypress-firebase").plugin;
 
    module.exports = (on, config) => {
-     const extendedConfig = cypressFirebasePlugin(on, config, admin)
+     const extendedConfig = cypressFirebasePlugin(on, config, admin);
 
      // Add other plugins/tasks such as code coverage here
 
-     return extendedConfig
+     return extendedConfig;
    };
    ```
 
@@ -85,7 +85,8 @@ If you are interested in what drove the need for this checkout [the why section]
      });
    });
    ```
-1. From the root of your project, start Cypress with the command `$(npm bin)/cypress open`.  In the Cypress window, click your new test (`test_hello_world.js`) to run it.
+
+1. From the root of your project, start Cypress with the command `$(npm bin)/cypress open`. In the Cypress window, click your new test (`test_hello_world.js`) to run it.
 1. Look in your Firestore instance and see the `test_hello_world` collection to confirm that a document was added.
 1. Pat yourself on the back, you are all setup to access Firebase/Firestore from within your tests!
 
@@ -198,6 +199,19 @@ const fakeProject = { some: "data" };
 cy.callRtdb("set", "projects/ABC123", fakeProject, { withMeta: true });
 ```
 
+_Set Data With Timestamps_
+
+```javascript
+import firebase from "firebase/app";
+import "firebase/database";
+
+const fakeProject = {
+  some: "data",
+  createdAt: firebase.database.ServerValue.TIMESTAMP,
+};
+cy.callRtdb("set", "projects/ABC123", fakeProject);
+```
+
 _Get/Verify Data_
 
 ```javascript
@@ -234,6 +248,22 @@ _Basic_
 
 ```javascript
 cy.callFirestore("set", "project/test-project", "fakeProject.json");
+```
+
+_Set Data With Server Timestamps_
+
+```javascript
+import firebase from "firebase/app";
+import "firebase/firestore";
+
+const fakeProject = {
+  some: "data",
+  // Use new firebase.firestore.Timestamp.now in place of serverTimestamp()
+  createdAt: firebase.firestore.Timestamp.now(),
+  // Or use fromDate if you would like to specify a date
+  // createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+};
+cy.callFirestore("set", "projects/ABC123", fakeProject);
 ```
 
 _Recursive Delete_
@@ -444,13 +474,13 @@ Pass `commandNames` in the `options` object to `attachCustomCommands`:
 const options = {
   // Key is current command name, value is new command name
   commandNames: {
-    login: 'newNameForLogin',
-    logout: 'newNameForLogout',
-    callRtdb: 'newNameForCallRtdb',
-    callFirestore: 'newNameForCallFirestore',
-    getAuthUser: 'newNameForGetAuthUser',
-  }
-}
+    login: "newNameForLogin",
+    logout: "newNameForLogout",
+    callRtdb: "newNameForCallRtdb",
+    callFirestore: "newNameForCallFirestore",
+    getAuthUser: "newNameForGetAuthUser",
+  },
+};
 attachCustomCommands({ Cypress, cy, firebase }, options);
 ```
 
@@ -547,6 +577,14 @@ When testing, tests should have admin read/write access to the database for seed
 
 - [fireadmin.io][fireadmin-url] - A Firebase project management tool ([here is the source][fireadmin-source])
 - [cv19assist.com](https://cv19assist.com) - App for connecting volunteers with at-health-risk population during the coronavirus pandemic. ([here is the source](https://github.com/CV19Assist/app))
+
+## Troubleshooting
+
+1. An error is coming from cypress mentioning "Error converting circular structure to JSON"
+
+The issue is most likely due to a circular object, such as a timestamp, being included in data you are attempting to write to Firestore. Instead of using `firebase.firestore.FieldValue.serverTimestamp()` you should instead use `firebase.firestore.Timestamp.now()` or you would like to specify a certain date `firebase.firestore.Timestamp.fromDate(new Date('01/01/18'))`.
+
+This comes from the fact that cypress stringifies values as it is passing them from the browser environment to the node environment through `cy.task`.
 
 [1]: #cylogin
 [2]: #examples

@@ -415,7 +415,7 @@ export default function attachCustomCommands(
             dataToWrite.createdBy = Cypress.env('TEST_UID');
           }
           if (!dataToWrite.createdAt) {
-            dataToWrite.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+            dataToWrite.createdAt = firebase.firestore.Timestamp.now();
           }
         }
         taskSettings.data = dataToWrite;
