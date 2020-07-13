@@ -78,7 +78,8 @@ function getDataWithTimestamps(
       typeof data[currKey] === 'object' &&
       /* eslint-disable-next-line no-underscore-dangle */
       !data[currKey]._methodName &&
-      !data[currKey].seconds
+      !data[currKey].seconds &&
+      !Array.isArray(data[currKey])
     ) {
       return {
         ...acc,
