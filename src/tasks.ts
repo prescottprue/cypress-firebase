@@ -249,7 +249,12 @@ export function callFirestore(
     return adminInstance
       .firestore()
       .doc(actionPath)
-      .set(dataToSet, options?.merge ? { merge: options?.merge } : undefined)
+      .set(
+        dataToSet,
+        options?.merge
+          ? ({ merge: options?.merge } as FirebaseFirestore.SetOptions)
+          : (undefined as any),
+      )
       .catch(handleError);
   }
   // "update" action
