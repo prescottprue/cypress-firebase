@@ -11,6 +11,11 @@ jobs:
   publish-npm:
     runs-on: ubuntu-latest
     steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.4.0
+        with:
+          access_token: ${{ github.token }}
+
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -94,11 +99,10 @@ jobs:
           name: build
           path: lib
 
-      # Upload to codecov.io. Curl used in place of codecov/codecov-action
-      # due to long build time. See https://github.com/codecov/codecov-action/issues/21
-      - name: Upload Coverage
-        if: steps.check.outputs.changed == 'true'
-        run: bash <(curl -s https://codecov.io/bash) || echo 'Codecov failed to upload'
+      - name: Upload Test Coverage
+        uses: codecov/codecov-action@v1
+        with:
+          fail_ci_if_error: true
 
       - name: Create Release
         if: steps.check.outputs.changed == 'true'
