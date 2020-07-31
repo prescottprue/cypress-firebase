@@ -73,24 +73,22 @@ function getDataWithTimestamps(
   if (!firestoreStatics) {
     return data;
   }
-  return Object.keys(data).reduce<object>((acc, currKey) => {
+  return Object.entries(data).reduce((acc, [currKey, currData]) => {
+    // Convert nested timestamp if item is an object
     if (
-      typeof data[currKey] === 'object' &&
+      typeof currData === 'object' &&
+      currData !== null &&
+      !Array.isArray(currData) &&
       /* eslint-disable-next-line no-underscore-dangle */
-      !data[currKey]._methodName &&
-      !data[currKey].seconds &&
-      !Array.isArray(data[currKey])
+      !currData._methodName &&
+      !currData.seconds
     ) {
       return {
         ...acc,
-        [currKey]: getDataWithTimestamps(data[currKey], firestoreStatics),
+        [currKey]: getDataWithTimestamps(currData, firestoreStatics),
       };
     }
-
-    const value = convertValueToTimestampIfPossible(
-      data[currKey],
-      firestoreStatics,
-    );
+    const value = convertValueToTimestampIfPossible(currData, firestoreStatics);
 
     return {
       ...acc,

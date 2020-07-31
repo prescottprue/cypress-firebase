@@ -1,6 +1,6 @@
 {
   "name": "cypress-firebase",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -26,10 +26,10 @@
     "prepare": "yarn clean && yarn build"
   },
   "peerDependencies": {
-    "firebase-admin": "^8"
+    "firebase-admin": "^8 || ^9"
   },
   "devDependencies": {
-    "@firebase/testing": "^0.20.7",
+    "@firebase/testing": "^0.20.9",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@size-limit/preset-small-lib": "^4.5.5",
     "@types/chai": "^4.2.11",
