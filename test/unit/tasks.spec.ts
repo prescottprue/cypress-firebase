@@ -206,6 +206,22 @@ describe('tasks', () => {
         expect(result).to.have.property('some', extraVal.some);
       });
 
+      it('sets a document with null data', async () => {
+        const extraVal = { some: 'other', another: null };
+        await tasks.callFirestore(
+          adminApp,
+          'set',
+          PROJECT_PATH,
+          { merge: true },
+          { ...testProject, ...extraVal },
+        );
+        const resultSnap = await projectFirestoreRef.get();
+        const result = resultSnap.data();
+        expect(result).to.have.property('name', testProject.name);
+        expect(result).to.have.property('some', extraVal.some);
+        expect(result).to.have.property('another', null);
+      });
+
       describe('with timestamps', () => {
         let stub: sinon.SinonStub;
         const correctTimestamp = {
