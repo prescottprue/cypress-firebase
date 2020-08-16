@@ -322,7 +322,7 @@ export default function attachCustomCommands(
   Cypress.Commands.add(
     options?.commandNames?.logout || 'logout',
     (): Promise<any> => {
-      return new Promise((resolve: Function, reject: Function): any => {
+      return new Promise((resolve: () => any, reject: () => any): any => {
         firebase.auth().onAuthStateChanged((auth: any) => {
           if (!auth) {
             resolve();

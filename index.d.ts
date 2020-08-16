@@ -335,7 +335,7 @@ declare module "plugin" {
      * @param adminInstance - firebase-admin instance
      * @returns Extended Cypress config
      */
-    export default function pluginWithTasks(cypressOnFunc: Function, cypressConfig: any, adminInstance: any): ExtendedCypressConfig;
+    export default function pluginWithTasks(cypressOnFunc: any, cypressConfig: any, adminInstance: any): ExtendedCypressConfig;
 }
 declare module "index" {
     import attachCustomCommands from "attachCustomCommands";

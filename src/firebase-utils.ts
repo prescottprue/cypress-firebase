@@ -60,7 +60,7 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
         process.env.GCLOUD_PROJECT ||
         process.env.FIREBASE_PROJECT ||
         process.env.FIREBASE_PROJECT_ID ||
-        serviceAccount?.project_id;
+        serviceAccount?.project_id; // eslint-disable-line camelcase
       const fbConfig: any = {
         projectId,
       };
@@ -101,7 +101,7 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
       // Get service account from local file falling back to environment variables
       const serviceAccount = getServiceAccount();
       const projectId =
-        process.env.GCLOUD_PROJECT || serviceAccount?.project_id;
+        process.env.GCLOUD_PROJECT || serviceAccount?.project_id; // eslint-disable-line camelcase
       if (!isString(projectId)) {
         const missingProjectIdErr =
           'Error GCLOUD_PROJECT environment variable or project_id from service account to initialize Firebase.';
@@ -219,7 +219,7 @@ export function slashPathToFirestoreRef(
 function deleteQueryBatch(
   db: any,
   query: admin.firestore.CollectionReference,
-  resolve: Function,
+  resolve: () => any,
   reject: any,
 ): void {
   query

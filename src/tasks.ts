@@ -68,7 +68,7 @@ function convertValueToTimestampIfPossible(
 function getDataWithTimestamps(
   data: admin.firestore.DocumentData,
   firestoreStatics: typeof admin.firestore,
-): object {
+): Record<string, any> {
   // Exit if no statics are passed
   if (!firestoreStatics) {
     return data;

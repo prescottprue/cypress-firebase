@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/camelcase */
 import { existsSync, readFileSync } from 'fs';
 
 /**
@@ -97,6 +96,7 @@ function envVarBasedOnCIEnv(varNameRoot: string, envName?: string): any {
   return process.env[combined] || process.env[varNameRoot];
 }
 
+/* eslint-disable camelcase */
 interface ServiceAccount {
   type: string;
   project_id: string;
@@ -109,6 +109,7 @@ interface ServiceAccount {
   auth_provider_x509_cert_url: string;
   client_x509_cert_url: string;
 }
+/* eslint-enable camelcase */
 
 /**
  * Get service account from either local file or environment variables
