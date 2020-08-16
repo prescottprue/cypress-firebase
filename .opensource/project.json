@@ -1,0 +1,17 @@
+{
+  "name": "cypress-firebase",
+  "platforms": ["Web"],
+  "content": "README.md",
+  "related": [
+    "firebase/firebase-js-sdk",
+    "firebase/firebase-admin-node",
+    "cypress-io/cypress"
+  ],
+  "tabs": [
+    { "title": "NPM", "href": "https://npmjs.com/package/cypress-firebase" },
+    {
+      "title": "API Reference",
+      "href": "https://github.com/prescottprue/cypress-firebase/blob/master/README.md"
+    }
+  ]
+}

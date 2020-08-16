@@ -11,7 +11,7 @@ import { initializeFirebase } from './firebase-utils';
  * @returns Extended Cypress config
  */
 export default function pluginWithTasks(
-  cypressOnFunc: Function,
+  cypressOnFunc: any,
   cypressConfig: any,
   adminInstance: any,
 ): ExtendedCypressConfig {
@@ -21,7 +21,7 @@ export default function pluginWithTasks(
   }
   // Parse single argument from task into arguments for task methods while
   // also passing the admin instance
-  const tasksWithFirebase: Record<string, Function> = {};
+  const tasksWithFirebase: Record<string, (taskSettings: any) => any> = {};
   Object.keys(tasks).forEach((taskName) => {
     tasksWithFirebase[taskName] = (taskSettings: any): any => {
       if (taskSettings?.uid) {

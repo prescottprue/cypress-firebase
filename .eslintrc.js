@@ -26,6 +26,7 @@ module.exports = {
   },
   rules: {
     '@typescript-eslint/no-explicit-any': 0,
+    '@typescript-eslint/explicit-module-boundary-types': 0,
     'import/prefer-default-export': 0,
     'no-shadow': 0,
     'consistent-return': 0,
