@@ -88,7 +88,11 @@ function getDataWithTimestamps(
         [currKey]: getDataWithTimestamps(currData, firestoreStatics),
       };
     }
-    const value = convertValueToTimestampIfPossible(currData, firestoreStatics);
+    const value = Array.isArray(currData)
+      ? currData.map((dataItem) =>
+          convertValueToTimestampIfPossible(dataItem, firestoreStatics),
+        )
+      : convertValueToTimestampIfPossible(currData, firestoreStatics);
 
     return {
       ...acc,

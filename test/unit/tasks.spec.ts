@@ -259,6 +259,28 @@ describe('tasks', () => {
           });
         });
 
+        it('sets a document with a timestamp FieldValue within an array', async () => {
+          const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
+
+          // cy.task stringifies and parses the data past to it resulting in the following value
+          const stringifiedServerTimestamp = {
+            _methodName: 'FieldValue.serverTimestamp',
+          };
+
+          await tasks.callFirestore(
+            adminApp,
+            'set',
+            PROJECT_PATH,
+            { statics: admin.firestore },
+            { timeArrProperty: [stringifiedServerTimestamp] },
+          );
+
+          const resultSnap = await projectFirestoreRef.get();
+          expect(resultSnap.data()).to.deep.equal({
+            timeArrProperty: [correctTimestamp],
+          });
+        });
+
         it('sets a document with a nested timestamp value', async () => {
           const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
 

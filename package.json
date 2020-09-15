@@ -1,6 +1,6 @@
 {
   "name": "cypress-firebase",
-  "version": "1.4.4",
+  "version": "1.4.5",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
