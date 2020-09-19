@@ -32,6 +32,9 @@ declare module "attachCustomCommands" {
          * Merge during set
          */
         merge?: boolean;
+        /**
+         * Size of batch to use while deleting
+         */
         batchSize?: number;
         /**
          * Filter documents by the specified field and the value should satisfy

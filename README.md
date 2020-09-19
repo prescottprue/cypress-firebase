@@ -165,7 +165,7 @@ cy.logout();
 
 #### cy.callRtdb
 
-Call Real Time Database path with some specified action. Authentication is through `FIREBASE_TOKEN` since firebase-tools is used (instead of firebaseExtra).
+Call Real Time Database path with some specified action such as `set`, `update` and `remove`
 
 ##### Parameters
 
@@ -231,15 +231,23 @@ cy.callRtdb("update", "project/test-project", fakeProject, opts);
 #### cy.callFirestore
 
 Call Firestore instance with some specified action. Authentication is through serviceAccount.json since it is at the base
-level. If using delete, auth is through FIREBASE_TOKEN since firebase-tools is used (instead of firebaseExtra).
+level.
 
 ##### Parameters
 
 - `action` **[String][11]** The action type to call with (set, push, update, delete)
 - `actionPath` **[String][11]** Path within RTDB that action should be applied
-- `dataOrOptions` **[String][11]** Data for write actions or options for get action
+- `dataOrOptions` **[String|Object][11]** Data for write actions or options for get action
 - `options` **[Object][12]** Options
-  - `options.args` **[Array][13]** Command line args to be passed
+  - `options.withMeta` **[boolean][13]** Whether or not to include `createdAt` and `createdBy`
+  - `options.merge` **[boolean][13]** Merge data during set
+  - `options.batchSize` **[number][13]** Size of batch to use while deleting
+  - `options.where` **[Array][13]** Filter documents by the specified field and the value should satisfy
+  * the relation constraint provided
+  - `options.orderBy` **[string|Array][13]** Order documents
+  - `options.limit` **[number][13]** Limit to n number of documents
+  - `options.limitToLast` **[number][13]** Limit to last n number of documents
+  - `options.statics` **[admin.firestore][13]** Firestore statics (i.e. `admin.firestore`). This should only be needed during testing due to @firebase/testing not containing statics
 
 ##### Examples
 
@@ -463,7 +471,6 @@ NOTE: You can also use `firebase serve`:
 ### CI
 
 1. Run `firebase login:ci` to generate a CI token for `firebase-tools` (this will give your `cy.callRtdb` and `cy.callFirestore` commands admin access to the DB)
-1. Set `FIREBASE_TOKEN` within CI environment variables
 
 ### Changing Custom Command Names
 

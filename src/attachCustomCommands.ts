@@ -36,7 +36,7 @@ export interface CallFirestoreOptions {
    * Merge during set
    */
   merge?: boolean;
-  /*
+  /**
    * Size of batch to use while deleting
    */
   batchSize?: number;
@@ -388,7 +388,6 @@ export default function attachCustomCommands(
    * @param action - The action type to call with (set, push, update, remove)
    * @param actionPath - Path within RTDB that action should be applied
    * @param options - Options
-   * @param options.args - Command line args to be passed
    * @name cy.callFirestore
    */
   Cypress.Commands.add(
