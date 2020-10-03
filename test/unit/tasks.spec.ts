@@ -22,6 +22,7 @@ const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
 describe('tasks', () => {
   after(async () => {
     // Cleanup all apps (keeps active listeners from preventing JS from exiting)
+    await adminApp.delete();
     await Promise.all(firebase.apps().map((app) => app.delete()));
   });
 
