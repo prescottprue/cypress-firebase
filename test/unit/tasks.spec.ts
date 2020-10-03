@@ -303,6 +303,23 @@ describe('tasks', () => {
           });
         });
       });
+
+      describe('with geo point', () => {
+        it('sets a document with a GeoPoint', async () => {
+          const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
+
+          await tasks.callFirestore(
+            adminApp,
+            'set',
+            PROJECT_PATH,
+            { statics: admin.firestore },
+            { geoPointProperty: {latitude: 32.323443, longitude: 122.3954238} },
+          );
+
+          const resultSnap = await projectFirestoreRef.get();
+          expect(resultSnap.get('geoPointProperty')).to.be.an.instanceof(admin.firestore.GeoPoint);
+        });
+      });
     });
 
     describe('update action', () => {
