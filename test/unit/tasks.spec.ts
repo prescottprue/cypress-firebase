@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import * as firebase from '@firebase/testing';
+import * as firebase from '@firebase/rules-unit-testing';
 import * as admin from 'firebase-admin';
 import sinon from 'sinon';
 import * as tasks from '../../src/tasks';
