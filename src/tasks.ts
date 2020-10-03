@@ -55,7 +55,8 @@ function convertValueToTimestampOrGeoPointIfPossible(
     typeof dataVal?.nanoseconds === 'number'
   ) {
     return new firestoreStatics.Timestamp(dataVal.seconds, dataVal.nanoseconds);
-  } else if (
+  }
+  if (
     typeof dataVal?.latitude === 'number' &&
     typeof dataVal?.longitude === 'number'
   ) {
@@ -91,12 +92,18 @@ function getDataWithTimestampsAndGeoPoints(
     ) {
       return {
         ...acc,
-        [currKey]: getDataWithTimestampsAndGeoPoints(currData, firestoreStatics),
+        [currKey]: getDataWithTimestampsAndGeoPoints(
+          currData,
+          firestoreStatics,
+        ),
       };
     }
     const value = Array.isArray(currData)
       ? currData.map((dataItem) =>
-          convertValueToTimestampOrGeoPointIfPossible(dataItem, firestoreStatics),
+          convertValueToTimestampOrGeoPointIfPossible(
+            dataItem,
+            firestoreStatics,
+          ),
         )
       : convertValueToTimestampOrGeoPointIfPossible(currData, firestoreStatics);
 
