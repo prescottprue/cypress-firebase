@@ -47,6 +47,7 @@ function convertValueToTimestampOrGeoPointIfPossible(
   dataVal: any,
   firestoreStatics: typeof admin.firestore,
 ): admin.firestore.FieldValue {
+  /* eslint-disable-next-line no-underscore-dangle */
   if (dataVal?._methodName === 'FieldValue.serverTimestamp') {
     return firestoreStatics.FieldValue.serverTimestamp();
   }
