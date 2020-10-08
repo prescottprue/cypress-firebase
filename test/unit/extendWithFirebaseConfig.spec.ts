@@ -2,6 +2,17 @@ import { expect } from 'chai';
 import extendWithFirebaseConfig from '../../src/extendWithFirebaseConfig';
 
 describe('extendWithFirebaseConfig', () => {
+  const projectName = process.env.GCLOUD_PROJECT;
+  const firestoreEmulatorHost = process.env.FIRESTORE_EMULATOR_HOST;
+  const databaseEmulatorHost = process.env.FIREBASE_DATABASE_EMULATOR_HOST;
+
+  after(() => {
+    process.env.GCLOUD_PROJECT = projectName;
+    process.env.FIRESTORE_EMULATOR_HOST = firestoreEmulatorHost;
+    process.env.FIREBASE_DATABASE_EMULATOR_HOST = databaseEmulatorHost;
+  });
+
+
   it('returns an object', () => {
     const originalConfig = {};
     expect(extendWithFirebaseConfig(originalConfig)).to.be.an('object');

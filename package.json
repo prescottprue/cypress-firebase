@@ -29,7 +29,7 @@
     "firebase-admin": "^8 || ^9"
   },
   "devDependencies": {
-    "@firebase/testing": "^0.20.11",
+    "@firebase/rules-unit-testing": "^1.0.5",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@size-limit/preset-small-lib": "^4.5.6",
     "@types/chai": "^4.2.12",
@@ -47,8 +47,8 @@
     "eslint-plugin-jsdoc": "^30.2.2",
     "eslint-plugin-jsx-a11y": "^6.3.1",
     "eslint-plugin-prettier": "^3.1.4",
-    "firebase-admin": "^9.1.0",
-    "firebase-tools": "^8.7.0",
+    "firebase-admin": "^9.2.0",
+    "firebase-tools": "^8.11.2",
     "husky": "^4.2.5",
     "lint-staged": "^10.2.11",
     "mocha": "^8.1.1",
