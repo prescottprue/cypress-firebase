@@ -43,10 +43,11 @@ function optionsToRtdbRef(baseRef: any, options?: CallRtdbOptions): any {
  * @param firestoreStatics - Statics from firestore instance
  * @returns Value converted into timestamp object if possible
  */
-function convertValueToTimestampIfPossible(
+function convertValueToTimestampOrGeoPointIfPossible(
   dataVal: any,
   firestoreStatics: typeof admin.firestore,
 ): admin.firestore.FieldValue {
+  /* eslint-disable-next-line no-underscore-dangle */
   if (dataVal?._methodName === 'FieldValue.serverTimestamp') {
     return firestoreStatics.FieldValue.serverTimestamp();
   }
@@ -55,6 +56,12 @@ function convertValueToTimestampIfPossible(
     typeof dataVal?.nanoseconds === 'number'
   ) {
     return new firestoreStatics.Timestamp(dataVal.seconds, dataVal.nanoseconds);
+  }
+  if (
+    typeof dataVal?.latitude === 'number' &&
+    typeof dataVal?.longitude === 'number'
+  ) {
+    return new firestoreStatics.GeoPoint(dataVal.latitude, dataVal.longitude);
   }
 
   return dataVal;
@@ -65,7 +72,7 @@ function convertValueToTimestampIfPossible(
  * @param firestoreStatics - Statics from Firestore object
  * @returns Data to be set in firestore with timestamp
  */
-function getDataWithTimestamps(
+function getDataWithTimestampsAndGeoPoints(
   data: admin.firestore.DocumentData,
   firestoreStatics: typeof admin.firestore,
 ): Record<string, any> {
@@ -81,18 +88,25 @@ function getDataWithTimestamps(
       !Array.isArray(currData) &&
       /* eslint-disable-next-line no-underscore-dangle */
       !currData._methodName &&
-      !currData.seconds
+      !currData.seconds &&
+      !(currData.latitude && currData.longitude)
     ) {
       return {
         ...acc,
-        [currKey]: getDataWithTimestamps(currData, firestoreStatics),
+        [currKey]: getDataWithTimestampsAndGeoPoints(
+          currData,
+          firestoreStatics,
+        ),
       };
     }
     const value = Array.isArray(currData)
       ? currData.map((dataItem) =>
-          convertValueToTimestampIfPossible(dataItem, firestoreStatics),
+          convertValueToTimestampOrGeoPointIfPossible(
+            dataItem,
+            firestoreStatics,
+          ),
         )
-      : convertValueToTimestampIfPossible(currData, firestoreStatics);
+      : convertValueToTimestampOrGeoPointIfPossible(currData, firestoreStatics);
 
     return {
       ...acc,
@@ -240,7 +254,7 @@ export function callFirestore(
     throw new Error(`You must define data to run ${action} in firestore.`);
   }
 
-  const dataToSet = getDataWithTimestamps(
+  const dataToSet = getDataWithTimestampsAndGeoPoints(
     data,
     // Use static option if passed (tests), otherwise fallback to statics on adminInstance
     // Tests do not have statics since they are using @firebase/testing

@@ -123,7 +123,7 @@ export interface CallRtdbOptions {
 declare global {
   /* eslint-disable @typescript-eslint/no-namespace */
   namespace Cypress {
-    /* eslint-enable @typescript-eslint/no-namespace */
+    /* eslint-enable @typescript-eslint/no-namespace,@typescript-eslint/no-unused-vars */
     interface Chainable {
       /**
        * Login to Firebase auth as a user with either a passed uid or the TEST_UID

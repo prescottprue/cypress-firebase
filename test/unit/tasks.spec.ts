@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import * as firebase from '@firebase/testing';
+import * as firebase from '@firebase/rules-unit-testing';
 import * as admin from 'firebase-admin';
 import sinon from 'sinon';
 import * as tasks from '../../src/tasks';
@@ -22,6 +22,7 @@ const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
 describe('tasks', () => {
   after(async () => {
     // Cleanup all apps (keeps active listeners from preventing JS from exiting)
+    await adminApp.delete();
     await Promise.all(firebase.apps().map((app) => app.delete()));
   });
 
@@ -301,6 +302,23 @@ describe('tasks', () => {
           expect(resultSnap.data()).to.deep.equal({
             time: { nested: correctTimestamp },
           });
+        });
+      });
+
+      describe('with geo point', () => {
+        it('sets a document with a GeoPoint', async () => {
+          const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
+
+          await tasks.callFirestore(
+            adminApp,
+            'set',
+            PROJECT_PATH,
+            { statics: admin.firestore },
+            { geoPointProperty: {latitude: 32.323443, longitude: 122.3954238} },
+          );
+
+          const resultSnap = await projectFirestoreRef.get();
+          expect(resultSnap.get('geoPointProperty')).to.be.an.instanceof(admin.firestore.GeoPoint);
         });
       });
     });
