@@ -38,14 +38,14 @@ jobs:
           
       - name: Cache Yarn Dependencies
         if: steps.check.outputs.changed == 'true'
-        uses: actions/cache@v2.1.1
+        uses: actions/cache@v2.1.2
         with:
           path: ${{ steps.cache-settings.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ matrix.app }}-${{ hashFiles('yarn.lock') }}
 
       - name: Cache Firebase Emulator Binaries
         if: steps.check.outputs.changed == 'true'
-        uses: actions/cache@v2.1.1
+        uses: actions/cache@v2.1.2
         with:
           path: ~/.cache/firebase/emulators
           key: ${{ runner.os }}-firebase-${{ steps.cache-settings.outputs.firebase-tools }}
