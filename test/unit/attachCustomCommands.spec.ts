@@ -7,7 +7,7 @@ const cy: any = { log: sinon.spy() };
 const loadedCustomCommands: any = {};
 const testUserId = 'TEST_USER';
 let addSpy: sinon.SinonSpy;
-let envSpy: sinon.SinonSpy;
+let envStub: sinon.SinonStub<string[], string | number | boolean>;
 let Cypress: any = {};
 let currentUser: any;
 let onAuthStateChanged: any;
@@ -36,7 +36,7 @@ describe('attachCustomCommands', () => {
     addSpy = sinon.spy((customCommandName: string, customCommandFunc: any) => {
       loadedCustomCommands[customCommandName] = customCommandFunc;
     });
-    Cypress = { Commands: { add: addSpy }, env: envSpy };
+    Cypress = { Commands: { add: addSpy }, env: envStub };
     attachCustomCommands({ cy, Cypress, firebase });
   });
 
@@ -71,6 +71,38 @@ describe('attachCustomCommands', () => {
     it('calls task with uid and custom claims', async () => {
       await loadedCustomCommands.login('123ABC');
       expect(taskSpy).to.have.been.calledOnce;
+      expect(signInWithCustomToken).to.have.been.calledOnce;
+    });
+
+    it('calls task with environment test uid', async () => {
+      envStub.withArgs('TEST_UID').returns('foo');
+      await loadedCustomCommands.login();
+      expect(taskSpy).to.have.been.calledOnceWith('createCustomToken', {
+        uid: 'foo',
+        customClaims: undefined,
+        tenantId: undefined,
+      });
+      expect(signInWithCustomToken).to.have.been.calledOnce;
+    });
+
+    it('calls task with tenantId', async () => {
+      await loadedCustomCommands.login('123ABC', undefined, 'tenant-id');
+      expect(taskSpy).to.have.been.calledOnceWith('createCustomToken', {
+        uid: '123ABC',
+        customClaims: undefined,
+        tenantId: 'tenant-id',
+      });
+      expect(signInWithCustomToken).to.have.been.calledOnce;
+    });
+
+    it('calls task with environment test tenantId', async () => {
+      envStub.withArgs('TEST_TENANT_ID').returns('env-tenant-id');
+      await loadedCustomCommands.login('123ABC');
+      expect(taskSpy).to.have.been.calledOnceWith('createCustomToken', {
+        uid: '123ABC',
+        customClaims: undefined,
+        tenantId: 'env-tenant-id',
+      });
       expect(signInWithCustomToken).to.have.been.calledOnce;
     });
   });

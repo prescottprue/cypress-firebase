@@ -137,7 +137,9 @@ If you are interested in what drove the need for this checkout [the why section]
 
 #### cy.login
 
-Login to Firebase using custom auth token
+Login to Firebase using custom auth token.
+
+To specify a tenant ID, either pass the ID as a parameter to `cy.login`, or set it as environment variable `TEST_TENANT_ID`. Read more about [Firebase multi-tenancy](https://firebase.google.com/docs/reference/admin/node/admin.auth.Tenant).
 
 ##### Examples
 
@@ -152,6 +154,14 @@ Passing a UID
 ```javascript
 const uid = "123SomeUid";
 cy.login(uid);
+```
+
+Passing a tenant ID
+
+```javascript
+const uid = "123SomeUid";
+const tenantId = "123SomeTenantId";
+cy.login(uid, undefined, tenantId);
 ```
 
 #### cy.logout

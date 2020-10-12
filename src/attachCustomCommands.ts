@@ -173,12 +173,13 @@ declare global {
        * @see https://github.com/prescottprue/cypress-firebase#cylogin
        * @param uid - UID of user to login as
        * @param customClaims - Custom claims to attach to the custom token
+       * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also be set with environment variable TEST_TENANT_ID
        * @example <caption>Env Based Login (TEST_UID)</caption>
        * cy.login()
        * @example <caption>Passed UID</caption>
        * cy.login('123SOMEUID')
        */
-      login: (uid?: string, customClaims?: any) => Chainable;
+      login: (uid?: string, customClaims?: any, tenantId?: string) => Chainable;
 
       /**
        * Log current user out of Firebase Auth
@@ -274,21 +275,18 @@ function getTypeStr(value: any): TypeStr {
 }
 
 /**
- * @param firebase - firebase instance
+ * @param auth - firebase auth instance
  * @param customToken - Custom token to use for login
  * @returns Promise which resolves with the user auth object
  */
-function loginWithCustomToken(
-  firebase: any,
-  customToken: string,
-): Promise<any> {
+function loginWithCustomToken(auth: any, customToken: string): Promise<any> {
   return new Promise((resolve, reject): any => {
-    firebase.auth().onAuthStateChanged((auth: any) => {
+    auth.onAuthStateChanged((auth: any) => {
       if (auth) {
         resolve(auth);
       }
     });
-    firebase.auth().signInWithCustomToken(customToken).catch(reject);
+    auth.signInWithCustomToken(customToken).catch(reject);
   });
 }
 
@@ -302,6 +300,7 @@ interface CommandNamespacesConfig {
 
 interface CustomCommandOptions {
   commandNames?: CommandNamespacesConfig;
+  tenantId?: string;
 }
 
 /**
@@ -317,6 +316,19 @@ export default function attachCustomCommands(
   const { Cypress, cy, firebase } = context;
 
   /**
+   * Get firebase auth instance, with tenantId set if provided
+   * @param tenantId Optional tenant ID
+   * @returns firebase auth instance
+   */
+  function getAuth(tenantId: string | undefined) {
+    const auth = firebase.auth();
+    if (tenantId) {
+      auth.tenantId = tenantId;
+    }
+    return auth;
+  }
+
+  /**
    * Login to Firebase auth as a user with either a passed uid or the TEST_UID
    * environment variable. A custom auth token is generated using firebase-admin
    * authenticated with serviceAccount.json or SERVICE_ACCOUNT env var.
@@ -324,7 +336,11 @@ export default function attachCustomCommands(
    */
   Cypress.Commands.add(
     options?.commandNames?.login || 'login',
-    (uid?: string, customClaims?: any): any => {
+    (
+      uid?: string,
+      customClaims?: any,
+      tenantId: string | undefined = Cypress.env('TEST_TENANT_ID'),
+    ): any => {
       const userUid = uid || Cypress.env('TEST_UID');
       // Handle UID which is passed in
       if (!userUid) {
@@ -332,11 +348,9 @@ export default function attachCustomCommands(
           'uid must be passed or TEST_UID set within environment to login',
         );
       }
+      const auth = getAuth(tenantId);
       // Resolve with current user if they already exist
-      if (
-        firebase.auth().currentUser &&
-        userUid === firebase.auth().currentUser.uid
-      ) {
+      if (auth.currentUser && userUid === auth.currentUser.uid) {
         cy.log('Authed user already exists, login complete.');
         return undefined;
       }
@@ -345,10 +359,12 @@ export default function attachCustomCommands(
 
       // Generate a custom token using createCustomToken task (if tasks are enabled) then login
       return cy
-        .task('createCustomToken', { uid: userUid, customClaims })
-        .then((customToken: string) =>
-          loginWithCustomToken(firebase, customToken),
-        );
+        .task('createCustomToken', {
+          uid: userUid,
+          customClaims,
+          tenantId,
+        })
+        .then((customToken: string) => loginWithCustomToken(auth, customToken));
     },
   );
 
@@ -361,18 +377,21 @@ export default function attachCustomCommands(
    */
   Cypress.Commands.add(
     options?.commandNames?.logout || 'logout',
-    (): Promise<any> =>
+    (
+      tenantId: string | undefined = Cypress.env('TEST_TENANT_ID'),
+    ): Promise<any> =>
       new Promise(
         (
           resolve: (value?: any) => void,
           reject: (reason?: any) => void,
         ): any => {
-          firebase.auth().onAuthStateChanged((auth: any) => {
+          const auth = getAuth(tenantId);
+          auth.onAuthStateChanged((auth: any) => {
             if (!auth) {
               resolve();
             }
           });
-          firebase.auth().signOut().catch(reject);
+          auth().signOut().catch(reject);
         },
       ),
   );

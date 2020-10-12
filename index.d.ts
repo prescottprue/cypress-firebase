@@ -132,12 +132,13 @@ declare module "attachCustomCommands" {
                  * @see https://github.com/prescottprue/cypress-firebase#cylogin
                  * @param uid - UID of user to login as
                  * @param customClaims - Custom claims to attach to the custom token
+                 * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also be set with environment variable TEST_TENANT_ID
                  * @example <caption>Env Based Login (TEST_UID)</caption>
                  * cy.login()
                  * @example <caption>Passed UID</caption>
                  * cy.login('123SOMEUID')
                  */
-                login: (uid?: string, customClaims?: any) => Chainable;
+                login: (uid?: string, customClaims?: any, tenantId?: string) => Chainable;
                 /**
                  * Log current user out of Firebase Auth
                  * @see https://github.com/prescottprue/cypress-firebase#cylogout
@@ -200,6 +201,7 @@ declare module "attachCustomCommands" {
     }
     interface CustomCommandOptions {
         commandNames?: CommandNamespacesConfig;
+        tenantId?: string;
     }
     /**
      * Attach custom commands including cy.login, cy.logout, cy.callRtdb,
@@ -341,9 +343,10 @@ declare module "tasks" {
      * Get Firebase Auth user based on UID
      * @param adminInstance - Admin SDK instance
      * @param uid - UID of user for which the custom token will be generated
+     * @param tenantId - Optional ID of tenant used for multi-tenancy
      * @returns Promise which resolves with a custom Firebase Auth token
      */
-    export function getAuthUser(adminInstance: any, uid: string): Promise<admin.auth.UserRecord>;
+    export function getAuthUser(adminInstance: any, uid: string, tenantId?: string): Promise<admin.auth.UserRecord>;
 }
 declare module "plugin" {
     import { AppOptions } from 'firebase-admin';
