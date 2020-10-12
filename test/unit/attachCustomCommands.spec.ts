@@ -6,7 +6,7 @@ let taskSpy: any;
 const cy: any = { log: sinon.spy() };
 const loadedCustomCommands: any = {};
 let addSpy: sinon.SinonSpy;
-let envSpy: sinon.SinonSpy;
+let envStub: sinon.SinonStub<string[], string | number | boolean>;
 let Cypress: any = {};
 let currentUser: any;
 let onAuthStateChanged: any;
@@ -23,7 +23,7 @@ const firebase = {
 describe('attachCustomCommands', () => {
   beforeEach(() => {
     taskSpy = sinon.spy(() => Promise.resolve());
-    envSpy = sinon.spy();
+    envStub = sinon.stub();
     onAuthStateChanged = sinon.spy((authHandleFunc) => {
       authHandleFunc({});
     });
@@ -32,7 +32,7 @@ describe('attachCustomCommands', () => {
     addSpy = sinon.spy((customCommandName: string, customCommandFunc: any) => {
       loadedCustomCommands[customCommandName] = customCommandFunc;
     });
-    Cypress = { Commands: { add: addSpy }, env: envSpy };
+    Cypress = { Commands: { add: addSpy }, env: envStub };
     attachCustomCommands({ cy, Cypress, firebase });
   });
 
@@ -55,6 +55,38 @@ describe('attachCustomCommands', () => {
     it('calls task', async () => {
       await loadedCustomCommands.login('123ABC');
       expect(taskSpy).to.have.been.calledOnce;
+      expect(signInWithCustomToken).to.have.been.calledOnce;
+    });
+
+    it('calls task with environment test uid', async () => {
+      envStub.withArgs('TEST_UID').returns('foo');
+      await loadedCustomCommands.login();
+      expect(taskSpy).to.have.been.calledOnceWith('createCustomToken', {
+        uid: 'foo',
+        customClaims: undefined,
+        tenantId: undefined,
+      });
+      expect(signInWithCustomToken).to.have.been.calledOnce;
+    });
+
+    it('calls task with tenantId', async () => {
+      await loadedCustomCommands.login('123ABC', undefined, 'tenant-id');
+      expect(taskSpy).to.have.been.calledOnceWith('createCustomToken', {
+        uid: '123ABC',
+        customClaims: undefined,
+        tenantId: 'tenant-id',
+      });
+      expect(signInWithCustomToken).to.have.been.calledOnce;
+    });
+
+    it('calls task with environment test tenantId', async () => {
+      envStub.withArgs('TEST_TENANT_ID').returns('env-tenant-id');
+      await loadedCustomCommands.login('123ABC');
+      expect(taskSpy).to.have.been.calledOnceWith('createCustomToken', {
+        uid: '123ABC',
+        customClaims: undefined,
+        tenantId: 'env-tenant-id',
+      });
       expect(signInWithCustomToken).to.have.been.calledOnce;
     });
   });
@@ -110,7 +142,7 @@ describe('attachCustomCommands', () => {
 
   beforeEach(() => {
     taskSpy = sinon.spy(() => Promise.resolve());
-    envSpy = sinon.spy();
+    envStub = sinon.stub();
     onAuthStateChanged = sinon.spy((authHandleFunc) => {
       authHandleFunc({});
     });
@@ -119,14 +151,14 @@ describe('attachCustomCommands', () => {
     addSpy = sinon.spy((customCommandName: string, customCommandFunc: any) => {
       loadedCustomCommands[customCommandName] = customCommandFunc;
     });
-    Cypress = { Commands: { add: addSpy }, env: envSpy };
+    Cypress = { Commands: { add: addSpy }, env: envStub };
     attachCustomCommands({ cy, Cypress, firebase });
   });
 
   describe('options', () => {
     beforeEach(() => {
       taskSpy = sinon.spy(() => Promise.resolve());
-      envSpy = sinon.spy();
+      envStub = sinon.stub();
       onAuthStateChanged = sinon.spy((authHandleFunc) => {
         authHandleFunc({});
       });
@@ -137,7 +169,7 @@ describe('attachCustomCommands', () => {
           loadedCustomCommands[customCommandName] = customCommandFunc;
         },
       );
-      Cypress = { Commands: { add: addSpy }, env: envSpy };
+      Cypress = { Commands: { add: addSpy }, env: envStub };
     });
 
     it('Aliases login command', () => {

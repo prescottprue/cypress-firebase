@@ -39,6 +39,22 @@ function optionsToRtdbRef(baseRef: any, options?: CallRtdbOptions): any {
 }
 
 /**
+ * Get Firebase Auth or TenantAwareAuth instance, based on tenantId being provided
+ * @param adminInstance - Admin SDK instance
+ * @param tenantId - Optional ID of tenant used for multi-tenancy
+ * @returns Firebase Auth or TenantAwareAuth instance
+ */
+function getAuth(
+  adminInstance: any,
+  tenantId?: string,
+): admin.auth.Auth | admin.auth.TenantAwareAuth {
+  const auth = tenantId
+    ? adminInstance.auth().tenantManager().authForTenant(tenantId)
+    : adminInstance.auth();
+  return auth;
+}
+
+/**
  * @param dataVal - Value of data
  * @param firestoreStatics - Statics from firestore instance
  * @returns Value converted into timestamp object if possible
@@ -299,18 +315,23 @@ export function createCustomToken(
   const customClaims = settings?.customClaims || { isTesting: true };
 
   // Create auth token
-  return adminInstance.auth().createCustomToken(uid, customClaims);
+  return getAuth(adminInstance, settings.tenantId).createCustomToken(
+    uid,
+    customClaims,
+  );
 }
 
 /**
  * Get Firebase Auth user based on UID
  * @param adminInstance - Admin SDK instance
  * @param uid - UID of user for which the custom token will be generated
+ * @param tenantId - Optional ID of tenant used for multi-tenancy
  * @returns Promise which resolves with a custom Firebase Auth token
  */
 export function getAuthUser(
   adminInstance: any,
   uid: string,
+  tenantId?: string,
 ): Promise<admin.auth.UserRecord> {
-  return adminInstance.auth().getUser(uid);
+  return getAuth(adminInstance, tenantId).getUser(uid);
 }
