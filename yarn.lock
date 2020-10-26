@@ -4076,9 +4076,9 @@ firebase-admin@^9.2.0:
     "@google-cloud/storage" "^5.3.0"
 
 firebase-tools@^8.12.0:
-  version "8.12.0"
-  resolved "https://registry.yarnpkg.com/firebase-tools/-/firebase-tools-8.12.0.tgz#1b05a3b72932f348d7a6c2b37f5c9bf292733681"
-  integrity sha512-R09lwkm0tTwJ4hzrFyDN0GvLxxmKXYJTl704KKUCOlAaM3nrlocS+Tdx60lJopMwbceFMOqcYenhz6Ask3h+Qg==
+  version "8.13.1"
+  resolved "https://registry.yarnpkg.com/firebase-tools/-/firebase-tools-8.13.1.tgz#28320153f640f76bfa14bff7c98cd3cea92dffec"
+  integrity sha512-4Yw3ipwidHfa8suUKxOsykgeegOuyBaNJ9DEEbxK9gChXx788Mt4bQm+I+d8F7QqdeDIf9UFOxMZ+Dn1GepCgQ==
   dependencies:
     "@google-cloud/pubsub" "^1.7.0"
     JSONStream "^1.2.1"
