@@ -236,7 +236,7 @@ level.
 ##### Parameters
 
 - `action` **[String][11]** The action type to call with (set, push, update, delete)
-- `actionPath` **[String][11]** Path within RTDB that action should be applied
+- `actionPath` **[String][11]** Path within Firestore that action should be applied
 - `dataOrOptions` **[String|Object][11]** Data for write actions or options for get action
 - `options` **[Object][12]** Options
   - `options.withMeta` **[boolean][13]** Whether or not to include `createdAt` and `createdBy`
