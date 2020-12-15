@@ -123,7 +123,7 @@ export function getServiceAccount(envSlug?: string): ServiceAccount | null {
     return readJsonFile(serviceAccountPath); // eslint-disable-line global-require, import/no-dynamic-require
   }
 
-  // Use environment variables (CI)
+  // Use environment variables
   const serviceAccountEnvVar = envVarBasedOnCIEnv('SERVICE_ACCOUNT', envSlug);
   if (serviceAccountEnvVar) {
     if (typeof serviceAccountEnvVar === 'string') {
