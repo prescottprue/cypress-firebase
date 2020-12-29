@@ -1,6 +1,6 @@
 {
   "name": "cypress-firebase",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -80,6 +80,11 @@
   "author": {
     "name": "Prescott Prue",
     "url": "https://github.com/prescottprue"
+  },
+  "browser": {
+    "fs": false,
+    "os": false,
+    "path": false
   },
   "files": [
     "bin",
