@@ -21,11 +21,11 @@ jobs:
 
       - name: Check if version has been updated
         id: check
-        uses: EndBug/version-check@v1
+        uses: EndBug/version-check@v2
 
       - name: Use Node 12
         if: steps.check.outputs.changed == 'true'
-        uses: actions/setup-node@v2.1.2
+        uses: actions/setup-node@v2.1.4
         with:
           node-version: 12
           registry-url: https://registry.npmjs.org/
