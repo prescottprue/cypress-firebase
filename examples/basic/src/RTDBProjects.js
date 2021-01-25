@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { invoke, map } from 'lodash';
 import Project from './Project'
 import firebase from 'firebase/app'
-import 'firebase/firestore' // make sure you add this for firestore
+import 'firebase/database'
 import './App.css';
 
 export default function Projects() {
@@ -16,23 +15,26 @@ export default function Projects() {
     .ref('projects')
     .limitToLast(10)
     .on('value', (snap) => {
-      console.log('snap', snap, snap.val())
+      console.log('Data snapshot:', snap.val())
       setProjects(snap.val())
       setLoadingState(false)
     }, (err) => {
-      setErrorState(invoke(err, 'toString') || err)
+      console.error('Error:', err)
+      setErrorState(err.message)
       setLoadingState(false)
     })
   }
+
   useEffect(() => {
     const unsetProjectsListener = loadProjects()
     return () => {
-      firebase.database().ref('projects').off(unsetProjectsListener)
+      // Unset listener on unmount
+      firebase.database().ref('projects').off("value", unsetProjectsListener)
     }
   }, [])
 
   if (errorState) {
-    return <div>Error</div>
+    return <div><h4>Error:</h4><p>{errorState}</p></div>
   }
 
   if (loading) {
@@ -46,10 +48,10 @@ export default function Projects() {
   return (
     <div data-test="projects">
       {
-        map(projects, (project, projectKey) =>
+        Object.keys(projects).map((projectKey) =>
           <Project
             key={`Project-${projectKey}`}
-            project={project}
+            project={projects[projectKey]}
             projectId={projectKey}
           />
         )

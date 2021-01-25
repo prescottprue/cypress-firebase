@@ -48,89 +48,71 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
     return fbInstance;
   }
   try {
-    // Use emulator if it exists in environment
-    if (
-      process.env.FIRESTORE_EMULATOR_HOST ||
-      process.env.FIREBASE_DATABASE_EMULATOR_HOST
-    ) {
-      // TODO: Look into using @firebase/testing in place of admin here to allow for
-      // usage of clearFirestoreData (see https://github.com/prescottprue/cypress-firebase/issues/73 for more info)
-      const serviceAccount = getServiceAccount();
-      const projectId =
-        process.env.GCLOUD_PROJECT ||
-        process.env.FIREBASE_PROJECT ||
-        process.env.FIREBASE_PROJECT_ID ||
-        serviceAccount?.project_id; // eslint-disable-line camelcase
-      const fbConfig: any = {
-        projectId,
-      };
+    // TODO: Look into using @firebase/testing in place of admin here to allow for
+    // usage of clearFirestoreData (see https://github.com/prescottprue/cypress-firebase/issues/73 for more info)
+    const serviceAccount = getServiceAccount();
+    const projectId =
+      process.env.GCLOUD_PROJECT ||
+      process.env.FIREBASE_PROJECT ||
+      process.env.FIREBASE_PROJECT_ID ||
+      serviceAccount?.project_id; // eslint-disable-line camelcase
+    const fbConfig: any = {
+      projectId,
+    };
 
-      // Initialize RTDB with databaseURL from FIREBASE_DATABASE_EMULATOR_HOST to allow for RTDB actions
-      // within Emulator
-      if (process.env.FIREBASE_DATABASE_EMULATOR_HOST) {
-        fbConfig.databaseURL = `http://${
-          process.env.FIREBASE_DATABASE_EMULATOR_HOST
-        }?ns=${fbConfig.projectId || 'local'}`;
-        /* eslint-disable no-console */
-        console.log(
-          'cypress-firebase: Using RTDB emulator with DB URL:',
-          fbConfig.databaseURL,
-        );
-        /* eslint-enable no-console */
-      }
-
-      // Add service account credential if it exists so that custom auth tokens can be generated
-      if (serviceAccount) {
-        fbConfig.credential = adminInstance.credential.cert(serviceAccount);
-      }
-
-      fbInstance = adminInstance.initializeApp(fbConfig);
-
-      // Initialize Firestore with emulator host settings
-      if (process.env.FIRESTORE_EMULATOR_HOST) {
-        const firestoreSettings = firestoreSettingsFromEnv();
-        /* eslint-disable no-console */
-        console.log(
-          'cypress-firebase: Using Firestore emulator with settings:',
-          firestoreSettings,
-        );
-        /* eslint-enable no-console */
-        adminInstance.firestore().settings(firestoreSettings);
-      }
+    // Initialize RTDB with databaseURL from FIREBASE_DATABASE_EMULATOR_HOST to allow for RTDB actions
+    // within Emulator
+    if (process.env.FIREBASE_DATABASE_EMULATOR_HOST) {
+      fbConfig.databaseURL = `http://${
+        process.env.FIREBASE_DATABASE_EMULATOR_HOST
+      }?ns=${fbConfig.projectId || 'local'}`;
+      /* eslint-disable no-console */
+      console.log(
+        'cypress-firebase: Using RTDB emulator with DB URL:',
+        fbConfig.databaseURL,
+      );
+      /* eslint-enable no-console */
     } else {
-      // Get service account from local file falling back to environment variables
-      const serviceAccount = getServiceAccount();
-      const projectId =
-        process.env.GCLOUD_PROJECT || serviceAccount?.project_id; // eslint-disable-line camelcase
-      if (!isString(projectId)) {
-        const missingProjectIdErr =
-          'Error GCLOUD_PROJECT environment variable or project_id from service account to initialize Firebase.';
-        console.error(`cypress-firebase: ${missingProjectIdErr}`); // eslint-disable-line no-console
-        throw new Error(missingProjectIdErr);
-      }
       const cleanProjectId = (projectId as string).replace(
         'firebase-top-agent-int',
         'top-agent-int',
       );
 
-      const appSettings: any = {
-        databaseURL: `https://${cleanProjectId}.firebaseio.com`,
-      };
+      fbConfig.databaseURL = `https://${cleanProjectId}.firebaseio.com`;
+    }
 
-      if (serviceAccount) {
-        appSettings.credential = adminInstance.credential.cert(
-          serviceAccount as any,
-        );
-      }
+    // Add service account credential if it exists so that custom auth tokens can be generated
+    if (serviceAccount) {
+      fbConfig.credential = adminInstance.credential.cert(serviceAccount);
+    }
 
-      fbInstance = adminInstance.initializeApp(appSettings);
+    if (process.env.FIREBASE_AUTH_EMULATOR_HOST) {
       /* eslint-disable no-console */
       console.log(
-        `cypress-firebase: Initialized app with project "${cleanProjectId}"`,
+        'cypress-firebase: Using Auth emulator with port:',
+        process.env.FIREBASE_AUTH_EMULATOR_HOST,
       );
       /* eslint-enable no-console */
     }
 
+    fbInstance = adminInstance.initializeApp(fbConfig);
+
+    // Initialize Firestore with emulator host settings
+    if (process.env.FIRESTORE_EMULATOR_HOST) {
+      const firestoreSettings = firestoreSettingsFromEnv();
+      /* eslint-disable no-console */
+      console.log(
+        'cypress-firebase: Using Firestore emulator with settings:',
+        firestoreSettings,
+      );
+      /* eslint-enable no-console */
+      adminInstance.firestore().settings(firestoreSettings);
+    }
+    /* eslint-disable no-console */
+    console.log(
+      `cypress-firebase: Initialized app with database url "${fbConfig.projectId}"`,
+    );
+    /* eslint-enable no-console */
     return fbInstance;
   } catch (err) {
     /* eslint-disable no-console */
@@ -219,7 +201,7 @@ export function slashPathToFirestoreRef(
 function deleteQueryBatch(
   db: any,
   query: admin.firestore.CollectionReference,
-  resolve: () => any,
+  resolve: (value?: any) => any,
   reject: any,
 ): void {
   query
@@ -236,9 +218,7 @@ function deleteQueryBatch(
         batch.delete(doc.ref);
       });
 
-      return batch.commit().then(() => {
-        return snapshot.size;
-      });
+      return batch.commit().then(() => snapshot.size);
     })
     .then((numDeleted: number) => {
       if (numDeleted === 0) {

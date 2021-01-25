@@ -9,3 +9,4 @@ es
 *.log*
 .nyc_output/**
 coverage/**
+**/*.eslintcache
