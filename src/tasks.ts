@@ -154,9 +154,7 @@ export function callRtdb(
     const pushRef = adminInstance.database().ref(actionPath).push();
     return pushRef
       .set(data)
-      .then(() => {
-        return pushRef.key;
-      })
+      .then(() => pushRef.key)
       .catch(handleError);
   }
 
@@ -169,11 +167,12 @@ export function callRtdb(
     .database()
     .ref(actionPath)
     [cleanedActionName](data)
-    .then(() => {
-      // Prevents Cypress error with message:
-      // "You must return a promise, a value, or null to indicate that the task was handled."
-      return null;
-    })
+    .then(
+      () =>
+        // Prevents Cypress error with message:
+        // "You must return a promise, a value, or null to indicate that the task was handled."
+        null,
+    )
     .catch(handleError);
 }
 

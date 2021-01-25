@@ -218,9 +218,7 @@ function deleteQueryBatch(
         batch.delete(doc.ref);
       });
 
-      return batch.commit().then(() => {
-        return snapshot.size;
-      });
+      return batch.commit().then(() => snapshot.size);
     })
     .then((numDeleted: number) => {
       if (numDeleted === 0) {
