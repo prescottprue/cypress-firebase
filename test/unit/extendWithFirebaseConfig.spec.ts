@@ -12,7 +12,6 @@ describe('extendWithFirebaseConfig', () => {
     process.env.FIREBASE_DATABASE_EMULATOR_HOST = databaseEmulatorHost;
   });
 
-
   it('returns an object', () => {
     const originalConfig = {};
     expect(extendWithFirebaseConfig(originalConfig)).to.be.an('object');
@@ -37,6 +36,16 @@ describe('extendWithFirebaseConfig', () => {
     expect(extendWithFirebaseConfig(originalConfig)).to.have.nested.property(
       'env.GCLOUD_PROJECT',
       projectName,
+    );
+  });
+
+  it('attaches FIREBASE_AUTH_EMULATOR_HOST to cypress env', () => {
+    const emulatorHost = 'localhost:9000';
+    process.env.FIREBASE_AUTH_EMULATOR_HOST = emulatorHost;
+    const originalConfig = {};
+    expect(extendWithFirebaseConfig(originalConfig)).to.have.nested.property(
+      'env.FIREBASE_AUTH_EMULATOR_HOST',
+      emulatorHost,
     );
   });
 

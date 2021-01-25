@@ -38,6 +38,9 @@ export default function getFirebaseInstance(initialState, history) {
       }
       firebase.firestore().settings(firestoreSettings)
     }
+
+    firebase.auth().useEmulator('http://localhost:9099/');
+    
     firebaseInstance = firebase
   }
 

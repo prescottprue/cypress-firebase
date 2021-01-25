@@ -316,7 +316,7 @@ describe("Test firestore", () => {
 
 ## Recipes
 
-### Using Database Emulators
+### Using Emulators
 
 1. Install cross-env for cross system environment variable support: `npm i --save-dev cross-env`
 1. Add the following to the `scripts` section of your `package.json`:
@@ -325,7 +325,7 @@ describe("Test firestore", () => {
    "emulators": "firebase emulators:start --only database,firestore",
    "test": "cypress run",
    "test:open": "cypress open",
-   "test:emulate": "cross-env FIREBASE_DATABASE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.database.port)\" FIRESTORE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.firestore.port)\" yarn test:open"
+   "test:emulate": "cross-env FIREBASE_AUTH_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.auth.port)\" FIREBASE_DATABASE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.database.port)\" FIRESTORE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.firestore.port)\" yarn test:open"
    ```
 
 1. If not already set by `firebase init`, add emulator ports to `firebase.json`:
@@ -337,6 +337,9 @@ describe("Test firestore", () => {
      },
      "firestore": {
        "port": 8080
+     },
+     "auth": {
+      "port": 9099
      }
    }
    ```
@@ -369,6 +372,12 @@ describe("Test firestore", () => {
 
      firebase.firestore().settings(firestoreSettings);
    }
+
+   // Emulate Auth
+   if (shouldUseEmulator) {
+     firebase.auth().useEmulator(`http://localhost:9099/`);
+     console.debug(`Using Auth emulator: http://localhost:9099/`);
+   }
    ```
 
 1. Make sure you also have init logic in `cypress/support/commands.js` or `cypress/support/index.js`:
@@ -399,6 +408,12 @@ describe("Test firestore", () => {
        host: firestoreEmulatorHost,
        ssl: false,
      });
+   }
+
+   const authEmulatorHost = Cypress.env("FIREBASE_AUTH_EMULATOR_HOST");
+   if (authEmulatorHost) {
+     firebase.auth().useEmulator(`http://${authEmulatorHost}/`);
+     console.debug(`Using Auth emulator: http://${authEmulatorHost}/`);
    }
 
    attachCustomCommands({ Cypress, cy, firebase });

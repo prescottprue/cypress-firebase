@@ -206,6 +206,7 @@ declare module "extendWithFirebaseConfig" {
     }
     export interface ExtendedCypressConfigEnv {
         [k: string]: any;
+        FIREBASE_AUTH_EMULATOR_HOST?: string;
         FIRESTORE_EMULATOR_HOST?: string;
         FIREBASE_DATABASE_EMULATOR_HOST?: string;
         GCLOUD_PROJECT?: string;
@@ -220,9 +221,9 @@ declare module "extendWithFirebaseConfig" {
     }
     /**
      * Load config for Cypress from environment variables. Loads
-     * FIRESTORE_EMULATOR_HOST, FIREBASE_DATABASE_EMULATOR_HOST, and
-     * GCLOUD_PROJECT variable values from environment to pass to
-     * Cypress environment
+     * FIREBASE_AUTH_EMULATOR_HOST, FIRESTORE_EMULATOR_HOST,
+     * FIREBASE_DATABASE_EMULATOR_HOST, and GCLOUD_PROJECT variable
+     * values from environment to pass to Cypress environment
      * @param cypressConfig - Existing Cypress config
      * @returns Cypress config extended with environment variables
      */

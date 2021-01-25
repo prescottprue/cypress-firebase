@@ -4,7 +4,7 @@ describe('Projects View', () => {
       // Use cy.setRtdb() to set projects created by authed user
       cy.callRtdb('push', 'projects', { name: 'project 1' }, { withMeta: true })
       cy.callRtdb('push', 'projects', { name: 'project 3' }, { withMeta: true })
-      cy.login(Cypress.env('TEST_UID'));
+      cy.login('abc123');
       // Go to home page
       cy.visit('/');
     });
