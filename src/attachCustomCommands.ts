@@ -321,16 +321,20 @@ export default function attachCustomCommands(
    */
   Cypress.Commands.add(
     options?.commandNames?.logout || 'logout',
-    (): Promise<any> => {
-      return new Promise((resolve: () => any, reject: () => any): any => {
-        firebase.auth().onAuthStateChanged((auth: any) => {
-          if (!auth) {
-            resolve();
-          }
-        });
-        firebase.auth().signOut().catch(reject);
-      });
-    },
+    (): Promise<any> =>
+      new Promise(
+        (
+          resolve: (value?: any) => void,
+          reject: (reason?: any) => void,
+        ): any => {
+          firebase.auth().onAuthStateChanged((auth: any) => {
+            if (!auth) {
+              resolve();
+            }
+          });
+          firebase.auth().signOut().catch(reject);
+        },
+      ),
   );
 
   /**
@@ -439,8 +443,6 @@ export default function attachCustomCommands(
    */
   Cypress.Commands.add(
     options?.commandNames?.getAuthUser || 'getAuthUser',
-    (uid: string): Promise<any> => {
-      return cy.task('getAuthUser', uid);
-    },
+    (uid: string): Promise<any> => cy.task('getAuthUser', uid),
   );
 }
