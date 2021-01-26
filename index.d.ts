@@ -269,8 +269,9 @@ declare module "firebase-utils" {
      * serviceAccount.json or environment variables)
      * @returns Initialized Firebase instance
      * @param adminInstance - firebase-admin instance to initialize
+     * @param overrideConfig - firebase-admin instance to initialize
      */
-    export function initializeFirebase(adminInstance: any): admin.app.App;
+    export function initializeFirebase(adminInstance: any, overrideConfig?: admin.AppOptions): admin.app.App;
     /**
      * Check with or not a slash path is the path of a document
      * @param slashPath - Path to check for whether or not it is a doc
@@ -332,14 +333,16 @@ declare module "tasks" {
     export function getAuthUser(adminInstance: any, uid: string): Promise<admin.auth.UserRecord>;
 }
 declare module "plugin" {
+    import { AppOptions } from 'firebase-admin';
     import { ExtendedCypressConfig } from "extendWithFirebaseConfig";
     /**
      * @param cypressOnFunc - on function from cypress plugins file
      * @param cypressConfig - Cypress config
      * @param adminInstance - firebase-admin instance
+     * @param overrideConfig - Override config for firebase instance
      * @returns Extended Cypress config
      */
-    export default function pluginWithTasks(cypressOnFunc: any, cypressConfig: any, adminInstance: any): ExtendedCypressConfig;
+    export default function pluginWithTasks(cypressOnFunc: any, cypressConfig: any, adminInstance: any, overrideConfig?: AppOptions): ExtendedCypressConfig;
 }
 declare module "index" {
     import attachCustomCommands from "attachCustomCommands";

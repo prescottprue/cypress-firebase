@@ -458,6 +458,31 @@ if (REACT_APP_FIRESTORE_EMULATOR_HOST) {
 }
 ```
 
+### Use Different RTDB Instance
+
+Firebase instance config can be overriden by passing another argument to the cypress-firebase plugin. We can use this to override the `databaseURL`:
+
+1. Setup the config within plugin (`cypress/plugins/index.js`):
+
+   ```js
+   const admin = require("firebase-admin");
+   const cypressFirebasePlugin = require("cypress-firebase").plugin;
+
+   module.exports = (on, config) => {
+     const overrideFirebaseConfig = {
+       databaseURL: "http://localhost:9000?ns=my-other-namespace",
+     };
+     const extendedConfig = cypressFirebasePlugin(on, config, admin);
+
+     // Add other plugins/tasks such as code coverage here
+
+     return extendedConfig;
+   };
+   ```
+
+1. Make sure you use the same `databaseURL` when initializing the firebase instance within cypress (`cypress/support/index.js`)
+1. Make sure you use the same `databaseURL` when initializing the firebase instance within your app code
+
 ### Test Built Version
 
 It is often required to run tests against the built version of your app instead of your dev version (with hot module reloading and other dev tools). You can do that by running a build script before spinning up the:
