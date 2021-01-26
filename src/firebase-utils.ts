@@ -42,8 +42,12 @@ let fbInstance: admin.app.App;
  * serviceAccount.json or environment variables)
  * @returns Initialized Firebase instance
  * @param adminInstance - firebase-admin instance to initialize
+ * @param overrideConfig - firebase-admin instance to initialize
  */
-export function initializeFirebase(adminInstance: any): admin.app.App {
+export function initializeFirebase(
+  adminInstance: any,
+  overrideConfig?: admin.AppOptions,
+): admin.app.App {
   if (fbInstance) {
     return fbInstance;
   }
@@ -56,34 +60,23 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
       process.env.FIREBASE_PROJECT ||
       process.env.FIREBASE_PROJECT_ID ||
       serviceAccount?.project_id; // eslint-disable-line camelcase
+    const { FIREBASE_DATABASE_EMULATOR_HOST } = process.env;
     const fbConfig: any = {
       projectId,
+      // Initialize RTDB with databaseURL pointed to emulator if FIREBASE_DATABASE_EMULATOR_HOST is set
+      databaseURL: FIREBASE_DATABASE_EMULATOR_HOST
+        ? `http://${FIREBASE_DATABASE_EMULATOR_HOST}?ns=${projectId || 'local'}`
+        : `https://${projectId}.firebaseio.com`,
+      ...overrideConfig,
     };
 
-    // Initialize RTDB with databaseURL from FIREBASE_DATABASE_EMULATOR_HOST to allow for RTDB actions
-    // within Emulator
-    if (process.env.FIREBASE_DATABASE_EMULATOR_HOST) {
-      fbConfig.databaseURL = `http://${
-        process.env.FIREBASE_DATABASE_EMULATOR_HOST
-      }?ns=${fbConfig.projectId || 'local'}`;
+    if (FIREBASE_DATABASE_EMULATOR_HOST) {
       /* eslint-disable no-console */
       console.log(
         'cypress-firebase: Using RTDB emulator with DB URL:',
         fbConfig.databaseURL,
       );
       /* eslint-enable no-console */
-    } else {
-      const cleanProjectId = (projectId as string).replace(
-        'firebase-top-agent-int',
-        'top-agent-int',
-      );
-
-      fbConfig.databaseURL = `https://${cleanProjectId}.firebaseio.com`;
-    }
-
-    // Add service account credential if it exists so that custom auth tokens can be generated
-    if (serviceAccount) {
-      fbConfig.credential = adminInstance.credential.cert(serviceAccount);
     }
 
     if (process.env.FIREBASE_AUTH_EMULATOR_HOST) {
@@ -93,6 +86,11 @@ export function initializeFirebase(adminInstance: any): admin.app.App {
         process.env.FIREBASE_AUTH_EMULATOR_HOST,
       );
       /* eslint-enable no-console */
+    }
+
+    // Add service account credential if it exists so that custom auth tokens can be generated
+    if (serviceAccount) {
+      fbConfig.credential = adminInstance.credential.cert(serviceAccount);
     }
 
     fbInstance = adminInstance.initializeApp(fbConfig);
