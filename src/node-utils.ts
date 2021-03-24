@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from 'fs';
  * @param filePath - Path for file
  * @returns Firebase settings object
  */
-export function readJsonFile(filePath: string): any {
+function readJsonFile(filePath: string): any {
   if (!existsSync(filePath)) {
     return {};
   }

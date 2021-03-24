@@ -423,8 +423,8 @@ export default function attachCustomCommands(
         }
         taskSettings.data = dataToWrite;
       }
-      // Use third argument as options for get action
-      if (action === 'get') {
+      // Use third argument as options for get and delete actions
+      if (action === 'get' || action === 'delete') {
         taskSettings.options = dataOrOptions;
       } else if (options) {
         // Attach options if they exist
