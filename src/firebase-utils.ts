@@ -108,7 +108,7 @@ export function initializeFirebase(
     }
     /* eslint-disable no-console */
     console.log(
-      `cypress-firebase: Initialized app with database url "${fbConfig.projectId}"`,
+      `cypress-firebase: Initialized app with database url "${fbConfig.databaseURL}"`,
     );
     /* eslint-enable no-console */
     return fbInstance;
