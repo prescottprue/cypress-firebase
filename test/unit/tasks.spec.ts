@@ -29,7 +29,7 @@ describe('tasks', () => {
   describe('callFirestore', () => {
     beforeEach(async () => {
       await firebase.clearFirestoreData({
-        projectId: process.env.GCLOUD_PROJECT,
+        projectId: process.env.GCLOUD_PROJECT || 'test-project',
       });
     });
 
