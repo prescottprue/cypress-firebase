@@ -45,6 +45,18 @@ describe('tasks', () => {
     });
 
     describe('get action', () => {
+      it('throws an error if action path is empty string', async () => {
+        await projectFirestoreRef.set(testProject);
+        try {
+          await tasks.callFirestore(adminApp, 'get', '');
+        } catch (err) {
+          expect(err).to.have.property(
+            'message',
+            'Path is required to make Firestore Reference',
+          );
+        }
+      });
+
       it('gets collections', async () => {
         await projectFirestoreRef.set(testProject);
         const result = await tasks.callFirestore(
@@ -120,11 +132,27 @@ describe('tasks', () => {
           'get',
           PROJECTS_COLLECTION,
           {
-            limit: 1,
+            orderBy: 'name',
+            limitToLast: 1,
           },
         );
         expect(result).to.have.length(1);
         expect(result[0]).to.have.property('name', testProject.name);
+      });
+
+      it('throws an error if limitToLast is called without orderBy', async () => {
+        await projectFirestoreRef.set(testProject);
+        await projectsFirestoreRef.doc('another').set(testProject);
+        try {
+          await tasks.callFirestore(adminApp, 'get', PROJECTS_COLLECTION, {
+            limitToLast: 1,
+          });
+        } catch (err) {
+          expect(err).to.have.property(
+            'message',
+            'limitToLast() queries require specifying at least one orderBy() clause.',
+          );
+        }
       });
 
       it('supports limit', async () => {
