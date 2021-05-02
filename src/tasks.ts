@@ -123,57 +123,55 @@ function getDataWithTimestampsAndGeoPoints(
  * @param data - Data to pass to action
  * @returns Promise which resolves with results of calling RTDB
  */
-export function callRtdb(
+export async function callRtdb(
   adminInstance: any,
   action: RTDBAction,
   actionPath: string,
   options?: CallRtdbOptions,
   data?: FixtureData | string | boolean,
 ): Promise<any> {
-  /**
-   * @param err - Error to handle
-   * @returns Promise which rejects
-   */
-  function handleError(err: Error): Promise<any> {
+  // Handle actionPath not being set (see #244 for more info)
+  if (!actionPath) {
+    throw new Error(
+      'actionPath is required for callRtdb. Use "/" for top level actions.',
+    );
+  }
+
+  try {
+    const dbRef = adminInstance.database().ref(actionPath);
+    if (action === 'get') {
+      const snap: admin.database.DataSnapshot = await optionsToRtdbRef(
+        dbRef,
+        options,
+      ).once('value');
+      return snap.val();
+    }
+
+    if (action === 'push') {
+      const pushRef = dbRef.push();
+      await pushRef.set(data);
+      // TODO: Return key on an object for consistent return regardless of action
+      return pushRef.key;
+    }
+
+    // Delete action
+    const actionNameMap = {
+      delete: 'remove',
+    };
+    const cleanedActionName = (actionNameMap as any)[action] || action;
+    await dbRef[cleanedActionName](data);
+    // Prevents Cypress error with message:
+    // "You must return a promise, a value, or null to indicate that the task was handled."
+    return null;
+  } catch (err) {
     /* eslint-disable no-console */
     console.error(
       `cypress-firebase: Error with RTDB "${action}" at path "${actionPath}" :`,
       err,
     );
     /* eslint-enable no-console */
-    return Promise.reject(err);
+    throw err;
   }
-  if (action === 'get') {
-    return optionsToRtdbRef(adminInstance.database().ref(actionPath), options)
-      .once('value')
-      .then((snap: admin.database.DataSnapshot): any => snap.val())
-      .catch(handleError);
-  }
-
-  if (action === 'push') {
-    const pushRef = adminInstance.database().ref(actionPath).push();
-    return pushRef
-      .set(data)
-      .then(() => pushRef.key)
-      .catch(handleError);
-  }
-
-  // Delete action
-  const actionNameMap = {
-    delete: 'remove',
-  };
-  const cleanedActionName = (actionNameMap as any)[action] || action;
-  return adminInstance
-    .database()
-    .ref(actionPath)
-    [cleanedActionName](data)
-    .then(
-      () =>
-        // Prevents Cypress error with message:
-        // "You must return a promise, a value, or null to indicate that the task was handled."
-        null,
-    )
-    .catch(handleError);
 }
 
 /**
@@ -212,7 +210,7 @@ export function callFirestore(
     ) as any)
       .get()
       .then((snap: any) => {
-        if (snap && snap.docs?.length && typeof snap.docs.map === 'function') {
+        if (snap?.docs?.length && typeof snap.docs.map === 'function') {
           return snap.docs.map(
             (docSnap: FirebaseFirestore.DocumentSnapshot) => ({
               ...docSnap.data(),
@@ -222,7 +220,7 @@ export function callFirestore(
         }
         // Falling back to null in the case of falsey value prevents Cypress error with message:
         // "You must return a promise, a value, or null to indicate that the task was handled."
-        return (snap && typeof snap.data === 'function' && snap.data()) || null;
+        return (typeof snap?.data === 'function' && snap.data()) || null;
       })
       .catch(handleError);
   }

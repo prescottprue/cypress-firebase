@@ -285,6 +285,12 @@ export default function attachCustomCommands(
     options?.commandNames?.login || 'login',
     (uid?: string, customClaims?: any): any => {
       const userUid = uid || Cypress.env('TEST_UID');
+      // Handle UID which is passed in
+      if (!userUid) {
+        throw new Error(
+          'uid must be passed or TEST_UID set within environment to login',
+        );
+      }
       // Resolve with current user if they already exist
       if (
         firebase.auth().currentUser &&
@@ -292,13 +298,6 @@ export default function attachCustomCommands(
       ) {
         cy.log('Authed user already exists, login complete.');
         return undefined;
-      }
-
-      // Handle UID which is passed in
-      if (!userUid) {
-        throw new Error(
-          'uid must be passed or TEST_UID set within environment to login',
-        );
       }
 
       cy.log('Creating custom token for login...');
