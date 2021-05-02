@@ -1,6 +1,6 @@
 {
   "name": "cypress-firebase",
-  "version": "1.8.1",
+  "version": "1.9.0",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -23,7 +23,7 @@
     "test": "firebase emulators:exec --only firestore,database \"yarn test:base\"",
     "test:cov": "firebase emulators:exec --only firestore,database \"yarn test:cov:base\"",
     "size": "yarn build && size-limit",
-    "prepare": "yarn clean && yarn build"
+    "prepare": "husky install && yarn clean && yarn build"
   },
   "peerDependencies": {
     "firebase-admin": "^8 || ^9"
@@ -33,15 +33,15 @@
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@size-limit/preset-small-lib": "^4.10.2",
     "@types/chai": "^4.2.17",
-    "@types/mocha": "^8.2.0",
-    "@types/node": "^14.14.22",
+    "@types/mocha": "^8.2.2",
+    "@types/node": "^15.0.1",
     "@types/sinon-chai": "^3.2.5",
     "@typescript-eslint/eslint-plugin": "^4.22.0",
     "@typescript-eslint/parser": "^4.22.0",
     "chai": "^4.2.0",
     "eslint": "^7.25.0",
     "eslint-config-airbnb-base": "^14.2.0",
-    "eslint-config-prettier": "^7.2.0",
+    "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jsdoc": "^33.0.0",
@@ -49,8 +49,8 @@
     "eslint-plugin-prettier": "^3.4.0",
     "firebase-admin": "^9.7.0",
     "firebase-tools": "^9.10.0",
-    "husky": "^4.3.8",
-    "lint-staged": "^10.5.3",
+    "husky": "^6.0.0",
+    "lint-staged": "^10.5.4",
     "mocha": "^8.2.1",
     "nyc": "^15.1.0",
     "prettier": "^2.2.1",
@@ -58,9 +58,8 @@
     "sinon": "^9.2.4",
     "sinon-chai": "^3.5.0",
     "size-limit": "^4.10.2",
-    "source-map-support": "^0.5.19",
-    "ts-node": "^9.0.0",
-    "typescript": "^4.1.3"
+    "ts-node": "^9.1.1",
+    "typescript": "^4.2.4"
   },
   "keywords": [
     "cypress",
@@ -93,11 +92,6 @@
     "lib-esm",
     "index.d.ts"
   ],
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn build:typefile && git add . && lint-staged"
-    }
-  },
   "lint-staged": {
     "*.{json,md}": [
       "prettier --write"
