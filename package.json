@@ -104,13 +104,13 @@
     {
       "name": "CommonJS",
       "path": "lib/*.js",
-      "limit": "10kb",
+      "limit": "10.5kb",
       "webpack": false
     },
     {
       "name": "ESM",
       "path": "lib-esm/*.js",
-      "limit": "9.5kb",
+      "limit": "9.75kb",
       "webpack": false
     }
   ]
