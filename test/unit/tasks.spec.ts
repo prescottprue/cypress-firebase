@@ -27,9 +27,9 @@ describe('tasks', () => {
   });
 
   describe('callFirestore', () => {
-    before(async () => {
+    beforeEach(async () => {
       await firebase.clearFirestoreData({
-        projectId: 'test-project',
+        projectId: process.env.GCLOUD_PROJECT,
       });
     });
 
