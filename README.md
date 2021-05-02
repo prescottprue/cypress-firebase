@@ -11,11 +11,12 @@
 
 ## What?
 
-- [Custom cypress commands](https://docs.cypress.io/api/cypress-api/custom-commands.html#Syntax) for auth and database interactions:
-  - [cy.login][1]
-  - [cy.logout][4]
-  - [cy.callRtdb][6]
-  - [cy.callFirestore][9]
+0 dependency plugin which adds [custom cypress commands](https://docs.cypress.io/api/cypress-api/custom-commands.html#Syntax) for interactions with Firebase:
+
+- [cy.login][1]
+- [cy.logout][4]
+- [cy.callRtdb][6]
+- [cy.callFirestore][9]
 
 If you are interested in what drove the need for this checkout [the why section](#why)
 
@@ -631,6 +632,11 @@ When testing, tests should have admin read/write access to the database for seed
 The issue is most likely due to a circular object, such as a timestamp, being included in data you are attempting to write to Firestore. Instead of using `firebase.firestore.FieldValue.serverTimestamp()` you should instead use `firebase.firestore.Timestamp.now()` or you would like to specify a certain date `firebase.firestore.Timestamp.fromDate(new Date('01/01/18'))`.
 
 This comes from the fact that cypress stringifies values as it is passing them from the browser environment to the node environment through `cy.task`.
+
+## Future Plans
+
+- Drop support for service account file in favor of application default credentails env variable (path to file set in `GOOGLE_APPLICATION_CREDENTIALS`)
+- Support for Auth emulators (this will become the suggested method instead of needing a service account)
 
 [1]: #cylogin
 [2]: #examples

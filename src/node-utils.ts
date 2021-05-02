@@ -6,10 +6,6 @@ import { existsSync, readFileSync } from 'fs';
  * @returns Firebase settings object
  */
 function readJsonFile(filePath: string): any {
-  if (!existsSync(filePath)) {
-    return {};
-  }
-
   try {
     const fileBuffer = readFileSync(filePath, 'utf8');
     return JSON.parse(fileBuffer.toString());
@@ -119,8 +115,9 @@ interface ServiceAccount {
 export function getServiceAccount(envSlug?: string): ServiceAccount | null {
   const serviceAccountPath = `${process.cwd()}/serviceAccount.json`;
   // Check for local service account file (Local dev)
+  // TODO: Drop support for service account file and instead use default credentails
   if (existsSync(serviceAccountPath)) {
-    return readJsonFile(serviceAccountPath); // eslint-disable-line global-require, import/no-dynamic-require
+    return readJsonFile(serviceAccountPath);
   }
 
   // Use environment variables

@@ -1,9 +1,12 @@
 import sinon from 'sinon';
 import { expect } from 'chai';
-import { createCustomToken } from '../../src/tasks';
 import pluginWithTasks from '../../src/plugin';
 
 describe('plugin', () => {
+  afterEach(() => {
+    sinon.restore();
+  });
+
   it('Should add tasks to cypress', () => {
     let assignedTasksObj;
     const onFuncSpy = sinon.spy((action, tasksObj) => {
@@ -19,11 +22,13 @@ describe('plugin', () => {
   it('Should initialize firebase if no apps exist', () => {
     const onFuncSpy = sinon.spy();
     const initializeSpy = sinon.spy(() => ({}));
+
     const results = pluginWithTasks(
       onFuncSpy,
       {},
       {
         initializeApp: initializeSpy,
+        credential: { cert: () => ({}) },
         apps: [],
         firestore: () => ({ settings: () => ({}) }),
       },
