@@ -314,11 +314,15 @@ describe('tasks', () => {
             'set',
             PROJECT_PATH,
             { statics: admin.firestore },
-            { geoPointProperty: {latitude: 32.323443, longitude: 122.3954238} },
+            {
+              geoPointProperty: { latitude: 32.323443, longitude: 122.3954238 },
+            },
           );
 
           const resultSnap = await projectFirestoreRef.get();
-          expect(resultSnap.get('geoPointProperty')).to.be.an.instanceof(admin.firestore.GeoPoint);
+          expect(resultSnap.get('geoPointProperty')).to.be.an.instanceof(
+            admin.firestore.GeoPoint,
+          );
         });
       });
     });
@@ -442,6 +446,24 @@ describe('tasks', () => {
 
   describe('callRtdb', () => {
     describe('get action', () => {
+      it('throws an error if actionPath is missing', async () => {
+        await adminApp.database().ref(PROJECT_PATH).set(testProject);
+        try {
+          await tasks.callRtdb(adminApp, 'get', '');
+        } catch (err) {
+          expect(err).to.have.property(
+            'message',
+            'actionPath is required for callRtdb. Use "/" for top level actions.',
+          );
+        }
+      });
+
+      it('gets whole DB when passed "/" as action path', async () => {
+        await adminApp.database().ref(PROJECT_PATH).set(testProject);
+        const result = await tasks.callRtdb(adminApp, 'get', '/');
+        expect(result).to.be.an('object');
+      });
+
       it('gets a list of objects', async () => {
         await adminApp.database().ref(PROJECT_PATH).set(testProject);
         const result = await tasks.callRtdb(adminApp, 'get', 'projects');
@@ -522,6 +544,24 @@ describe('tasks', () => {
           .ref(`${PROJECT_PATH}/some`)
           .once('value');
         expect(result.val()).to.equal(testString);
+      });
+    });
+
+    describe('push action', () => {
+      it('sets an object', async () => {
+        const pushKey = await tasks.callRtdb(
+          adminApp,
+          'push',
+          PROJECT_PATH,
+          {},
+          testProject,
+        );
+        const result = await adminApp
+          .database()
+          .ref(`${PROJECT_PATH}/${pushKey}`)
+          .once('value');
+        expect(result.val()).to.be.an('object');
+        expect(result.val()).to.have.property('name', testProject.name);
       });
     });
   });
