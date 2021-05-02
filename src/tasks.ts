@@ -235,7 +235,8 @@ export function callFirestore(
           actionPath,
           options,
         ) as FirebaseFirestore.DocumentReference).delete()
-      : deleteCollection(
+      : // TODO: Here the ref should be passed along instead so we can accept options
+        deleteCollection(
           adminInstance.firestore(),
           actionPath,
           options?.batchSize,
