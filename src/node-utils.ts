@@ -129,7 +129,7 @@ export function getServiceAccount(envSlug?: string): ServiceAccount | null {
       } catch (err) {
         /* eslint-disable no-console */
         console.warn(
-          `cypress-firebase: Issue parsing 'SERVICE_ACCOUNT' environment variable from string to object, returning string`,
+          `cypress-firebase: Issue parsing "${serviceAccountEnvVar}" environment variable from string to object, returning string`,
         );
         /* eslint-enable no-console */
       }
