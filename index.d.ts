@@ -230,12 +230,6 @@ declare module "extendWithFirebaseConfig" {
     export default function extendWithFirebaseConfig(cypressConfig: CypressConfig): ExtendedCypressConfig;
 }
 declare module "node-utils" {
-    /**
-     * Read a file from the filesystem and JSON.parse contents
-     * @param filePath - Path for file
-     * @returns Firebase settings object
-     */
-    export function readJsonFile(filePath: string): any;
     interface ServiceAccount {
         type: string;
         project_id: string;
