@@ -203,11 +203,13 @@ export function callFirestore(
     return Promise.reject(err);
   }
   if (action === 'get') {
-    return (slashPathToFirestoreRef(
-      adminInstance.firestore(),
-      actionPath,
-      options,
-    ) as any)
+    return (
+      slashPathToFirestoreRef(
+        adminInstance.firestore(),
+        actionPath,
+        options,
+      ) as any
+    )
       .get()
       .then((snap: any) => {
         if (snap?.docs?.length && typeof snap.docs.map === 'function') {
@@ -228,11 +230,13 @@ export function callFirestore(
   if (action === 'delete') {
     // Handle deleting of collections & sub-collections if not a doc path
     const deletePromise = isDocPath(actionPath)
-      ? (slashPathToFirestoreRef(
-          adminInstance.firestore(),
-          actionPath,
-          options,
-        ) as FirebaseFirestore.DocumentReference).delete()
+      ? (
+          slashPathToFirestoreRef(
+            adminInstance.firestore(),
+            actionPath,
+            options,
+          ) as FirebaseFirestore.DocumentReference
+        ).delete()
       : // TODO: Here the ref should be passed along instead so we can accept options
         deleteCollection(
           adminInstance.firestore(),
@@ -272,11 +276,13 @@ export function callFirestore(
       .catch(handleError);
   }
   // "update" action
-  return (slashPathToFirestoreRef(
-    adminInstance.firestore(),
-    actionPath,
-    options,
-  ) as any)
+  return (
+    slashPathToFirestoreRef(
+      adminInstance.firestore(),
+      actionPath,
+      options,
+    ) as any
+  )
     [action](dataToSet)
     .catch(handleError);
 }
