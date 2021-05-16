@@ -337,12 +337,11 @@ export default function attachCustomCommands(
   );
 
   /**
-   * Call Real Time Database path with some specified action. Authentication is through
-   * FIREBASE_TOKEN since firebase-tools is used (instead of firebaseExtra).
+   * Call Real Time Database path with some specified action. Leverages callRtdb
+   * Cypress task which calls through firebase-admin.
    * @param action - The action type to call with (set, push, update, remove)
    * @param actionPath - Path within RTDB that action should be applied
    * @param options - Options
-   * @param options.args - Command line args to be passed
    * @name cy.callRtdb
    */
   Cypress.Commands.add(
@@ -386,8 +385,8 @@ export default function attachCustomCommands(
   );
 
   /**
-   * Call Firestore instance with some specified action. Authentication is through serviceAccount.json since it is at the base
-   * level. If using delete, auth is through `FIREBASE_TOKEN` since firebase-tools is used (instead of firebaseExtra).
+   * Call Firestore instance with some specified action.  Leverages callFirestore
+   * Cypress task which calls through firebase-admin.
    * @param action - The action type to call with (set, push, update, remove)
    * @param actionPath - Path within RTDB that action should be applied
    * @param options - Options
