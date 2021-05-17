@@ -17,22 +17,31 @@ import {
  * @param options - Options for ref
  * @returns RTDB Reference
  */
-function optionsToRtdbRef(baseRef: any, options?: CallRtdbOptions): any {
+function optionsToRtdbRef(
+  baseRef: admin.database.Reference,
+  options?: CallRtdbOptions,
+): admin.database.Reference | admin.database.Query {
   let newRef = baseRef;
-  const optionsToAdd = [
+  [
     'orderByChild',
     'orderByKey',
     'orderByValue',
     'equalTo',
+    'startAfter',
+    'startAt',
+    'endBefore',
+    'endAt',
     'limitToFirst',
     'limitToLast',
-    'startAt',
-    'endAt',
-  ];
-  // TODO: Switch to reduce over options keys with baseRef as acc
-  optionsToAdd.forEach((optionName: string) => {
+  ].forEach((optionName: string) => {
     if (options && (options as any)[optionName]) {
-      newRef = newRef[optionName]((options as any)[optionName]);
+      const args = (options as any)[optionName];
+      // Spread arg arrays (such as startAfter and endBefore)
+      if (Array.isArray(args)) {
+        newRef = (newRef as any)[optionName](...args);
+      } else {
+        newRef = (newRef as any)[optionName](args);
+      }
     }
   });
   return newRef;
@@ -138,12 +147,11 @@ export async function callRtdb(
   }
 
   try {
-    const dbRef = adminInstance.database().ref(actionPath);
+    const dbRef: admin.database.Reference = adminInstance
+      .database()
+      .ref(actionPath);
     if (action === 'get') {
-      const snap: admin.database.DataSnapshot = await optionsToRtdbRef(
-        dbRef,
-        options,
-      ).once('value');
+      const snap = await optionsToRtdbRef(dbRef, options).once('value');
       return snap.val();
     }
 
@@ -158,7 +166,9 @@ export async function callRtdb(
     const actionNameMap = {
       delete: 'remove',
     };
-    const cleanedActionName = (actionNameMap as any)[action] || action;
+    type RTDBMethod = 'push' | 'remove' | 'set' | 'update' | 'get';
+    const cleanedActionName: RTDBMethod =
+      (actionNameMap as any)[action] || action;
     await dbRef[cleanedActionName](data);
     // Prevents Cypress error with message:
     // "You must return a promise, a value, or null to indicate that the task was handled."
@@ -182,109 +192,95 @@ export async function callRtdb(
  * @param data - Data to pass to action
  * @returns Promise which resolves with results of calling Firestore
  */
-export function callFirestore(
+export async function callFirestore(
   adminInstance: admin.app.App,
   action: FirestoreAction,
   actionPath: string,
   options?: CallFirestoreOptions,
   data?: FixtureData,
 ): Promise<any> {
-  /**
-   * @param err - Error to handle
-   * @returns Promise which rejects
-   */
-  function handleError(err: Error): Promise<any> {
-    /* eslint-disable no-console */
-    console.error(
-      `cypress-firebase: Error with Firestore "${action}" at path "${actionPath}" :`,
-      err,
+  try {
+    if (action === 'get') {
+      const snap = await (
+        slashPathToFirestoreRef(
+          adminInstance.firestore(),
+          actionPath,
+          options,
+        ) as any
+      ).get();
+
+      if (snap?.docs?.length && typeof snap.docs.map === 'function') {
+        return snap.docs.map((docSnap: FirebaseFirestore.DocumentSnapshot) => ({
+          ...docSnap.data(),
+          id: docSnap.id,
+        }));
+      }
+      // Falling back to null in the case of falsey value prevents Cypress error with message:
+      // "You must return a promise, a value, or null to indicate that the task was handled."
+      return (typeof snap?.data === 'function' && snap.data()) || null;
+    }
+
+    if (action === 'delete') {
+      // Handle deleting of collections & sub-collections if not a doc path
+      const deletePromise = isDocPath(actionPath)
+        ? (
+            slashPathToFirestoreRef(
+              adminInstance.firestore(),
+              actionPath,
+              options,
+            ) as FirebaseFirestore.DocumentReference
+          ).delete()
+        : // TODO: Here the ref should be passed along instead so we can accept options
+          deleteCollection(
+            adminInstance.firestore(),
+            actionPath,
+            options?.batchSize,
+          );
+      await deletePromise;
+      // Returning null in the case of falsey value prevents Cypress error with message:
+      // "You must return a promise, a value, or null to indicate that the task was handled."
+      return null;
+    }
+
+    if (!data) {
+      throw new Error(`You must define data to run ${action} in firestore.`);
+    }
+
+    const dataToSet = getDataWithTimestampsAndGeoPoints(
+      data,
+      // Use static option if passed (tests), otherwise fallback to statics on adminInstance
+      // Tests do not have statics since they are using @firebase/testing
+      options?.statics || (adminInstance.firestore as typeof admin.firestore),
     );
-    /* eslint-enable no-console */
-    return Promise.reject(err);
-  }
-  if (action === 'get') {
+
+    if (action === 'set') {
+      return adminInstance
+        .firestore()
+        .doc(actionPath)
+        .set(
+          dataToSet,
+          options?.merge
+            ? ({ merge: options?.merge } as FirebaseFirestore.SetOptions)
+            : (undefined as any),
+        );
+    }
+    // "update" action
     return (
       slashPathToFirestoreRef(
         adminInstance.firestore(),
         actionPath,
         options,
       ) as any
-    )
-      .get()
-      .then((snap: any) => {
-        if (snap?.docs?.length && typeof snap.docs.map === 'function') {
-          return snap.docs.map(
-            (docSnap: FirebaseFirestore.DocumentSnapshot) => ({
-              ...docSnap.data(),
-              id: docSnap.id,
-            }),
-          );
-        }
-        // Falling back to null in the case of falsey value prevents Cypress error with message:
-        // "You must return a promise, a value, or null to indicate that the task was handled."
-        return (typeof snap?.data === 'function' && snap.data()) || null;
-      })
-      .catch(handleError);
-  }
-
-  if (action === 'delete') {
-    // Handle deleting of collections & sub-collections if not a doc path
-    const deletePromise = isDocPath(actionPath)
-      ? (
-          slashPathToFirestoreRef(
-            adminInstance.firestore(),
-            actionPath,
-            options,
-          ) as FirebaseFirestore.DocumentReference
-        ).delete()
-      : // TODO: Here the ref should be passed along instead so we can accept options
-        deleteCollection(
-          adminInstance.firestore(),
-          actionPath,
-          options?.batchSize,
-        );
-    return (
-      deletePromise
-        // Returning null in the case of falsey value prevents Cypress error with message:
-        // "You must return a promise, a value, or null to indicate that the task was handled."
-        .then(() => null)
-        .catch(handleError)
+    )[action](dataToSet);
+  } catch (err) {
+    /* eslint-disable no-console */
+    console.error(
+      `cypress-firebase: Error with Firestore "${action}" at path "${actionPath}" :`,
+      err,
     );
+    /* eslint-enable no-console */
+    throw err;
   }
-
-  if (!data) {
-    throw new Error(`You must define data to run ${action} in firestore.`);
-  }
-
-  const dataToSet = getDataWithTimestampsAndGeoPoints(
-    data,
-    // Use static option if passed (tests), otherwise fallback to statics on adminInstance
-    // Tests do not have statics since they are using @firebase/testing
-    options?.statics || (adminInstance.firestore as typeof admin.firestore),
-  );
-
-  if (action === 'set') {
-    return adminInstance
-      .firestore()
-      .doc(actionPath)
-      .set(
-        dataToSet,
-        options?.merge
-          ? ({ merge: options?.merge } as FirebaseFirestore.SetOptions)
-          : (undefined as any),
-      )
-      .catch(handleError);
-  }
-  // "update" action
-  return (
-    slashPathToFirestoreRef(
-      adminInstance.firestore(),
-      actionPath,
-      options,
-    ) as any
-  )
-    [action](dataToSet)
-    .catch(handleError);
 }
 
 /**
