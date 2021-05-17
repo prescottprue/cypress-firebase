@@ -1,5 +1,6 @@
 import { expect } from 'chai';
-import { isString } from '../../src/firebase-utils';
+import sinon from 'sinon';
+import { isString, initializeFirebase } from '../../src/firebase-utils';
 
 describe('firebase-utils', () => {
   describe('isString', () => {
@@ -16,6 +17,27 @@ describe('firebase-utils', () => {
       expect(isString([])).to.be.false;
       expect(isString({})).to.be.false;
       expect(isString(new Date())).to.be.false;
+    });
+  });
+
+  describe('initializeFirebase', () => {
+    it('Should call initializeApp with projectId and databaseURL by default', () => {
+      const returnedInstance = {};
+      const initializeMock = sinon.spy(() => returnedInstance);
+      const settingsMock = sinon.spy();
+      const adminInstanceMock = {
+        initializeApp: initializeMock,
+        firestore: sinon.spy(() => ({
+          settings: settingsMock,
+        })),
+      };
+      const result = initializeFirebase(adminInstanceMock);
+      expect(result).to.equal(returnedInstance);
+      const projectId = 'test-project';
+      expect(initializeMock).to.have.been.calledWith({
+        projectId,
+        databaseURL: `http://localhost:9000?ns=${projectId}`,
+      });
     });
   });
 });

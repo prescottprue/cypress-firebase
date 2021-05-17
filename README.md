@@ -509,10 +509,6 @@ NOTE: You can also use `firebase serve`:
 "start:dist": "npm run build && firebase serve --only hosting -p 3000",
 ```
 
-### CI
-
-1. Run `firebase login:ci` to generate a CI token for `firebase-tools` (this will give your `cy.callRtdb` and `cy.callFirestore` commands admin access to the DB)
-
 ### Changing Custom Command Names
 
 Pass `commandNames` in the `options` object to `attachCustomCommands`:
