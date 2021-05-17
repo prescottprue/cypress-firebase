@@ -32,6 +32,7 @@
     "@firebase/rules-unit-testing": "^1.3.1",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@size-limit/preset-small-lib": "^4.10.2",
+    "@tsconfig/node12": "^1.0.7",
     "@types/chai": "^4.2.18",
     "@types/mocha": "^8.2.2",
     "@types/node": "^15.0.1",
@@ -104,13 +105,13 @@
     {
       "name": "CommonJS",
       "path": "lib/*.js",
-      "limit": "10.5kb",
+      "limit": "10.25kb",
       "webpack": false
     },
     {
       "name": "ESM",
       "path": "lib-esm/*.js",
-      "limit": "9.75kb",
+      "limit": "9.5kb",
       "webpack": false
     }
   ]
