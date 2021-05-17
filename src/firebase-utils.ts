@@ -51,12 +51,7 @@ function getFirebaseCredential(
   // Add default credentials if they exist
   const defaultCredentials = adminInstance.credential.applicationDefault();
   if (defaultCredentials) {
-    /* eslint-disable no-console */
-    console.log(
-      'cypress-firebase: Using default credentials',
-      defaultCredentials,
-    );
-    /* eslint-enable no-console */
+    console.log('cypress-firebase: Using default credentials'); // eslint-disable-line no-console
     return defaultCredentials;
   }
 }
