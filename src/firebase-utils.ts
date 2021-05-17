@@ -48,6 +48,8 @@ export function initializeFirebase(
   adminInstance: any,
   overrideConfig?: admin.AppOptions,
 ): admin.app.App {
+  // TODO: Remove caching of fbInstance - initializeFirebase should only be called once since we check for
+  // existing app instances before calling. This also prevents generating new fbInstances in tests
   if (fbInstance) {
     return fbInstance;
   }
@@ -63,18 +65,18 @@ export function initializeFirebase(
     const { FIREBASE_DATABASE_EMULATOR_HOST } = process.env;
     const fbConfig: any = {
       projectId,
+      // Initialize RTDB with databaseURL pointed to emulator if FIREBASE_DATABASE_EMULATOR_HOST is set
+      databaseURL: FIREBASE_DATABASE_EMULATOR_HOST
+        ? `http://${FIREBASE_DATABASE_EMULATOR_HOST}?ns=${projectId || 'local'}`
+        : `https://${projectId}.firebaseio.com`,
       ...overrideConfig,
     };
 
     if (FIREBASE_DATABASE_EMULATOR_HOST) {
-      // Initialize RTDB with databaseURL pointed to emulator if FIREBASE_DATABASE_EMULATOR_HOST is set
-      fbConfig.databaseURL = `http://${FIREBASE_DATABASE_EMULATOR_HOST}?ns=${
-        projectId || 'local'
-      }`;
       /* eslint-disable no-console */
       console.log(
-        'cypress-firebase: Using RTDB emulator with DB URL:',
-        fbConfig.databaseURL,
+        'cypress-firebase: Using RTDB emulator with host:',
+        FIREBASE_DATABASE_EMULATOR_HOST,
       );
       /* eslint-enable no-console */
     }
