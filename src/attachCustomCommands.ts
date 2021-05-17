@@ -112,27 +112,52 @@ export interface CallRtdbOptions {
    * Creates a Query with the specified starting point.
    * @see https://firebase.google.com/docs/reference/js/firebase.database.Query#startat
    */
-  startAt?: number | string | boolean | null | [ number | string | boolean | null ,  string ];
+  startAt?:
+    | number
+    | string
+    | boolean
+    | null
+    | [number | string | boolean | null, string];
   /**
    * Creates a Query with the specified starting point.
    * @see https://firebase.google.com/docs/reference/js/firebase.database.Query#startafter
    */
-  startAfter?:  number | string | boolean | null | [ number | string | boolean | null ,  string ];
+  startAfter?:
+    | number
+    | string
+    | boolean
+    | null
+    | [number | string | boolean | null, string];
   /**
    * End results after <val, key> (based on specified ordering)
    * @see https://firebase.google.com/docs/reference/js/firebase.database.Query#endbefore
    */
-  endBefore?: number | string | boolean | null | [ number | string | boolean | null ,  string ];
+  endBefore?:
+    | number
+    | string
+    | boolean
+    | null
+    | [number | string | boolean | null, string];
   /**
    * End results at <val> (based on specified ordering)
    * @see https://firebase.google.com/docs/reference/js/firebase.database.Query#endat
    */
-  endAt?: number | string | boolean | null | [ number | string | boolean | null ,  string ];
+  endAt?:
+    | number
+    | string
+    | boolean
+    | null
+    | [number | string | boolean | null, string];
   /**
    * Restrict results to <val> (based on specified ordering)
    * @see https://firebase.google.com/docs/reference/js/firebase.database.Query#equalto
    */
-  equalTo?: number | string | boolean | null | [ number | string | boolean | null ,  string ];
+  equalTo?:
+    | number
+    | string
+    | boolean
+    | null
+    | [number | string | boolean | null, string];
 }
 
 // Add custom commands to the existing Cypress interface
