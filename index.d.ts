@@ -243,7 +243,10 @@ declare module "node-utils" {
         client_x509_cert_url: string;
     }
     /**
-     * Get service account from either local file or environment variables
+     * Get service account from either environment variables or local file.
+     * SERVICE_ACCOUNT environment variables takes precedence
+     * NOTE: Loading from default local file path "process.cwd()}/serviceAccount.json"
+     * is now deprecated
      * @param envSlug - Environment option
      * @returns Service account object
      */
