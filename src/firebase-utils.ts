@@ -48,20 +48,11 @@ export function initializeFirebase(
   adminInstance: any,
   overrideConfig?: admin.AppOptions,
 ): admin.app.App {
-  // TODO: Remove caching of fbInstance - initializeFirebase should only be called once since we check for
-  // existing app instances before calling. This also prevents generating new fbInstances in tests
-  if (fbInstance) {
-    return fbInstance;
-  }
   try {
     // TODO: Look into using @firebase/testing in place of admin here to allow for
     // usage of clearFirestoreData (see https://github.com/prescottprue/cypress-firebase/issues/73 for more info)
     const serviceAccount = getServiceAccount();
-    const projectId =
-      process.env.GCLOUD_PROJECT ||
-      process.env.FIREBASE_PROJECT ||
-      process.env.FIREBASE_PROJECT_ID ||
-      serviceAccount?.project_id; // eslint-disable-line camelcase
+    const projectId = process.env.GCLOUD_PROJECT || serviceAccount?.project_id; // eslint-disable-line camelcase
     const { FIREBASE_DATABASE_EMULATOR_HOST } = process.env;
     const fbConfig: any = {
       projectId,
