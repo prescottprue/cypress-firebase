@@ -209,14 +209,14 @@
     enabled "2.0.x"
     kuler "^2.0.0"
 
-"@es-joy/jsdoccomment@^0.4.4":
-  version "0.4.4"
-  resolved "https://registry.yarnpkg.com/@es-joy/jsdoccomment/-/jsdoccomment-0.4.4.tgz#8a25154156edbfc29e310943ebb17ee29122c9df"
-  integrity sha512-ua4qDt9dQb4qt5OI38eCZcQZYE5Bq3P0GzgvDARdT8Lt0mAUpxKTPy8JGGqEvF77tG1irKDZ3WreeezEa3P43w==
+"@es-joy/jsdoccomment@^0.8.0-alpha.2":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@es-joy/jsdoccomment/-/jsdoccomment-0.8.0.tgz#1add451f50f57597676ab85ee7bd0a273d7b7c43"
+  integrity sha512-Xd3GzYsL2sz2pcdtYt5Q0Wz1ol/o9Nt2UQL4nFPDcaEomvPmwjJsbjkKx1SKhl2h3TgwazNBLdcNr2m0UiGiFA==
   dependencies:
     comment-parser "^1.1.5"
     esquery "^1.4.0"
-    jsdoctypeparser "^9.0.0"
+    jsdoc-type-pratt-parser "1.0.4"
 
 "@eslint/eslintrc@^0.4.1":
   version "0.4.1"
@@ -3164,14 +3164,7 @@ debug@4.1.0:
   dependencies:
     ms "^2.1.1"
 
-debug@^3.1.1:
-  version "3.2.6"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-3.2.6.tgz#e83d17de16d8a7efb7717edbe5fb10135eee629b"
-  integrity sha512-mel+jf7nrtEl5Pn1Qx46zARXKDpBbvzezse7p7LqINmdoIk8PYP5SySaxEmYv6TZ0JyEKA1hsCId6DIhgITtWQ==
-  dependencies:
-    ms "^2.1.1"
-
-debug@^3.2.7:
+debug@^3.1.1, debug@^3.2.7:
   version "3.2.7"
   resolved "https://registry.yarnpkg.com/debug/-/debug-3.2.7.tgz#72580b7e9145fb39b6676f9c5e5fb100b934179a"
   integrity sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==
@@ -3759,18 +3752,18 @@ eslint-plugin-import@^2.23.2:
     resolve "^1.20.0"
     tsconfig-paths "^3.9.0"
 
-eslint-plugin-jsdoc@^33.0.0:
-  version "33.3.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-33.3.0.tgz#a287db838d2cac4b36b76d99213901be6a31e9f5"
-  integrity sha512-wt6I9X8JoOyUtnsafM7AWBEfLCD3BI1wR5/vTu0hti4CoZc37bB4ZX9A7DsWKbEC/xROAAcBV2VAT638w9VKyQ==
+eslint-plugin-jsdoc@^35.4.0:
+  version "35.4.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-35.4.0.tgz#4f4809ffa9430070aed10087fe691b9ededa2b05"
+  integrity sha512-0cr+NkPTxpTiMCtYOd8W5fd2IyC/CmaTHKb+0bzkpP9p8HfmJ3B2/M6FWj97rQJOLwLMkx+g2MIEZsrttpbFmQ==
   dependencies:
-    "@es-joy/jsdoccomment" "^0.4.4"
+    "@es-joy/jsdoccomment" "^0.8.0-alpha.2"
     comment-parser "1.1.5"
     debug "^4.3.1"
     esquery "^1.4.0"
-    jsdoctypeparser "^9.0.0"
+    jsdoc-type-pratt-parser "^1.0.4"
     lodash "^4.17.21"
-    regextras "^0.7.1"
+    regextras "^0.8.0"
     semver "^7.3.5"
     spdx-expression-parse "^3.0.1"
 
@@ -5840,10 +5833,10 @@ jsbn@~0.1.0:
   resolved "https://registry.yarnpkg.com/jsbn/-/jsbn-0.1.1.tgz#a5e654c2e5a2deb5f201d96cefbca80c0ef2f513"
   integrity sha1-peZUwuWi3rXyAdls77yoDA7y9RM=
 
-jsdoctypeparser@^9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/jsdoctypeparser/-/jsdoctypeparser-9.0.0.tgz#8c97e2fb69315eb274b0f01377eaa5c940bd7b26"
-  integrity sha512-jrTA2jJIL6/DAEILBEh2/w9QxCuwmvNXIry39Ay/HVfhE3o2yVV0U44blYkqdHA/OKloJEqvJy0xU+GSdE2SIw==
+jsdoc-type-pratt-parser@1.0.4, jsdoc-type-pratt-parser@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/jsdoc-type-pratt-parser/-/jsdoc-type-pratt-parser-1.0.4.tgz#5750d2d32ffb001866537d3baaedea7cf84c7036"
+  integrity sha512-jzmW9gokeq9+bHPDR1nCeidMyFUikdZlbOhKzh9+/nJqB75XhpNKec1/UuxW5c4+O+Pi31Gc/dCboyfSm/pSpQ==
 
 jsesc@^2.5.1:
   version "2.5.2"
@@ -8436,10 +8429,10 @@ regexpp@^3.0.0, regexpp@^3.1.0:
   resolved "https://registry.yarnpkg.com/regexpp/-/regexpp-3.1.0.tgz#206d0ad0a5648cffbdb8ae46438f3dc51c9f78e2"
   integrity sha512-ZOIzd8yVsQQA7j8GCSlPGXwg5PfmA1mrq0JP4nGhh54LaKN3xdai/vHUDu74pKwV8OxseMS65u2NImosQcSD0Q==
 
-regextras@^0.7.1:
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/regextras/-/regextras-0.7.1.tgz#be95719d5f43f9ef0b9fa07ad89b7c606995a3b2"
-  integrity sha512-9YXf6xtW+qzQ+hcMQXx95MOvfqXFgsKDZodX3qZB0x2n5Z94ioetIITsBtvJbiOyxa/6s9AtyweBLCdPmPko/w==
+regextras@^0.8.0:
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/regextras/-/regextras-0.8.0.tgz#ec0f99853d4912839321172f608b544814b02217"
+  integrity sha512-k519uI04Z3SaY0fLX843MRXnDeG2+vHOFsyhiPZvNLe7r8rD2YNRjq4BQLZZ0oAr2NrtvZlICsXysGNFPGa3CQ==
 
 registry-auth-token@^4.0.0:
   version "4.2.0"
