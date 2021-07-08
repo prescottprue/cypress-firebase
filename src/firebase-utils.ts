@@ -35,7 +35,38 @@ function firestoreSettingsFromEnv(): FirebaseFirestore.Settings {
   };
 }
 
-let fbInstance: admin.app.App;
+/**
+ * @param adminInstance - firebase-admin instance to initialize
+ * @returns Firebase admin credential
+ */
+function getFirebaseCredential(
+  adminInstance: any,
+): admin.credential.Credential | undefined {
+  const serviceAccount = getServiceAccount();
+  // Add service account credential if it exists so that custom auth tokens can be generated
+  if (serviceAccount) {
+    return adminInstance.credential.cert(serviceAccount);
+  }
+
+  // Add default credentials if they exist
+  const defaultCredentials = adminInstance.credential.applicationDefault();
+  if (defaultCredentials) {
+    console.log('cypress-firebase: Using default credentials'); // eslint-disable-line no-console
+    return defaultCredentials;
+  }
+}
+
+/**
+ * Get default datbase url
+ * @param projectId - Project id
+ * @returns Default database url
+ */
+function getDefaultDatabaseUrl(projectId?: string): string {
+  const { FIREBASE_DATABASE_EMULATOR_HOST } = process.env;
+  return FIREBASE_DATABASE_EMULATOR_HOST
+    ? `http://${FIREBASE_DATABASE_EMULATOR_HOST}?ns=${projectId || 'local'}`
+    : `https://${projectId}.firebaseio.com`;
+}
 
 /**
  * Initialize Firebase instance from service account (from either local
@@ -48,27 +79,12 @@ export function initializeFirebase(
   adminInstance: any,
   overrideConfig?: admin.AppOptions,
 ): admin.app.App {
-  // TODO: Remove caching of fbInstance - initializeFirebase should only be called once since we check for
-  // existing app instances before calling. This also prevents generating new fbInstances in tests
-  if (fbInstance) {
-    return fbInstance;
-  }
   try {
     // TODO: Look into using @firebase/testing in place of admin here to allow for
     // usage of clearFirestoreData (see https://github.com/prescottprue/cypress-firebase/issues/73 for more info)
-    const serviceAccount = getServiceAccount();
-    const projectId =
-      process.env.GCLOUD_PROJECT ||
-      process.env.FIREBASE_PROJECT ||
-      process.env.FIREBASE_PROJECT_ID ||
-      serviceAccount?.project_id; // eslint-disable-line camelcase
     const { FIREBASE_DATABASE_EMULATOR_HOST } = process.env;
-    const fbConfig: any = {
-      projectId,
+    const fbConfig: admin.AppOptions = {
       // Initialize RTDB with databaseURL pointed to emulator if FIREBASE_DATABASE_EMULATOR_HOST is set
-      databaseURL: FIREBASE_DATABASE_EMULATOR_HOST
-        ? `http://${FIREBASE_DATABASE_EMULATOR_HOST}?ns=${projectId || 'local'}`
-        : `https://${projectId}.firebaseio.com`,
       ...overrideConfig,
     };
 
@@ -90,13 +106,32 @@ export function initializeFirebase(
       /* eslint-enable no-console */
     }
 
-    // Add service account credential if it exists so that custom auth tokens can be generated
-    if (serviceAccount) {
-      fbConfig.credential = adminInstance.credential.cert(serviceAccount);
+    // Add credentials if they do not already exist - starting with application default, falling back to SERVICE_ACCOUNT env variable
+    if (!fbConfig.credential) {
+      const credential = getFirebaseCredential(adminInstance);
+      if (credential) {
+        fbConfig.credential = credential;
+      }
     }
 
-    fbInstance = adminInstance.initializeApp(fbConfig);
+    // Add projectId to fb config if it doesn't already exist
+    if (!fbConfig.projectId) {
+      const projectId =
+        process.env.GCLOUD_PROJECT || (fbConfig.credential as any)?.projectId; // eslint-disable-line camelcase
+      if (projectId) {
+        fbConfig.projectId = projectId;
+      }
+    }
 
+    // Add databaseURL if it doesn't already exist
+    if (!fbConfig.databaseURL) {
+      const databaseURL = getDefaultDatabaseUrl(fbConfig.projectId);
+      if (databaseURL) {
+        fbConfig.databaseURL = databaseURL;
+      }
+    }
+
+    const fbInstance = adminInstance.initializeApp(fbConfig);
     // Initialize Firestore with emulator host settings
     if (process.env.FIRESTORE_EMULATOR_HOST) {
       const firestoreSettings = firestoreSettingsFromEnv();
@@ -108,6 +143,7 @@ export function initializeFirebase(
       /* eslint-enable no-console */
       adminInstance.firestore().settings(firestoreSettings);
     }
+
     /* eslint-disable no-console */
     console.log(
       `cypress-firebase: Initialized app with database url "${fbConfig.databaseURL}"`,

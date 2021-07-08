@@ -108,18 +108,14 @@ interface ServiceAccount {
 /* eslint-enable camelcase */
 
 /**
- * Get service account from either local file or environment variables
+ * Get service account from either environment variables or local file.
+ * SERVICE_ACCOUNT environment variables takes precedence
+ * NOTE: Loading from default local file path "process.cwd()}/serviceAccount.json"
+ * is now deprecated
  * @param envSlug - Environment option
  * @returns Service account object
  */
 export function getServiceAccount(envSlug?: string): ServiceAccount | null {
-  const serviceAccountPath = `${process.cwd()}/serviceAccount.json`;
-  // Check for local service account file (Local dev)
-  // TODO: Drop support for service account file and instead use default credentails
-  if (existsSync(serviceAccountPath)) {
-    return readJsonFile(serviceAccountPath);
-  }
-
   // Use environment variables
   const serviceAccountEnvVar = envVarBasedOnCIEnv('SERVICE_ACCOUNT', envSlug);
   if (serviceAccountEnvVar) {
@@ -135,6 +131,18 @@ export function getServiceAccount(envSlug?: string): ServiceAccount | null {
       }
     }
     return serviceAccountEnvVar;
+  }
+
+  const serviceAccountPath = `${process.cwd()}/serviceAccount.json`;
+  // Check for local service account file (Local dev)
+  // TODO: Drop support for service account file and instead use default credentails
+  if (existsSync(serviceAccountPath)) {
+    /* eslint-disable no-console */
+    console.warn(
+      `cypress-firebase: Using a service account from local file is deprecated and will be removed in a future version. Use application default credentials.`,
+    );
+    /* eslint-enable no-console */
+    return readJsonFile(serviceAccountPath);
   }
 
   return null;
