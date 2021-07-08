@@ -1444,7 +1444,7 @@ ajv-keywords@^3.1.0, ajv-keywords@^3.4.1, ajv-keywords@^3.5.2:
   resolved "https://registry.yarnpkg.com/ajv-keywords/-/ajv-keywords-3.5.2.tgz#31f29da5ab6e00d1c2d329acf7b5929614d5014d"
   integrity sha512-5p6WTN0DdTGVQk6VjcEju19IgaHudalcfabD7yhDGeA6bcQnmL+CpveLJq/3hvfwd1aof6L386Ougkx6RfyMIQ==
 
-ajv@^6.1.0, ajv@^6.10.0, ajv@^6.10.2, ajv@^6.12.2, ajv@^6.12.3, ajv@^6.12.4, ajv@^6.12.5:
+ajv@^6.1.0, ajv@^6.10.0, ajv@^6.10.2, ajv@^6.12.2, ajv@^6.12.3, ajv@^6.12.4, ajv@^6.12.5, ajv@^6.12.6:
   version "6.12.6"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.12.6.tgz#baf5a62e802b07d977034586f8c3baf5adf26df4"
   integrity sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==
@@ -4358,14 +4358,15 @@ firebase-admin@^9.8.0:
     "@google-cloud/storage" "^5.3.0"
 
 firebase-tools@^9.10.2:
-  version "9.14.0"
-  resolved "https://registry.yarnpkg.com/firebase-tools/-/firebase-tools-9.14.0.tgz#30d837c7ce8454746e69c5bf7e4f3689ae686dcb"
-  integrity sha512-CHR1Xw5LJ+hDQ/SaRqvuNXJEmpbPsOEtNRj6oD44VFGRp9ZTjY3irilSj6uv7S2P1A1XLEGyO7jEpCH5mkc9RQ==
+  version "9.15.0"
+  resolved "https://registry.yarnpkg.com/firebase-tools/-/firebase-tools-9.15.0.tgz#9173c7a88a8de79d9c88a5a0f9df3a580ced2e64"
+  integrity sha512-CCADpr+GdUGMmVvvNFRT3AKgQyal97cSej+t5v/BMtzGBs2jRTdscgEcHawG2hspjjghpHYx7yjZEN7aaEQJnw==
   dependencies:
     "@google-cloud/pubsub" "^2.7.0"
     "@types/archiver" "^5.1.0"
     JSONStream "^1.2.1"
     abort-controller "^3.0.0"
+    ajv "^6.12.6"
     archiver "^5.0.0"
     body-parser "^1.19.0"
     chokidar "^3.0.2"
