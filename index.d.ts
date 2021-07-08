@@ -72,39 +72,55 @@ declare module "attachCustomCommands" {
          */
         withMeta?: boolean;
         /**
-         * Limit to the last <num> results. If true is passed
-         * than query is limited to last 1 item.
+         * Limit to the last <num> results.
+         * @see https://firebase.google.com/docs/reference/js/firebase.database.Query#limittolast
          */
-        limitToLast?: boolean | number;
+        limitToLast?: number;
         /**
-         * Limit to the first <num> results. If true is passed
-         * than query is limited to last 1 item.
+         * Limit to the first <num> results.
+         * @see https://firebase.google.com/docs/reference/js/firebase.database.Query#limittofirst
          */
-        limitToFirst?: boolean | number;
+        limitToFirst?: number;
         /**
          * Select a child key by which to order results
+         * @see https://firebase.google.com/docs/reference/js/firebase.database.Query#orderbychild
          */
         orderByChild?: string;
         /**
          * Order by key name
+         * @see https://firebase.google.com/docs/reference/js/firebase.database.Query#orderbykey
          */
         orderByKey?: boolean;
         /**
          * Order by primitive value
+         * @see https://firebase.google.com/docs/reference/js/firebase.database.Query#orderbyvalue
          */
         orderByValue?: boolean;
         /**
-         * Start results at <val> (based on specified ordering)
+         * Creates a Query with the specified starting point.
+         * @see https://firebase.google.com/docs/reference/js/firebase.database.Query#startat
          */
-        startAt?: any;
+        startAt?: number | string | boolean | null | [number | string | boolean | null, string];
+        /**
+         * Creates a Query with the specified starting point.
+         * @see https://firebase.google.com/docs/reference/js/firebase.database.Query#startafter
+         */
+        startAfter?: number | string | boolean | null | [number | string | boolean | null, string];
+        /**
+         * End results after <val, key> (based on specified ordering)
+         * @see https://firebase.google.com/docs/reference/js/firebase.database.Query#endbefore
+         */
+        endBefore?: number | string | boolean | null | [number | string | boolean | null, string];
         /**
          * End results at <val> (based on specified ordering)
+         * @see https://firebase.google.com/docs/reference/js/firebase.database.Query#endat
          */
-        endAt?: any;
+        endAt?: number | string | boolean | null | [number | string | boolean | null, string];
         /**
          * Restrict results to <val> (based on specified ordering)
+         * @see https://firebase.google.com/docs/reference/js/firebase.database.Query#equalto
          */
-        equalTo?: any;
+        equalTo?: number | string | boolean | null | [number | string | boolean | null, string];
     }
     global {
         namespace Cypress {
@@ -243,7 +259,10 @@ declare module "node-utils" {
         client_x509_cert_url: string;
     }
     /**
-     * Get service account from either local file or environment variables
+     * Get service account from either environment variables or local file.
+     * SERVICE_ACCOUNT environment variables takes precedence
+     * NOTE: Loading from default local file path "process.cwd()}/serviceAccount.json"
+     * is now deprecated
      * @param envSlug - Environment option
      * @returns Service account object
      */
