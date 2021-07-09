@@ -23,11 +23,11 @@ jobs:
         id: check
         uses: EndBug/version-check@v2
 
-      - name: Use Node 12
+      - name: Use Node 14
         if: steps.check.outputs.changed == 'true'
         uses: actions/setup-node@v2.2.0
         with:
-          node-version: 12
+          node-version: 14
           registry-url: https://registry.npmjs.org/
 
       - name: Get cache settings
