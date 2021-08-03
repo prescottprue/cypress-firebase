@@ -7,6 +7,7 @@ const cy: any = { log: sinon.spy() };
 const loadedCustomCommands: any = {};
 const testUserId = 'TEST_USER';
 let addSpy: sinon.SinonSpy;
+let envSpy: sinon.SinonSpy;
 let envStub: sinon.SinonStub<string[], string | number | boolean>;
 let Cypress: any = {};
 let currentUser: any;
@@ -28,6 +29,7 @@ describe('attachCustomCommands', () => {
     currentUser = {};
     taskSpy = sinon.spy(() => Promise.resolve());
     envSpy = sinon.spy((param) => param === 'TEST_UID' && testUserId);
+    envStub = sinon.stub();
     onAuthStateChanged = sinon.spy((authHandleFunc) => {
       authHandleFunc({});
     });
@@ -36,7 +38,7 @@ describe('attachCustomCommands', () => {
     addSpy = sinon.spy((customCommandName: string, customCommandFunc: any) => {
       loadedCustomCommands[customCommandName] = customCommandFunc;
     });
-    Cypress = { Commands: { add: addSpy }, env: envStub };
+    Cypress = { Commands: { add: addSpy }, env: envSpy };
     attachCustomCommands({ cy, Cypress, firebase });
   });
 
@@ -75,6 +77,8 @@ describe('attachCustomCommands', () => {
     });
 
     it('calls task with environment test uid', async () => {
+      Cypress = { Commands: { add: addSpy }, env: envStub };
+      attachCustomCommands({ cy, Cypress, firebase });
       envStub.withArgs('TEST_UID').returns('foo');
       await loadedCustomCommands.login();
       expect(taskSpy).to.have.been.calledOnceWith('createCustomToken', {
@@ -86,6 +90,8 @@ describe('attachCustomCommands', () => {
     });
 
     it('calls task with tenantId', async () => {
+      Cypress = { Commands: { add: addSpy }, env: envStub };
+      attachCustomCommands({ cy, Cypress, firebase });
       await loadedCustomCommands.login('123ABC', undefined, 'tenant-id');
       expect(taskSpy).to.have.been.calledOnceWith('createCustomToken', {
         uid: '123ABC',
@@ -96,6 +102,8 @@ describe('attachCustomCommands', () => {
     });
 
     it('calls task with environment test tenantId', async () => {
+      Cypress = { Commands: { add: addSpy }, env: envStub };
+      attachCustomCommands({ cy, Cypress, firebase });
       envStub.withArgs('TEST_TENANT_ID').returns('env-tenant-id');
       await loadedCustomCommands.login('123ABC');
       expect(taskSpy).to.have.been.calledOnceWith('createCustomToken', {
