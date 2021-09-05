@@ -53,6 +53,24 @@ If you are interested in what drove the need for this checkout [the why section]
    attachCustomCommands({ Cypress, cy, firebase });
    ```
 
+   With [Firebase Web SDK version 9](https://firebase.google.com/docs/web/modular-upgrade)
+
+   ```js
+   import firebase from "firebase/compat/app";
+   import "firebase/compat/auth";
+   import "firebase/compat/database";
+   import "firebase/compat/firestore";
+   import { attachCustomCommands } from "cypress-firebase";
+
+   const fbConfig = {
+     // Your config from Firebase Console
+   };
+
+   firebase.initializeApp(fbConfig);
+
+   attachCustomCommands({ Cypress, cy, firebase });
+   ```
+
 1. Make sure that you load the custom commands file in an `cypress/support/index.js` like so:
 
    ```js
@@ -212,6 +230,19 @@ const fakeProject = {
 cy.callRtdb("set", "projects/ABC123", fakeProject);
 ```
 
+With [Firebase Web SDK version 9](https://firebase.google.com/docs/web/modular-upgrade)
+
+```javascript
+import firebase from "firebase/compat/app";
+import "firebase/compat/database";
+
+const fakeProject = {
+  some: "data",
+  createdAt: firebase.database.ServerValue.TIMESTAMP,
+};
+cy.callRtdb("set", "projects/ABC123", fakeProject);
+```
+
 _Get/Verify Data_
 
 ```javascript
@@ -263,6 +294,22 @@ _Set Data With Server Timestamps_
 ```javascript
 import firebase from "firebase/app";
 import "firebase/firestore";
+
+const fakeProject = {
+  some: "data",
+  // Use new firebase.firestore.Timestamp.now in place of serverTimestamp()
+  createdAt: firebase.firestore.Timestamp.now(),
+  // Or use fromDate if you would like to specify a date
+  // createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+};
+cy.callFirestore("set", "projects/ABC123", fakeProject);
+```
+
+With [Firebase Web SDK version 9](https://firebase.google.com/docs/web/modular-upgrade)
+
+```javascript
+import firebase from "firebase/compat/app";
+import "firebase/compat/firestore";
 
 const fakeProject = {
   some: "data",
@@ -419,6 +466,45 @@ describe("Test firestore", () => {
 
    attachCustomCommands({ Cypress, cy, firebase });
    ```
+
+With [Firebase Web SDK version 9](https://firebase.google.com/docs/web/modular-upgrade)
+
+```js
+import firebase from "firebase/compat/app";
+import "firebase/compat/auth";
+import "firebase/compat/database";
+import "firebase/compat/firestore";
+import { attachCustomCommands } from "cypress-firebase";
+
+const fbConfig = {
+  // Your Firebase Config
+};
+
+// Emulate RTDB if Env variable is passed
+const rtdbEmulatorHost = Cypress.env("FIREBASE_DATABASE_EMULATOR_HOST");
+if (rtdbEmulatorHost) {
+  fbConfig.databaseURL = `http://${rtdbEmulatorHost}?ns=${fbConfig.projectId}`;
+}
+
+firebase.initializeApp(fbConfig);
+
+// Emulate Firestore if Env variable is passed
+const firestoreEmulatorHost = Cypress.env("FIRESTORE_EMULATOR_HOST");
+if (firestoreEmulatorHost) {
+  firebase.firestore().settings({
+    host: firestoreEmulatorHost,
+    ssl: false,
+  });
+}
+
+const authEmulatorHost = Cypress.env("FIREBASE_AUTH_EMULATOR_HOST");
+if (authEmulatorHost) {
+  firebase.auth().useEmulator(`http://${authEmulatorHost}/`);
+  console.debug(`Using Auth emulator: http://${authEmulatorHost}/`);
+}
+
+attachCustomCommands({ Cypress, cy, firebase });
+```
 
 1. Start emulators: `npm run emulators`
 1. In another terminal window, start the application: `npm start`
