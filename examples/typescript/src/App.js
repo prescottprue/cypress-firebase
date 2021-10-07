@@ -7,8 +7,12 @@ import './App.css'
 const initialState = window.__INITIAL_STATE__ || { firebase: { authError: null } }
 const store = configureStore(initialState)
 
-export default () => (
-  <Provider store={store}>
-    <Home />
-  </Provider>
-)
+function App () {
+  return (
+    <Provider store={store}>
+      <Home />
+    </Provider>
+  )
+}
+
+export default App

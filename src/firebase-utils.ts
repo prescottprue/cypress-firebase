@@ -143,10 +143,12 @@ export function initializeFirebase(
       /* eslint-enable no-console */
       adminInstance.firestore().settings(firestoreSettings);
     }
-
     /* eslint-disable no-console */
+    const dbUrlLog = fbConfig.databaseURL
+      ? ` and databaseURL "${fbConfig.databaseURL}"`
+      : '';
     console.log(
-      `cypress-firebase: Initialized app with database url "${fbConfig.databaseURL}"`,
+      `cypress-firebase: Initialized Firebase app for project "${fbConfig.projectId}"${dbUrlLog}`,
     );
     /* eslint-enable no-console */
     return fbInstance;
