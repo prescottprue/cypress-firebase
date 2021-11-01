@@ -473,7 +473,7 @@ Firebase instance config can be overriden by passing another argument to the cyp
      const overrideFirebaseConfig = {
        databaseURL: "http://localhost:9000?ns=my-other-namespace",
      };
-     const extendedConfig = cypressFirebasePlugin(on, config, admin);
+     const extendedConfig = cypressFirebasePlugin(on, config, admin, overrideFirebaseConfig);
 
      // Add other plugins/tasks such as code coverage here
 
