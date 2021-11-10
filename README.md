@@ -118,6 +118,16 @@ If you are interested in what drove the need for this checkout [the why section]
    - `CYPRESS_TEST_UID` - UID of your test user
    - `SERVICE_ACCOUNT` - service account object
 
+### Named app support
+
+When using a custom app name or running more than one firebase instance in your app:
+
+```js
+const namedApp = firebase.initializeApp(fbConfig, "app_name");
+
+attachCustomCommands({ Cypress, cy, firebase, app: namedApp });
+```
+
 ## Docs
 
 ### Custom Cypress Commands

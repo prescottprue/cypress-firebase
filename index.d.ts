@@ -8,6 +8,7 @@ declare module "attachCustomCommands" {
         Cypress: any;
         cy: any;
         firebase: any;
+        app?: any;
     }
     /**
      * Action for Firestore
