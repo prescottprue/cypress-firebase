@@ -1,4 +1,4 @@
-import * as admin from 'firebase-admin';
+import type { firestore } from 'firebase-admin';
 
 /**
  * Params for attachCustomCommand function for
@@ -62,7 +62,7 @@ export interface CallFirestoreOptions {
    * Firestore statics (i.e. admin.firestore). This should only be needed during
    * testing due to @firebase/testing not containing statics
    */
-  statics?: typeof admin.firestore;
+  statics?: typeof firestore;
 }
 
 /**
