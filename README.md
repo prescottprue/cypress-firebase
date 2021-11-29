@@ -487,7 +487,7 @@ describe("Test firestore", () => {
    attachCustomCommands({ Cypress, cy, firebase });
    ```
 
-With [Firebase Web SDK version 9](https://firebase.google.com/docs/web/modular-upgrade)
+With [Firebase Web SDK version 9](https://firebase.google.com/docs/web/modular-upgrade) in compat mode (same API as v8 with different import)
 
 ```js
 import firebase from "firebase/compat/app";

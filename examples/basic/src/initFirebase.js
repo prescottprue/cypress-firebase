@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app'
-import { getAuth } from 'firebase/auth'
+import { getAuth, connectAuthEmulator } from 'firebase/auth'
 import { getFirestore, initializeFirestore } from 'firebase/firestore'
 import fbConfig from './fbConfig'
 
@@ -28,6 +28,6 @@ const shouldUseEmulator = !!process.env.REACT_APP_USE_DB_EMULATORS
     initializeFirestore(app, firestoreSettings)
     // getFirestore().settings(firestoreSettings)
   }
-
-  // getAuth().useEmulator('http://localhost:9099/');
+  const auth = getAuth()
+  connectAuthEmulator(auth, "http://localhost:9099");
 }
