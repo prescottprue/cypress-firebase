@@ -1,20 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Project from './Project'
-import firebase from 'firebase/app'
-import 'firebase/database'
-import './App.css';
+import { getDatabase, ref, limitToLast, query, off, onValue } from 'firebase/database'
 
 export default function Projects() {
   const [loading, setLoadingState] = useState(false)
   const [projects, setProjects] = useState()
   const [errorState, setErrorState] = useState()
-
-  function loadProjects() {
+  const projectsQuery = query(ref(getDatabase(), 'projects'), limitToLast(10))
+  const loadProjects = useCallback(() => {
     setLoadingState(true)
-    return firebase.database()
-    .ref('projects')
-    .limitToLast(10)
-    .on('value', (snap) => {
+    return onValue(projectsQuery, (snap) => {
       console.log('Data snapshot:', snap.val())
       setProjects(snap.val())
       setLoadingState(false)
@@ -23,15 +18,15 @@ export default function Projects() {
       setErrorState(err.message)
       setLoadingState(false)
     })
-  }
+  }, [projectsQuery, setProjects, setLoadingState, setErrorState])
 
   useEffect(() => {
-    const unsetProjectsListener = loadProjects()
+    loadProjects()
     return () => {
       // Unset listener on unmount
-      firebase.database().ref('projects').off("value", unsetProjectsListener)
+      off(projectsQuery, 'value')
     }
-  }, [])
+  }, [loadProjects, projectsQuery])
 
   if (errorState) {
     return <div><h4>Error:</h4><p>{errorState}</p></div>

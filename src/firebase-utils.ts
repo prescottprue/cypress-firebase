@@ -1,4 +1,4 @@
-import * as admin from 'firebase-admin';
+import type { AppOptions, app, firestore, credential } from 'firebase-admin';
 import { getServiceAccount } from './node-utils';
 import { CallFirestoreOptions } from './attachCustomCommands';
 
@@ -41,7 +41,7 @@ function firestoreSettingsFromEnv(): FirebaseFirestore.Settings {
  */
 function getFirebaseCredential(
   adminInstance: any,
-): admin.credential.Credential | undefined {
+): credential.Credential | undefined {
   const serviceAccount = getServiceAccount();
   // Add service account credential if it exists so that custom auth tokens can be generated
   if (serviceAccount) {
@@ -77,13 +77,13 @@ function getDefaultDatabaseUrl(projectId?: string): string {
  */
 export function initializeFirebase(
   adminInstance: any,
-  overrideConfig?: admin.AppOptions,
-): admin.app.App {
+  overrideConfig?: AppOptions,
+): app.App {
   try {
     // TODO: Look into using @firebase/testing in place of admin here to allow for
     // usage of clearFirestoreData (see https://github.com/prescottprue/cypress-firebase/issues/73 for more info)
     const { FIREBASE_DATABASE_EMULATOR_HOST } = process.env;
-    const fbConfig: admin.AppOptions = {
+    const fbConfig: AppOptions = {
       // Initialize RTDB with databaseURL pointed to emulator if FIREBASE_DATABASE_EMULATOR_HOST is set
       ...overrideConfig,
     };
@@ -143,10 +143,12 @@ export function initializeFirebase(
       /* eslint-enable no-console */
       adminInstance.firestore().settings(firestoreSettings);
     }
-
     /* eslint-disable no-console */
+    const dbUrlLog = fbConfig.databaseURL
+      ? ` and databaseURL "${fbConfig.databaseURL}"`
+      : '';
     console.log(
-      `cypress-firebase: Initialized app with database url "${fbConfig.databaseURL}"`,
+      `cypress-firebase: Initialized Firebase app for project "${fbConfig.projectId}"${dbUrlLog}`,
     );
     /* eslint-enable no-console */
     return fbInstance;
@@ -154,7 +156,7 @@ export function initializeFirebase(
     /* eslint-disable no-console */
     console.error(
       'cypress-firebase: Error initializing firebase-admin instance:',
-      err.message,
+      err instanceof Error && err.message,
     );
     /* eslint-enable no-console */
     throw err;
@@ -183,9 +185,9 @@ export function slashPathToFirestoreRef(
   slashPath: string,
   options?: CallFirestoreOptions,
 ):
-  | admin.firestore.CollectionReference
-  | admin.firestore.DocumentReference
-  | admin.firestore.Query {
+  | firestore.CollectionReference
+  | firestore.DocumentReference
+  | firestore.Query {
   if (!slashPath) {
     throw new Error('Path is required to make Firestore Reference');
   }
@@ -236,13 +238,13 @@ export function slashPathToFirestoreRef(
  */
 function deleteQueryBatch(
   db: any,
-  query: admin.firestore.CollectionReference,
+  query: FirebaseFirestore.CollectionReference | FirebaseFirestore.Query,
   resolve: (value?: any) => any,
   reject: any,
 ): void {
   query
     .get()
-    .then((snapshot: admin.firestore.QuerySnapshot) => {
+    .then((snapshot: firestore.QuerySnapshot) => {
       // When there are no documents left, we are done
       if (snapshot.size === 0) {
         return 0;
@@ -250,7 +252,7 @@ function deleteQueryBatch(
 
       // Delete documents in a batch
       const batch = db.batch();
-      snapshot.docs.forEach((doc: admin.firestore.QueryDocumentSnapshot) => {
+      snapshot.docs.forEach((doc: firestore.QueryDocumentSnapshot) => {
         batch.delete(doc.ref);
       });
 
@@ -272,20 +274,29 @@ function deleteQueryBatch(
 }
 
 /**
- * @param db - Firestore instance
- * @param collectionPath - Path of collection
- * @param batchSize - Size of delete batch
+ * @param db - Firestore database instance
+ * @param refOrQuery - Firestore instance
+ * @param options - Call Firestore options
  * @returns Promise which resolves with results of deleting batch
  */
 export function deleteCollection(
   db: any,
-  collectionPath: string,
-  batchSize?: number,
+  refOrQuery: FirebaseFirestore.CollectionReference | FirebaseFirestore.Query,
+  options?: CallFirestoreOptions,
 ): Promise<any> {
-  const collectionRef = db.collection(collectionPath);
-  const query = collectionRef.orderBy('__name__').limit(batchSize || 500);
+  let baseQuery = refOrQuery.orderBy('__name__');
+
+  // If no ordering is applied, order by id (__name__) to have groups in order
+  if (!options?.orderBy) {
+    baseQuery = refOrQuery.orderBy('__name__');
+  }
+
+  // Limit to batches to set batchSize or 500
+  if (!options?.limit) {
+    baseQuery = refOrQuery.limit(options?.batchSize || 500);
+  }
 
   return new Promise((resolve, reject) => {
-    deleteQueryBatch(db, query, resolve, reject);
+    deleteQueryBatch(db, baseQuery, resolve, reject);
   });
 }

@@ -2,32 +2,21 @@
   "compilerOptions": {
     "target": "es5",
     "module": "esnext",
-    "lib": [
-      "es2015",
-      "dom"
-    ],
+    "lib": ["es2015", "dom"],
     "skipLibCheck": true,
     "strict": true,
     "esModuleInterop": true,
-    "types": [
-      "cypress",
-      "node",
-      "cypress-firebase"
-    ],
+    "types": ["cypress", "node", "cypress-firebase"],
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "noEmit": true,
-    "jsx": "react"
+    "jsx": "react",
+    "noFallthroughCasesInSwitch": true,
+    "isolatedModules": true
   },
-  "include": [
-    "node_modules/cypress",
-    "cypress/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules/**",
-    "src/**"
-  ]
+  "include": ["node_modules/cypress", "cypress/**/*.ts"],
+  "exclude": ["node_modules/**", "src/**"]
 }

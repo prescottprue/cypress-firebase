@@ -1,5 +1,5 @@
 declare module "attachCustomCommands" {
-    import * as admin from 'firebase-admin';
+    import type { firestore } from 'firebase-admin';
     /**
      * Params for attachCustomCommand function for
      * attaching custom commands.
@@ -8,6 +8,7 @@ declare module "attachCustomCommands" {
         Cypress: any;
         cy: any;
         firebase: any;
+        app?: any;
     }
     /**
      * Action for Firestore
@@ -57,7 +58,7 @@ declare module "attachCustomCommands" {
          * Firestore statics (i.e. admin.firestore). This should only be needed during
          * testing due to @firebase/testing not containing statics
          */
-        statics?: typeof admin.firestore;
+        statics?: typeof firestore;
     }
     /**
      * Action for Real Time Database
@@ -132,12 +133,13 @@ declare module "attachCustomCommands" {
                  * @see https://github.com/prescottprue/cypress-firebase#cylogin
                  * @param uid - UID of user to login as
                  * @param customClaims - Custom claims to attach to the custom token
+                 * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also be set with environment variable TEST_TENANT_ID
                  * @example <caption>Env Based Login (TEST_UID)</caption>
                  * cy.login()
                  * @example <caption>Passed UID</caption>
                  * cy.login('123SOMEUID')
                  */
-                login: (uid?: string, customClaims?: any) => Chainable;
+                login: (uid?: string, customClaims?: any, tenantId?: string) => Chainable;
                 /**
                  * Log current user out of Firebase Auth
                  * @see https://github.com/prescottprue/cypress-firebase#cylogout
@@ -200,6 +202,7 @@ declare module "attachCustomCommands" {
     }
     interface CustomCommandOptions {
         commandNames?: CommandNamespacesConfig;
+        tenantId?: string;
     }
     /**
      * Attach custom commands including cy.login, cy.logout, cy.callRtdb,
@@ -269,7 +272,7 @@ declare module "node-utils" {
     export function getServiceAccount(envSlug?: string): ServiceAccount | null;
 }
 declare module "firebase-utils" {
-    import * as admin from 'firebase-admin';
+    import type { AppOptions, app, firestore } from 'firebase-admin';
     import { CallFirestoreOptions } from "attachCustomCommands";
     /**
      * Check whether a value is a string or not
@@ -284,7 +287,7 @@ declare module "firebase-utils" {
      * @param adminInstance - firebase-admin instance to initialize
      * @param overrideConfig - firebase-admin instance to initialize
      */
-    export function initializeFirebase(adminInstance: any, overrideConfig?: admin.AppOptions): admin.app.App;
+    export function initializeFirebase(adminInstance: any, overrideConfig?: AppOptions): app.App;
     /**
      * Check with or not a slash path is the path of a document
      * @param slashPath - Path to check for whether or not it is a doc
@@ -299,17 +302,17 @@ declare module "firebase-utils" {
      * @param options - Options object
      * @returns Ref at slash path
      */
-    export function slashPathToFirestoreRef(firestoreInstance: any, slashPath: string, options?: CallFirestoreOptions): admin.firestore.CollectionReference | admin.firestore.DocumentReference | admin.firestore.Query;
+    export function slashPathToFirestoreRef(firestoreInstance: any, slashPath: string, options?: CallFirestoreOptions): firestore.CollectionReference | firestore.DocumentReference | firestore.Query;
     /**
-     * @param db - Firestore instance
-     * @param collectionPath - Path of collection
-     * @param batchSize - Size of delete batch
+     * @param db - Firestore database instance
+     * @param refOrQuery - Firestore instance
+     * @param options - Call Firestore options
      * @returns Promise which resolves with results of deleting batch
      */
-    export function deleteCollection(db: any, collectionPath: string, batchSize?: number): Promise<any>;
+    export function deleteCollection(db: any, refOrQuery: FirebaseFirestore.CollectionReference | FirebaseFirestore.Query, options?: CallFirestoreOptions): Promise<any>;
 }
 declare module "tasks" {
-    import * as admin from 'firebase-admin';
+    import type { auth, app } from 'firebase-admin';
     import { FixtureData, FirestoreAction, RTDBAction, CallRtdbOptions, CallFirestoreOptions } from "attachCustomCommands";
     /**
      * @param adminInstance - firebase-admin instance
@@ -328,7 +331,7 @@ declare module "tasks" {
      * @param data - Data to pass to action
      * @returns Promise which resolves with results of calling Firestore
      */
-    export function callFirestore(adminInstance: admin.app.App, action: FirestoreAction, actionPath: string, options?: CallFirestoreOptions, data?: FixtureData): Promise<any>;
+    export function callFirestore(adminInstance: app.App, action: FirestoreAction, actionPath: string, options?: CallFirestoreOptions, data?: FixtureData): Promise<any>;
     /**
      * Create a custom token
      * @param adminInstance - Admin SDK instance
@@ -341,9 +344,10 @@ declare module "tasks" {
      * Get Firebase Auth user based on UID
      * @param adminInstance - Admin SDK instance
      * @param uid - UID of user for which the custom token will be generated
+     * @param tenantId - Optional ID of tenant used for multi-tenancy
      * @returns Promise which resolves with a custom Firebase Auth token
      */
-    export function getAuthUser(adminInstance: any, uid: string): Promise<admin.auth.UserRecord>;
+    export function getAuthUser(adminInstance: any, uid: string, tenantId?: string): Promise<auth.UserRecord>;
 }
 declare module "plugin" {
     import { AppOptions } from 'firebase-admin';

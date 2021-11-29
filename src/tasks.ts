@@ -1,4 +1,4 @@
-import * as admin from 'firebase-admin'; // NOTE: Only used for types
+import type { database, firestore, auth, app } from 'firebase-admin'; // NOTE: Only used for types
 import {
   FixtureData,
   FirestoreAction,
@@ -18,9 +18,9 @@ import {
  * @returns RTDB Reference
  */
 function optionsToRtdbRef(
-  baseRef: admin.database.Reference,
+  baseRef: database.Reference,
   options?: CallRtdbOptions,
-): admin.database.Reference | admin.database.Query {
+): database.Reference | database.Query {
   let newRef = baseRef;
   [
     'orderByChild',
@@ -48,14 +48,30 @@ function optionsToRtdbRef(
 }
 
 /**
+ * Get Firebase Auth or TenantAwareAuth instance, based on tenantId being provided
+ * @param adminInstance - Admin SDK instance
+ * @param tenantId - Optional ID of tenant used for multi-tenancy
+ * @returns Firebase Auth or TenantAwareAuth instance
+ */
+function getAuth(
+  adminInstance: any,
+  tenantId?: string,
+): auth.Auth | auth.TenantAwareAuth {
+  const auth = tenantId
+    ? adminInstance.auth().tenantManager().authForTenant(tenantId)
+    : adminInstance.auth();
+  return auth;
+}
+
+/**
  * @param dataVal - Value of data
  * @param firestoreStatics - Statics from firestore instance
  * @returns Value converted into timestamp object if possible
  */
 function convertValueToTimestampOrGeoPointIfPossible(
   dataVal: any,
-  firestoreStatics: typeof admin.firestore,
-): admin.firestore.FieldValue {
+  firestoreStatics: typeof firestore,
+): firestore.FieldValue {
   /* eslint-disable-next-line no-underscore-dangle */
   if (dataVal?._methodName === 'FieldValue.serverTimestamp') {
     return firestoreStatics.FieldValue.serverTimestamp();
@@ -82,8 +98,8 @@ function convertValueToTimestampOrGeoPointIfPossible(
  * @returns Data to be set in firestore with timestamp
  */
 function getDataWithTimestampsAndGeoPoints(
-  data: admin.firestore.DocumentData,
-  firestoreStatics: typeof admin.firestore,
+  data: firestore.DocumentData,
+  firestoreStatics: typeof firestore,
 ): Record<string, any> {
   // Exit if no statics are passed
   if (!firestoreStatics) {
@@ -147,9 +163,7 @@ export async function callRtdb(
   }
 
   try {
-    const dbRef: admin.database.Reference = adminInstance
-      .database()
-      .ref(actionPath);
+    const dbRef: database.Reference = adminInstance.database().ref(actionPath);
     if (action === 'get') {
       const snap = await optionsToRtdbRef(dbRef, options).once('value');
       return snap.val();
@@ -193,7 +207,7 @@ export async function callRtdb(
  * @returns Promise which resolves with results of calling Firestore
  */
 export async function callFirestore(
-  adminInstance: admin.app.App,
+  adminInstance: app.App,
   action: FirestoreAction,
   actionPath: string,
   options?: CallFirestoreOptions,
@@ -230,11 +244,16 @@ export async function callFirestore(
               options,
             ) as FirebaseFirestore.DocumentReference
           ).delete()
-        : // TODO: Here the ref should be passed along instead so we can accept options
-          deleteCollection(
+        : deleteCollection(
             adminInstance.firestore(),
-            actionPath,
-            options?.batchSize,
+            slashPathToFirestoreRef(
+              adminInstance.firestore(),
+              actionPath,
+              options,
+            ) as
+              | FirebaseFirestore.CollectionReference
+              | FirebaseFirestore.Query,
+            options,
           );
       await deletePromise;
       // Returning null in the case of falsey value prevents Cypress error with message:
@@ -250,7 +269,7 @@ export async function callFirestore(
       data,
       // Use static option if passed (tests), otherwise fallback to statics on adminInstance
       // Tests do not have statics since they are using @firebase/testing
-      options?.statics || (adminInstance.firestore as typeof admin.firestore),
+      options?.statics || (adminInstance.firestore as typeof firestore),
     );
 
     if (action === 'set') {
@@ -299,18 +318,23 @@ export function createCustomToken(
   const customClaims = settings?.customClaims || { isTesting: true };
 
   // Create auth token
-  return adminInstance.auth().createCustomToken(uid, customClaims);
+  return getAuth(adminInstance, settings.tenantId).createCustomToken(
+    uid,
+    customClaims,
+  );
 }
 
 /**
  * Get Firebase Auth user based on UID
  * @param adminInstance - Admin SDK instance
  * @param uid - UID of user for which the custom token will be generated
+ * @param tenantId - Optional ID of tenant used for multi-tenancy
  * @returns Promise which resolves with a custom Firebase Auth token
  */
 export function getAuthUser(
   adminInstance: any,
   uid: string,
-): Promise<admin.auth.UserRecord> {
-  return adminInstance.auth().getUser(uid);
+  tenantId?: string,
+): Promise<auth.UserRecord> {
+  return getAuth(adminInstance, tenantId).getUser(uid);
 }

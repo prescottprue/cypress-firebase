@@ -15,19 +15,20 @@
     "test:emulate": "cross-env FIREBASE_AUTH_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.auth.port)\" FIREBASE_DATABASE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.database.port)\" FIRESTORE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.firestore.port)\" yarn test:open"
   },
   "dependencies": {
-    "firebase": "^8.2.4",
+    "firebase": "^9.5.0",
     "lodash": "^4.17.21",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
-    "cypress": "^6.3.0",
-    "cypress-firebase": "^1.6.0",
-    "eslint-plugin-chai-friendly": "^0.6.0",
-    "eslint-plugin-cypress": "^2.11.2",
-    "firebase-tools": "^9.2.2",
-    "react-scripts": "4.0.1"
+    "cypress": "^9.1.0",
+    "cypress-firebase": "^2.0.0",
+    "eslint-plugin-chai-friendly": "^0.7.2",
+    "eslint-plugin-cypress": "^2.12.1",
+    "firebase-admin": "^10.0.0",
+    "firebase-tools": "^9.23.0",
+    "react-scripts": "^4.0.3"
   },
   "eslintConfig": {
     "extends": "./.eslintrc.js"

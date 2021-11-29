@@ -7,6 +7,12 @@
         ".write": "auth !== null && $uid === auth.uid"
       }
     },
+    "public_todos": {
+      ".read": "true",
+      "$todoId": {
+        ".write": "!data.exists()"
+      }
+    },
     "todos": {
       ".read": "true",
       "$todoId": {

@@ -31,7 +31,7 @@ If you are interested in what drove the need for this checkout [the why section]
 
 **Note:** These instructions assume your tests are in the `cypress` folder (cypress' default). See the [folders section below](#folders) for more info about other supported folders.
 
-1. Install `cypress-firebase` and [`firebase-admin`](https://www.npmjs.org/package/firebase-admin) both: `yarn add -D cypress-firebase firebase-admin` or `npm i --save-dev cypress-firebase firebase-admin`
+1. Install `cypress-firebase` and [`firebase-admin`](https://www.npmjs.org/package/firebase-admin) both: `yarn add -D cypress-firebase firebase-admin@9` or `npm i --save-dev cypress-firebase firebase-admin@9` (**NOTE**: `firebase-admin` v10 modules is not yet supported, but is in the works)
 1. Go to project setting on firebase console and generate new private key. See how to do so [in the Google Docs](https://sites.google.com/site/scriptsexamples/new-connectors-to-google-services/firebase/tutorials/authenticate-with-a-service-account).
 1. Add `serviceAccount.json` to your `.gitignore` (THIS IS VERY IMPORTANT TO KEEPING YOUR INFORMATION SECURE!)
 1. Save the downloaded file as `serviceAccount.json` in the root of your project (make sure that it is .gitignored) - needed for `firebase-admin` to have read/write access to your DB from within your tests
@@ -42,6 +42,24 @@ If you are interested in what drove the need for this checkout [the why section]
    import "firebase/auth";
    import "firebase/database";
    import "firebase/firestore";
+   import { attachCustomCommands } from "cypress-firebase";
+
+   const fbConfig = {
+     // Your config from Firebase Console
+   };
+
+   firebase.initializeApp(fbConfig);
+
+   attachCustomCommands({ Cypress, cy, firebase });
+   ```
+
+   With [Firebase Web SDK version 9](https://firebase.google.com/docs/web/modular-upgrade)
+
+   ```js
+   import firebase from "firebase/compat/app";
+   import "firebase/compat/auth";
+   import "firebase/compat/database";
+   import "firebase/compat/firestore";
    import { attachCustomCommands } from "cypress-firebase";
 
    const fbConfig = {
@@ -118,6 +136,16 @@ If you are interested in what drove the need for this checkout [the why section]
    - `CYPRESS_TEST_UID` - UID of your test user
    - `SERVICE_ACCOUNT` - service account object
 
+### Named app support
+
+When using a custom app name or running more than one firebase instance in your app:
+
+```js
+const namedApp = firebase.initializeApp(fbConfig, "app_name");
+
+attachCustomCommands({ Cypress, cy, firebase, app: namedApp });
+```
+
 ## Docs
 
 ### Custom Cypress Commands
@@ -137,7 +165,9 @@ If you are interested in what drove the need for this checkout [the why section]
 
 #### cy.login
 
-Login to Firebase using custom auth token
+Login to Firebase using custom auth token.
+
+To specify a tenant ID, either pass the ID as a parameter to `cy.login`, or set it as environment variable `TEST_TENANT_ID`. Read more about [Firebase multi-tenancy](https://firebase.google.com/docs/reference/admin/node/admin.auth.Tenant).
 
 ##### Examples
 
@@ -152,6 +182,14 @@ Passing a UID
 ```javascript
 const uid = "123SomeUid";
 cy.login(uid);
+```
+
+Passing a tenant ID
+
+```javascript
+const uid = "123SomeUid";
+const tenantId = "123SomeTenantId";
+cy.login(uid, undefined, tenantId);
 ```
 
 #### cy.logout
@@ -210,6 +248,30 @@ const fakeProject = {
   createdAt: firebase.database.ServerValue.TIMESTAMP,
 };
 cy.callRtdb("set", "projects/ABC123", fakeProject);
+```
+
+With [Firebase Web SDK version 9](https://firebase.google.com/docs/web/modular-upgrade)
+
+```javascript
+import firebase from "firebase/compat/app";
+import "firebase/compat/database";
+
+const fakeProject = {
+  some: "data",
+  createdAt: firebase.database.ServerValue.TIMESTAMP,
+};
+cy.callRtdb("set", "projects/ABC123", fakeProject);
+```
+
+_Delete Data_
+
+```javascript
+// Delete document
+cy.callRtdb("delete", "projects/ABC123");
+// Delete filtered collection
+cy.callRtdb("delete", "projects", { where: ["name", "==", "Test Project"] });
+// Delete whole collection - BE CAREFUL!!
+cy.callRtdb("delete", "projectsToDelete");
 ```
 
 _Get/Verify Data_
@@ -274,18 +336,20 @@ const fakeProject = {
 cy.callFirestore("set", "projects/ABC123", fakeProject);
 ```
 
-_Recursive Delete_
+With [Firebase Web SDK version 9](https://firebase.google.com/docs/web/modular-upgrade)
 
 ```javascript
-const opts = { recursive: true };
-cy.callFirestore("delete", "project/test-project", opts);
-```
+import firebase from "firebase/compat/app";
+import "firebase/compat/firestore";
 
-_Other Args_
-
-```javascript
-const opts = { args: ["-r"] };
-cy.callFirestore("delete", "project/test-project", opts);
+const fakeProject = {
+  some: "data",
+  // Use new firebase.firestore.Timestamp.now in place of serverTimestamp()
+  createdAt: firebase.firestore.Timestamp.now(),
+  // Or use fromDate if you would like to specify a date
+  // createdAt: firebase.firestore.Timestamp.fromDate(new Date())
+};
+cy.callFirestore("set", "projects/ABC123", fakeProject);
 ```
 
 _Full_
@@ -297,6 +361,7 @@ describe("Test firestore", () => {
 
   beforeEach(() => {
     cy.visit("/");
+    cy.callFirestore("delete", "testCollection");
   });
 
   it("read/write test", () => {
@@ -420,6 +485,45 @@ describe("Test firestore", () => {
    attachCustomCommands({ Cypress, cy, firebase });
    ```
 
+With [Firebase Web SDK version 9](https://firebase.google.com/docs/web/modular-upgrade) in compat mode (same API as v8 with different import)
+
+```js
+import firebase from "firebase/compat/app";
+import "firebase/compat/auth";
+import "firebase/compat/database";
+import "firebase/compat/firestore";
+import { attachCustomCommands } from "cypress-firebase";
+
+const fbConfig = {
+  // Your Firebase Config
+};
+
+// Emulate RTDB if Env variable is passed
+const rtdbEmulatorHost = Cypress.env("FIREBASE_DATABASE_EMULATOR_HOST");
+if (rtdbEmulatorHost) {
+  fbConfig.databaseURL = `http://${rtdbEmulatorHost}?ns=${fbConfig.projectId}`;
+}
+
+firebase.initializeApp(fbConfig);
+
+// Emulate Firestore if Env variable is passed
+const firestoreEmulatorHost = Cypress.env("FIRESTORE_EMULATOR_HOST");
+if (firestoreEmulatorHost) {
+  firebase.firestore().settings({
+    host: firestoreEmulatorHost,
+    ssl: false,
+  });
+}
+
+const authEmulatorHost = Cypress.env("FIREBASE_AUTH_EMULATOR_HOST");
+if (authEmulatorHost) {
+  firebase.auth().useEmulator(`http://${authEmulatorHost}/`);
+  console.debug(`Using Auth emulator: http://${authEmulatorHost}/`);
+}
+
+attachCustomCommands({ Cypress, cy, firebase });
+```
+
 1. Start emulators: `npm run emulators`
 1. In another terminal window, start the application: `npm start`
 1. In another terminal window, open test runner with emulator settings: `npm run test:emulate`
@@ -473,7 +577,12 @@ Firebase instance config can be overriden by passing another argument to the cyp
      const overrideFirebaseConfig = {
        databaseURL: "http://localhost:9000?ns=my-other-namespace",
      };
-     const extendedConfig = cypressFirebasePlugin(on, config, admin);
+     const extendedConfig = cypressFirebasePlugin(
+       on,
+       config,
+       admin,
+       overrideFirebaseConfig
+     );
 
      // Add other plugins/tasks such as code coverage here
 
@@ -555,14 +664,14 @@ on: [pull_request]
 jobs:
   ui-tests:
     name: UI Tests
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
 
       # Cypress action manages installing/caching npm dependencies and Cypress binary.
       - name: Cypress Run
-        uses: cypress-io/github-action@v1
+        uses: cypress-io/github-action@v2
         with:
           group: "E2E Tests"
         env:
@@ -594,8 +703,7 @@ jobs:
 
       # Cypress action manages installing/caching npm dependencies and Cypress binary
       - name: Cypress Run
-        uses: cypress-io/github-action@v1
-        runs-on: ubuntu-16.04
+        uses: cypress-io/github-action@v2
         with:
           group: "E2E Tests"
           start: npm start
@@ -631,6 +739,7 @@ This comes from the fact that cypress stringifies values as it is passing them f
 
 ## Future Plans
 
+- firebase-admin v10 module support
 - Drop support for service account file in favor of application default credentails env variable (path to file set in `GOOGLE_APPLICATION_CREDENTIALS`)
 - Support for Auth emulators (this will become the suggested method instead of needing a service account)
 
