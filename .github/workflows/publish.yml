@@ -3,21 +3,20 @@ name: NPM Package Publish
 on:
   push:
     branches:
-      - master
+      - main
       - next
       - alpha
+
+concurrency:
+  group: publish-${{ github.head_ref }}
+  cancel-in-progress: true
 
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
     steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.9.1
-        with:
-          access_token: ${{ github.token }}
-
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.4.0
 
       - name: Check if version has been updated
         id: check
@@ -28,20 +27,12 @@ jobs:
         uses: actions/setup-node@v2.4.1
         with:
           node-version: 14
-          registry-url: https://registry.npmjs.org/
+          cache: 'yarn'
 
       - name: Get cache settings
         id: cache-settings
         run: |
-          echo "::set-output name=dir::$(yarn cache dir)"
           echo "::set-output name=firebase-tools::$(yarn list -s --depth=0 --pattern firebase-tools | tail -n 1 | sed 's/.*@//g')"
-          
-      - name: Cache Yarn Dependencies
-        if: steps.check.outputs.changed == 'true'
-        uses: actions/cache@v2.1.6
-        with:
-          path: ${{ steps.cache-settings.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ matrix.app }}-${{ hashFiles('yarn.lock') }}
 
       - name: Cache Firebase Emulator Binaries
         if: steps.check.outputs.changed == 'true'
@@ -88,7 +79,7 @@ jobs:
         run: |
           gitBranch=${GITHUB_REF##*/}
           packageVersion=$(cat package.json | jq -r '.version')
-          publishFlag=$(if [ "$GITHUB_REF" != 'refs/heads/master' ]; then eval echo '--tag $gitBranch'; else echo ''; fi;)
+          publishFlag=$(if [ "$GITHUB_REF" == 'refs/heads/main' ]; then echo ''; else eval echo '--tag $gitBranch'; fi;)
           echo "PACKAGE_VERSION=$packageVersion" >> $GITHUB_ENV
           npm publish $publishFlag
 
@@ -114,4 +105,4 @@ jobs:
           tag_name: v${{ env.PACKAGE_VERSION }}
           release_name: v${{ env.PACKAGE_VERSION }}
           draft: false
-          prerelease: github.ref != 'refs/heads/master'
+          prerelease: github.ref != 'refs/heads/main'

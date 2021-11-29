@@ -2,6 +2,10 @@ name: Verify
 
 on: [pull_request]
 
+concurrency:
+  group: verify-${{ matrix-node-version }}-${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build
@@ -10,11 +14,6 @@ jobs:
       matrix:
         node-version: [12.x, 14.x, 16.x]
     steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.9.1
-        with:
-          access_token: ${{ github.token }}
-
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -22,18 +21,12 @@ jobs:
         uses: actions/setup-node@v2.4.1
         with:
           node-version: ${{ matrix.node-version }}
+          cache: 'yarn'
 
       - name: Get cache settings
         id: cache-settings
         run: |
-          echo "::set-output name=dir::$(yarn cache dir)"
           echo "::set-output name=firebase-tools::$(yarn list -s --depth=0 --pattern firebase-tools | tail -n 1 | sed 's/.*@//g')"
-          
-      - name: Cache Yarn Dependencies
-        uses: actions/cache@v2.1.6
-        with:
-          path: ${{ steps.cache-settings.outputs.dir }}
-          key: ${{ runner.os }}-${{ matrix.node-version }}-yarn-${{ matrix.app }}-${{ hashFiles('yarn.lock') }}
 
       - name: Cache Firebase Emulator Binaries
         uses: actions/cache@v2.1.6
@@ -68,4 +61,3 @@ jobs:
         uses: codecov/codecov-action@v2.1.0
         with:
           fail_ci_if_error: false
-
