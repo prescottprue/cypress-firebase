@@ -3,7 +3,7 @@ name: Verify
 on: [pull_request]
 
 concurrency:
-  group: verify-${{ matrix-node-version }}-${{ github.head_ref }}
+  group: verify-${{ github.head_ref }}
   cancel-in-progress: true
 
 jobs:
