@@ -8,6 +8,7 @@ export interface AttachCustomCommandParams {
   Cypress: any;
   cy: any;
   firebase: any;
+  app?: any;
 }
 
 /**
@@ -276,19 +277,21 @@ function getTypeStr(value: any): TypeStr {
 /**
  * @param firebase - firebase instance
  * @param customToken - Custom token to use for login
+ * @param app - firebase app
  * @returns Promise which resolves with the user auth object
  */
 function loginWithCustomToken(
   firebase: any,
   customToken: string,
+  app: any,
 ): Promise<any> {
   return new Promise((resolve, reject): any => {
-    firebase.auth().onAuthStateChanged((auth: any) => {
+    firebase.auth(app).onAuthStateChanged((auth: any) => {
       if (auth) {
         resolve(auth);
       }
     });
-    firebase.auth().signInWithCustomToken(customToken).catch(reject);
+    firebase.auth(app).signInWithCustomToken(customToken).catch(reject);
   });
 }
 
@@ -314,7 +317,9 @@ export default function attachCustomCommands(
   context: AttachCustomCommandParams,
   options?: CustomCommandOptions,
 ): void {
-  const { Cypress, cy, firebase } = context;
+  const { Cypress, cy, firebase, app } = context;
+
+  const defaultApp = app || firebase.app(); // select default  app
 
   /**
    * Login to Firebase auth as a user with either a passed uid or the TEST_UID
@@ -334,8 +339,8 @@ export default function attachCustomCommands(
       }
       // Resolve with current user if they already exist
       if (
-        firebase.auth().currentUser &&
-        userUid === firebase.auth().currentUser.uid
+        firebase.auth(defaultApp).currentUser &&
+        userUid === firebase.auth(defaultApp).currentUser.uid
       ) {
         cy.log('Authed user already exists, login complete.');
         return undefined;
@@ -347,7 +352,7 @@ export default function attachCustomCommands(
       return cy
         .task('createCustomToken', { uid: userUid, customClaims })
         .then((customToken: string) =>
-          loginWithCustomToken(firebase, customToken),
+          loginWithCustomToken(firebase, customToken, app),
         );
     },
   );
@@ -367,12 +372,12 @@ export default function attachCustomCommands(
           resolve: (value?: any) => void,
           reject: (reason?: any) => void,
         ): any => {
-          firebase.auth().onAuthStateChanged((auth: any) => {
+          firebase.auth(defaultApp).onAuthStateChanged((auth: any) => {
             if (!auth) {
               resolve();
             }
           });
-          firebase.auth().signOut().catch(reject);
+          firebase.auth(defaultApp).signOut().catch(reject);
         },
       ),
   );
