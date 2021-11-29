@@ -8,7 +8,7 @@ on:
       - alpha
 
 concurrency:
-  group: publish-${{ github.head_ref }}
+  group: publish-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -28,6 +28,7 @@ jobs:
         with:
           node-version: 14
           cache: 'yarn'
+          registry-url: https://registry.npmjs.org/
 
       - name: Get cache settings
         id: cache-settings
