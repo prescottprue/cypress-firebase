@@ -1,18 +1,31 @@
 describe('Firestore', () => {
-  it('get', () => {
-    cy.callFirestore('get', 'projects').then(results => {
-      cy.log('results:', results);
-      expect(results).to.exist;
-    });
-  });
 
-  it('get with limit', () => {
-    cy.callFirestore('get', 'projects', { limit: 1 }).then(results => {
-      cy.log('results:', results);
-      expect(results).to.exist;
-      expect(results).to.have.length(1);
+  describe('get', () => {
+    it('should return null for empty collection', () => {
+      cy.callFirestore('get', 'asdf').then(results => {
+        cy.log('results:', results);
+        expect(results).be.null;
+      });
     });
-  });
+
+    it('should return null for empty collection', () => {
+      cy.callFirestore('add', 'projects', { name: 'test' }).then(() => {
+        cy.callFirestore('get', 'projects').then(results => {
+          cy.log('results:', results);
+          expect(results).to.exist;
+        });
+      });
+    });
+  
+    it('get with limit', () => {
+      cy.callFirestore('get', 'projects', { limit: 1 }).then(results => {
+        cy.log('results:', results);
+        expect(results).to.exist;
+        expect(results).to.have.length(1);
+      });
+    });
+  })
+
 
   it('set', () => {
     cy.callFirestore('set', 'projects/123ABC', { some: 'value' }).then(

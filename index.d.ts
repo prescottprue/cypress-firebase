@@ -312,7 +312,7 @@ declare module "firebase-utils" {
     export function deleteCollection(db: any, collectionPath: string, batchSize?: number): Promise<any>;
 }
 declare module "tasks" {
-    import * as admin from 'firebase-admin';
+    import type { auth, app } from 'firebase-admin';
     import { FixtureData, FirestoreAction, RTDBAction, CallRtdbOptions, CallFirestoreOptions } from "attachCustomCommands";
     /**
      * @param adminInstance - firebase-admin instance
@@ -331,7 +331,7 @@ declare module "tasks" {
      * @param data - Data to pass to action
      * @returns Promise which resolves with results of calling Firestore
      */
-    export function callFirestore(adminInstance: admin.app.App, action: FirestoreAction, actionPath: string, options?: CallFirestoreOptions, data?: FixtureData): Promise<any>;
+    export function callFirestore(adminInstance: app.App, action: FirestoreAction, actionPath: string, options?: CallFirestoreOptions, data?: FixtureData): Promise<any>;
     /**
      * Create a custom token
      * @param adminInstance - Admin SDK instance
@@ -347,7 +347,7 @@ declare module "tasks" {
      * @param tenantId - Optional ID of tenant used for multi-tenancy
      * @returns Promise which resolves with a custom Firebase Auth token
      */
-    export function getAuthUser(adminInstance: any, uid: string, tenantId?: string): Promise<admin.auth.UserRecord>;
+    export function getAuthUser(adminInstance: any, uid: string, tenantId?: string): Promise<auth.UserRecord>;
 }
 declare module "plugin" {
     import { AppOptions } from 'firebase-admin';

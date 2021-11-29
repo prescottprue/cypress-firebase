@@ -1,4 +1,4 @@
-import * as admin from 'firebase-admin'; // NOTE: Only used for types
+import type { database, firestore, auth, app } from 'firebase-admin'; // NOTE: Only used for types
 import {
   FixtureData,
   FirestoreAction,
@@ -18,9 +18,9 @@ import {
  * @returns RTDB Reference
  */
 function optionsToRtdbRef(
-  baseRef: admin.database.Reference,
+  baseRef: database.Reference,
   options?: CallRtdbOptions,
-): admin.database.Reference | admin.database.Query {
+): database.Reference | database.Query {
   let newRef = baseRef;
   [
     'orderByChild',
@@ -56,7 +56,7 @@ function optionsToRtdbRef(
 function getAuth(
   adminInstance: any,
   tenantId?: string,
-): admin.auth.Auth | admin.auth.TenantAwareAuth {
+): auth.Auth | auth.TenantAwareAuth {
   const auth = tenantId
     ? adminInstance.auth().tenantManager().authForTenant(tenantId)
     : adminInstance.auth();
@@ -70,8 +70,8 @@ function getAuth(
  */
 function convertValueToTimestampOrGeoPointIfPossible(
   dataVal: any,
-  firestoreStatics: typeof admin.firestore,
-): admin.firestore.FieldValue {
+  firestoreStatics: typeof firestore,
+): firestore.FieldValue {
   /* eslint-disable-next-line no-underscore-dangle */
   if (dataVal?._methodName === 'FieldValue.serverTimestamp') {
     return firestoreStatics.FieldValue.serverTimestamp();
@@ -98,8 +98,8 @@ function convertValueToTimestampOrGeoPointIfPossible(
  * @returns Data to be set in firestore with timestamp
  */
 function getDataWithTimestampsAndGeoPoints(
-  data: admin.firestore.DocumentData,
-  firestoreStatics: typeof admin.firestore,
+  data: firestore.DocumentData,
+  firestoreStatics: typeof firestore,
 ): Record<string, any> {
   // Exit if no statics are passed
   if (!firestoreStatics) {
@@ -163,9 +163,7 @@ export async function callRtdb(
   }
 
   try {
-    const dbRef: admin.database.Reference = adminInstance
-      .database()
-      .ref(actionPath);
+    const dbRef: database.Reference = adminInstance.database().ref(actionPath);
     if (action === 'get') {
       const snap = await optionsToRtdbRef(dbRef, options).once('value');
       return snap.val();
@@ -209,7 +207,7 @@ export async function callRtdb(
  * @returns Promise which resolves with results of calling Firestore
  */
 export async function callFirestore(
-  adminInstance: admin.app.App,
+  adminInstance: app.App,
   action: FirestoreAction,
   actionPath: string,
   options?: CallFirestoreOptions,
@@ -266,7 +264,7 @@ export async function callFirestore(
       data,
       // Use static option if passed (tests), otherwise fallback to statics on adminInstance
       // Tests do not have statics since they are using @firebase/testing
-      options?.statics || (adminInstance.firestore as typeof admin.firestore),
+      options?.statics || (adminInstance.firestore as typeof firestore),
     );
 
     if (action === 'set') {
@@ -332,6 +330,6 @@ export function getAuthUser(
   adminInstance: any,
   uid: string,
   tenantId?: string,
-): Promise<admin.auth.UserRecord> {
+): Promise<auth.UserRecord> {
   return getAuth(adminInstance, tenantId).getUser(uid);
 }

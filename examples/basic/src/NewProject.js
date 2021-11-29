@@ -1,20 +1,19 @@
 import React, { useState } from 'react';
-import firebase from 'firebase/app'
-import 'firebase/database' // make sure you add this for firestore
+import { getDatabase, ref, push, serverTimestamp } from 'firebase/database'
+import { getAuth } from 'firebase/auth'
 
 export default function NewProject() {
   const [projectName, setProjectName] = useState()
   function addProject() {
     const newProjectData = {
       name: projectName,
-      createdAt: firebase.database.ServerValue.TIMESTAMP
+      createdAt: serverTimestamp()
     }
-    if (firebase.auth().currentUser && firebase.auth().currentUser.uid) {
-      newProjectData.createdBy = firebase.auth().currentUser.uid
+    const auth = getAuth()
+    if (auth.currentUser?.uid) {
+      newProjectData.createdBy = auth.currentUser.uid
     }
-    return firebase.database()
-    .ref('projects')
-    .push(newProjectData)
+    return push(ref(getDatabase(), 'projects'), newProjectData)
   }
 
   return (

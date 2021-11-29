@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { invoke, map } from 'lodash';
 import Project from './Project'
-import firebase from 'firebase/app'
-import 'firebase/firestore' // make sure you add this for firestore
+import { getFirestore, query, collection, limit, onSnapshot } from 'firebase/firestore'
+import { getAuth } from 'firebase/auth'
 import './App.css';
 
 export default function Projects() {
@@ -10,20 +9,24 @@ export default function Projects() {
   const [projects, setProjects] = useState()
   const [errorState, setErrorState] = useState()
 
+  const firestore = getFirestore()
+  const projectsQuery = query(
+    collection(firestore, 'public_projects'),
+    limit(10)
+  )
+  
   function loadProjects() {
     setLoadingState(true)
-    return firebase.firestore()
-    .collection('projects')
-    .limit(10)
-    .onSnapshot((snap) => {
+    onSnapshot(projectsQuery, (snap) => {
       console.log('snap', snap)
       setProjects(snap.docs.map((docSnap) => ({...docSnap.data(), id: docSnap.id})))
       setLoadingState(false)
     }, (err) => {
-      setErrorState(invoke(err, 'toString') || err)
+      setErrorState(err?.toString ? err.toString() : err)
       setLoadingState(false)
     })
   }
+  
   useEffect(() => {
     const unsetProjectsListener = loadProjects()
     return () => {
@@ -46,7 +49,7 @@ export default function Projects() {
   return (
     <div data-test="projects">
       {
-        map(projects, (project, projectKey) =>
+        projects.map((project, projectKey) =>
           <Project
             key={`Project-${projectKey}`}
             project={project}

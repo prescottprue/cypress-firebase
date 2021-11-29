@@ -1,20 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import Project from './Project'
-import firebase from 'firebase/app'
-import 'firebase/database'
+import { getDatabase, ref, limitToLast, query, off, onValue } from 'firebase/database'
 import './App.css';
 
 export default function Projects() {
   const [loading, setLoadingState] = useState(false)
   const [projects, setProjects] = useState()
   const [errorState, setErrorState] = useState()
-
+  const projectsQuery = query(ref(getDatabase(), 'projects'), limitToLast(10))
   function loadProjects() {
     setLoadingState(true)
-    return firebase.database()
-    .ref('projects')
-    .limitToLast(10)
-    .on('value', (snap) => {
+    return onValue(projectsQuery, (snap) => {
       console.log('Data snapshot:', snap.val())
       setProjects(snap.val())
       setLoadingState(false)
@@ -26,10 +22,10 @@ export default function Projects() {
   }
 
   useEffect(() => {
-    const unsetProjectsListener = loadProjects()
+    loadProjects()
     return () => {
       // Unset listener on unmount
-      firebase.database().ref('projects').off("value", unsetProjectsListener)
+      off(projectsQuery, 'value')
     }
   }, [])
 
