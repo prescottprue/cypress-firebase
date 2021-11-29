@@ -15,7 +15,7 @@ jobs:
         node-version: [12.x, 14.x, 16.x]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.4.0
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2.4.1
@@ -29,7 +29,7 @@ jobs:
           echo "::set-output name=firebase-tools::$(yarn list -s --depth=0 --pattern firebase-tools | tail -n 1 | sed 's/.*@//g')"
 
       - name: Cache Firebase Emulator Binaries
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         with:
           path: ~/.cache/firebase/emulators
           key: ${{ runner.os }}-${{ matrix.node-version }}-firebase-${{ steps.cache-settings.outputs.firebase-tools }}

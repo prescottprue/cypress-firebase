@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Project from './Project'
 import { getFirestore, query, collection, limit, onSnapshot } from 'firebase/firestore'
-import { getAuth } from 'firebase/auth'
-import './App.css';
 
 export default function Projects() {
   const [loading, setLoadingState] = useState(false)
@@ -15,24 +13,26 @@ export default function Projects() {
     limit(10)
   )
   
-  function loadProjects() {
+  const loadProjects = useCallback(() => {
     setLoadingState(true)
     onSnapshot(projectsQuery, (snap) => {
-      console.log('snap', snap)
-      setProjects(snap.docs.map((docSnap) => ({...docSnap.data(), id: docSnap.id})))
+      setProjects(snap.docs.map((docSnap) => ({
+        ...docSnap.data(),
+        id: docSnap.id
+      })))
       setLoadingState(false)
     }, (err) => {
       setErrorState(err?.toString ? err.toString() : err)
       setLoadingState(false)
     })
-  }
+  }, [projectsQuery, setLoadingState, setProjects, setErrorState])
   
   useEffect(() => {
     const unsetProjectsListener = loadProjects()
     return () => {
       unsetProjectsListener()
     }
-  }, [])
+  }, [loadProjects])
 
   if (errorState) {
     return <div>Error</div>

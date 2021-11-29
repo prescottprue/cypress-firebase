@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Project from './Project'
 import { getDatabase, ref, limitToLast, query, off, onValue } from 'firebase/database'
-import './App.css';
 
 export default function Projects() {
   const [loading, setLoadingState] = useState(false)
   const [projects, setProjects] = useState()
   const [errorState, setErrorState] = useState()
   const projectsQuery = query(ref(getDatabase(), 'projects'), limitToLast(10))
-  function loadProjects() {
+  const loadProjects = useCallback(() => {
     setLoadingState(true)
     return onValue(projectsQuery, (snap) => {
       console.log('Data snapshot:', snap.val())
@@ -19,7 +18,7 @@ export default function Projects() {
       setErrorState(err.message)
       setLoadingState(false)
     })
-  }
+  }, [projectsQuery, setProjects, setLoadingState, setErrorState])
 
   useEffect(() => {
     loadProjects()
@@ -27,7 +26,7 @@ export default function Projects() {
       // Unset listener on unmount
       off(projectsQuery, 'value')
     }
-  }, [])
+  }, [loadProjects, projectsQuery])
 
   if (errorState) {
     return <div><h4>Error:</h4><p>{errorState}</p></div>

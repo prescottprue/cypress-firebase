@@ -36,7 +36,7 @@ jobs:
 
       - name: Cache Firebase Emulator Binaries
         if: steps.check.outputs.changed == 'true'
-        uses: actions/cache@v2.1.6
+        uses: actions/cache@v2.1.7
         with:
           path: ~/.cache/firebase/emulators
           key: ${{ runner.os }}-firebase-${{ steps.cache-settings.outputs.firebase-tools }}

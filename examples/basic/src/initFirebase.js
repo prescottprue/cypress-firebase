@@ -1,12 +1,12 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth, connectAuthEmulator } from 'firebase/auth'
-import { getFirestore, initializeFirestore } from 'firebase/firestore'
+import { initializeFirestore } from 'firebase/firestore'
 import fbConfig from './fbConfig'
 
 
 export default function initFirebase(initialState, history) {
   // Initialize firebase instance if it doesn't already exist
-const shouldUseEmulator = !!process.env.REACT_APP_USE_DB_EMULATORS
+  const shouldUseEmulator = !!process.env.REACT_APP_USE_DB_EMULATORS
 
   if (shouldUseEmulator) { // or window.location.hostname === 'localhost' if you want
     console.log('Using RTDB emulator')
@@ -26,7 +26,6 @@ const shouldUseEmulator = !!process.env.REACT_APP_USE_DB_EMULATORS
       firestoreSettings.experimentalForceLongPolling = true;
     }
     initializeFirestore(app, firestoreSettings)
-    // getFirestore().settings(firestoreSettings)
   }
   const auth = getAuth()
   connectAuthEmulator(auth, "http://localhost:9099");
