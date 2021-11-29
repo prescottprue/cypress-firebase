@@ -23,7 +23,6 @@ jobs:
         uses: EndBug/version-check@v2
 
       - name: Use Node 14
-        if: steps.check.outputs.changed == 'true'
         uses: actions/setup-node@v2.4.1
         with:
           node-version: 14
@@ -36,24 +35,18 @@ jobs:
           echo "::set-output name=firebase-tools::$(yarn list -s --depth=0 --pattern firebase-tools | tail -n 1 | sed 's/.*@//g')"
 
       - name: Cache Firebase Emulator Binaries
-        if: steps.check.outputs.changed == 'true'
         uses: actions/cache@v2.1.7
         with:
           path: ~/.cache/firebase/emulators
           key: ${{ runner.os }}-firebase-${{ steps.cache-settings.outputs.firebase-tools }}
 
       - name: Install Dependencies
-        if: steps.check.outputs.changed == 'true'
         run: yarn install --frozen-lockfile
 
       - name: Check For Lint
-        if: steps.check.outputs.changed == 'true'
         run: yarn lint
 
       - name: Run Unit Tests + Coverage
-        if: steps.check.outputs.changed == 'true'
-        env:
-          CODE_CLIMATE: ${{ secrets.CODE_CLIMATE }}
         run: yarn test:cov
 
       - name: Run Build
