@@ -459,6 +459,22 @@ describe('tasks', () => {
         expect(result.size).to.equal(0);
       });
 
+      it('deletes documents based on a query', async () => {
+        const projectToDelete = { name: 'projectToDelete' };
+        const projectId = 'projectToDelete';
+        const projectToDeleteRef = projectsFirestoreRef.doc(projectId);
+        // Add two projects document
+        await projectToDeleteRef.set(projectToDelete);
+        await projectsFirestoreRef.doc('some').set(testProject);
+        // Run delete on projects with name matching testProject's name
+        await tasks.callFirestore(adminApp, 'delete', PROJECTS_COLLECTION, {
+          where: ['name', '==', projectToDelete.name],
+        });
+        const result = await projectToDeleteRef.get();
+        // Confirm projects collection is empty
+        expect(result).to.have.property('exists', false);
+      });
+
       it('deletes a document', async () => {
         // Add a project document
         await projectFirestoreRef.set(testProject);

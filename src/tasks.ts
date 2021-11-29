@@ -244,11 +244,16 @@ export async function callFirestore(
               options,
             ) as FirebaseFirestore.DocumentReference
           ).delete()
-        : // TODO: Here the ref should be passed along instead so we can accept options
-          deleteCollection(
+        : deleteCollection(
             adminInstance.firestore(),
-            actionPath,
-            options?.batchSize,
+            slashPathToFirestoreRef(
+              adminInstance.firestore(),
+              actionPath,
+              options,
+            ) as
+              | FirebaseFirestore.CollectionReference
+              | FirebaseFirestore.Query,
+            options,
           );
       await deletePromise;
       // Returning null in the case of falsey value prevents Cypress error with message:

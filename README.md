@@ -263,6 +263,17 @@ const fakeProject = {
 cy.callRtdb("set", "projects/ABC123", fakeProject);
 ```
 
+_Delete Data_
+
+```javascript
+// Delete document
+cy.callRtdb("delete", "projects/ABC123");
+// Delete filtered collection
+cy.callRtdb("delete", "projects", { where: ["name", "==", "Test Project"] });
+// Delete whole collection - BE CAREFUL!!
+cy.callRtdb("delete", "projectsToDelete");
+```
+
 _Get/Verify Data_
 
 ```javascript
@@ -341,20 +352,6 @@ const fakeProject = {
 cy.callFirestore("set", "projects/ABC123", fakeProject);
 ```
 
-_Recursive Delete_
-
-```javascript
-const opts = { recursive: true };
-cy.callFirestore("delete", "project/test-project", opts);
-```
-
-_Other Args_
-
-```javascript
-const opts = { args: ["-r"] };
-cy.callFirestore("delete", "project/test-project", opts);
-```
-
 _Full_
 
 ```javascript
@@ -364,6 +361,7 @@ describe("Test firestore", () => {
 
   beforeEach(() => {
     cy.visit("/");
+    cy.callFirestore("delete", "testCollection");
   });
 
   it("read/write test", () => {
@@ -666,14 +664,14 @@ on: [pull_request]
 jobs:
   ui-tests:
     name: UI Tests
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout Repo
         uses: actions/checkout@v2
 
       # Cypress action manages installing/caching npm dependencies and Cypress binary.
       - name: Cypress Run
-        uses: cypress-io/github-action@v1
+        uses: cypress-io/github-action@v2
         with:
           group: "E2E Tests"
         env:
@@ -705,8 +703,7 @@ jobs:
 
       # Cypress action manages installing/caching npm dependencies and Cypress binary
       - name: Cypress Run
-        uses: cypress-io/github-action@v1
-        runs-on: ubuntu-16.04
+        uses: cypress-io/github-action@v2
         with:
           group: "E2E Tests"
           start: npm start
@@ -742,6 +739,7 @@ This comes from the fact that cypress stringifies values as it is passing them f
 
 ## Future Plans
 
+- firebase-admin v10 module support
 - Drop support for service account file in favor of application default credentails env variable (path to file set in `GOOGLE_APPLICATION_CREDENTIALS`)
 - Support for Auth emulators (this will become the suggested method instead of needing a service account)
 

@@ -304,12 +304,12 @@ declare module "firebase-utils" {
      */
     export function slashPathToFirestoreRef(firestoreInstance: any, slashPath: string, options?: CallFirestoreOptions): firestore.CollectionReference | firestore.DocumentReference | firestore.Query;
     /**
-     * @param db - Firestore instance
-     * @param collectionPath - Path of collection
-     * @param batchSize - Size of delete batch
+     * @param db - Firestore database instance
+     * @param refOrQuery - Firestore instance
+     * @param options - Call Firestore options
      * @returns Promise which resolves with results of deleting batch
      */
-    export function deleteCollection(db: any, collectionPath: string, batchSize?: number): Promise<any>;
+    export function deleteCollection(db: any, refOrQuery: FirebaseFirestore.CollectionReference | FirebaseFirestore.Query, options?: CallFirestoreOptions): Promise<any>;
 }
 declare module "tasks" {
     import type { auth, app } from 'firebase-admin';
