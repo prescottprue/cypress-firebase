@@ -156,7 +156,7 @@ export function initializeFirebase(
     /* eslint-disable no-console */
     console.error(
       'cypress-firebase: Error initializing firebase-admin instance:',
-      err.message,
+      err instanceof Error && err.message,
     );
     /* eslint-enable no-console */
     throw err;
