@@ -1,4 +1,4 @@
-import * as admin from 'firebase-admin';
+import type { firestore } from 'firebase-admin';
 
 /**
  * Params for attachCustomCommand function for
@@ -8,6 +8,7 @@ export interface AttachCustomCommandParams {
   Cypress: any;
   cy: any;
   firebase: any;
+  app?: any;
 }
 
 /**
@@ -61,7 +62,7 @@ export interface CallFirestoreOptions {
    * Firestore statics (i.e. admin.firestore). This should only be needed during
    * testing due to @firebase/testing not containing statics
    */
-  statics?: typeof admin.firestore;
+  statics?: typeof firestore;
 }
 
 /**
@@ -313,7 +314,9 @@ export default function attachCustomCommands(
   context: AttachCustomCommandParams,
   options?: CustomCommandOptions,
 ): void {
-  const { Cypress, cy, firebase } = context;
+  const { Cypress, cy, firebase, app } = context;
+
+  const defaultApp = app || firebase.app(); // select default  app
 
   /**
    * Get firebase auth instance, with tenantId set if provided
@@ -321,7 +324,7 @@ export default function attachCustomCommands(
    * @returns firebase auth instance
    */
   function getAuth(tenantId: string | undefined) {
-    const auth = firebase.auth();
+    const auth = defaultApp.auth();
     if (tenantId) {
       auth.tenantId = tenantId;
     }

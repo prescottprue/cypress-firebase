@@ -12,4 +12,3 @@ export const rrfConfig = {
   enableLogging: false
 }
 
-export default { firebase, rrfConfig }

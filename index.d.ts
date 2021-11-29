@@ -1,5 +1,5 @@
 declare module "attachCustomCommands" {
-    import * as admin from 'firebase-admin';
+    import type { firestore } from 'firebase-admin';
     /**
      * Params for attachCustomCommand function for
      * attaching custom commands.
@@ -8,6 +8,7 @@ declare module "attachCustomCommands" {
         Cypress: any;
         cy: any;
         firebase: any;
+        app?: any;
     }
     /**
      * Action for Firestore
@@ -57,7 +58,7 @@ declare module "attachCustomCommands" {
          * Firestore statics (i.e. admin.firestore). This should only be needed during
          * testing due to @firebase/testing not containing statics
          */
-        statics?: typeof admin.firestore;
+        statics?: typeof firestore;
     }
     /**
      * Action for Real Time Database
@@ -271,7 +272,7 @@ declare module "node-utils" {
     export function getServiceAccount(envSlug?: string): ServiceAccount | null;
 }
 declare module "firebase-utils" {
-    import * as admin from 'firebase-admin';
+    import type { AppOptions, app, firestore } from 'firebase-admin';
     import { CallFirestoreOptions } from "attachCustomCommands";
     /**
      * Check whether a value is a string or not
@@ -286,7 +287,7 @@ declare module "firebase-utils" {
      * @param adminInstance - firebase-admin instance to initialize
      * @param overrideConfig - firebase-admin instance to initialize
      */
-    export function initializeFirebase(adminInstance: any, overrideConfig?: admin.AppOptions): admin.app.App;
+    export function initializeFirebase(adminInstance: any, overrideConfig?: AppOptions): app.App;
     /**
      * Check with or not a slash path is the path of a document
      * @param slashPath - Path to check for whether or not it is a doc
@@ -301,7 +302,7 @@ declare module "firebase-utils" {
      * @param options - Options object
      * @returns Ref at slash path
      */
-    export function slashPathToFirestoreRef(firestoreInstance: any, slashPath: string, options?: CallFirestoreOptions): admin.firestore.CollectionReference | admin.firestore.DocumentReference | admin.firestore.Query;
+    export function slashPathToFirestoreRef(firestoreInstance: any, slashPath: string, options?: CallFirestoreOptions): firestore.CollectionReference | firestore.DocumentReference | firestore.Query;
     /**
      * @param db - Firestore instance
      * @param collectionPath - Path of collection

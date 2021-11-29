@@ -2,7 +2,6 @@ module.exports = {
   'extends': [
     'react-app',
     'prettier',
-    'prettier/react'
   ],
   rules: {
     'no-console': 0,
@@ -16,7 +15,6 @@ module.exports = {
       'extends': [
         'prettier',
         'plugin:@typescript-eslint/recommended',
-        'prettier/@typescript-eslint',
         "plugin:jsdoc/recommended"
       ],
       env: {

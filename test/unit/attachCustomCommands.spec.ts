@@ -14,6 +14,7 @@ let currentUser: any;
 let onAuthStateChanged: any;
 let signInWithCustomToken: any;
 const firebase = {
+  app: () => firebase,
   auth: sinon.spy(() => ({
     currentUser,
     onAuthStateChanged,
