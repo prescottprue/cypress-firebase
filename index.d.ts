@@ -298,7 +298,7 @@ declare module "firebase-utils" {
      * Convert slash path to Firestore reference
      * @param firestoreInstance - Instance on which to
      * create ref
-     * @param slashPath - Path to convert into firestore refernce
+     * @param slashPath - Path to convert into firestore reference
      * @param options - Options object
      * @returns Ref at slash path
      */

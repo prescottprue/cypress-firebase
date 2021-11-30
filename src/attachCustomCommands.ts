@@ -394,7 +394,7 @@ export default function attachCustomCommands(
               resolve();
             }
           });
-          auth().signOut().catch(reject);
+          auth.signOut().catch(reject);
         },
       ),
   );
