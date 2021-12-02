@@ -94,6 +94,21 @@ If you are interested in what drove the need for this checkout [the why section]
    };
    ```
 
+   With Typescript
+
+   ```ts
+   import admin from "firebase-admin";
+   import { plugin as cypressFirebasePlugin } from "cypress-firebase";
+
+   module.exports = (
+     on: Cypress.PluginEvents,
+     config: Cypress.PluginConfigOptions
+   ) => {
+     const extendedConfig = cypressFirebasePlugin(on, config, admin);
+     return extendedConfig;
+   };
+   ```
+
 1. To confirm things are working, create a new test file (`cypress/integration/examples/test_hello_world.js`) adding a test that uses the cypress-firebase custom command (`cy.callFirestore`):
 
    ```js
@@ -736,6 +751,21 @@ When testing, tests should have admin read/write access to the database for seed
 The issue is most likely due to a circular object, such as a timestamp, being included in data you are attempting to write to Firestore. Instead of using `firebase.firestore.FieldValue.serverTimestamp()` you should instead use `firebase.firestore.Timestamp.now()` or you would like to specify a certain date `firebase.firestore.Timestamp.fromDate(new Date('01/01/18'))`.
 
 This comes from the fact that cypress stringifies values as it is passing them from the browser environment to the node environment through `cy.task`.
+
+1. An error is causing tests to fail mentioning "firebaseinstallations.googleapis.com blocked by CORS policy"
+
+This has to do with the Firebase JS SDK having problems calling a Google API - this issue has mostly been seen with older versions of Firebase SDK (pre v8) when being tested on Firebase Hosting (as opposed to a local server).
+
+The following should help prevent the issue from failing tests:
+
+```js
+Cypress.on("uncaught:exception", (err) => {
+  // Prevent test failure from errors from firebase installations API
+  return err.message.includes("firebaseinstallations.googleapis.com");
+});
+```
+
+If you experience this with an SDK version newer than v7 please create a new issue.
 
 ## Future Plans
 

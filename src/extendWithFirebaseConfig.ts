@@ -1,12 +1,8 @@
+import type * as Cypress from 'cypress';
+
 export interface CypressEnvironmentOptions {
   envName?: string;
   firebaseProjectId?: string;
-  [k: string]: any;
-}
-
-export interface CypressConfig {
-  env?: CypressEnvironmentOptions;
-  baseUrl?: string;
   [k: string]: any;
 }
 
@@ -18,10 +14,12 @@ export interface ExtendedCypressConfigEnv {
   GCLOUD_PROJECT?: string;
 }
 
-export interface ExtendedCypressConfig {
-  [k: string]: any;
+export interface ExtendedCypressConfigBase {
   env: ExtendedCypressConfigEnv;
 }
+
+export type ExtendedCypressConfig = Partial<Cypress.PluginConfigOptions> &
+  ExtendedCypressConfigBase;
 
 export interface ExtendWithFirebaseConfigSettings {
   localBaseUrl?: string;
@@ -37,7 +35,7 @@ export interface ExtendWithFirebaseConfigSettings {
  * @returns Cypress config extended with environment variables
  */
 export default function extendWithFirebaseConfig(
-  cypressConfig: CypressConfig,
+  cypressConfig: Partial<Cypress.PluginConfigOptions>,
 ): ExtendedCypressConfig {
   const valuesFromEnv = [
     'FIREBASE_AUTH_EMULATOR_HOST',

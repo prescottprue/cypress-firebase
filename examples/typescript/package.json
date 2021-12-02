@@ -1,38 +1,40 @@
 {
-  "name": "cypress-example-typescript-webpack",
-  "version": "1.0.0",
-  "description": "Example showing TypeScript tests with Cypress",
+  "name": "typescript",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^12.0.0",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "firebase": "^9.5.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-scripts": "4.0.3",
+    "typescript": "^4.1.2",
+    "web-vitals": "^1.0.1"
+  },
   "scripts": {
     "start": "react-scripts start",
+    "start:emulate": "cross-env REACT_APP_USE_DB_EMULATORS=true yarn start",
     "build": "react-scripts build",
-    "test": "cross-env GCLOUD_PROJECT=redux-firebasev3 cypress run",
-    "test:open": "cross-env GCLOUD_PROJECT=redux-firebasev3 cypress open",
-    "lint": "eslint ./src/*.js cypress/**/*.ts --ext .ts,js",
-    "lint:fix": "yarn lint --fix"
+    "eject": "react-scripts eject",
+    "lint": "eslint src/**.js",
+    "lint:fix": "yarn lint --fix",
+    "emulate": "firebase emulators:start --only database,firestore,auth --project redux-firebasev3",
+    "test": "cross-env GCLOUD_PROJECT=redux-firebasev3 CYPRESS_baseUrl=http://localhost:3000 cypress run",
+    "test:open": "cross-env GCLOUD_PROJECT=redux-firebasev3 CYPRESS_baseUrl=http://localhost:3000 cypress open",
+    "test:emulate": "cross-env FIREBASE_AUTH_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.auth.port)\" FIREBASE_DATABASE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.database.port)\" FIRESTORE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.firestore.port)\" yarn test:open"
   },
-  "dependencies": {
-    "firebase": "^7.14.0",
-    "react": "^16.13.0",
-    "react-dom": "^16.13.0",
-    "react-redux": "^5.0.7",
-    "react-redux-firebase": "^2.4.1",
-    "recompose": "^0.30.0",
-    "redux": "^4.0.1"
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.33.0",
-    "cross-env": "^7.0.2",
-    "cypress": "^8.5.0",
-    "eslint": "^7.32.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-chai-friendly": "^0.7.2",
-    "eslint-plugin-cypress": "^2.12.1",
-    "eslint-plugin-prettier": "^4.0.0",
-    "prettier": "^2.4.1",
-    "react-scripts": "4.0.3"
-  },
-  "license": "MIT",
   "browserslist": {
     "production": [
       ">0.2%",
@@ -44,5 +46,13 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "cypress": "^9.1.0",
+    "cypress-firebase": "^2.1.1",
+    "eslint-plugin-chai-friendly": "^0.7.2",
+    "eslint-plugin-cypress": "^2.12.1",
+    "firebase-tools": "^9.23.0"
   }
 }

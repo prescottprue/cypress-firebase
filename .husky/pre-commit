@@ -1,4 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-yarn build:typefile && git add . && yarn lint-staged
+yarn lint-staged

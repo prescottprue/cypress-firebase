@@ -1,0 +1,30 @@
+{
+  "rules": {
+    ".read": "auth !== null",
+    ".write": "auth !== null",
+    "users": {
+      "$uid": {
+        ".write": "auth !== null && $uid === auth.uid"
+      }
+    },
+    "public_todos": {
+      ".read": "true",
+      "$todoId": {
+        ".write": "!data.exists()"
+      }
+    },
+    "todos": {
+      ".read": "true",
+      "$todoId": {
+        ".write": "auth !== null && (newData.child('createdBy').val() === auth.uid || data.child('createdBy').val() === auth.uid)"
+      }
+    },
+    "projects": {
+      ".indexOn": ["createdBy"],
+      ".read": true,
+      "$projectId": {
+        ".write": "data.child('createdBy').val() === auth.uid || (!data.exists() && newData.child('createdBy').val() === auth.uid)"
+      }
+    }
+  }
+}

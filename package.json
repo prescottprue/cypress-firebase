@@ -1,15 +1,14 @@
 {
   "name": "cypress-firebase",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
   "jsnext:main": "lib-esm/index.js",
-  "types": "./index.d.ts",
+  "types": "lib/index.d.ts",
   "scripts": {
     "clean": "rimraf lib lib-esm",
-    "build": "yarn build:lib && yarn build:esm && yarn build:typefile",
-    "build:typefile": "tsc --declaration --outFile index.d.ts --emitDeclarationOnly",
+    "build": "yarn build:lib && yarn build:esm",
     "build:lib": "tsc",
     "build:esm": "tsc -m es6 --outDir lib-esm",
     "watch": "yarn build:lib --watch",
@@ -41,6 +40,7 @@
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",
     "chai": "^4.3.4",
+    "cypress": "^9.1.0",
     "eslint": "^8.3.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.3.0",
@@ -107,14 +107,14 @@
       "name": "CommonJS: attachCustomCommands",
       "path": "lib/index.js",
       "import": "{ attachCustomCommands }",
-      "limit": "6.9kb",
+      "limit": "10kb",
       "webpack": false
     },
     {
       "name": "CommonJS: plugin",
       "path": "lib/index.js",
       "import": "{ plugin }",
-      "limit": "6.9kb",
+      "limit": "10kb",
       "webpack": false
     },
     {
