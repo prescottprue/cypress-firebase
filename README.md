@@ -94,6 +94,21 @@ If you are interested in what drove the need for this checkout [the why section]
    };
    ```
 
+   With Typescript
+
+   ```ts
+   import admin from "firebase-admin";
+   import { plugin as cypressFirebasePlugin } from "cypress-firebase";
+
+   module.exports = (
+     on: Cypress.PluginEvents,
+     config: Cypress.PluginConfigOptions
+   ) => {
+     const extendedConfig = cypressFirebasePlugin(on, config, admin);
+     return extendedConfig;
+   };
+   ```
+
 1. To confirm things are working, create a new test file (`cypress/integration/examples/test_hello_world.js`) adding a test that uses the cypress-firebase custom command (`cy.callFirestore`):
 
    ```js

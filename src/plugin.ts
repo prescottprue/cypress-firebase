@@ -1,4 +1,4 @@
-import { AppOptions } from 'firebase-admin';
+import type { AppOptions } from 'firebase-admin';
 import extendWithFirebaseConfig, {
   ExtendedCypressConfig,
 } from './extendWithFirebaseConfig';
@@ -24,8 +24,8 @@ type TaskKey =
  * @returns Extended Cypress config
  */
 export default function pluginWithTasks(
-  cypressOnFunc: any,
-  cypressConfig: any,
+  cypressOnFunc: Cypress.PluginEvents,
+  cypressConfig: Cypress.PluginConfigOptions,
   adminInstance: any,
   overrideConfig?: AppOptions,
 ): ExtendedCypressConfig {

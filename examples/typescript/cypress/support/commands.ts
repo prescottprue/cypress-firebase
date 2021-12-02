@@ -4,7 +4,6 @@ import 'firebase/compat/database';
 import 'firebase/compat/firestore';
 import { attachCustomCommands } from 'cypress-firebase';
 
-
 const fbConfig = {
   apiKey: "AIzaSyCTUERDM-Pchn_UDTsfhVPiwM4TtNIxots",
   authDomain: "redux-firebasev3.firebaseapp.com",

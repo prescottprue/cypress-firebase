@@ -1,4 +1,4 @@
-import type { database, firestore, auth, app } from 'firebase-admin'; // NOTE: Only used for types
+import type { database, firestore, auth, app } from 'firebase-admin';
 import {
   FixtureData,
   FirestoreAction,
