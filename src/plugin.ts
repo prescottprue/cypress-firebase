@@ -25,7 +25,7 @@ type TaskKey =
  */
 export default function pluginWithTasks(
   cypressOnFunc: Cypress.PluginEvents,
-  cypressConfig: Cypress.PluginConfigOptions,
+  cypressConfig: Partial<Cypress.PluginConfigOptions>,
   adminInstance: any,
   overrideConfig?: AppOptions,
 ): ExtendedCypressConfig {
