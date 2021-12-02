@@ -752,6 +752,21 @@ The issue is most likely due to a circular object, such as a timestamp, being in
 
 This comes from the fact that cypress stringifies values as it is passing them from the browser environment to the node environment through `cy.task`.
 
+1. An error is causing tests to fail mentioning "firebaseinstallations.googleapis.com blocked by CORS policy"
+
+This has to do with the Firebase JS SDK having problems calling a Google API - this issue has mostly been seen with older versions of Firebase SDK (pre v8) when being tested on Firebase Hosting (as opposed to a local server).
+
+The following should help prevent the issue from failing tests:
+
+```js
+Cypress.on("uncaught:exception", (err) => {
+  // Prevent test failure from errors from firebase installations API
+  return err.message.includes("firebaseinstallations.googleapis.com");
+});
+```
+
+If you experience this with an SDK version newer than v7 please create a new issue.
+
 ## Future Plans
 
 - firebase-admin v10 module support

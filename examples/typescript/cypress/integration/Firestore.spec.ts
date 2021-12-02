@@ -79,11 +79,11 @@ describe('callFirestore', () => {
     cy.callFirestore('set', 'projects/123ABCUpdate', { some: 'value' }).then(
       () => {
         cy.callFirestore('update', 'projects/123ABCUpdate', {
-          updatedValue,
+          value: updatedValue,
         }).then(() => {
           cy.callFirestore('get', 'projects/123ABCUpdate').then(result => {
             expect(result).to.have.exist;
-            expect(result).to.have.property('updatedValue', updatedValue);
+            expect(result).to.have.property('value', updatedValue);
           });
         });
       },
