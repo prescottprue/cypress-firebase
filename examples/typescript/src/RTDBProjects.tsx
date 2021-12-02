@@ -1,16 +1,20 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import Project from './Project'
+import Project, { ProjectData } from './Project'
 import { getDatabase, ref, limitToLast, query, off, onValue } from 'firebase/database'
+
+interface ProjectsMap {
+  [k: string]: ProjectData
+}
 
 export default function Projects() {
   const [loading, setLoadingState] = useState(false)
-  const [projects, setProjects] = useState()
-  const [errorState, setErrorState] = useState()
-
+  const [projects, setProjects] = useState<ProjectsMap>()
+  const [errorState, setErrorState] = useState('')
+  
   const loadProjects = useCallback(() => {
     setLoadingState(true)
     const projectsQuery = query(ref(getDatabase(), 'projects'), limitToLast(10))
-    return onValue(projectsQuery, (snap) => {
+    onValue(projectsQuery, (snap) => {
       console.log('Data snapshot:', snap.val())
       setProjects(snap.val())
       setLoadingState(false)
@@ -19,6 +23,7 @@ export default function Projects() {
       setErrorState(err.message)
       setLoadingState(false)
     })
+    return projectsQuery
   }, [setProjects, setLoadingState, setErrorState])
 
   useEffect(() => {
@@ -27,7 +32,7 @@ export default function Projects() {
       // Unset listener on unmount
       off(projectsQuery, 'value')
     }
-  }, [loadProjects, projectsQuery])
+  }, [loadProjects])
 
   if (errorState) {
     return <div><h4>Error:</h4><p>{errorState}</p></div>
@@ -44,11 +49,10 @@ export default function Projects() {
   return (
     <div data-test="projects">
       {
-        Object.keys(projects).map((projectKey) =>
+        Object.entries(projects).map(([projectKey, project]) =>
           <Project
             key={`Project-${projectKey}`}
-            project={projects[projectKey]}
-            projectId={projectKey}
+            project={project}
           />
         )
       }

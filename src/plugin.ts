@@ -12,6 +12,11 @@ type TaskKey =
   | 'getAuthUser';
 
 /**
+ * Cypress plugin which attaches tasks used by custom commands
+ * and returns modified Cypress config. Modified config includes
+ * env setting with values of Firebase specific environment variables
+ * such as GCLOUD_PROJECT, FIREBASE_DATABASE_EMULATOR_HOST,
+ * FIRESTORE_EMULATOR_HOST and FIREBASE_AUTH_EMULATOR_HOST.
  * @param cypressOnFunc - on function from cypress plugins file
  * @param cypressConfig - Cypress config
  * @param adminInstance - firebase-admin instance

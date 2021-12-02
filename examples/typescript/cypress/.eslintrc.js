@@ -1,18 +1,8 @@
 module.exports = {
-  'extends': '../.eslintrc.js',
+  extends: '../.eslintrc.js',
   env: {
     mocha: true,
     'cypress/globals': true
-  },
-  globals:{ 
-    sinon: true,
-    expect: true,
-    after: true,
-    afterEach: true,
-    before: true,
-    beforeEach: true,
-    it: true,
-    describe: true
   },
   plugins: [
     'cypress',

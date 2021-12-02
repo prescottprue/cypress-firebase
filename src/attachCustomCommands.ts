@@ -427,7 +427,7 @@ export default function attachCustomCommands(
 
         // Add metadata to dataToWrite if specified by options
         if (dataIsObject && options?.withMeta) {
-          if (!dataToWrite.createdBy) {
+          if (!dataToWrite.createdBy && Cypress.env('TEST_UID')) {
             dataToWrite.createdBy = Cypress.env('TEST_UID');
           }
           if (!dataToWrite.createdAt) {

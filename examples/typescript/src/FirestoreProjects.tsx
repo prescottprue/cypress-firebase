@@ -1,31 +1,33 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import Project from './Project'
+import Project, { ProjectData } from './Project'
 import { getFirestore, query, collection, limit, onSnapshot } from 'firebase/firestore'
+
 
 export default function Projects() {
   const [loading, setLoadingState] = useState(false)
-  const [projects, setProjects] = useState()
-  const [errorState, setErrorState] = useState()
+  const [projects, setProjects] = useState<ProjectData[]>([])
+  const [errorState, setErrorState] = useState<string>()
 
-  const firestore = getFirestore()
-  const projectsQuery = query(
-    collection(firestore, 'public_projects'),
-    limit(10)
-  )
-  
   const loadProjects = useCallback(() => {
     setLoadingState(true)
+    const firestore = getFirestore()
+    const projectsQuery = query(
+      collection(firestore, 'public_projects'),
+      limit(10)
+    )
     return onSnapshot(projectsQuery, (snap) => {
+      console.log('projects')
       setProjects(snap.docs.map((docSnap) => ({
         ...docSnap.data(),
         id: docSnap.id
       })))
       setLoadingState(false)
     }, (err) => {
-      setErrorState(err?.toString ? err.toString() : err)
+      console.log('err', err)
+      setErrorState(err?.toString ? err.toString() : JSON.stringify(err))
       setLoadingState(false)
     })
-  }, [projectsQuery, setLoadingState, setProjects, setErrorState])
+  }, [setLoadingState, setProjects, setErrorState])
   
   useEffect(() => {
     const unsetProjectsListener = loadProjects()
@@ -53,7 +55,6 @@ export default function Projects() {
           <Project
             key={`Project-${projectKey}`}
             project={project}
-            projectId={projectKey}
           />
         )
       }
