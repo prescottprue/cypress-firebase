@@ -1,5 +1,9 @@
 describe('callFirestore', () => {
   describe('get', () => {
+    before(() => {
+      cy.callFirestore('add', 'projects', { name: 'test' })
+    })
+
     it('should return null for empty collection', () => {
       cy.callFirestore('get', 'asdf').then(results => {
         cy.log('results:', results);
@@ -8,11 +12,9 @@ describe('callFirestore', () => {
     });
 
     it('should return documents from collection', () => {
-      cy.callFirestore('add', 'projects', { name: 'test' }).then(() => {
-        cy.callFirestore('get', 'projects').then(results => {
-          cy.log('results:', results);
-          expect(results).to.exist;
-        });
+      cy.callFirestore('get', 'projects').then(results => {
+        cy.log('results:', results);
+        expect(results).to.exist;
       });
     });
   
@@ -23,6 +25,18 @@ describe('callFirestore', () => {
         expect(results).to.have.length(1);
       });
     });
+
+    it('should query with where', () => {
+      const uniqueName = 'Test Where'
+      cy.callFirestore('add', 'projects', { name: uniqueName })
+      cy.callFirestore('get', 'projects', {
+        where: ['name', '==', uniqueName],
+      }).then((results) => {
+        cy.log('get respond', results);
+        expect(results).to.exist;
+        expect(results).to.have.length(1);
+      });  
+    })
   })
 
   describe('set', () => {
