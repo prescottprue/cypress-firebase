@@ -31,7 +31,7 @@ export default function pluginWithTasks(
 ): ExtendedCypressConfig {
   // Only initialize admin instance if it hasn't already been initialized
   if (adminInstance.apps?.length === 0) {
-    initializeFirebase(adminInstance, overrideConfig);
+    initializeFirebase(overrideConfig);
   }
   // Parse single argument from task into arguments for task methods while
   // also passing the admin instance

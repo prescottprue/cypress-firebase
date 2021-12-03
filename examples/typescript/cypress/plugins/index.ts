@@ -5,6 +5,6 @@ module.exports = (
   on: Cypress.PluginEvents,
   config: Cypress.PluginConfigOptions
 ) => {
-  const extendedConfig = cypressFirebasePlugin(on, config, admin)
+  const extendedConfig = cypressFirebasePlugin(on, config)
   return extendedConfig
 }

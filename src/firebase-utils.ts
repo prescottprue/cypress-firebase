@@ -1,4 +1,20 @@
-import type { AppOptions, app, firestore, credential } from 'firebase-admin';
+import type { firestore } from 'firebase-admin';
+import {
+  initializeApp,
+  applicationDefault,
+  cert,
+  Credential,
+  App,
+  AppOptions,
+  ServiceAccount,
+} from 'firebase-admin/app';
+import type {
+  Settings,
+  CollectionReference,
+  DocumentReference,
+  Query,
+  QuerySnapshot,
+} from 'firebase-admin/firestore';
 import { getServiceAccount } from './node-utils';
 import { CallFirestoreOptions } from './attachCustomCommands';
 
@@ -17,7 +33,7 @@ export function isString(valToCheck: any): boolean {
  * defaults to port 8080 and servicePath "localhost".
  * @returns Firestore settings to be passed to firebase.firestore().settings
  */
-function firestoreSettingsFromEnv(): FirebaseFirestore.Settings {
+function firestoreSettingsFromEnv(): Settings {
   const { FIRESTORE_EMULATOR_HOST } = process.env;
   if (
     typeof FIRESTORE_EMULATOR_HOST === 'undefined' ||
@@ -39,17 +55,15 @@ function firestoreSettingsFromEnv(): FirebaseFirestore.Settings {
  * @param adminInstance - firebase-admin instance to initialize
  * @returns Firebase admin credential
  */
-function getFirebaseCredential(
-  adminInstance: any,
-): credential.Credential | undefined {
+function getFirebaseCredential(): Credential | undefined {
   const serviceAccount = getServiceAccount();
   // Add service account credential if it exists so that custom auth tokens can be generated
   if (serviceAccount) {
-    return adminInstance.credential.cert(serviceAccount);
+    return cert(serviceAccount as ServiceAccount);
   }
 
   // Add default credentials if they exist
-  const defaultCredentials = adminInstance.credential.applicationDefault();
+  const defaultCredentials = applicationDefault();
   if (defaultCredentials) {
     console.log('cypress-firebase: Using default credentials'); // eslint-disable-line no-console
     return defaultCredentials;
@@ -71,14 +85,9 @@ function getDefaultDatabaseUrl(projectId?: string): string {
 /**
  * Initialize Firebase instance from service account (from either local
  * serviceAccount.json or environment variables)
- * @returns Initialized Firebase instance
- * @param adminInstance - firebase-admin instance to initialize
  * @param overrideConfig - firebase-admin instance to initialize
  */
-export function initializeFirebase(
-  adminInstance: any,
-  overrideConfig?: AppOptions,
-): app.App {
+export function initializeFirebase(overrideConfig?: AppOptions): void {
   try {
     // TODO: Look into using @firebase/testing in place of admin here to allow for
     // usage of clearFirestoreData (see https://github.com/prescottprue/cypress-firebase/issues/73 for more info)
@@ -108,7 +117,7 @@ export function initializeFirebase(
 
     // Add credentials if they do not already exist - starting with application default, falling back to SERVICE_ACCOUNT env variable
     if (!fbConfig.credential) {
-      const credential = getFirebaseCredential(adminInstance);
+      const credential = getFirebaseCredential();
       if (credential) {
         fbConfig.credential = credential;
       }
@@ -131,7 +140,7 @@ export function initializeFirebase(
       }
     }
 
-    const fbInstance = adminInstance.initializeApp(fbConfig);
+    initializeApp(fbConfig);
     // Initialize Firestore with emulator host settings
     if (process.env.FIRESTORE_EMULATOR_HOST) {
       const firestoreSettings = firestoreSettingsFromEnv();
@@ -141,7 +150,6 @@ export function initializeFirebase(
         firestoreSettings,
       );
       /* eslint-enable no-console */
-      adminInstance.firestore().settings(firestoreSettings);
     }
     /* eslint-disable no-console */
     const dbUrlLog = fbConfig.databaseURL
@@ -151,7 +159,6 @@ export function initializeFirebase(
       `cypress-firebase: Initialized Firebase app for project "${fbConfig.projectId}"${dbUrlLog}`,
     );
     /* eslint-enable no-console */
-    return fbInstance;
   } catch (err) {
     /* eslint-disable no-console */
     console.error(
@@ -184,10 +191,7 @@ export function slashPathToFirestoreRef(
   firestoreInstance: any,
   slashPath: string,
   options?: CallFirestoreOptions,
-):
-  | firestore.CollectionReference
-  | firestore.DocumentReference
-  | firestore.Query {
+): CollectionReference | DocumentReference | Query {
   if (!slashPath) {
     throw new Error('Path is required to make Firestore Reference');
   }
@@ -244,7 +248,7 @@ function deleteQueryBatch(
 ): void {
   query
     .get()
-    .then((snapshot: firestore.QuerySnapshot) => {
+    .then((snapshot: QuerySnapshot) => {
       // When there are no documents left, we are done
       if (snapshot.size === 0) {
         return 0;

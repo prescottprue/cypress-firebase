@@ -31,7 +31,7 @@ If you are interested in what drove the need for this checkout [the why section]
 
 **Note:** These instructions assume your tests are in the `cypress` folder (cypress' default). See the [folders section below](#folders) for more info about other supported folders.
 
-1. Install `cypress-firebase` and [`firebase-admin`](https://www.npmjs.org/package/firebase-admin) both: `yarn add -D cypress-firebase firebase-admin@9` or `npm i --save-dev cypress-firebase firebase-admin@9` (**NOTE**: `firebase-admin` v10 modules is not yet supported, but is in the works)
+1. Install `cypress-firebase` and [`firebase-admin`](https://www.npmjs.org/package/firebase-admin) both: `yarn add -D cypress-firebase firebase-admin@9` or `npm i --save-dev cypress-firebase firebase-admin` (**NOTE**: `firebase-admin` v10 currently requires use of compat, but modules support is in the works)
 1. Go to project setting on firebase console and generate new private key. See how to do so [in the Google Docs](https://sites.google.com/site/scriptsexamples/new-connectors-to-google-services/firebase/tutorials/authenticate-with-a-service-account).
 1. Add `serviceAccount.json` to your `.gitignore` (THIS IS VERY IMPORTANT TO KEEPING YOUR INFORMATION SECURE!)
 1. Save the downloaded file as `serviceAccount.json` in the root of your project (make sure that it is .gitignored) - needed for `firebase-admin` to have read/write access to your DB from within your tests
