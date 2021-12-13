@@ -39,16 +39,14 @@ describe('tasks', () => {
     });
 
     it('returns a promise', () => {
-      expect(tasks.callFirestore(adminApp, 'get', 'some/path').then).to.be.a(
-        'function',
-      );
+      expect(tasks.callFirestore('get', 'some/path').then).to.be.a('function');
     });
 
     describe('get action', () => {
       it('throws an error if action path is empty string', async () => {
         await projectFirestoreRef.set(testProject);
         try {
-          await tasks.callFirestore(adminApp, 'get', '');
+          await tasks.callFirestore('get', '');
         } catch (err) {
           expect(err).to.have.property(
             'message',
@@ -59,30 +57,26 @@ describe('tasks', () => {
 
       it('gets collections', async () => {
         await projectFirestoreRef.set(testProject);
-        const result = await tasks.callFirestore(
-          adminApp,
-          'get',
-          PROJECTS_COLLECTION,
-        );
+        const result = await tasks.callFirestore('get', PROJECTS_COLLECTION);
         expect(result).to.be.an('array');
         expect(result[0]).to.have.property('name', testProject.name);
       });
 
       it('returns null for an empty collection', async () => {
         await projectFirestoreRef.set(testProject);
-        const result = await tasks.callFirestore(adminApp, 'get', 'asdf');
+        const result = await tasks.callFirestore('get', 'asdf');
         expect(result).to.equal(null);
       });
 
       it('gets a document', async () => {
         await projectFirestoreRef.set(testProject);
-        const result = await tasks.callFirestore(adminApp, 'get', PROJECT_PATH);
+        const result = await tasks.callFirestore('get', PROJECT_PATH);
         expect(result).to.be.an('object');
         expect(result).to.have.property('name', testProject.name);
       });
 
       it('returns null for an empty doc', async () => {
-        const result = await tasks.callFirestore(adminApp, 'get', 'some/doc');
+        const result = await tasks.callFirestore('get', 'some/doc');
         expect(result).to.equal(null);
       });
 
@@ -91,14 +85,9 @@ describe('tasks', () => {
         const secondProjectId = 'some';
         const secondProject = { name: 'another' };
         await projectsFirestoreRef.doc(secondProjectId).set(secondProject);
-        const result = await tasks.callFirestore(
-          adminApp,
-          'get',
-          PROJECTS_COLLECTION,
-          {
-            where: ['name', '==', secondProject.name],
-          },
-        );
+        const result = await tasks.callFirestore('get', PROJECTS_COLLECTION, {
+          where: ['name', '==', secondProject.name],
+        });
         expect(result[0]).to.have.property('id', secondProjectId);
         expect(result[0]).to.have.property('name', secondProject.name);
       });
@@ -108,17 +97,12 @@ describe('tasks', () => {
         const secondProjectId = 'some';
         const secondProject = { name: 'another', status: 'asdf' };
         await projectsFirestoreRef.doc(secondProjectId).set(secondProject);
-        const result = await tasks.callFirestore(
-          adminApp,
-          'get',
-          PROJECTS_COLLECTION,
-          {
-            where: [
-              ['name', '==', secondProject.name],
-              ['status', '==', secondProject.status],
-            ],
-          },
-        );
+        const result = await tasks.callFirestore('get', PROJECTS_COLLECTION, {
+          where: [
+            ['name', '==', secondProject.name],
+            ['status', '==', secondProject.status],
+          ],
+        });
         expect(result[0]).to.have.property('id', secondProjectId);
         expect(result[0]).to.have.property('name', secondProject.name);
         expect(result[0]).to.have.property('status', secondProject.status);
@@ -127,15 +111,10 @@ describe('tasks', () => {
       it('supports limitToLast', async () => {
         await projectFirestoreRef.set(testProject);
         await projectsFirestoreRef.doc('another').set(testProject);
-        const result = await tasks.callFirestore(
-          adminApp,
-          'get',
-          PROJECTS_COLLECTION,
-          {
-            orderBy: 'name',
-            limitToLast: 1,
-          },
-        );
+        const result = await tasks.callFirestore('get', PROJECTS_COLLECTION, {
+          orderBy: 'name',
+          limitToLast: 1,
+        });
         expect(result).to.have.length(1);
         expect(result[0]).to.have.property('name', testProject.name);
       });
@@ -144,7 +123,7 @@ describe('tasks', () => {
         await projectFirestoreRef.set(testProject);
         await projectsFirestoreRef.doc('another').set(testProject);
         try {
-          await tasks.callFirestore(adminApp, 'get', PROJECTS_COLLECTION, {
+          await tasks.callFirestore('get', PROJECTS_COLLECTION, {
             limitToLast: 1,
           });
         } catch (err) {
@@ -158,14 +137,9 @@ describe('tasks', () => {
       it('supports limit', async () => {
         await projectFirestoreRef.set(testProject);
         await projectsFirestoreRef.doc('another').set(testProject);
-        const result = await tasks.callFirestore(
-          adminApp,
-          'get',
-          PROJECTS_COLLECTION,
-          {
-            limit: 1,
-          },
-        );
+        const result = await tasks.callFirestore('get', PROJECTS_COLLECTION, {
+          limit: 1,
+        });
         expect(result).to.have.length(1);
         expect(result[0]).to.have.property('name', testProject.name);
       });
@@ -175,14 +149,9 @@ describe('tasks', () => {
         const secondProject = { name: 'aaaa' };
         await projectsFirestoreRef.add({ name: 'zzzzz' });
         await projectsFirestoreRef.add(secondProject);
-        const result = await tasks.callFirestore(
-          adminApp,
-          'get',
-          PROJECTS_COLLECTION,
-          {
-            orderBy: 'name',
-          },
-        );
+        const result = await tasks.callFirestore('get', PROJECTS_COLLECTION, {
+          orderBy: 'name',
+        });
         expect(result).to.be.an('array');
         expect(result[0]).to.have.property('name', secondProject.name);
       });
@@ -193,14 +162,9 @@ describe('tasks', () => {
         const secondProjectId = 'some';
         const secondProject = { name: 'zzzzz' };
         await projectsFirestoreRef.doc(secondProjectId).set(secondProject);
-        const result = await tasks.callFirestore(
-          adminApp,
-          'get',
-          PROJECTS_COLLECTION,
-          {
-            orderBy: ['name', 'desc'],
-          },
-        );
+        const result = await tasks.callFirestore('get', PROJECTS_COLLECTION, {
+          orderBy: ['name', 'desc'],
+        });
         expect(result).to.be.an('array');
         expect(result[0]).to.have.property('id', secondProjectId);
         expect(result[0]).to.have.property('name', secondProject.name);
@@ -209,13 +173,7 @@ describe('tasks', () => {
 
     describe('set action', () => {
       it('sets a document', async () => {
-        await tasks.callFirestore(
-          adminApp,
-          'set',
-          PROJECT_PATH,
-          {},
-          testProject,
-        );
+        await tasks.callFirestore('set', PROJECT_PATH, {}, testProject);
         const resultSnap = await projectFirestoreRef.get();
         expect(resultSnap.data()).to.have.property('name', testProject.name);
       });
@@ -223,7 +181,6 @@ describe('tasks', () => {
       it('sets a document with merge', async () => {
         const extraVal = { some: 'other' };
         await tasks.callFirestore(
-          adminApp,
           'set',
           PROJECT_PATH,
           { merge: true },
@@ -238,7 +195,6 @@ describe('tasks', () => {
       it('sets a document with null data', async () => {
         const extraVal = { some: 'other', another: null };
         await tasks.callFirestore(
-          adminApp,
           'set',
           PROJECT_PATH,
           { merge: true },
@@ -275,7 +231,6 @@ describe('tasks', () => {
           };
 
           await tasks.callFirestore(
-            adminApp,
             'set',
             PROJECT_PATH,
             { statics: admin.firestore },
@@ -297,7 +252,6 @@ describe('tasks', () => {
           };
 
           await tasks.callFirestore(
-            adminApp,
             'set',
             PROJECT_PATH,
             { statics: admin.firestore },
@@ -319,7 +273,6 @@ describe('tasks', () => {
           };
 
           await tasks.callFirestore(
-            adminApp,
             'set',
             PROJECT_PATH,
             { statics: admin.firestore },
@@ -338,7 +291,6 @@ describe('tasks', () => {
           const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
 
           await tasks.callFirestore(
-            adminApp,
             'set',
             PROJECT_PATH,
             { statics: admin.firestore },
@@ -361,7 +313,6 @@ describe('tasks', () => {
         await projectFirestoreRef.set(testProject);
         await projectsFirestoreRef.add({ some: 'other' });
         await tasks.callFirestore(
-          adminApp,
           'update',
           PROJECT_PATH,
           {},
@@ -395,7 +346,6 @@ describe('tasks', () => {
           };
 
           await tasks.callFirestore(
-            adminApp,
             'update',
             PROJECT_PATH,
             { statics: admin.firestore },
@@ -425,7 +375,6 @@ describe('tasks', () => {
           };
 
           await tasks.callFirestore(
-            adminApp,
             'update',
             PROJECT_PATH,
             { statics: admin.firestore },
@@ -453,7 +402,7 @@ describe('tasks', () => {
         await projectFirestoreRef.set(testProject);
         await projectsFirestoreRef.doc('some').set(testProject);
         // Run delete on collection
-        await tasks.callFirestore(adminApp, 'delete', PROJECTS_COLLECTION);
+        await tasks.callFirestore('delete', PROJECTS_COLLECTION);
         const result = await projectsFirestoreRef.get();
         // Confirm projects collection is empty
         expect(result.size).to.equal(0);
@@ -467,7 +416,7 @@ describe('tasks', () => {
         await projectToDeleteRef.set(projectToDelete);
         await projectsFirestoreRef.doc('some').set(testProject);
         // Run delete on projects with name matching testProject's name
-        await tasks.callFirestore(adminApp, 'delete', PROJECTS_COLLECTION, {
+        await tasks.callFirestore('delete', PROJECTS_COLLECTION, {
           where: ['name', '==', projectToDelete.name],
         });
         const result = await projectToDeleteRef.get();
@@ -479,7 +428,7 @@ describe('tasks', () => {
         // Add a project document
         await projectFirestoreRef.set(testProject);
         // Run delete on project document
-        await tasks.callFirestore(adminApp, 'delete', PROJECT_PATH);
+        await tasks.callFirestore('delete', PROJECT_PATH);
         // Run delete on collection
         const result = await projectFirestoreRef.get();
         // Confirm project is deleted
@@ -493,7 +442,7 @@ describe('tasks', () => {
       it('throws an error if actionPath is missing', async () => {
         await adminApp.database().ref(PROJECT_PATH).set(testProject);
         try {
-          await tasks.callRtdb(adminApp, 'get', '');
+          await tasks.callRtdb('get', '');
         } catch (err) {
           expect(err).to.have.property(
             'message',
@@ -504,13 +453,13 @@ describe('tasks', () => {
 
       it('gets whole DB when passed "/" as action path', async () => {
         await adminApp.database().ref(PROJECT_PATH).set(testProject);
-        const result = await tasks.callRtdb(adminApp, 'get', '/');
+        const result = await tasks.callRtdb('get', '/');
         expect(result).to.be.an('object');
       });
 
       it('gets a list of objects', async () => {
         await adminApp.database().ref(PROJECT_PATH).set(testProject);
-        const result = await tasks.callRtdb(adminApp, 'get', 'projects');
+        const result = await tasks.callRtdb('get', 'projects');
         expect(result).to.be.an('object');
         expect(result).to.have.nested.property(
           `${PROJECT_ID}.name`,
@@ -519,32 +468,27 @@ describe('tasks', () => {
       });
 
       it('returns null for an empty top level path', async () => {
-        const result = await tasks.callRtdb(adminApp, 'get', 'asdf');
+        const result = await tasks.callRtdb('get', 'asdf');
         expect(result).to.equal(null);
       });
 
       it('gets a single object value', async () => {
         await adminApp.database().ref(PROJECT_PATH).set(testProject);
-        const result = await tasks.callRtdb(adminApp, 'get', PROJECT_PATH);
+        const result = await tasks.callRtdb('get', PROJECT_PATH);
         expect(result).to.have.property('name', testProject.name);
       });
 
       it('returns null for an empty deeper path', async () => {
-        const result = await tasks.callRtdb(adminApp, 'get', 'some/doc');
+        const result = await tasks.callRtdb('get', 'some/doc');
         expect(result).to.equal(null);
       });
 
       it('supports orderByChild with equalTo', async () => {
         await adminApp.database().ref(PROJECT_PATH).set(testProject);
-        const result = await tasks.callRtdb(
-          adminApp,
-          'get',
-          PROJECTS_COLLECTION,
-          {
-            orderByChild: 'name',
-            equalTo: testProject.name,
-          },
-        );
+        const result = await tasks.callRtdb('get', PROJECTS_COLLECTION, {
+          orderByChild: 'name',
+          equalTo: testProject.name,
+        });
         expect(result).to.be.an('object');
         expect(result).to.have.keys(PROJECT_ID);
         expect(result).to.have.nested.property(
@@ -556,7 +500,7 @@ describe('tasks', () => {
 
     describe('set action', () => {
       it('sets an object', async () => {
-        await tasks.callRtdb(adminApp, 'set', PROJECT_PATH, {}, testProject);
+        await tasks.callRtdb('set', PROJECT_PATH, {}, testProject);
         const result = await adminApp
           .database()
           .ref(PROJECT_PATH)
@@ -566,7 +510,7 @@ describe('tasks', () => {
       });
 
       it('sets a boolean value', async () => {
-        await tasks.callRtdb(adminApp, 'set', `${PROJECT_PATH}/some`, {}, true);
+        await tasks.callRtdb('set', `${PROJECT_PATH}/some`, {}, true);
         const result = await adminApp
           .database()
           .ref(`${PROJECT_PATH}/some`)
@@ -576,13 +520,7 @@ describe('tasks', () => {
 
       it('sets a string value', async () => {
         const testString = 'testing';
-        await tasks.callRtdb(
-          adminApp,
-          'set',
-          `${PROJECT_PATH}/some`,
-          {},
-          testString,
-        );
+        await tasks.callRtdb('set', `${PROJECT_PATH}/some`, {}, testString);
         const result = await adminApp
           .database()
           .ref(`${PROJECT_PATH}/some`)
@@ -594,7 +532,6 @@ describe('tasks', () => {
     describe('push action', () => {
       it('sets an object', async () => {
         const pushKey = await tasks.callRtdb(
-          adminApp,
           'push',
           PROJECT_PATH,
           {},
