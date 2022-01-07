@@ -9,7 +9,7 @@ updates:
       prefix-development: chore
       include: scope
     ignore:
-    # Locked to match current Node version 16
+    # Locked to match lowest supported Node Version (12)
     - dependency-name: '@types/node'
       update-types: ['version-update:semver-major']
   - package-ecosystem: "github-actions"
@@ -17,5 +17,5 @@ updates:
     schedule:
       interval: "weekly"
     commit-message:
-      prefix: fix
+      prefix: chore
       include: scope
