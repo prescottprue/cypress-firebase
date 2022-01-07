@@ -1,6 +1,6 @@
 {
   "name": "cypress-firebase",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib/index.js",
@@ -35,7 +35,7 @@
     "@tsconfig/node12": "^1.0.9",
     "@types/chai": "^4.2.22",
     "@types/mocha": "^9.0.0",
-    "@types/node": "^16.11.10",
+    "@types/node": "^16.11.19",
     "@types/sinon-chai": "^3.2.6",
     "@typescript-eslint/eslint-plugin": "^5.4.0",
     "@typescript-eslint/parser": "^5.4.0",

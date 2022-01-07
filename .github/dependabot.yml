@@ -8,6 +8,10 @@ updates:
       prefix: fix
       prefix-development: chore
       include: scope
+    ignore:
+    # Locked to match current Node version 16
+    - dependency-name: '@types/node'
+      update-types: ['version-update:semver-major']
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
