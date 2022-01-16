@@ -15,13 +15,13 @@ jobs:
         node-version: [12.x, 14.x, 16.x]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2.4.0
+        uses: actions/checkout@v2
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2.5.1
+        uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
+          cache: "yarn"
 
       - name: Get cache settings
         id: cache-settings
@@ -29,7 +29,7 @@ jobs:
           echo "::set-output name=firebase-tools::$(yarn list -s --depth=0 --pattern firebase-tools | tail -n 1 | sed 's/.*@//g')"
 
       - name: Cache Firebase Emulator Binaries
-        uses: actions/cache@v2.1.7
+        uses: actions/cache@v2
         with:
           path: ~/.cache/firebase/emulators
           key: ${{ runner.os }}-${{ matrix.node-version }}-firebase-${{ steps.cache-settings.outputs.firebase-tools }}
@@ -42,6 +42,11 @@ jobs:
 
       - name: Run Unit Tests + Coverage
         run: yarn test:cov
+
+      - name: Upload Test Coverage
+        uses: codecov/codecov-action@v2
+        with:
+          fail_ci_if_error: false
 
       - name: Run Build
         run: yarn build
@@ -56,8 +61,3 @@ jobs:
 
       - name: Size Check
         run: $(yarn bin)/size-limit
-
-      - name: Upload Test Coverage
-        uses: codecov/codecov-action@v2.1.0
-        with:
-          fail_ci_if_error: false
