@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "yarn"
+          cache: 'yarn'
 
       - name: Get cache settings
         id: cache-settings
@@ -45,7 +45,7 @@ jobs:
 
       - name: Upload Test Coverage
         uses: codecov/codecov-action@v2
-        if: matrix.node-version == "14.x"
+        if: matrix.node-version == '14.x'
         with:
           fail_ci_if_error: false
 
