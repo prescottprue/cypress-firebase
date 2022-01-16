@@ -13,7 +13,7 @@
     "build:esm": "tsc -m es6 --outDir lib-esm",
     "watch": "yarn build:lib --watch",
     "watch:es": "yarn build:esm --watch",
-    "lint": "eslint src/**.ts --ext .ts",
+    "lint": "eslint . --ext .js,.ts",
     "lint:fix": "yarn lint --fix",
     "test:base": "mocha ./test/unit/**/*.spec.ts",
     "test:cov:base": "nyc --reporter=lcov --reporter=html yarn test:base",
