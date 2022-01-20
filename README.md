@@ -38,6 +38,8 @@ If you are interested in what drove the need for this checkout [the why section]
 1. Save the downloaded file as `serviceAccount.json` in the root of your project (make sure that it is .gitignored) - needed for `firebase-admin` to have read/write access to your DB from within your tests
 1. Add the following your custom commands file (`cypress/support/commands.js`):
 
+ With [Firebase Web SDK versions up to 8](https://firebase.google.com/docs/web/modular-upgrade)
+
    ```js
    import firebase from "firebase/app";
    import "firebase/auth";
