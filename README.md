@@ -466,6 +466,9 @@ describe("Test firestore", () => {
 
 1. Make sure you also have init logic in `cypress/support/commands.js` or `cypress/support/index.js`:
 
+With [Firebase Web SDK versions up to 8](https://firebase.google.com/docs/web/modular-upgrade)
+
+
    ```js
    import firebase from "firebase/app";
    import "firebase/auth";
