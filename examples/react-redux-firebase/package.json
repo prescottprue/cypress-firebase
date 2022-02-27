@@ -22,11 +22,11 @@
     "redux": "^4.0.1"
   },
   "devDependencies": {
-    "cross-env": "^7.0.2",
-    "cypress": "^4.11.0",
+    "cross-env": "7.0.2",
+    "cypress": "4.11.0",
     "cypress-firebase": "*",
-    "eslint-plugin-cypress": "^2.11.1",
-    "firebase-tools": "^8.6.0",
+    "eslint-plugin-cypress": "2.11.1",
+    "firebase-tools": "8.6.0",
     "react-scripts": "3.4.1"
   },
   "eslintConfig": {
