@@ -27,7 +27,7 @@
     "cypress-firebase": "*",
     "eslint-plugin-cypress": "2.11.1",
     "firebase-tools": "8.6.0",
-    "react-scripts": "3.4.1"
+    "react-scripts": "3.4.4"
   },
   "eslintConfig": {
     "extends": "react-app"
