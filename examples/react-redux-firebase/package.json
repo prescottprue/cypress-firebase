@@ -16,7 +16,7 @@
     "firebase": "^7.14.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-redux": "^5.0.7",
+    "react-redux": "^7.0.0",
     "react-redux-firebase": "^2.1.8",
     "recompose": "^0.30.0",
     "redux": "^4.0.1"
