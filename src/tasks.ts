@@ -125,12 +125,16 @@ function getDataWithTimestampsAndGeoPoints(
       };
     }
     const value = Array.isArray(currData)
-      ? currData.map((dataItem) =>
-          convertValueToTimestampOrGeoPointIfPossible(
+      ? currData.map((dataItem) => {
+          const result = convertValueToTimestampOrGeoPointIfPossible(
             dataItem,
             firestoreStatics,
-          ),
-        )
+          );
+
+          return result.constructor === Object
+            ? getDataWithTimestampsAndGeoPoints(result, firestoreStatics)
+            : result;
+        })
       : convertValueToTimestampOrGeoPointIfPossible(currData, firestoreStatics);
 
     return {
