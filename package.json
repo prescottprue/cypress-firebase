@@ -59,7 +59,7 @@
     "nyc": "15.1.0",
     "prettier": "2.5.1",
     "rimraf": "3.0.2",
-    "sinon": "13.0.1",
+    "sinon": "13.0.2",
     "sinon-chai": "3.7.0",
     "size-limit": "7.0.3",
     "ts-node": "10.7.0",
