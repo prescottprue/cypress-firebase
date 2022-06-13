@@ -34,7 +34,7 @@
     "@istanbuljs/nyc-config-typescript": "1.0.2",
     "@size-limit/preset-small-lib": "7.0.3",
     "@size-limit/webpack": "7.0.3",
-    "@tsconfig/node12": "1.0.9",
+    "@tsconfig/node12": "1.0.10",
     "@types/chai": "4.3.1",
     "@types/mocha": "9.1.0",
     "@types/node": "12.20.48",
