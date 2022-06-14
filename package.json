@@ -52,7 +52,7 @@
     "eslint-plugin-jsx-a11y": "6.5.1",
     "eslint-plugin-prettier": "4.0.0",
     "firebase-admin": "10.3.0",
-    "firebase-tools": "10.6.0",
+    "firebase-tools": "10.9.2",
     "husky": "7.0.4",
     "lint-staged": "12.3.8",
     "mocha": "9.2.2",
