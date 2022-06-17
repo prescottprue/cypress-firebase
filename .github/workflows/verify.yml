@@ -44,7 +44,7 @@ jobs:
         run: yarn test:cov
 
       - name: Upload Test Coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         if: matrix.node-version == '14.x'
         with:
           fail_ci_if_error: false
