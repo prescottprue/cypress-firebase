@@ -26,8 +26,32 @@ If you are interested in what drove the need for this checkout [the why section]
 ### Pre-Setup
 
 1. If you do not already have it installed, install Cypress and add it to your package file: `npm i --save-dev cypress` or `yarn add -D cypress`
-1. Make sure you have a `cypress` folder containing Cypress tests (or create one by calling `cypress open`)
-1. Set the following config in your `cypress.config.js`
+1. Make sure you have a `cypress` folder containing Cypress tests
+
+### Setup
+
+1. Set the following config in your `cypress.config.js` or `cypress.config.ts`
+
+   ```js
+   import admin from 'firebase-admin';
+   import { defineConfig } from 'cypress';
+   import { plugin as cypressFirebasePlugin } from 'cypress-firebase';
+
+   const cypressConfig = defineConfig({
+     e2e: {
+       baseUrl: 'http://localhost:3000',
+       supportFile: 'cypress/support/e2e/index.js',
+       setupNodeEvents(on, config) {
+         cypressFirebasePlugin(on, config, admin);
+         // e2e testing node events setup code
+       },
+     },
+   });
+
+   export default cypressConfig;
+   ```
+
+   or if you are not using TS, then within `cypress.config.js`:
 
    ```js
    const { defineConfig } = require('cypress');
@@ -46,7 +70,7 @@ If you are interested in what drove the need for this checkout [the why section]
    });
    ```
 
-1. Add the following your custom commands file (`cypress/support/e2e/commands.js`):
+1. Add the following your custom commands file (`cypress/support/e2e.js` or `cypress/support/e2e.ts`):
 
    ```js
    import firebase from 'firebase/app';
@@ -80,117 +104,9 @@ If you are interested in what drove the need for this checkout [the why section]
    firebase.initializeApp(fbConfig);
 
    attachCustomCommands({ Cypress, cy, firebase });
-   ```
-
-1. Make sure that you load the custom commands file in an `cypress/support/e2e/index.js` like so:
-
-   ```js
-   import './commands';
    ```
 
 1. To confirm things are working, create a new test file (`cypress/integration/examples/test_hello_world.cy.js`) adding a test that uses the cypress-firebase custom command (`cy.callFirestore`):
-
-   ```js
-   describe('Some Test', () => {
-     it('Adds document to test_hello_world collection of Firestore', () => {
-       cy.callFirestore('add', 'test_hello_world', { some: 'value' });
-     });
-   });
-   ```
-
-1. From the root of your project, start Cypress with the command `$(npm bin)/cypress open`. In the Cypress window, click your new test (`test_hello_world.js`) to run it.
-1. Look in your Firestore instance and see the `test_hello_world` collection to confirm that a document was added.
-1. Pat yourself on the back, you are all setup to access Firebase/Firestore from within your tests!
-
-### Setup
-
-**Cypress v10**
-
-1. Install `cypress-firebase` and [`firebase-admin`](https://www.npmjs.org/package/firebase-admin) both: `yarn add -D cypress-firebase firebase-admin` or `npm i --save-dev cypress-firebase firebase-admin`
-
-**Cypress <v9**
-
-**Note:** These instructions assume your tests are in the `cypress` folder (cypress' default). See the [folders section below](#folders) for more info about other supported folders.
-
-1. Install `cypress-firebase` and [`firebase-admin`](https://www.npmjs.org/package/firebase-admin) both: `yarn add -D cypress-firebase firebase-admin@9` or `npm i --save-dev cypress-firebase firebase-admin@9` (**NOTE**: `firebase-admin` v10 modules is not yet supported, but is in the works)
-1. Go to project setting on firebase console and generate new private key. See how to do so [in the Google Docs](https://sites.google.com/site/scriptsexamples/new-connectors-to-google-services/firebase/tutorials/authenticate-with-a-service-account).
-1. Add `serviceAccount.json` to your `.gitignore` (THIS IS VERY IMPORTANT TO KEEPING YOUR INFORMATION SECURE!)
-1. Save the downloaded file as `serviceAccount.json` in the root of your project (make sure that it is .gitignored) - needed for `firebase-admin` to have read/write access to your DB from within your tests
-1. Add the following your custom commands file (`cypress/support/commands.js`):
-
-   ```js
-   import firebase from 'firebase/app';
-   import 'firebase/auth';
-   import 'firebase/database';
-   import 'firebase/firestore';
-   import { attachCustomCommands } from 'cypress-firebase';
-
-   const fbConfig = {
-     // Your config from Firebase Console
-   };
-
-   firebase.initializeApp(fbConfig);
-
-   attachCustomCommands({ Cypress, cy, firebase });
-   ```
-
-   With [Firebase Web SDK version 9](https://firebase.google.com/docs/web/modular-upgrade)
-
-   ```js
-   import firebase from 'firebase/compat/app';
-   import 'firebase/compat/auth';
-   import 'firebase/compat/database';
-   import 'firebase/compat/firestore';
-   import { attachCustomCommands } from 'cypress-firebase';
-
-   const fbConfig = {
-     // Your config from Firebase Console
-   };
-
-   firebase.initializeApp(fbConfig);
-
-   attachCustomCommands({ Cypress, cy, firebase });
-   ```
-
-1. Make sure that you load the custom commands file in an `cypress/support/index.js` like so:
-
-   ```js
-   import './commands';
-   ```
-
-   **NOTE**: This is a pattern which is setup by default by Cypress, so this file may already exist
-
-1. Setup plugin adding following your plugins file (`cypress/plugins/index.js`):
-
-   ```js
-   const admin = require('firebase-admin');
-   const cypressFirebasePlugin = require('cypress-firebase').plugin;
-
-   module.exports = (on, config) => {
-     const extendedConfig = cypressFirebasePlugin(on, config, admin);
-
-     // Add other plugins/tasks such as code coverage here
-
-     return extendedConfig;
-   };
-   ```
-
-   With Typescript
-
-   ```ts
-   import admin from 'firebase-admin';
-   import { plugin as cypressFirebasePlugin } from 'cypress-firebase';
-
-   module.exports = (
-     on: Cypress.PluginEvents,
-     config: Cypress.PluginConfigOptions,
-   ) => {
-     const extendedConfig = cypressFirebasePlugin(on, config, admin);
-     return extendedConfig;
-   };
-   ```
-
-1. To confirm things are working, create a new test file (`cypress/integration/examples/test_hello_world.js`) adding a test that uses the cypress-firebase custom command (`cy.callFirestore`):
 
    ```js
    describe('Some Test', () => {
