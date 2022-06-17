@@ -26,24 +26,58 @@ If you are interested in what drove the need for this checkout [the why section]
 ### Pre-Setup
 
 1. If you do not already have it installed, install Cypress and add it to your package file: `npm i --save-dev cypress` or `yarn add -D cypress`
-1. Make sure you have a `cypress` folder containing Cypress tests (or create one by calling `cypress open`)
+1. Make sure you have a `cypress` folder containing Cypress tests
 
 ### Setup
 
-**Note:** These instructions assume your tests are in the `cypress` folder (cypress' default). See the [folders section below](#folders) for more info about other supported folders.
-
-1. Install `cypress-firebase` and [`firebase-admin`](https://www.npmjs.org/package/firebase-admin) both: `yarn add -D cypress-firebase firebase-admin@9` or `npm i --save-dev cypress-firebase firebase-admin@9` (**NOTE**: `firebase-admin` v10 modules is not yet supported, but is in the works)
-1. Go to project setting on firebase console and generate new private key. See how to do so [in the Google Docs](https://sites.google.com/site/scriptsexamples/new-connectors-to-google-services/firebase/tutorials/authenticate-with-a-service-account).
-1. Add `serviceAccount.json` to your `.gitignore` (THIS IS VERY IMPORTANT TO KEEPING YOUR INFORMATION SECURE!)
-1. Save the downloaded file as `serviceAccount.json` in the root of your project (make sure that it is .gitignored) - needed for `firebase-admin` to have read/write access to your DB from within your tests
-1. Add the following your custom commands file (`cypress/support/commands.js`):
+1. Set the following config in your `cypress.config.js` or `cypress.config.ts`
 
    ```js
-   import firebase from "firebase/app";
-   import "firebase/auth";
-   import "firebase/database";
-   import "firebase/firestore";
-   import { attachCustomCommands } from "cypress-firebase";
+   import admin from 'firebase-admin';
+   import { defineConfig } from 'cypress';
+   import { plugin as cypressFirebasePlugin } from 'cypress-firebase';
+
+   const cypressConfig = defineConfig({
+     e2e: {
+       baseUrl: 'http://localhost:3000',
+       supportFile: 'cypress/support/e2e/index.js',
+       setupNodeEvents(on, config) {
+         cypressFirebasePlugin(on, config, admin);
+         // e2e testing node events setup code
+       },
+     },
+   });
+
+   export default cypressConfig;
+   ```
+
+   or if you are not using TS, then within `cypress.config.js`:
+
+   ```js
+   const { defineConfig } = require('cypress');
+   const cypressFirebasePlugin = require('cypress-firebase').plugin;
+   const admin = require('firebase-admin');
+
+   module.exports = defineConfig({
+     e2e: {
+       baseUrl: 'http://localhost:3000',
+       supportFile: 'cypress/support/e2e/index.js',
+       setupNodeEvents(on, config) {
+         cypressFirebasePlugin(on, config, admin);
+         // e2e testing node events setup code
+       },
+     },
+   });
+   ```
+
+1. Add the following your custom commands file (`cypress/support/e2e.js` or `cypress/support/e2e.ts`):
+
+   ```js
+   import firebase from 'firebase/app';
+   import 'firebase/auth';
+   import 'firebase/database';
+   import 'firebase/firestore';
+   import { attachCustomCommands } from 'cypress-firebase';
 
    const fbConfig = {
      // Your config from Firebase Console
@@ -57,11 +91,11 @@ If you are interested in what drove the need for this checkout [the why section]
    With [Firebase Web SDK version 9](https://firebase.google.com/docs/web/modular-upgrade)
 
    ```js
-   import firebase from "firebase/compat/app";
-   import "firebase/compat/auth";
-   import "firebase/compat/database";
-   import "firebase/compat/firestore";
-   import { attachCustomCommands } from "cypress-firebase";
+   import firebase from 'firebase/compat/app';
+   import 'firebase/compat/auth';
+   import 'firebase/compat/database';
+   import 'firebase/compat/firestore';
+   import { attachCustomCommands } from 'cypress-firebase';
 
    const fbConfig = {
      // Your config from Firebase Console
@@ -72,50 +106,12 @@ If you are interested in what drove the need for this checkout [the why section]
    attachCustomCommands({ Cypress, cy, firebase });
    ```
 
-1. Make sure that you load the custom commands file in an `cypress/support/index.js` like so:
+1. To confirm things are working, create a new test file (`cypress/integration/examples/test_hello_world.cy.js`) adding a test that uses the cypress-firebase custom command (`cy.callFirestore`):
 
    ```js
-   import "./commands";
-   ```
-
-   **NOTE**: This is a pattern which is setup by default by Cypress, so this file may already exist
-
-1. Setup plugin adding following your plugins file (`cypress/plugins/index.js`):
-
-   ```js
-   const admin = require("firebase-admin");
-   const cypressFirebasePlugin = require("cypress-firebase").plugin;
-
-   module.exports = (on, config) => {
-     const extendedConfig = cypressFirebasePlugin(on, config, admin);
-
-     // Add other plugins/tasks such as code coverage here
-
-     return extendedConfig;
-   };
-   ```
-
-   With Typescript
-
-   ```ts
-   import admin from "firebase-admin";
-   import { plugin as cypressFirebasePlugin } from "cypress-firebase";
-
-   module.exports = (
-     on: Cypress.PluginEvents,
-     config: Cypress.PluginConfigOptions
-   ) => {
-     const extendedConfig = cypressFirebasePlugin(on, config, admin);
-     return extendedConfig;
-   };
-   ```
-
-1. To confirm things are working, create a new test file (`cypress/integration/examples/test_hello_world.js`) adding a test that uses the cypress-firebase custom command (`cy.callFirestore`):
-
-   ```js
-   describe("Some Test", () => {
-     it("Adds document to test_hello_world collection of Firestore", () => {
-       cy.callFirestore("add", "test_hello_world", { some: "value" });
+   describe('Some Test', () => {
+     it('Adds document to test_hello_world collection of Firestore', () => {
+       cy.callFirestore('add', 'test_hello_world', { some: 'value' });
      });
    });
    ```
@@ -157,7 +153,7 @@ If you are interested in what drove the need for this checkout [the why section]
 When using a custom app name or running more than one firebase instance in your app:
 
 ```js
-const namedApp = firebase.initializeApp(fbConfig, "app_name");
+const namedApp = firebase.initializeApp(fbConfig, 'app_name');
 
 attachCustomCommands({ Cypress, cy, firebase, app: namedApp });
 ```
@@ -196,15 +192,15 @@ cy.login();
 Passing a UID
 
 ```javascript
-const uid = "123SomeUid";
+const uid = '123SomeUid';
 cy.login(uid);
 ```
 
 Passing a tenant ID
 
 ```javascript
-const uid = "123SomeUid";
-const tenantId = "123SomeTenantId";
+const uid = '123SomeUid';
+const tenantId = '123SomeTenantId';
 cy.login(uid, undefined, tenantId);
 ```
 
@@ -241,70 +237,70 @@ Call Real Time Database path with some specified action such as `set`, `update` 
 _Set data_
 
 ```javascript
-const fakeProject = { some: "data" };
-cy.callRtdb("set", "projects/ABC123", fakeProject);
+const fakeProject = { some: 'data' };
+cy.callRtdb('set', 'projects/ABC123', fakeProject);
 ```
 
 _Set Data With Meta_
 
 ```javascript
-const fakeProject = { some: "data" };
+const fakeProject = { some: 'data' };
 // Adds createdAt and createdBy (current user's uid) on data
-cy.callRtdb("set", "projects/ABC123", fakeProject, { withMeta: true });
+cy.callRtdb('set', 'projects/ABC123', fakeProject, { withMeta: true });
 ```
 
 _Set Data With Timestamps_
 
 ```javascript
-import firebase from "firebase/app";
-import "firebase/database";
+import firebase from 'firebase/app';
+import 'firebase/database';
 
 const fakeProject = {
-  some: "data",
+  some: 'data',
   createdAt: firebase.database.ServerValue.TIMESTAMP,
 };
-cy.callRtdb("set", "projects/ABC123", fakeProject);
+cy.callRtdb('set', 'projects/ABC123', fakeProject);
 ```
 
 With [Firebase Web SDK version 9](https://firebase.google.com/docs/web/modular-upgrade)
 
 ```javascript
-import firebase from "firebase/compat/app";
-import "firebase/compat/database";
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/database';
 
 const fakeProject = {
-  some: "data",
+  some: 'data',
   createdAt: firebase.database.ServerValue.TIMESTAMP,
 };
-cy.callRtdb("set", "projects/ABC123", fakeProject);
+cy.callRtdb('set', 'projects/ABC123', fakeProject);
 ```
 
 _Delete Data_
 
 ```javascript
 // Delete document
-cy.callRtdb("delete", "projects/ABC123");
+cy.callRtdb('delete', 'projects/ABC123');
 // Delete filtered collection
-cy.callRtdb("delete", "projects", { where: ["name", "==", "Test Project"] });
+cy.callRtdb('delete', 'projects', { where: ['name', '==', 'Test Project'] });
 // Delete whole collection - BE CAREFUL!!
-cy.callRtdb("delete", "projectsToDelete");
+cy.callRtdb('delete', 'projectsToDelete');
 ```
 
 _Get/Verify Data_
 
 ```javascript
-cy.callRtdb("get", "projects/ABC123").then((project) => {
+cy.callRtdb('get', 'projects/ABC123').then((project) => {
   // Confirm new data has users uid
-  cy.wrap(project).its("createdBy").should("equal", Cypress.env("TEST_UID"));
+  cy.wrap(project).its('createdBy').should('equal', Cypress.env('TEST_UID'));
 });
 ```
 
 _Other Args_
 
 ```javascript
-const opts = { args: ["-d"] };
-const fakeProject = { some: "data" };
-cy.callRtdb("update", "project/test-project", fakeProject, opts);
+const opts = { args: ['-d'] };
+const fakeProject = { some: 'data' };
+cy.callRtdb('update', 'project/test-project', fakeProject, opts);
 ```
 
 #### cy.callFirestore
@@ -333,65 +329,65 @@ level.
 _Basic_
 
 ```javascript
-cy.callFirestore("set", "project/test-project", "fakeProject.json");
+cy.callFirestore('set', 'project/test-project', 'fakeProject.json');
 ```
 
 _Set Data With Server Timestamps_
 
 ```javascript
-import firebase from "firebase/app";
-import "firebase/firestore";
+import firebase from 'firebase/app';
+import 'firebase/firestore';
 
 const fakeProject = {
-  some: "data",
+  some: 'data',
   // Use new firebase.firestore.Timestamp.now in place of serverTimestamp()
   createdAt: firebase.firestore.Timestamp.now(),
   // Or use fromDate if you would like to specify a date
   // createdAt: firebase.firestore.Timestamp.fromDate(new Date())
 };
-cy.callFirestore("set", "projects/ABC123", fakeProject);
+cy.callFirestore('set', 'projects/ABC123', fakeProject);
 ```
 
 With [Firebase Web SDK version 9](https://firebase.google.com/docs/web/modular-upgrade)
 
 ```javascript
-import firebase from "firebase/compat/app";
-import "firebase/compat/firestore";
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 
 const fakeProject = {
-  some: "data",
+  some: 'data',
   // Use new firebase.firestore.Timestamp.now in place of serverTimestamp()
   createdAt: firebase.firestore.Timestamp.now(),
   // Or use fromDate if you would like to specify a date
   // createdAt: firebase.firestore.Timestamp.fromDate(new Date())
 };
-cy.callFirestore("set", "projects/ABC123", fakeProject);
+cy.callFirestore('set', 'projects/ABC123', fakeProject);
 ```
 
 _Full_
 
 ```javascript
-describe("Test firestore", () => {
-  const TEST_UID = Cypress.env("TEST_UID");
+describe('Test firestore', () => {
+  const TEST_UID = Cypress.env('TEST_UID');
   const mockAge = 8;
 
   beforeEach(() => {
-    cy.visit("/");
-    cy.callFirestore("delete", "testCollection");
+    cy.visit('/');
+    cy.callFirestore('delete', 'testCollection');
   });
 
-  it("read/write test", () => {
-    cy.log("Starting test");
+  it('read/write test', () => {
+    cy.log('Starting test');
 
-    cy.callFirestore("set", `testCollection/${TEST_UID}`, {
-      name: "axa",
+    cy.callFirestore('set', `testCollection/${TEST_UID}`, {
+      name: 'axa',
       age: 8,
     });
-    cy.callFirestore("get", `testCollection/${TEST_UID}`).then((r) => {
-      cy.log("get returned: ", r);
-      cy.wrap(r).its("data.age").should("equal", mockAge);
+    cy.callFirestore('get', `testCollection/${TEST_UID}`).then((r) => {
+      cy.log('get returned: ', r);
+      cy.wrap(r).its('data.age').should('equal', mockAge);
     });
-    cy.log("Ended test");
+    cy.log('Ended test');
   });
 });
 ```
@@ -429,7 +425,7 @@ describe("Test firestore", () => {
 1. Modify your application code to connect to the emulators (where your code calls `firebase.initializeApp(...)`), updating the localhost ports as appropriate from the `emulators` values in the previous step:
 
    ```js
-   const shouldUseEmulator = window.location.hostname === "localhost"; // or other logic to determine when to use
+   const shouldUseEmulator = window.location.hostname === 'localhost'; // or other logic to determine when to use
    // Emulate RTDB
    if (shouldUseEmulator) {
      fbConfig.databaseURL = `http://localhost:9000?ns=${fbConfig.projectId}`;
@@ -448,7 +444,7 @@ describe("Test firestore", () => {
 
    // Emulate Firestore
    if (shouldUseEmulator) {
-     firestoreSettings.host = "localhost:8080";
+     firestoreSettings.host = 'localhost:8080';
      firestoreSettings.ssl = false;
      console.debug(`Using Firestore emulator: ${firestoreSettings.host}`);
 
@@ -465,18 +461,18 @@ describe("Test firestore", () => {
 1. Make sure you also have init logic in `cypress/support/commands.js` or `cypress/support/index.js`:
 
    ```js
-   import firebase from "firebase/app";
-   import "firebase/auth";
-   import "firebase/database";
-   import "firebase/firestore";
-   import { attachCustomCommands } from "cypress-firebase";
+   import firebase from 'firebase/app';
+   import 'firebase/auth';
+   import 'firebase/database';
+   import 'firebase/firestore';
+   import { attachCustomCommands } from 'cypress-firebase';
 
    const fbConfig = {
      // Your Firebase Config
    };
 
    // Emulate RTDB if Env variable is passed
-   const rtdbEmulatorHost = Cypress.env("FIREBASE_DATABASE_EMULATOR_HOST");
+   const rtdbEmulatorHost = Cypress.env('FIREBASE_DATABASE_EMULATOR_HOST');
    if (rtdbEmulatorHost) {
      fbConfig.databaseURL = `http://${rtdbEmulatorHost}?ns=${fbConfig.projectId}`;
    }
@@ -484,7 +480,7 @@ describe("Test firestore", () => {
    firebase.initializeApp(fbConfig);
 
    // Emulate Firestore if Env variable is passed
-   const firestoreEmulatorHost = Cypress.env("FIRESTORE_EMULATOR_HOST");
+   const firestoreEmulatorHost = Cypress.env('FIRESTORE_EMULATOR_HOST');
    if (firestoreEmulatorHost) {
      firebase.firestore().settings({
        host: firestoreEmulatorHost,
@@ -492,7 +488,7 @@ describe("Test firestore", () => {
      });
    }
 
-   const authEmulatorHost = Cypress.env("FIREBASE_AUTH_EMULATOR_HOST");
+   const authEmulatorHost = Cypress.env('FIREBASE_AUTH_EMULATOR_HOST');
    if (authEmulatorHost) {
      firebase.auth().useEmulator(`http://${authEmulatorHost}/`);
      console.debug(`Using Auth emulator: http://${authEmulatorHost}/`);
@@ -504,18 +500,18 @@ describe("Test firestore", () => {
 With [Firebase Web SDK version 9](https://firebase.google.com/docs/web/modular-upgrade) in compat mode (same API as v8 with different import)
 
 ```js
-import firebase from "firebase/compat/app";
-import "firebase/compat/auth";
-import "firebase/compat/database";
-import "firebase/compat/firestore";
-import { attachCustomCommands } from "cypress-firebase";
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/database';
+import 'firebase/compat/firestore';
+import { attachCustomCommands } from 'cypress-firebase';
 
 const fbConfig = {
   // Your Firebase Config
 };
 
 // Emulate RTDB if Env variable is passed
-const rtdbEmulatorHost = Cypress.env("FIREBASE_DATABASE_EMULATOR_HOST");
+const rtdbEmulatorHost = Cypress.env('FIREBASE_DATABASE_EMULATOR_HOST');
 if (rtdbEmulatorHost) {
   fbConfig.databaseURL = `http://${rtdbEmulatorHost}?ns=${fbConfig.projectId}`;
 }
@@ -523,7 +519,7 @@ if (rtdbEmulatorHost) {
 firebase.initializeApp(fbConfig);
 
 // Emulate Firestore if Env variable is passed
-const firestoreEmulatorHost = Cypress.env("FIRESTORE_EMULATOR_HOST");
+const firestoreEmulatorHost = Cypress.env('FIRESTORE_EMULATOR_HOST');
 if (firestoreEmulatorHost) {
   firebase.firestore().settings({
     host: firestoreEmulatorHost,
@@ -531,7 +527,7 @@ if (firestoreEmulatorHost) {
   });
 }
 
-const authEmulatorHost = Cypress.env("FIREBASE_AUTH_EMULATOR_HOST");
+const authEmulatorHost = Cypress.env('FIREBASE_AUTH_EMULATOR_HOST');
 if (authEmulatorHost) {
   firebase.auth().useEmulator(`http://${authEmulatorHost}/`);
   console.debug(`Using Auth emulator: http://${authEmulatorHost}/`);
@@ -586,18 +582,18 @@ Firebase instance config can be overriden by passing another argument to the cyp
 1. Setup the config within plugin (`cypress/plugins/index.js`):
 
    ```js
-   const admin = require("firebase-admin");
-   const cypressFirebasePlugin = require("cypress-firebase").plugin;
+   const admin = require('firebase-admin');
+   const cypressFirebasePlugin = require('cypress-firebase').plugin;
 
    module.exports = (on, config) => {
      const overrideFirebaseConfig = {
-       databaseURL: "http://localhost:9000?ns=my-other-namespace",
+       databaseURL: 'http://localhost:9000?ns=my-other-namespace',
      };
      const extendedConfig = cypressFirebasePlugin(
        on,
        config,
        admin,
-       overrideFirebaseConfig
+       overrideFirebaseConfig,
      );
 
      // Add other plugins/tasks such as code coverage here
@@ -642,11 +638,11 @@ Pass `commandNames` in the `options` object to `attachCustomCommands`:
 const options = {
   // Key is current command name, value is new command name
   commandNames: {
-    login: "newNameForLogin",
-    logout: "newNameForLogout",
-    callRtdb: "newNameForCallRtdb",
-    callFirestore: "newNameForCallFirestore",
-    getAuthUser: "newNameForGetAuthUser",
+    login: 'newNameForLogin',
+    logout: 'newNameForLogout',
+    callRtdb: 'newNameForCallRtdb',
+    callFirestore: 'newNameForCallFirestore',
+    getAuthUser: 'newNameForGetAuthUser',
   },
 };
 attachCustomCommands({ Cypress, cy, firebase }, options);
@@ -660,7 +656,7 @@ If you are using a file preprocessor which is building for the browser environme
 
 ```js
 node: {
-  fs: "empty";
+  fs: 'empty';
 }
 ```
 
@@ -689,7 +685,7 @@ jobs:
       - name: Cypress Run
         uses: cypress-io/github-action@v2
         with:
-          group: "E2E Tests"
+          group: 'E2E Tests'
         env:
           # pass the Dashboard record key as an environment variable
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_KEY }}
@@ -721,7 +717,7 @@ jobs:
       - name: Cypress Run
         uses: cypress-io/github-action@v2
         with:
-          group: "E2E Tests"
+          group: 'E2E Tests'
           start: npm start
           wait-on: http://localhost:3000
         env:
@@ -760,9 +756,9 @@ This has to do with the Firebase JS SDK having problems calling a Google API - t
 The following should help prevent the issue from failing tests:
 
 ```js
-Cypress.on("uncaught:exception", (err) => {
+Cypress.on('uncaught:exception', (err) => {
   // Prevent test failure from errors from firebase installations API
-  return err.message.includes("firebaseinstallations.googleapis.com");
+  return err.message.includes('firebaseinstallations.googleapis.com');
 });
 ```
 
