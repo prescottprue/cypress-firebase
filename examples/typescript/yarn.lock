@@ -5151,10 +5151,10 @@ cyclist@^1.0.1:
   resolved "https://registry.yarnpkg.com/cyclist/-/cyclist-1.0.1.tgz#596e9698fd0c80e12038c2b82d6eb1b35b6224d9"
   integrity sha1-WW6WmP0MgOEgOMK4LW6xs1tiJNk=
 
-cypress-firebase@2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/cypress-firebase/-/cypress-firebase-2.2.1.tgz#90600db8553c62efe0f6e6e5b1799b0744d5e7e3"
-  integrity sha512-zbj2k5itH0L4SdBrJwI20P2e1FJF5YGPjjBPUA5J/42YAHQapmoWDB56T/TRsUPvuCwBe+lTkrqbJxIYw52emw==
+cypress-firebase@2.2.2:
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/cypress-firebase/-/cypress-firebase-2.2.2.tgz#493c8736cb80aceb7b3548d690a547b02cf72aa5"
+  integrity sha512-EfpSJ8z8WXnIM1ezbxFUk51Kt6jaFFnEZp6uOoSgb9DF58hwxJ+MoSw1rpyX8Kwuiv/14pFpDiI1U+ZvSTK5fg==
 
 cypress@10.3.0:
   version "10.3.0"
