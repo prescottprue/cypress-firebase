@@ -3,6 +3,7 @@ import * as firebase from '@firebase/rules-unit-testing';
 import * as admin from 'firebase-admin';
 import sinon from 'sinon';
 import * as tasks from '../../src/tasks';
+import { initializeFirebase } from '../../src/firebase-utils';
 
 const PROJECTS_COLLECTION = 'projects';
 const PROJECT_ID = 'project-1';
@@ -20,6 +21,9 @@ const projectsFirestoreRef = adminApp
 const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
 
 describe('tasks', () => {
+  before(() => {
+    initializeFirebase();
+  });
   after(async () => {
     // Cleanup all apps (keeps active listeners from preventing JS from exiting)
     await adminApp.delete();

@@ -64,18 +64,16 @@ function optionsToRtdbRef(
 
 /**
  * Get Firebase Auth or TenantAwareAuth instance, based on tenantId being provided
- * @param options - Optional ID of tenant used for multi-tenancy
- * @param options.tenantId - Optional ID of tenant used for multi-tenancy
- * @param options.appName - Optional name of Firebase app. Defaults to "[DEFAULT]"
+ * @param authSettings - Optional ID of tenant used for multi-tenancy
+ * @param authSettings.tenantId - Optional ID of tenant used for multi-tenancy
+ * @param authSettings.appName - Optional name of Firebase app. Defaults to "[DEFAULT]"
  * @returns Firebase Auth or TenantAwareAuth instance
  */
-function getAdminAuthWithTenantId({
-  tenantId,
-  appName,
-}: {
+function getAdminAuthWithTenantId(authSettings?: {
   tenantId?: string;
   appName?: string;
 }): Auth | TenantAwareAuth {
+  const { tenantId, appName } = authSettings || {};
   const authInstance = getFirebaseAuth(appName ? getApp(appName) : undefined);
   const auth = tenantId
     ? authInstance.tenantManager().authForTenant(tenantId)
@@ -178,7 +176,7 @@ export async function callRtdb(
       const pushRef = dbRef.push();
       await pushRef.set(data);
       // TODO: Return key on an object for consistent return regardless of action
-      return { id: pushRef.key };
+      return pushRef.key;
     }
 
     // Delete action

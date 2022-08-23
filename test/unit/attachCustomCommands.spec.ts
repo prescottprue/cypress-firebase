@@ -49,7 +49,6 @@ describe('attachCustomCommands', () => {
     });
 
     it('throws if no uid is passed or within environment', () => {
-      Cypress = { Commands: { add: addSpy }, env: sinon.spy() };
       attachCustomCommands({ cy, Cypress, firebase });
       currentUser = undefined;
       try {
@@ -85,14 +84,15 @@ describe('attachCustomCommands', () => {
       expect(taskSpy).to.have.been.calledOnceWith('createCustomToken', {
         uid: 'foo',
         customClaims: undefined,
+        tenantId: undefined,
       });
       expect(signInWithCustomToken).to.have.been.calledOnce;
     });
 
     it('calls task with tenantId', async () => {
-      Cypress = { Commands: { add: addSpy }, env: envStub };
-      attachCustomCommands({ cy, Cypress, firebase });
-      await loadedCustomCommands.login('123ABC', undefined, 'tenant-id');
+      await loadedCustomCommands.login('123ABC', undefined, {
+        tenantId: 'tenant-id',
+      });
       expect(taskSpy).to.have.been.calledOnceWith('createCustomToken', {
         uid: '123ABC',
         customClaims: undefined,
@@ -103,8 +103,8 @@ describe('attachCustomCommands', () => {
 
     it('calls task with environment test tenantId', async () => {
       Cypress = { Commands: { add: addSpy }, env: envStub };
-      attachCustomCommands({ cy, Cypress, firebase });
       envStub.withArgs('TEST_TENANT_ID').returns('env-tenant-id');
+      attachCustomCommands({ cy, Cypress, firebase });
       await loadedCustomCommands.login('123ABC');
       expect(taskSpy).to.have.been.calledOnceWith('createCustomToken', {
         uid: '123ABC',
@@ -285,7 +285,7 @@ describe('attachCustomCommands', () => {
     it('calls task with uid', async () => {
       const uid = 'TESTING_USER_UID';
       await loadedCustomCommands.getAuthUser(uid);
-      expect(taskSpy).to.have.been.calledWith('getAuthUser', uid);
+      expect(taskSpy).to.have.been.calledWith('getAuthUser', { uid });
     });
   });
 

@@ -4,9 +4,9 @@ import {
   applicationDefault,
   cert,
   Credential,
-  App,
   AppOptions,
   ServiceAccount,
+  App,
 } from 'firebase-admin/app';
 import type {
   Settings,
@@ -87,7 +87,7 @@ function getDefaultDatabaseUrl(projectId?: string): string {
  * serviceAccount.json or environment variables)
  * @param overrideConfig - firebase-admin instance to initialize
  */
-export function initializeFirebase(overrideConfig?: AppOptions): void {
+export function initializeFirebase(overrideConfig?: AppOptions): App {
   try {
     // TODO: Look into using @firebase/testing in place of admin here to allow for
     // usage of clearFirestoreData (see https://github.com/prescottprue/cypress-firebase/issues/73 for more info)
@@ -140,7 +140,7 @@ export function initializeFirebase(overrideConfig?: AppOptions): void {
       }
     }
 
-    initializeApp(fbConfig);
+    const app = initializeApp(fbConfig);
     // Initialize Firestore with emulator host settings
     if (process.env.FIRESTORE_EMULATOR_HOST) {
       const firestoreSettings = firestoreSettingsFromEnv();
@@ -158,6 +158,7 @@ export function initializeFirebase(overrideConfig?: AppOptions): void {
     console.log(
       `cypress-firebase: Initialized Firebase app for project "${fbConfig.projectId}"${dbUrlLog}`,
     );
+    return app;
     /* eslint-enable no-console */
   } catch (err) {
     /* eslint-disable no-console */
