@@ -27,7 +27,7 @@ export default function Projects() {
       // Unset listener on unmount
       off(projectsQuery, 'value')
     }
-  }, [loadProjects, projectsQuery])
+  }, [loadProjects])
 
   if (errorState) {
     return <div><h4>Error:</h4><p>{errorState}</p></div>

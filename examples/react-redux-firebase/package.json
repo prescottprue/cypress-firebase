@@ -13,21 +13,21 @@
     "test:emulate": "cross-env GCLOUD_PROJECT=redux-firebasev3 FIREBASE_DATABASE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.database.port)\" FIRESTORE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.firestore.port)\" yarn test:open"
   },
   "dependencies": {
-    "firebase": "^7.14.1",
+    "firebase": "^9.0.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-redux": "^5.0.7",
-    "react-redux-firebase": "^2.1.8",
+    "react-redux-firebase": "^3.0.0",
     "recompose": "^0.30.0",
     "redux": "^4.0.1"
   },
   "devDependencies": {
-    "cross-env": "^7.0.2",
-    "cypress": "^4.11.0",
+    "cross-env": "7.0.3",
+    "cypress": "10.3.0",
     "cypress-firebase": "*",
-    "eslint-plugin-cypress": "^2.11.1",
-    "firebase-tools": "^8.6.0",
-    "react-scripts": "3.4.1"
+    "eslint-plugin-cypress": "2.12.1",
+    "firebase-tools": "10.9.2",
+    "react-scripts": "3.4.4"
   },
   "eslintConfig": {
     "extends": "react-app"
