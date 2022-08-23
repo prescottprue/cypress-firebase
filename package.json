@@ -25,7 +25,7 @@
     "prepare": "husky install && yarn clean && yarn build"
   },
   "peerDependencies": {
-    "firebase-admin": ">=8"
+    "firebase-admin": ">=11"
   },
   "devDependencies": {
     "@commitlint/cli": "17.0.3",
