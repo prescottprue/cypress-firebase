@@ -393,8 +393,7 @@ export default function attachCustomCommands(
         .task('createCustomToken', {
           uid: userUid,
           customClaims,
-          tenantId: options.tenantId,
-          appName: options.tenantId,
+          ...options,
         } as CustomTokenTaskSettings)
         .then((customToken: string) => loginWithCustomToken(auth, customToken));
     },
@@ -531,6 +530,7 @@ export default function attachCustomCommands(
    */
   Cypress.Commands.add(
     options?.commandNames?.getAuthUser || 'getAuthUser',
-    (uid: string, options): Promise<any> => cy.task('getAuthUser', { uid }),
+    (uid: string, options?: AppOptions): Promise<any> =>
+      cy.task('getAuthUser', { uid, ...options }),
   );
 }

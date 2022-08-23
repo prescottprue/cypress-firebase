@@ -85,7 +85,6 @@ describe('attachCustomCommands', () => {
       expect(taskSpy).to.have.been.calledOnceWith('createCustomToken', {
         uid: 'foo',
         customClaims: undefined,
-        tenantId: undefined,
       });
       expect(signInWithCustomToken).to.have.been.calledOnce;
     });
