@@ -12,6 +12,7 @@ import {
   FieldValue,
   DocumentData,
 } from 'firebase-admin/firestore';
+import { getApp } from 'firebase-admin/app';
 import {
   FixtureData,
   FirestoreAction,
@@ -24,6 +25,7 @@ import {
   deleteCollection,
   isDocPath,
 } from './firebase-utils';
+import { AppOptions } from './types';
 
 /**
  * @param baseRef - Base RTDB reference
@@ -62,11 +64,19 @@ function optionsToRtdbRef(
 
 /**
  * Get Firebase Auth or TenantAwareAuth instance, based on tenantId being provided
- * @param tenantId - Optional ID of tenant used for multi-tenancy
+ * @param options - Optional ID of tenant used for multi-tenancy
+ * @param options.tenantId - Optional ID of tenant used for multi-tenancy
+ * @param options.appName - Optional name of Firebase app. Defaults to "[DEFAULT]"
  * @returns Firebase Auth or TenantAwareAuth instance
  */
-function getAuth(tenantId?: string): Auth | TenantAwareAuth {
-  const authInstance = getFirebaseAuth();
+function getAdminAuthWithTenantId({
+  tenantId,
+  appName,
+}: {
+  tenantId?: string;
+  appName?: string;
+}): Auth | TenantAwareAuth {
+  const authInstance = getFirebaseAuth(appName ? getApp(appName) : undefined);
   const auth = tenantId
     ? authInstance.tenantManager().authForTenant(tenantId)
     : authInstance;
@@ -155,7 +165,10 @@ export async function callRtdb(
   }
 
   try {
-    const dbRef: Reference = getDatabase().ref(actionPath);
+    const dbInstance = getDatabase(
+      options?.appName ? getApp(options.appName) : undefined,
+    );
+    const dbRef: Reference = dbInstance.ref(actionPath);
     if (action === 'get') {
       const snap = await optionsToRtdbRef(dbRef, options).once('value');
       return snap.val();
@@ -165,7 +178,7 @@ export async function callRtdb(
       const pushRef = dbRef.push();
       await pushRef.set(data);
       // TODO: Return key on an object for consistent return regardless of action
-      return pushRef.key;
+      return { id: pushRef.key };
     }
 
     // Delete action
@@ -203,7 +216,9 @@ export async function callFirestore(
   options?: CallFirestoreOptions,
   data?: FixtureData,
 ): Promise<any> {
-  const firestoreInstance = getFirestore();
+  const firestoreInstance = getFirestore(
+    options?.appName ? getApp(options.appName) : undefined,
+  );
   try {
     if (action === 'get') {
       const snap = await (
@@ -275,32 +290,42 @@ export async function callFirestore(
   }
 }
 
+export interface CustomTokenTaskSettings extends AppOptions {
+  uid: string;
+  customClaims?: any;
+}
+
 /**
  * Create a custom token
- * @param uid - UID of user for which the custom token will be generated
  * @param settings - Settings object
  * @returns Promise which resolves with a custom Firebase Auth token
  */
 export function createCustomToken(
-  uid: string,
-  settings?: any,
+  settings: CustomTokenTaskSettings,
 ): Promise<string> {
   // Use custom claims or default to { isTesting: true }
   const customClaims = settings?.customClaims || { isTesting: true };
 
   // Create auth token
-  return getAuth(settings.tenantId).createCustomToken(uid, customClaims);
+  return getAdminAuthWithTenantId(settings).createCustomToken(
+    settings.uid,
+    customClaims,
+  );
+}
+
+export interface GetAuthUserTaskSettings extends AppOptions {
+  uid: string;
 }
 
 /**
  * Get Firebase Auth user based on UID
- * @param uid - UID of user for which the custom token will be generated
- * @param tenantId - Optional ID of tenant used for multi-tenancy
+ * @param settings - Task settings
+ * @param settings.uid - UID of user for which the custom token will be generated
+ * @param settings.tenantId - Optional ID of tenant used for multi-tenancy
  * @returns Promise which resolves with a custom Firebase Auth token
  */
 export function getAuthUser(
-  uid: string,
-  tenantId?: string,
+  settings: GetAuthUserTaskSettings,
 ): Promise<UserRecord> {
-  return getAuth(tenantId).getUser(uid);
+  return getAdminAuthWithTenantId(settings).getUser(settings.uid);
 }
