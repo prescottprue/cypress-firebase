@@ -3,7 +3,6 @@ import * as firebase from '@firebase/rules-unit-testing';
 import * as admin from 'firebase-admin';
 import sinon from 'sinon';
 import * as tasks from '../../src/tasks';
-import { initializeFirebase } from '../../src/firebase-utils';
 
 const PROJECTS_COLLECTION = 'projects';
 const PROJECT_ID = 'project-1';
@@ -22,12 +21,22 @@ const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
 
 describe('tasks', () => {
   before(() => {
-    initializeFirebase();
+    /**
+     * Initialize firebase-admin SDK with emulator settings for RTDB
+     */
+    admin.initializeApp({
+      projectId: process.env.GCLOUD_PROJECT,
+      databaseURL: `http://${process.env.FIREBASE_DATABASE_EMULATOR_HOST}?ns=${process.env.GCLOUD_PROJECT}`,
+      credential: admin.credential.applicationDefault(),
+    });
   });
   after(async () => {
     // Cleanup all apps (keeps active listeners from preventing JS from exiting)
     await adminApp.delete();
     await Promise.all(firebase.apps().map((app) => app.delete()));
+
+    // Cleanup only this tests's instance of firebase-admin app
+    await Promise.all(admin.apps.map((app) => app?.delete()));
   });
 
   describe('callFirestore', () => {
