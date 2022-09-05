@@ -24,7 +24,7 @@
     "size": "yarn build && size-limit",
     "prepare": "husky install && yarn clean && yarn build"
   },
-  "dependencies": {
+  "peerDependencies": {
     "firebase-admin": "11.0.1"
   },
   "devDependencies": {
@@ -32,8 +32,8 @@
     "@commitlint/config-conventional": "17.0.3",
     "@firebase/rules-unit-testing": "1.3.16",
     "@istanbuljs/nyc-config-typescript": "1.0.2",
-    "@size-limit/preset-small-lib": "7.0.3",
-    "@size-limit/webpack": "7.0.3",
+    "@size-limit/preset-small-lib": "8.0.1",
+    "@size-limit/webpack": "8.0.1",
     "@tsconfig/node16": "1.0.3",
     "@types/chai": "4.3.1",
     "@types/mocha": "9.1.1",
@@ -51,6 +51,7 @@
     "eslint-plugin-jsdoc": "39.3.6",
     "eslint-plugin-jsx-a11y": "6.6.0",
     "eslint-plugin-prettier": "4.2.1",
+    "firebase-admin": "^11.0.1",
     "firebase-tools": "11.8.0",
     "husky": "8.0.1",
     "lint-staged": "13.0.3",
@@ -60,7 +61,7 @@
     "rimraf": "3.0.2",
     "sinon": "13.0.2",
     "sinon-chai": "3.7.0",
-    "size-limit": "7.0.3",
+    "size-limit": "8.0.1",
     "ts-node": "10.8.2",
     "typescript": "4.7.4"
   },
