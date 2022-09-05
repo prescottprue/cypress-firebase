@@ -1,5 +1,8 @@
 import { expect } from 'chai';
-import * as firebase from '@firebase/rules-unit-testing';
+import {
+  initializeTestEnvironment,
+  RulesTestEnvironment,
+} from '@firebase/rules-unit-testing';
 import * as admin from 'firebase-admin';
 import sinon from 'sinon';
 import * as tasks from '../../src/tasks';
@@ -8,10 +11,13 @@ const PROJECTS_COLLECTION = 'projects';
 const PROJECT_ID = 'project-1';
 const PROJECT_PATH = `${PROJECTS_COLLECTION}/${PROJECT_ID}`;
 const testProject = { name: 'project 1' };
-
-const adminApp: any = firebase.initializeAdminApp({
+/**
+ * Initialize firebase-admin SDK with emulator settings for RTDB
+ */
+const adminApp = admin.initializeApp({
   projectId: process.env.GCLOUD_PROJECT,
-  databaseName: process.env.GCLOUD_PROJECT,
+  databaseURL: `http://${process.env.FIREBASE_DATABASE_EMULATOR_HOST}?ns=${process.env.GCLOUD_PROJECT}`,
+  credential: admin.credential.applicationDefault(),
 });
 
 const projectsFirestoreRef = adminApp
@@ -20,20 +26,19 @@ const projectsFirestoreRef = adminApp
 const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
 
 describe('tasks', () => {
-  before(() => {
+  let testEnv: RulesTestEnvironment;
+  before(async () => {
     /**
      * Initialize firebase-admin SDK with emulator settings for RTDB
      */
-    admin.initializeApp({
+    testEnv = await initializeTestEnvironment({
       projectId: process.env.GCLOUD_PROJECT,
-      databaseURL: `http://${process.env.FIREBASE_DATABASE_EMULATOR_HOST}?ns=${process.env.GCLOUD_PROJECT}`,
-      credential: admin.credential.applicationDefault(),
     });
   });
   after(async () => {
     // Cleanup all apps (keeps active listeners from preventing JS from exiting)
     await adminApp.delete();
-    await Promise.all(firebase.apps().map((app) => app.delete()));
+    await testEnv.cleanup();
 
     // Cleanup only this tests's instance of firebase-admin app
     await Promise.all(admin.apps.map((app) => app?.delete()));
@@ -41,9 +46,7 @@ describe('tasks', () => {
 
   describe('callFirestore', () => {
     beforeEach(async () => {
-      await firebase.clearFirestoreData({
-        projectId: process.env.GCLOUD_PROJECT || 'test-project',
-      });
+      await testEnv.clearFirestore();
     });
 
     it('is exported', () => {
