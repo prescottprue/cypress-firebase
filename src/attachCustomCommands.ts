@@ -1,4 +1,4 @@
-import type { firestore } from 'firebase-admin';
+import type { FieldValue } from 'firebase-admin/firestore';
 import { CustomTokenTaskSettings } from './tasks';
 import type { AppOptions } from './types';
 
@@ -69,7 +69,7 @@ export interface CallFirestoreOptions {
    * Firestore statics (i.e. admin.firestore). This should only be needed during
    * testing due to @firebase/testing not containing statics
    */
-  statics?: typeof firestore;
+  statics?: typeof FieldValue;
 }
 
 /**

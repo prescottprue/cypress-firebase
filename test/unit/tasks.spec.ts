@@ -246,7 +246,7 @@ describe('tasks', () => {
           await tasks.callFirestore(
             'set',
             PROJECT_PATH,
-            { statics: admin.firestore },
+            { statics: admin.firestore.FieldValue },
             { timeProperty: stringifiedServerTimestamp },
           );
 
@@ -267,7 +267,7 @@ describe('tasks', () => {
           await tasks.callFirestore(
             'set',
             PROJECT_PATH,
-            { statics: admin.firestore },
+            { statics: admin.firestore.FieldValue },
             { timeArrProperty: [stringifiedServerTimestamp] },
           );
 
@@ -288,7 +288,7 @@ describe('tasks', () => {
           await tasks.callFirestore(
             'set',
             PROJECT_PATH,
-            { statics: admin.firestore },
+            { statics: admin.firestore.FieldValue },
             { time: { nested: stringifiedServerTimestamp } },
           );
 
@@ -306,7 +306,7 @@ describe('tasks', () => {
           await tasks.callFirestore(
             'set',
             PROJECT_PATH,
-            { statics: admin.firestore },
+            { statics: admin.firestore.FieldValue },
             {
               geoPointProperty: { latitude: 32.323443, longitude: 122.3954238 },
             },
@@ -361,7 +361,7 @@ describe('tasks', () => {
           await tasks.callFirestore(
             'update',
             PROJECT_PATH,
-            { statics: admin.firestore },
+            { statics: admin.firestore.FieldValue },
             { timeProperty: stringifiedServerTimestamp },
           );
 
@@ -390,7 +390,7 @@ describe('tasks', () => {
           await tasks.callFirestore(
             'update',
             PROJECT_PATH,
-            { statics: admin.firestore },
+            { statics: admin.firestore.FieldValue },
             { time: { nested: stringifiedServerTimestamp } },
           );
 
