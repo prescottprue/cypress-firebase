@@ -25,17 +25,21 @@ If you are interested in what drove the need for this checkout [the why section]
 
 ### Pre-Setup
 
-1. If you do not already have it installed, install Cypress and add it to your package file: `npm i --save-dev cypress` or `yarn add -D cypress`
+1. If you do not already have it installed, install Cypress and firebase-admin and add them to your package file: `npm i --save-dev cypress firebase-admin` or `yarn add -D cypress firebase-admin`
 1. Make sure you have a `cypress` folder containing Cypress tests
+1. `cypress-firebase` v3 uses firebase-admin v11 - if you want to use an earlier version of firebase-admin, use `^2` versions of `cypress-firebase`
 
 ### Setup
 
 1. Set the following config in your `cypress.config.js` or `cypress.config.ts`
 
    ```js
-   import admin from 'firebase-admin';
+   import { initializeApp } from 'firebase-admin/app';
    import { defineConfig } from 'cypress';
    import { plugin as cypressFirebasePlugin } from 'cypress-firebase';
+
+   // Initialize firebase-admin default app
+   initializeApp();
 
    const cypressConfig = defineConfig({
      e2e: {
@@ -56,15 +60,17 @@ If you are interested in what drove the need for this checkout [the why section]
    ```js
    const { defineConfig } = require('cypress');
    const cypressFirebasePlugin = require('cypress-firebase').plugin;
-   const admin = require('firebase-admin');
+   const { initializeApp } = require('firebase-admin/app');
+
+   // Initialize firebase-admin default app
+   initializeApp();
 
    module.exports = defineConfig({
      e2e: {
        baseUrl: 'http://localhost:3000',
        supportFile: 'cypress/support/e2e/index.js',
        setupNodeEvents(on, config) {
-         cypressFirebasePlugin(on, config, admin);
-         // e2e testing node events setup code
+         return cypressFirebasePlugin(on, config, admin);
        },
      },
    });

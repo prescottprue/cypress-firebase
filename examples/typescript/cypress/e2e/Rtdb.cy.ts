@@ -65,6 +65,5 @@ describe('Projects View', () => {
       expect(result).to.exist;
       expect(result).to.be.an('object');
     });
-    ;
   });
 });

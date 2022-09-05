@@ -1,4 +1,6 @@
-import type { firestore } from 'firebase-admin';
+import type { FieldValue } from 'firebase-admin/firestore';
+import { CustomTokenTaskSettings } from './tasks';
+import type { AppOptions } from './types';
 
 /**
  * Params for attachCustomCommand function for
@@ -29,6 +31,11 @@ type WhereOptions = [string, FirebaseFirestore.WhereFilterOp, any];
  * Options for callFirestore custom Cypress command.
  */
 export interface CallFirestoreOptions {
+  /**
+   * Name of Firebase app. Defaults to Firebase's internal setting
+   * of "[DEFAULT]".
+   */
+  appName?: string;
   /**
    * Whether or not to include createdAt and createdBy
    */
@@ -62,7 +69,7 @@ export interface CallFirestoreOptions {
    * Firestore statics (i.e. admin.firestore). This should only be needed during
    * testing due to @firebase/testing not containing statics
    */
-  statics?: typeof firestore;
+  statics?: typeof FieldValue;
 }
 
 /**
@@ -80,6 +87,11 @@ export type RTDBAction =
  * Options for callRtdb commands
  */
 export interface CallRtdbOptions {
+  /**
+   * Name of Firebase app. Defaults to Firebase's internal setting
+   * of "[DEFAULT]".
+   */
+  appName?: string;
   /**
    * Whether or not to include meta data
    */
@@ -161,6 +173,9 @@ export interface CallRtdbOptions {
     | [number | string | boolean | null, string];
 }
 
+export type LoginOptions = AppOptions;
+export type LogoutOptions = AppOptions;
+
 // Add custom commands to the existing Cypress interface
 declare global {
   /* eslint-disable @typescript-eslint/no-namespace */
@@ -174,21 +189,30 @@ declare global {
        * @see https://github.com/prescottprue/cypress-firebase#cylogin
        * @param uid - UID of user to login as
        * @param customClaims - Custom claims to attach to the custom token
-       * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also be set with environment variable TEST_TENANT_ID
+       * @param options - Options
+       * @param options.appName - Optional name of firebase-admin app. Defaults to Firebase's default app (i.e DEFAULT)
+       * @param options.tenantId - Optional ID of tenant used for multi-tenancy. Can also be set with environment variable TEST_TENANT_ID
        * @example <caption>Env Based Login (TEST_UID)</caption>
        * cy.login()
        * @example <caption>Passed UID</caption>
        * cy.login('123SOMEUID')
        */
-      login: (uid?: string, customClaims?: any, tenantId?: string) => Chainable;
+      login: (
+        uid?: string,
+        customClaims?: any,
+        options?: LoginOptions,
+      ) => Chainable;
 
       /**
        * Log current user out of Firebase Auth
        * @see https://github.com/prescottprue/cypress-firebase#cylogout
+       * @param options - Options object
+       * @param options.appName - Optional name of firebase-admin app. Defaults to Firebase's default app (i.e DEFAULT)
+       * @param options.tenantId - Optional ID of tenant used for multi-tenancy. Can also be set with environment variable TEST_TENANT_ID
        * @example
        * cy.logout()
        */
-      logout: () => Chainable;
+      logout: (options?: LogoutOptions) => Chainable;
 
       /**
        * Call Real Time Database path with some specified action. Authentication is through
@@ -308,24 +332,31 @@ interface CustomCommandOptions {
  * Attach custom commands including cy.login, cy.logout, cy.callRtdb,
  * @param context - Context values passed from Cypress environment
  * custom command attachment
- * @param options - Custom command options
+ * @param customCommandOptions - Custom command options
  */
 export default function attachCustomCommands(
   context: AttachCustomCommandParams,
-  options?: CustomCommandOptions,
+  customCommandOptions?: CustomCommandOptions,
 ): void {
   const { Cypress, cy, firebase, app } = context;
 
-  const defaultApp = app || firebase.app(); // select default  app
-
   /**
    * Get firebase auth instance, with tenantId set if provided
-   * @param tenantId Optional tenant ID
+   * @param authOptions - Settings object
+   * @param authOptions.tenantId Optional tenant ID
+   * @param authOptions.appName - Name of app
    * @returns firebase auth instance
    */
-  function getAuth(tenantId: string | undefined) {
-    const auth = defaultApp.auth();
-    if (tenantId) {
+  function getAuthWithTenantId(authOptions?: {
+    tenantId?: string;
+    appName?: string;
+  }) {
+    const { tenantId = Cypress.env('TEST_TENANT_ID'), appName } =
+      authOptions || {};
+    const browserAppInstance = app || firebase.app(appName); // select default app
+    const auth = browserAppInstance.auth();
+    // Check for undefined handles null values for removing tenant from instance
+    if (typeof tenantId !== 'undefined') {
       auth.tenantId = tenantId;
     }
     return auth;
@@ -338,12 +369,8 @@ export default function attachCustomCommands(
    * @name cy.login
    */
   Cypress.Commands.add(
-    options?.commandNames?.login || 'login',
-    (
-      uid?: string,
-      customClaims?: any,
-      tenantId: string | undefined = Cypress.env('TEST_TENANT_ID'),
-    ): any => {
+    customCommandOptions?.commandNames?.login || 'login',
+    (uid?: string, customClaims?: any, options?: AppOptions): any => {
       const userUid = uid || Cypress.env('TEST_UID');
       // Handle UID which is passed in
       if (!userUid) {
@@ -351,7 +378,7 @@ export default function attachCustomCommands(
           'uid must be passed or TEST_UID set within environment to login',
         );
       }
-      const auth = getAuth(tenantId);
+      const auth = getAuthWithTenantId(options);
       // Resolve with current user if they already exist
       if (auth.currentUser && userUid === auth.currentUser.uid) {
         cy.log('Authed user already exists, login complete.');
@@ -365,8 +392,9 @@ export default function attachCustomCommands(
         .task('createCustomToken', {
           uid: userUid,
           customClaims,
-          tenantId,
-        })
+          tenantId: auth.tenantId,
+          ...options,
+        } as CustomTokenTaskSettings)
         .then((customToken: string) => loginWithCustomToken(auth, customToken));
     },
   );
@@ -379,16 +407,14 @@ export default function attachCustomCommands(
    * cy.logout()
    */
   Cypress.Commands.add(
-    options?.commandNames?.logout || 'logout',
-    (
-      tenantId: string | undefined = Cypress.env('TEST_TENANT_ID'),
-    ): Promise<any> =>
+    customCommandOptions?.commandNames?.logout || 'logout',
+    (options?: AppOptions): Promise<any> =>
       new Promise(
         (
           resolve: (value?: any) => void,
           reject: (reason?: any) => void,
         ): any => {
-          const auth = getAuth(tenantId);
+          const auth = getAuthWithTenantId(options);
           auth.onAuthStateChanged((auth: any) => {
             if (!auth) {
               resolve();
@@ -408,13 +434,14 @@ export default function attachCustomCommands(
    * @name cy.callRtdb
    */
   Cypress.Commands.add(
-    options?.commandNames?.callRtdb || 'callRtdb',
+    customCommandOptions?.commandNames?.callRtdb || 'callRtdb',
     (
       action: RTDBAction,
       actionPath: string,
       dataOrOptions?: any,
       options?: CallRtdbOptions,
     ) => {
+      // TODO: Make exposed types dynamic to action (i.e. get has 3rd arg as options)
       const taskSettings: any = {
         action,
         path: actionPath,
@@ -456,7 +483,7 @@ export default function attachCustomCommands(
    * @name cy.callFirestore
    */
   Cypress.Commands.add(
-    options?.commandNames?.callFirestore || 'callFirestore',
+    customCommandOptions?.commandNames?.callFirestore || 'callFirestore',
     (
       action: FirestoreAction,
       actionPath: string,
@@ -503,7 +530,8 @@ export default function attachCustomCommands(
    * cy.getAuthUser()
    */
   Cypress.Commands.add(
-    options?.commandNames?.getAuthUser || 'getAuthUser',
-    (uid: string): Promise<any> => cy.task('getAuthUser', uid),
+    customCommandOptions?.commandNames?.getAuthUser || 'getAuthUser',
+    (uid: string, options?: AppOptions): Promise<any> =>
+      cy.task('getAuthUser', { uid, ...options }),
   );
 }

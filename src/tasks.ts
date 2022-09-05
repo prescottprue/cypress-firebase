@@ -1,4 +1,18 @@
-import type { database, firestore, auth, app } from 'firebase-admin';
+import { getDatabase, Reference, Query } from 'firebase-admin/database';
+import {
+  getAuth as getFirebaseAuth,
+  Auth,
+  TenantAwareAuth,
+  UserRecord,
+} from 'firebase-admin/auth';
+import {
+  getFirestore,
+  Timestamp,
+  GeoPoint,
+  FieldValue,
+  DocumentData,
+} from 'firebase-admin/firestore';
+import { getApp } from 'firebase-admin/app';
 import {
   FixtureData,
   FirestoreAction,
@@ -11,6 +25,7 @@ import {
   deleteCollection,
   isDocPath,
 } from './firebase-utils';
+import { AppOptions } from './types';
 
 /**
  * @param baseRef - Base RTDB reference
@@ -18,9 +33,9 @@ import {
  * @returns RTDB Reference
  */
 function optionsToRtdbRef(
-  baseRef: database.Reference,
+  baseRef: Reference,
   options?: CallRtdbOptions,
-): database.Reference | database.Query {
+): Reference | Query {
   let newRef = baseRef;
   [
     'orderByChild',
@@ -49,44 +64,43 @@ function optionsToRtdbRef(
 
 /**
  * Get Firebase Auth or TenantAwareAuth instance, based on tenantId being provided
- * @param adminInstance - Admin SDK instance
- * @param tenantId - Optional ID of tenant used for multi-tenancy
+ * @param authSettings - Optional ID of tenant used for multi-tenancy
+ * @param authSettings.tenantId - Optional ID of tenant used for multi-tenancy
+ * @param authSettings.appName - Optional name of Firebase app. Defaults to "[DEFAULT]"
  * @returns Firebase Auth or TenantAwareAuth instance
  */
-function getAuth(
-  adminInstance: any,
-  tenantId?: string,
-): auth.Auth | auth.TenantAwareAuth {
+function getAdminAuthWithTenantId(authSettings?: {
+  tenantId?: string;
+  appName?: string;
+}): Auth | TenantAwareAuth {
+  const { tenantId, appName } = authSettings || {};
+  const authInstance = getFirebaseAuth(appName ? getApp(appName) : undefined);
   const auth = tenantId
-    ? adminInstance.auth().tenantManager().authForTenant(tenantId)
-    : adminInstance.auth();
+    ? authInstance.tenantManager().authForTenant(tenantId)
+    : authInstance;
   return auth;
 }
 
 /**
  * @param dataVal - Value of data
- * @param firestoreStatics - Statics from firestore instance
  * @returns Value converted into timestamp object if possible
  */
-function convertValueToTimestampOrGeoPointIfPossible(
-  dataVal: any,
-  firestoreStatics: typeof firestore,
-): firestore.FieldValue {
+function convertValueToTimestampOrGeoPointIfPossible(dataVal: any): FieldValue {
   /* eslint-disable-next-line no-underscore-dangle */
   if (dataVal?._methodName === 'FieldValue.serverTimestamp') {
-    return firestoreStatics.FieldValue.serverTimestamp();
+    return FieldValue.serverTimestamp();
   }
   if (
     typeof dataVal?.seconds === 'number' &&
     typeof dataVal?.nanoseconds === 'number'
   ) {
-    return new firestoreStatics.Timestamp(dataVal.seconds, dataVal.nanoseconds);
+    return new Timestamp(dataVal.seconds, dataVal.nanoseconds);
   }
   if (
     typeof dataVal?.latitude === 'number' &&
     typeof dataVal?.longitude === 'number'
   ) {
-    return new firestoreStatics.GeoPoint(dataVal.latitude, dataVal.longitude);
+    return new GeoPoint(dataVal.latitude, dataVal.longitude);
   }
 
   return dataVal;
@@ -94,17 +108,11 @@ function convertValueToTimestampOrGeoPointIfPossible(
 
 /**
  * @param data - Data to be set in firestore
- * @param firestoreStatics - Statics from Firestore object
  * @returns Data to be set in firestore with timestamp
  */
 function getDataWithTimestampsAndGeoPoints(
-  data: firestore.DocumentData,
-  firestoreStatics: typeof firestore,
+  data: DocumentData,
 ): Record<string, any> {
-  // Exit if no statics are passed
-  if (!firestoreStatics) {
-    return data;
-  }
   return Object.entries(data).reduce((acc, [currKey, currData]) => {
     // Convert nested timestamp if item is an object
     if (
@@ -118,20 +126,14 @@ function getDataWithTimestampsAndGeoPoints(
     ) {
       return {
         ...acc,
-        [currKey]: getDataWithTimestampsAndGeoPoints(
-          currData,
-          firestoreStatics,
-        ),
+        [currKey]: getDataWithTimestampsAndGeoPoints(currData),
       };
     }
     const value = Array.isArray(currData)
       ? currData.map((dataItem) =>
-          convertValueToTimestampOrGeoPointIfPossible(
-            dataItem,
-            firestoreStatics,
-          ),
+          convertValueToTimestampOrGeoPointIfPossible(dataItem),
         )
-      : convertValueToTimestampOrGeoPointIfPossible(currData, firestoreStatics);
+      : convertValueToTimestampOrGeoPointIfPossible(currData);
 
     return {
       ...acc,
@@ -141,7 +143,6 @@ function getDataWithTimestampsAndGeoPoints(
 }
 
 /**
- * @param adminInstance - firebase-admin instance
  * @param action - Action to run
  * @param actionPath - Path in RTDB
  * @param options - Query options
@@ -149,7 +150,6 @@ function getDataWithTimestampsAndGeoPoints(
  * @returns Promise which resolves with results of calling RTDB
  */
 export async function callRtdb(
-  adminInstance: any,
   action: RTDBAction,
   actionPath: string,
   options?: CallRtdbOptions,
@@ -163,7 +163,10 @@ export async function callRtdb(
   }
 
   try {
-    const dbRef: database.Reference = adminInstance.database().ref(actionPath);
+    const dbInstance = getDatabase(
+      options?.appName ? getApp(options.appName) : undefined,
+    );
+    const dbRef: Reference = dbInstance.ref(actionPath);
     if (action === 'get') {
       const snap = await optionsToRtdbRef(dbRef, options).once('value');
       return snap.val();
@@ -199,7 +202,6 @@ export async function callRtdb(
 }
 
 /**
- * @param adminInstance - firebase-admin instance
  * @param action - Action to run
  * @param actionPath - Path to collection or document within Firestore
  * @param options - Query options
@@ -207,20 +209,18 @@ export async function callRtdb(
  * @returns Promise which resolves with results of calling Firestore
  */
 export async function callFirestore(
-  adminInstance: app.App,
   action: FirestoreAction,
   actionPath: string,
   options?: CallFirestoreOptions,
   data?: FixtureData,
 ): Promise<any> {
+  const firestoreInstance = getFirestore(
+    options?.appName ? getApp(options.appName) : undefined,
+  );
   try {
     if (action === 'get') {
       const snap = await (
-        slashPathToFirestoreRef(
-          adminInstance.firestore(),
-          actionPath,
-          options,
-        ) as any
+        slashPathToFirestoreRef(firestoreInstance, actionPath, options) as any
       ).get();
 
       if (snap?.docs?.length && typeof snap.docs.map === 'function') {
@@ -239,18 +239,14 @@ export async function callFirestore(
       const deletePromise = isDocPath(actionPath)
         ? (
             slashPathToFirestoreRef(
-              adminInstance.firestore(),
+              firestoreInstance,
               actionPath,
               options,
             ) as FirebaseFirestore.DocumentReference
           ).delete()
         : deleteCollection(
-            adminInstance.firestore(),
-            slashPathToFirestoreRef(
-              adminInstance.firestore(),
-              actionPath,
-              options,
-            ) as
+            firestoreInstance,
+            slashPathToFirestoreRef(firestoreInstance, actionPath, options) as
               | FirebaseFirestore.CollectionReference
               | FirebaseFirestore.Query,
             options,
@@ -265,16 +261,10 @@ export async function callFirestore(
       throw new Error(`You must define data to run ${action} in firestore.`);
     }
 
-    const dataToSet = getDataWithTimestampsAndGeoPoints(
-      data,
-      // Use static option if passed (tests), otherwise fallback to statics on adminInstance
-      // Tests do not have statics since they are using @firebase/testing
-      options?.statics || (adminInstance.firestore as typeof firestore),
-    );
+    const dataToSet = getDataWithTimestampsAndGeoPoints(data);
 
     if (action === 'set') {
-      return adminInstance
-        .firestore()
+      return firestoreInstance
         .doc(actionPath)
         .set(
           dataToSet,
@@ -285,11 +275,7 @@ export async function callFirestore(
     }
     // "update" action
     return (
-      slashPathToFirestoreRef(
-        adminInstance.firestore(),
-        actionPath,
-        options,
-      ) as any
+      slashPathToFirestoreRef(firestoreInstance, actionPath, options) as any
     )[action](dataToSet);
   } catch (err) {
     /* eslint-disable no-console */
@@ -302,39 +288,42 @@ export async function callFirestore(
   }
 }
 
+export interface CustomTokenTaskSettings extends AppOptions {
+  uid: string;
+  customClaims?: any;
+}
+
 /**
  * Create a custom token
- * @param adminInstance - Admin SDK instance
- * @param uid - UID of user for which the custom token will be generated
  * @param settings - Settings object
  * @returns Promise which resolves with a custom Firebase Auth token
  */
 export function createCustomToken(
-  adminInstance: any,
-  uid: string,
-  settings?: any,
+  settings: CustomTokenTaskSettings,
 ): Promise<string> {
   // Use custom claims or default to { isTesting: true }
   const customClaims = settings?.customClaims || { isTesting: true };
 
   // Create auth token
-  return getAuth(adminInstance, settings.tenantId).createCustomToken(
-    uid,
+  return getAdminAuthWithTenantId(settings).createCustomToken(
+    settings.uid,
     customClaims,
   );
 }
 
+export interface GetAuthUserTaskSettings extends AppOptions {
+  uid: string;
+}
+
 /**
  * Get Firebase Auth user based on UID
- * @param adminInstance - Admin SDK instance
- * @param uid - UID of user for which the custom token will be generated
- * @param tenantId - Optional ID of tenant used for multi-tenancy
+ * @param settings - Task settings
+ * @param settings.uid - UID of user for which the custom token will be generated
+ * @param settings.tenantId - Optional ID of tenant used for multi-tenancy
  * @returns Promise which resolves with a custom Firebase Auth token
  */
 export function getAuthUser(
-  adminInstance: any,
-  uid: string,
-  tenantId?: string,
-): Promise<auth.UserRecord> {
-  return getAuth(adminInstance, tenantId).getUser(uid);
+  settings: GetAuthUserTaskSettings,
+): Promise<UserRecord> {
+  return getAdminAuthWithTenantId(settings).getUser(settings.uid);
 }
