@@ -3,7 +3,7 @@
   "version": "2.2.1",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
-  "module": "lib/index.js",
+  "module": "lib-esm/index.js",
   "jsnext:main": "lib-esm/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
@@ -28,7 +28,7 @@
     "firebase-admin": "11.0.1"
   },
   "devDependencies": {
-    "@commitlint/cli": "17.0.3",
+    "@commitlint/cli": "17.1.2",
     "@commitlint/config-conventional": "17.0.3",
     "@firebase/rules-unit-testing": "1.3.16",
     "@istanbuljs/nyc-config-typescript": "1.0.2",
@@ -42,8 +42,8 @@
     "@typescript-eslint/eslint-plugin": "5.30.5",
     "@typescript-eslint/parser": "5.30.5",
     "chai": "4.3.6",
-    "cypress": "10.6.0",
-    "eslint": "8.22.0",
+    "cypress": "10.7.0",
+    "eslint": "8.23.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-babel": "5.3.1",
@@ -51,19 +51,19 @@
     "eslint-plugin-jsdoc": "39.3.6",
     "eslint-plugin-jsx-a11y": "6.6.0",
     "eslint-plugin-prettier": "4.2.1",
-    "firebase-admin": "^11.0.1",
+    "firebase-admin": "11.0.1",
     "firebase-tools": "11.8.0",
     "husky": "8.0.1",
     "lint-staged": "13.0.3",
-    "mocha": "9.2.2",
+    "mocha": "10.0.0",
     "nyc": "15.1.0",
     "prettier": "2.7.1",
     "rimraf": "3.0.2",
-    "sinon": "13.0.2",
+    "sinon": "14.0.0",
     "sinon-chai": "3.7.0",
     "size-limit": "8.0.1",
     "ts-node": "10.8.2",
-    "typescript": "4.7.4"
+    "typescript": "4.8.2"
   },
   "keywords": [
     "cypress",
