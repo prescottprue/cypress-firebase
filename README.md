@@ -40,10 +40,10 @@ If you are interested in what drove the need for this checkout [the why section]
    const cypressConfig = defineConfig({
      e2e: {
        baseUrl: 'http://localhost:3000',
-       supportFile: 'cypress/support/e2e/index.js',
+       // NOTE: Make supportFile exists if separate location is provided
        setupNodeEvents(on, config) {
-         cypressFirebasePlugin(on, config, admin);
          // e2e testing node events setup code
+         return cypressFirebasePlugin(on, config, admin);
        },
      },
    });
@@ -61,7 +61,7 @@ If you are interested in what drove the need for this checkout [the why section]
    module.exports = defineConfig({
      e2e: {
        baseUrl: 'http://localhost:3000',
-       supportFile: 'cypress/support/e2e/index.js',
+       // NOTE: Make supportFile exists if separate location is provided
        setupNodeEvents(on, config) {
          cypressFirebasePlugin(on, config, admin);
          // e2e testing node events setup code
