@@ -179,7 +179,7 @@ attachCustomCommands({ Cypress, cy, firebase, app: namedApp });
 
 Login to Firebase using custom auth token.
 
-To specify a tenant ID, either pass the ID as a parameter to `cy.login`, or set it as environment variable `TEST_TENANT_ID`. Read more about [Firebase multi-tenancy](https://firebase.google.com/docs/reference/admin/node/admin.auth.Tenant).
+To specify a tenant ID, either pass the ID as a parameter to `cy.login`, or set it as environment variable `TEST_TENANT_ID`. Read more about [Firebase multi-tenancy](https://cloud.google.com/identity-platform/docs/multi-tenancy-authentication).
 
 ##### Examples
 
