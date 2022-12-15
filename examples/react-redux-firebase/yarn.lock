@@ -5703,7 +5703,7 @@ cyclist@~0.2.2:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/cyclist/-/cyclist-0.2.2.tgz#1b33792e11e914a2fd6d6ed6447464444e5fa640"
 
-cypress-firebase@*:
+cypress-firebase@0.1.1:
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/cypress-firebase/-/cypress-firebase-0.1.1.tgz#e593e72a16e569d54988c792e5b2fd0f46ad41d0"
   integrity sha512-unhjVH7P6jqhznzKaJdyYV/hh/23VhQ7CaTHGTCnCS3fg4Em741OWuLiEi3BGXsd9wx5o82uomt8WbmKUz3XgQ==
