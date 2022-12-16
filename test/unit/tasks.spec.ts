@@ -429,7 +429,13 @@ describe('tasks', () => {
             'update',
             PROJECT_PATH,
             { statics: admin.firestore },
-            { time: { nested: stringifiedServerTimestamp } },
+            {
+              time: {
+                nested: stringifiedServerTimestamp,
+                arrayNested: [stringifiedServerTimestamp],
+                mapInArrayNested: [{ nested: stringifiedServerTimestamp }],
+              },
+            },
           );
 
           const resultSnap = await projectFirestoreRef.get();
@@ -440,6 +446,22 @@ describe('tasks', () => {
           );
           expect(resultSnap.data()).to.have.nested.property(
             'time.nested._nanoseconds',
+            correctTimestamp._nanoseconds,
+          );
+          expect(resultSnap.data()).to.have.nested.property(
+            'time.arrayNested[0]._seconds',
+            correctTimestamp._seconds,
+          );
+          expect(resultSnap.data()).to.have.nested.property(
+            'time.arrayNested[0]._nanoseconds',
+            correctTimestamp._nanoseconds,
+          );
+          expect(resultSnap.data()).to.have.nested.property(
+            'time.mapInArrayNested[0].nested._seconds',
+            correctTimestamp._seconds,
+          );
+          expect(resultSnap.data()).to.have.nested.property(
+            'time.mapInArrayNested[0].nested._nanoseconds',
             correctTimestamp._nanoseconds,
           );
           /* eslint-enable no-underscore-dangle */
