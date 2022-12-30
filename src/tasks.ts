@@ -64,6 +64,8 @@ function getAuth(
 }
 
 /**
+ * Convert unique data types which have been stringified and parsed back
+ * into their original type.
  * @param dataVal - Value of data
  * @param firestoreStatics - Statics from firestore instance
  * @returns Value converted into timestamp object if possible
@@ -73,12 +75,15 @@ function convertValueToTimestampOrGeoPointIfPossible(
   firestoreStatics: typeof firestore,
 ): firestore.FieldValue {
   /* eslint-disable no-underscore-dangle */
-  if (dataVal?._methodName === 'FieldValue.serverTimestamp') {
+  if (
+    dataVal?._methodName === 'serverTimestamp' ||
+    dataVal?._methodName === 'FieldValue.serverTimestamp' // v8 and earlier
+  ) {
     return firestoreStatics.FieldValue.serverTimestamp();
   }
   if (
     dataVal?._methodName === 'deleteField' ||
-    dataVal?._methodName === 'FieldValue.delete'
+    dataVal?._methodName === 'FieldValue.delete' // v8 and earlier
   ) {
     return firestoreStatics.FieldValue.delete();
   }
