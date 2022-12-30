@@ -1,3 +1,5 @@
+import { deleteField, Timestamp } from "firebase/firestore";
+
 describe('callFirestore', () => {
   describe('get', () => {
     before(() => {
@@ -124,5 +126,24 @@ describe('callFirestore', () => {
         expect(projectsAfterDelete).to.exist
       });
     });
+  });
+
+  it('write nested timestamp field', () => {
+    const time = Timestamp.fromDate(new Date())
+    cy.callFirestore('set', 'test/foo', { test: [{ time }] })
+    cy.callFirestore('get', 'test/foo').then((doc) => {
+      expect(doc).to.have.nested.property('test.0.time._seconds')
+      expect(doc).to.have.nested.property('test.0.time._nanoseconds')
+    })
+  });
+
+  it('update should allow deleting of a field', () => {
+    const originalDoc = { name: 'toDelete', some: 'asdf' }
+    cy.callFirestore('set', 'my-collection/doc-id', originalDoc)
+    cy.callFirestore('update', 'my-collection/doc-id', { some: deleteField() });
+    cy.callFirestore('get', 'my-collection/doc-id').then((doc) => {
+      expect(doc).to.not.have.property('some')
+      expect(doc).to.have.property('name', originalDoc.name)
+    })
   });
 });

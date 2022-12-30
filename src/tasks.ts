@@ -72,10 +72,17 @@ function convertValueToTimestampOrGeoPointIfPossible(
   dataVal: any,
   firestoreStatics: typeof firestore,
 ): firestore.FieldValue {
-  /* eslint-disable-next-line no-underscore-dangle */
+  /* eslint-disable no-underscore-dangle */
   if (dataVal?._methodName === 'FieldValue.serverTimestamp') {
     return firestoreStatics.FieldValue.serverTimestamp();
   }
+  if (
+    dataVal?._methodName === 'deleteField' ||
+    dataVal?._methodName === 'FieldValue.delete'
+  ) {
+    return firestoreStatics.FieldValue.delete();
+  }
+  /* eslint-enable no-underscore-dangle */
   if (
     typeof dataVal?.seconds === 'number' &&
     typeof dataVal?.nanoseconds === 'number'
