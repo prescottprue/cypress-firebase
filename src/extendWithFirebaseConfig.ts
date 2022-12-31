@@ -18,7 +18,7 @@ export interface ExtendedCypressConfigBase {
   env: ExtendedCypressConfigEnv;
 }
 
-export type ExtendedCypressConfig = Partial<Cypress.PluginConfigOptions> &
+export type ExtendedCypressConfig = Cypress.PluginConfigOptions &
   ExtendedCypressConfigBase;
 
 export interface ExtendWithFirebaseConfigSettings {
@@ -35,7 +35,7 @@ export interface ExtendWithFirebaseConfigSettings {
  * @returns Cypress config extended with environment variables
  */
 export default function extendWithFirebaseConfig(
-  cypressConfig: Partial<Cypress.PluginConfigOptions>,
+  cypressConfig: Cypress.PluginConfigOptions,
 ): ExtendedCypressConfig {
   const valuesFromEnv = [
     'FIREBASE_AUTH_EMULATOR_HOST',
