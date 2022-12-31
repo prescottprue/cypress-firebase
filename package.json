@@ -37,7 +37,7 @@
     "@tsconfig/node12": "1.0.11",
     "@types/chai": "4.3.4",
     "@types/mocha": "9.1.1",
-    "@types/node": "16.18.10",
+    "@types/node": "16.18.11",
     "@types/sinon-chai": "3.2.9",
     "@typescript-eslint/eslint-plugin": "5.46.1",
     "@typescript-eslint/parser": "5.46.1",
