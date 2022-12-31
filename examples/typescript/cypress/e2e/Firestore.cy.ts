@@ -39,6 +39,20 @@ describe('callFirestore', () => {
         expect(results).to.have.length(1);
       });  
     })
+
+    it('should query with where with timestamp', () => {
+      const uniqueName = 'Test Where'
+      const futureDate = new Date()
+      futureDate.setDate(futureDate.getDate() - 2)
+      cy.callFirestore('add', 'projects', { name: uniqueName, createdAt: Timestamp.fromDate(futureDate) })
+      cy.callFirestore('get', 'projects', {
+        // where: ['createdAt', '<=', Timestamp.now()],
+      }).then((results) => {
+        cy.log('get respond', results);
+        expect(results).to.exist;
+        expect(results).to.have.length(1);
+      });  
+    })
   })
 
   describe('set', () => {

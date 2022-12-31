@@ -97,6 +97,23 @@ describe('tasks', () => {
         expect(result[0]).to.have.property('name', secondProject.name);
       });
 
+      it.only('supports where with timestamp', async () => {
+        await projectFirestoreRef.set(testProject);
+        const secondProjectId = 'some';
+        const secondProject = { name: 'another' };
+        await projectsFirestoreRef.doc(secondProjectId).set(secondProject);
+        const result = await tasks.callFirestore(
+          adminApp,
+          'get',
+          PROJECTS_COLLECTION,
+          {
+            where: ['createdAt', '>=', admin.firestore.Timestamp.now()],
+          },
+        );
+        expect(result[0]).to.have.property('id', secondProjectId);
+        expect(result[0]).to.have.property('name', secondProject.name);
+      });
+
       it('supports multi-where', async () => {
         await projectFirestoreRef.set(testProject);
         const secondProjectId = 'some';
