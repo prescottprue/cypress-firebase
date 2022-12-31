@@ -822,8 +822,8 @@ If you experience this with an SDK version newer than v7 please create a new iss
 [npm-image]: https://img.shields.io/npm/v/cypress-firebase.svg?style=flat-square
 [npm-url]: https://npmjs.org/package/cypress-firebase
 [npm-downloads-image]: https://img.shields.io/npm/dm/cypress-firebase.svg?style=flat-square
-[build-status-image]: https://img.shields.io/github/workflow/status/prescottprue/cypress-firebase/NPM%20Package%20Publish?style=flat-square&logo=github
-[build-status-url]: https://github.com/prescottprue/cypress-firebase/actions
+[build-status-image]: https://img.shields.io/github/actions/workflow/status/prescottprue/cypress-firebase/publish.yml?branch=main&style=flat-square
+[build-status-url]: https://github.com/prescottprue/cypress-firebase/actions/workflows/publish.yml
 [coverage-image]: https://img.shields.io/codecov/c/gh/prescottprue/cypress-firebase?style=flat-square&logo=codecov
 [coverage-url]: https://codecov.io/gh/prescottprue/cypress-firebase
 [license-image]: https://img.shields.io/npm/l/cypress-firebase.svg?style=flat-square

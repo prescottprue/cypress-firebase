@@ -1,6 +1,6 @@
 {
   "name": "cypress-firebase",
-  "version": "2.2.1",
+  "version": "0.0.0-development",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "module": "lib-esm/index.js",
@@ -110,14 +110,14 @@
       "name": "CommonJS: attachCustomCommands",
       "path": "lib/index.js",
       "import": "{ attachCustomCommands }",
-      "limit": "10kb",
+      "limit": "7kb",
       "webpack": false
     },
     {
       "name": "CommonJS: plugin",
       "path": "lib/index.js",
       "import": "{ plugin }",
-      "limit": "10kb",
+      "limit": "7kb",
       "webpack": false
     },
     {
