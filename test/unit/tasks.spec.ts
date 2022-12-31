@@ -143,7 +143,7 @@ describe('tasks', () => {
             ],
           },
         );
-        console.log('result', result);
+        // TODO: Come up with a more stable way to verify here - data from other tests can cause fails
         expect(result[0]).to.have.property('id', projectId);
       });
 
