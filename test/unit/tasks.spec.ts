@@ -27,12 +27,6 @@ describe('tasks', () => {
   });
 
   describe('callFirestore', () => {
-    beforeEach(async () => {
-      await firebase.clearFirestoreData({
-        projectId: process.env.GCLOUD_PROJECT || 'test-project',
-      });
-    });
-
     it('is exported', () => {
       expect(tasks).to.have.property('callFirestore');
       expect(tasks.callFirestore).to.be.a('function');
@@ -369,6 +363,70 @@ describe('tasks', () => {
         );
         const resultSnap = await projectFirestoreRef.get();
         expect(resultSnap.data()).to.have.property('some', testValue);
+      });
+
+      it('supports deleting a field from a document using deleteField', async () => {
+        const originalDoc = { some: 'other', another: 'one', keep: 'asdf' };
+        await projectFirestoreRef.set(originalDoc);
+        // cy.task stringifies and parses the data past to it resulting in the following value
+        const legacyStringifiedFieldDelete = {
+          _methodName: 'FieldValue.delete',
+        };
+        // V9 syntax
+        const stringifiedFieldDelete = {
+          _methodName: 'deleteField',
+        };
+
+        await tasks.callFirestore(
+          adminApp,
+          'update',
+          PROJECT_PATH,
+          { statics: admin.firestore, merge: true },
+          { some: legacyStringifiedFieldDelete },
+        );
+        await tasks.callFirestore(
+          adminApp,
+          'update',
+          PROJECT_PATH,
+          { statics: admin.firestore, merge: true },
+          { another: stringifiedFieldDelete },
+        );
+        const resultSnap = await projectFirestoreRef.get();
+        expect(resultSnap.data()).to.not.have.property('some');
+        expect(resultSnap.data()).to.not.have.property('another');
+        expect(resultSnap.data()).to.have.property('keep', originalDoc.keep);
+      });
+
+      it('supports deleting a nested field from a document using deleteField', async () => {
+        const originalDoc = {
+          top: {
+            second: {
+              some: 'other',
+              keep: 'asdf',
+            },
+          },
+        };
+        await projectFirestoreRef.set(originalDoc);
+        // cy.task stringifies and parses the data past to it resulting in the following value
+        const stringifiedFieldDelete = {
+          _methodName: 'deleteField',
+        };
+
+        await tasks.callFirestore(
+          adminApp,
+          'set',
+          PROJECT_PATH,
+          { statics: admin.firestore, merge: true },
+          { top: { second: { some: stringifiedFieldDelete } } },
+        );
+        const resultSnap = await projectFirestoreRef.get();
+        expect(resultSnap.data()).to.not.have.nested.property(
+          'top.second.some',
+        );
+        expect(resultSnap.data()).to.have.nested.property(
+          'top.second.keep',
+          originalDoc.top.second.keep,
+        );
       });
 
       describe('with timestamps', () => {
