@@ -23,7 +23,7 @@ export interface FixtureData {
   [k: string]: any;
 }
 
-type WhereOptions = [string, FirebaseFirestore.WhereFilterOp, any];
+export type WhereOptions = [string, FirebaseFirestore.WhereFilterOp, any];
 
 /**
  * Options for callFirestore custom Cypress command.

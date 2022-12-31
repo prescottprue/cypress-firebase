@@ -131,7 +131,7 @@
       "name": "ESM: plugin",
       "path": "lib-esm/index.js",
       "import": "{ plugin }",
-      "limit": "2.75kb",
+      "limit": "3kb",
       "webpack": false
     }
   ]
