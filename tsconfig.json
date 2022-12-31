@@ -1,15 +1,16 @@
 {
-  "extends": "@tsconfig/node12/tsconfig.json",
+  "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
     "moduleResolution": "node",
     "declaration": true,
     "outDir": "lib",
     "rootDir": "./src",
     "importHelpers": true,
+    "esModuleInterop": true,
     "downlevelIteration": true,
     "allowSyntheticDefaultImports": true
   },
   "typeRoots": ["./types", "./node_modules/@types"],
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "examples"]
+  "exclude": ["node_modules"]
 }
