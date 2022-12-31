@@ -11,8 +11,6 @@ import * as tasks from './tasks';
  * FIRESTORE_EMULATOR_HOST and FIREBASE_AUTH_EMULATOR_HOST.
  * @param cypressOnFunc - on function from cypress plugins file
  * @param cypressConfig - Cypress config
- * @param adminInstance - firebase-admin instance
- * @param overrideConfig - Override config for firebase instance
  * @returns Extended Cypress config
  */
 export default function pluginWithTasks(

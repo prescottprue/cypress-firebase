@@ -409,7 +409,7 @@ describe('Test firestore', () => {
 
 ### Plugin
 
-Plugin attaches cypress tasks, which are called by custom commands, and initializes firebase-admin instance. By default cypress-firebase internally initializes firebase-admin using `GCLOUD_PROJECT` environment variable for project identification and application-default credentials (set by providing path to service account in `GOOGLE_APPLICATION_CREDENTIALS` environment variable) [matching Google documentation](https://firebase.google.com/docs/admin/setup#initialize-sdk). This default functionality can be overriden by passing a forth argument to the plugin - this argument is passed directly into the firebase-admin instance as [AppOptions](https://firebase.google.com/docs/reference/admin/dotnet/class/firebase-admin/app-options#constructors-and-destructors) on init which means any other config such as `databaseURL`, `credential`, or `databaseAuthVariableOverride` can be included.
+Plugin attaches cypress tasks, which are called by custom commands, and initializes firebase-admin instance. By default cypress-firebase internally initializes firebase-admin using `GCLOUD_PROJECT` environment variable for project identification and application-default credentials (set by providing path to service account in `GOOGLE_APPLICATION_CREDENTIALS` environment variable) [matching Google documentation](https://firebase.google.com/docs/admin/setup#initialize-sdk).
 
 ```js
 import admin from 'firebase-admin';
@@ -422,7 +422,7 @@ const cypressConfig = defineConfig({
     // NOTE: Make supportFile exists if separate location is provided
     setupNodeEvents(on, config) {
       // e2e testing node events setup code
-      return cypressFirebasePlugin(on, config, admin);
+      return cypressFirebasePlugin(on, config);
       // NOTE: If not setting GCLOUD_PROJECT env variable, project can be set like so:
       // return cypressFirebasePlugin(on, config, admin, { projectId: 'some-project' });
     },

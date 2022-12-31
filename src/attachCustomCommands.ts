@@ -381,7 +381,7 @@ export default function attachCustomCommands(
       const auth = getAuthWithTenantId(options);
       // Resolve with current user if they already exist
       if (auth.currentUser && userUid === auth.currentUser.uid) {
-        cy.log('Authed user already exists, login complete.');
+        cy.log('Authenticated user already exists, login complete.');
         return undefined;
       }
 
@@ -493,6 +493,7 @@ export default function attachCustomCommands(
       const taskSettings: any = {
         action,
         path: actionPath,
+        appName: options.appName,
       };
       // Add data only for write actions
       if (['set', 'update', 'add'].includes(action)) {

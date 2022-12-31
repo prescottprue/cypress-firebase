@@ -1,21 +1,10 @@
 import type { firestore } from 'firebase-admin';
-import {
-  initializeApp,
-  applicationDefault,
-  cert,
-  Credential,
-  AppOptions,
-  ServiceAccount,
-  App,
-} from 'firebase-admin/app';
 import type {
-  Settings,
   CollectionReference,
   DocumentReference,
   Query,
   QuerySnapshot,
 } from 'firebase-admin/firestore';
-import { getServiceAccount } from './node-utils';
 import { CallFirestoreOptions } from './attachCustomCommands';
 
 /**
@@ -25,150 +14,6 @@ import { CallFirestoreOptions } from './attachCustomCommands';
  */
 export function isString(valToCheck: any): boolean {
   return typeof valToCheck === 'string' || valToCheck instanceof String;
-}
-
-/**
- * Get settings for Firestore from environment. Loads port and servicePath from
- * FIRESTORE_EMULATOR_HOST node environment variable if found, otherwise
- * defaults to port 8080 and servicePath "localhost".
- * @returns Firestore settings to be passed to firebase.firestore().settings
- */
-function firestoreSettingsFromEnv(): Settings {
-  const { FIRESTORE_EMULATOR_HOST } = process.env;
-  if (
-    typeof FIRESTORE_EMULATOR_HOST === 'undefined' ||
-    !isString(FIRESTORE_EMULATOR_HOST)
-  ) {
-    return {
-      servicePath: 'localhost',
-      port: 8080,
-    };
-  }
-  const [servicePath, portStr] = FIRESTORE_EMULATOR_HOST.split(':');
-  return {
-    servicePath,
-    port: parseInt(portStr, 10),
-  };
-}
-
-/**
- * @param adminInstance - firebase-admin instance to initialize
- * @returns Firebase admin credential
- */
-function getFirebaseCredential(): Credential | undefined {
-  const serviceAccount = getServiceAccount();
-  // Add service account credential if it exists so that custom auth tokens can be generated
-  if (serviceAccount) {
-    return cert(serviceAccount as ServiceAccount);
-  }
-
-  // Add default credentials if they exist
-  const defaultCredentials = applicationDefault();
-  if (defaultCredentials) {
-    console.log('cypress-firebase: Using default credentials'); // eslint-disable-line no-console
-    return defaultCredentials;
-  }
-}
-
-/**
- * Get default datbase url
- * @param projectId - Project id
- * @returns Default database url
- */
-function getDefaultDatabaseUrl(projectId?: string): string {
-  const { FIREBASE_DATABASE_EMULATOR_HOST } = process.env;
-  return FIREBASE_DATABASE_EMULATOR_HOST
-    ? `http://${FIREBASE_DATABASE_EMULATOR_HOST}?ns=${projectId || 'local'}`
-    : `https://${projectId}.firebaseio.com`;
-}
-
-/**
- * Initialize Firebase instance from service account (from either local
- * serviceAccount.json or environment variables)
- * @param overrideConfig - firebase-admin instance to initialize
- */
-export function initializeFirebase(overrideConfig?: AppOptions): App {
-  try {
-    // TODO: Look into using @firebase/testing in place of admin here to allow for
-    // usage of clearFirestoreData (see https://github.com/prescottprue/cypress-firebase/issues/73 for more info)
-    const { FIREBASE_DATABASE_EMULATOR_HOST } = process.env;
-    const fbConfig: AppOptions = {
-      // Initialize RTDB with databaseURL pointed to emulator if FIREBASE_DATABASE_EMULATOR_HOST is set
-      ...overrideConfig,
-    };
-
-    if (FIREBASE_DATABASE_EMULATOR_HOST) {
-      /* eslint-disable no-console */
-      console.log(
-        'cypress-firebase: Using RTDB emulator with host:',
-        FIREBASE_DATABASE_EMULATOR_HOST,
-      );
-      /* eslint-enable no-console */
-    }
-
-    if (process.env.FIREBASE_AUTH_EMULATOR_HOST) {
-      /* eslint-disable no-console */
-      console.log(
-        'cypress-firebase: Using Auth emulator with port:',
-        process.env.FIREBASE_AUTH_EMULATOR_HOST,
-      );
-      /* eslint-enable no-console */
-    }
-
-    // Add credentials if they do not already exist - starting with application default, falling back to SERVICE_ACCOUNT env variable
-    if (!fbConfig.credential) {
-      const credential = getFirebaseCredential();
-      if (credential) {
-        fbConfig.credential = credential;
-      }
-    }
-
-    // Add projectId to fb config if it doesn't already exist
-    if (!fbConfig.projectId) {
-      const projectId =
-        process.env.GCLOUD_PROJECT || (fbConfig.credential as any)?.projectId; // eslint-disable-line camelcase
-      if (projectId) {
-        fbConfig.projectId = projectId;
-      }
-    }
-
-    // Add databaseURL if it doesn't already exist
-    if (!fbConfig.databaseURL) {
-      const databaseURL = getDefaultDatabaseUrl(fbConfig.projectId);
-      if (databaseURL) {
-        fbConfig.databaseURL = databaseURL;
-      }
-    }
-
-    const app = initializeApp(fbConfig);
-    // Initialize Firestore with emulator host settings
-    if (process.env.FIRESTORE_EMULATOR_HOST) {
-      const firestoreSettings = firestoreSettingsFromEnv();
-      /* eslint-disable no-console */
-      console.log(
-        'cypress-firebase: Using Firestore emulator with settings:',
-        firestoreSettings,
-      );
-      /* eslint-enable no-console */
-    }
-    /* eslint-disable no-console */
-    const dbUrlLog = fbConfig.databaseURL
-      ? ` and databaseURL "${fbConfig.databaseURL}"`
-      : '';
-    console.log(
-      `cypress-firebase: Initialized Firebase app for project "${fbConfig.projectId}"${dbUrlLog}`,
-    );
-    return app;
-    /* eslint-enable no-console */
-  } catch (err) {
-    /* eslint-disable no-console */
-    console.error(
-      'cypress-firebase: Error initializing firebase-admin instance:',
-      err instanceof Error && err.message,
-    );
-    /* eslint-enable no-console */
-    throw err;
-  }
 }
 
 /**

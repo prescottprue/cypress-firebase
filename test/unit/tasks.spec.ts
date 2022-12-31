@@ -351,17 +351,15 @@ describe('tasks', () => {
         };
 
         await tasks.callFirestore(
-          adminApp,
           'update',
           PROJECT_PATH,
-          { statics: admin.firestore, merge: true },
+          { statics: admin.firestore.FieldValue },
           { some: legacyStringifiedFieldDelete },
         );
         await tasks.callFirestore(
-          adminApp,
           'update',
           PROJECT_PATH,
-          { statics: admin.firestore, merge: true },
+          { statics: admin.firestore.FieldValue },
           { another: stringifiedFieldDelete },
         );
         const resultSnap = await projectFirestoreRef.get();
@@ -386,10 +384,9 @@ describe('tasks', () => {
         };
 
         await tasks.callFirestore(
-          adminApp,
           'set',
           PROJECT_PATH,
-          { statics: admin.firestore, merge: true },
+          { statics: admin.firestore.FieldValue, merge: true },
           { top: { second: { some: stringifiedFieldDelete } } },
         );
         const resultSnap = await projectFirestoreRef.get();

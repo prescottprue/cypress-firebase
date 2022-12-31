@@ -230,9 +230,7 @@ export async function callFirestore(
   options?: CallFirestoreOptions,
   data?: FixtureData,
 ): Promise<any> {
-  const firestoreInstance = getFirestore(
-    options?.appName ? getApp(options.appName) : undefined,
-  );
+  const firestoreInstance = getFirestore(getApp(options?.appName));
   try {
     if (action === 'get') {
       const snap = await (
@@ -306,7 +304,7 @@ export async function callFirestore(
 
 export interface CustomTokenTaskSettings extends AppOptions {
   uid: string;
-  customClaims?: any;
+  customClaims?: Record<string, unknown>;
 }
 
 /**
