@@ -41,10 +41,10 @@ If you are interested in what drove the need for this checkout [the why section]
    import { defineConfig } from 'cypress';
    import { plugin as cypressFirebasePlugin } from 'cypress-firebase';
 
-   const cypressConfig = defineConfig({
+   export default defineConfig({
      e2e: {
        baseUrl: 'http://localhost:3000',
-       // NOTE: Make supportFile exists if separate location is provided
+       // NOTE: Add "supportFile" setting if separate location is used
        setupNodeEvents(on, config) {
          // e2e testing node events setup code
          return cypressFirebasePlugin(on, config, admin);
@@ -53,8 +53,6 @@ If you are interested in what drove the need for this checkout [the why section]
        },
      },
    });
-
-   export default cypressConfig;
    ```
 
    or if you are not using TS, then within `cypress.config.js`:
