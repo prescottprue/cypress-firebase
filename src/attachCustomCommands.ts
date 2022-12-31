@@ -493,7 +493,7 @@ export default function attachCustomCommands(
       const taskSettings: any = {
         action,
         path: actionPath,
-        appName: options.appName,
+        appName: options?.appName,
       };
       // Add data only for write actions
       if (['set', 'update', 'add'].includes(action)) {
