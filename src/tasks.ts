@@ -82,14 +82,26 @@ function getAdminAuthWithTenantId(authSettings?: {
 }
 
 /**
+ * Convert unique data types which have been stringified and parsed back
+ * into their original type.
  * @param dataVal - Value of data
  * @returns Value converted into timestamp object if possible
  */
 function convertValueToTimestampOrGeoPointIfPossible(dataVal: any): FieldValue {
-  /* eslint-disable-next-line no-underscore-dangle */
-  if (dataVal?._methodName === 'FieldValue.serverTimestamp') {
+  /* eslint-disable no-underscore-dangle */
+  if (
+    dataVal?._methodName === 'serverTimestamp' ||
+    dataVal?._methodName === 'FieldValue.serverTimestamp' // v8 and earlier
+  ) {
     return FieldValue.serverTimestamp();
   }
+  if (
+    dataVal?._methodName === 'deleteField' ||
+    dataVal?._methodName === 'FieldValue.delete' // v8 and earlier
+  ) {
+    return FieldValue.delete();
+  }
+  /* eslint-enable no-underscore-dangle */
   if (
     typeof dataVal?.seconds === 'number' &&
     typeof dataVal?.nanoseconds === 'number'

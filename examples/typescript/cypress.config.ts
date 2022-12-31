@@ -4,12 +4,10 @@ import { defineConfig } from 'cypress';
 
 initializeApp()
 
-const cypressConfig = defineConfig({
+export default defineConfig({
   e2e: {
     setupNodeEvents(on, config): Cypress.PluginConfigOptions {
       return cypressFirebasePlugin(on, config);
     },
   },
 });
-
-export default cypressConfig;
