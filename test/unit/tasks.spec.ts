@@ -98,20 +98,54 @@ describe('tasks', () => {
       });
 
       it('supports where with timestamp', async () => {
-        await projectFirestoreRef.set(testProject);
-        const secondProjectId = 'some';
-        const secondProject = { name: 'another' };
-        await projectsFirestoreRef.doc(secondProjectId).set(secondProject);
+        const projectId = 'one-where-timestamp';
+        const pastDate = new Date();
+        pastDate.setDate(pastDate.getDate() - 2);
+        await projectsFirestoreRef
+          .doc(projectId)
+          .set({ dateField: admin.firestore.Timestamp.fromDate(pastDate) });
         const result = await tasks.callFirestore(
           adminApp,
           'get',
           PROJECTS_COLLECTION,
           {
-            where: ['createdAt', '>=', admin.firestore.Timestamp.now()],
+            statics: { Timestamp: admin.firestore.Timestamp } as any,
+            where: [
+              'dateField',
+              '==',
+              admin.firestore.Timestamp.fromDate(pastDate),
+            ],
           },
         );
-        expect(result[0]).to.have.property('id', secondProjectId);
-        expect(result[0]).to.have.property('name', secondProject.name);
+        expect(result[0]).to.have.property('id', projectId);
+      });
+
+      it.only('supports multiple wheres with timestamps', async () => {
+        const projectId = 'multi-where-timestamp';
+        const pastDate = new Date();
+        pastDate.setDate(pastDate.getDate() - 2);
+        const fieldName = 'anotherField';
+        await projectsFirestoreRef
+          .doc(projectId)
+          .set({ [fieldName]: admin.firestore.Timestamp.fromDate(pastDate) });
+        const result = await tasks.callFirestore(
+          adminApp,
+          'get',
+          PROJECTS_COLLECTION,
+          {
+            statics: { Timestamp: admin.firestore.Timestamp } as any,
+            where: [
+              [
+                fieldName,
+                '>=',
+                admin.firestore.Timestamp.fromDate(new Date('1/1/21')),
+              ],
+              [fieldName, '<=', admin.firestore.Timestamp.fromDate(new Date())],
+            ],
+          },
+        );
+        console.log('result', result);
+        expect(result[0]).to.have.property('id', projectId);
       });
 
       it('supports multi-where', async () => {
