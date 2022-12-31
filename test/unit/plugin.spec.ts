@@ -12,7 +12,11 @@ describe('plugin', () => {
     const onFuncSpy = sinon.spy((action, tasksObj) => {
       assignedTasksObj = tasksObj;
     });
-    const results = pluginWithTasks(onFuncSpy, {}, {});
+    const results = pluginWithTasks(
+      onFuncSpy,
+      {} as Cypress.PluginConfigOptions,
+      {},
+    );
     expect(results).to.be.an('object');
     expect(onFuncSpy).to.have.been.calledOnceWith('task');
     expect(assignedTasksObj).to.have.property('callRtdb');
@@ -25,7 +29,7 @@ describe('plugin', () => {
 
     const results = pluginWithTasks(
       onFuncSpy,
-      {},
+      {} as Cypress.PluginConfigOptions,
       {
         initializeApp: initializeSpy,
         credential: { cert: () => ({}), applicationDefault: sinon.spy() },
@@ -47,8 +51,10 @@ describe('plugin', () => {
     const createCustomTokenSpy = sinon.spy(() => 'asdf');
     const results = pluginWithTasks(
       onFuncSpy,
-      {},
-      { auth: () => ({ createCustomToken: createCustomTokenSpy }) },
+      {} as Cypress.PluginConfigOptions,
+      {
+        auth: () => ({ createCustomToken: createCustomTokenSpy }),
+      },
     );
     expect(results).to.be.an('object');
     expect(onFuncSpy).to.have.been.calledOnceWith('task');
