@@ -130,9 +130,13 @@ function getDataWithTimestampsAndGeoPoints(
       };
     }
     const value = Array.isArray(currData)
-      ? currData.map((dataItem) =>
-          convertValueToTimestampOrGeoPointIfPossible(dataItem),
-        )
+      ? currData.map((dataItem) => {
+          const result = convertValueToTimestampOrGeoPointIfPossible(dataItem);
+
+          return result.constructor === Object
+            ? getDataWithTimestampsAndGeoPoints(result)
+            : result;
+        })
       : convertValueToTimestampOrGeoPointIfPossible(currData);
 
     return {

@@ -31,6 +31,10 @@ If you are interested in what drove the need for this checkout [the why section]
 
 ### Setup
 
+1. Make Google Cloud project name available to cypress-firebase to pass to firebase-admin on initialization by doing one of the following:
+   - _suggested_ Set `GCLOUD_PROJECT` environment variable to match the Google Project you would like to use. This needs to be on the process running cypress, so it should be before `cypress open` or `cypress run` in npm scripts. cross-env is a helpful way to do this to support multiple platforms and is how it is done in examples.
+   - Pass `projectId` into `cypressFirebasePlugin` options when initializing (see comment in next step)
+1. Generate and download a service account as described in [the firebase-admin setup documentation](https://firebase.google.com/docs/admin/setup#initialize-sdk). Save this to a local file within the project which you confirm is within your `.gitignore` - often `./serviceAccount.json`. Make sure YOU DO NOT COMMIT THIS FILE - it is sensitive and will give others admin access to your project.
 1. Set the following config in your `cypress.config.js` or `cypress.config.ts`
 
    ```js
@@ -44,10 +48,12 @@ If you are interested in what drove the need for this checkout [the why section]
    const cypressConfig = defineConfig({
      e2e: {
        baseUrl: 'http://localhost:3000',
-       supportFile: 'cypress/support/e2e/index.js',
+       // NOTE: Make supportFile exists if separate location is provided
        setupNodeEvents(on, config) {
-         cypressFirebasePlugin(on, config, admin);
          // e2e testing node events setup code
+         return cypressFirebasePlugin(on, config, admin);
+         // NOTE: If not setting GCLOUD_PROJECT env variable, project can be set like so:
+         // return cypressFirebasePlugin(on, config, admin, { projectId: 'some-project' });
        },
      },
    });
@@ -68,9 +74,12 @@ If you are interested in what drove the need for this checkout [the why section]
    module.exports = defineConfig({
      e2e: {
        baseUrl: 'http://localhost:3000',
-       supportFile: 'cypress/support/e2e/index.js',
+       // NOTE: Make supportFile exists if separate location is provided
        setupNodeEvents(on, config) {
+         // e2e testing node events setup code
          return cypressFirebasePlugin(on, config, admin);
+         // NOTE: If not setting GCLOUD_PROJECT env variable, project can be set like so:
+         // return cypressFirebasePlugin(on, config, admin, { projectId: 'some-project' });
        },
      },
    });
@@ -185,7 +194,7 @@ attachCustomCommands({ Cypress, cy, firebase, app: namedApp });
 
 Login to Firebase using custom auth token.
 
-To specify a tenant ID, either pass the ID as a parameter to `cy.login`, or set it as environment variable `TEST_TENANT_ID`. Read more about [Firebase multi-tenancy](https://firebase.google.com/docs/reference/admin/node/admin.auth.Tenant).
+To specify a tenant ID, either pass the ID as a parameter to `cy.login`, or set it as environment variable `TEST_TENANT_ID`. Read more about [Firebase multi-tenancy](https://cloud.google.com/identity-platform/docs/multi-tenancy-authentication).
 
 ##### Examples
 
@@ -396,6 +405,31 @@ describe('Test firestore', () => {
     cy.log('Ended test');
   });
 });
+```
+
+### Plugin
+
+Plugin attaches cypress tasks, which are called by custom commands, and initializes firebase-admin instance. By default cypress-firebase internally initializes firebase-admin using `GCLOUD_PROJECT` environment variable for project identification and application-default credentials (set by providing path to service account in `GOOGLE_APPLICATION_CREDENTIALS` environment variable) [matching Google documentation](https://firebase.google.com/docs/admin/setup#initialize-sdk). This default functionality can be overriden by passing a forth argument to the plugin - this argument is passed directly into the firebase-admin instance as [AppOptions](https://firebase.google.com/docs/reference/admin/dotnet/class/firebase-admin/app-options#constructors-and-destructors) on init which means any other config such as `databaseURL`, `credential`, or `databaseAuthVariableOverride` can be included.
+
+```js
+import admin from 'firebase-admin';
+import { defineConfig } from 'cypress';
+import { plugin as cypressFirebasePlugin } from 'cypress-firebase';
+
+const cypressConfig = defineConfig({
+  e2e: {
+    baseUrl: 'http://localhost:3000',
+    // NOTE: Make supportFile exists if separate location is provided
+    setupNodeEvents(on, config) {
+      // e2e testing node events setup code
+      return cypressFirebasePlugin(on, config, admin);
+      // NOTE: If not setting GCLOUD_PROJECT env variable, project can be set like so:
+      // return cypressFirebasePlugin(on, config, admin, { projectId: 'some-project' });
+    },
+  },
+});
+
+export default cypressConfig;
 ```
 
 ## Recipes

@@ -22,13 +22,13 @@
   },
   "devDependencies": {
     "cross-env": "7.0.3",
-    "cypress": "10.3.0",
+    "cypress": "10.11.0",
     "cypress-firebase": "2.2.2",
     "eslint-plugin-chai-friendly": "0.7.2",
     "eslint-plugin-cypress": "2.12.1",
     "firebase-admin": "10.3.0",
     "firebase-tools": "11.1.0",
-    "react-scripts": "4.0.3"
+    "react-scripts": "5.0.1"
   },
   "eslintConfig": {
     "extends": "./.eslintrc.js"
