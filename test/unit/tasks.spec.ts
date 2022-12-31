@@ -97,7 +97,7 @@ describe('tasks', () => {
         expect(result[0]).to.have.property('name', secondProject.name);
       });
 
-      it.only('supports where with timestamp', async () => {
+      it('supports where with timestamp', async () => {
         await projectFirestoreRef.set(testProject);
         const secondProjectId = 'some';
         const secondProject = { name: 'another' };
