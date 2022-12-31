@@ -28,7 +28,7 @@ describe('plugin', () => {
       {},
       {
         initializeApp: initializeSpy,
-        credential: { cert: () => ({}) },
+        credential: { cert: () => ({}), applicationDefault: sinon.spy() },
         apps: [],
         firestore: () => ({ settings: () => ({}) }),
       },
