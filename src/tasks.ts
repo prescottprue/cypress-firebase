@@ -70,7 +70,7 @@ function getAuth(
  * @param firestoreStatics - Statics from firestore instance
  * @returns Value converted into timestamp object if possible
  */
-function convertValueToTimestampOrGeoPointIfPossible(
+export function convertValueToTimestampOrGeoPointIfPossible(
   dataVal: any,
   firestoreStatics: typeof firestore,
 ): firestore.FieldValue {
@@ -233,7 +233,7 @@ export async function callFirestore(
     if (action === 'get') {
       const snap = await (
         slashPathToFirestoreRef(
-          adminInstance.firestore(),
+          adminInstance.firestore,
           actionPath,
           options,
         ) as any
@@ -255,7 +255,7 @@ export async function callFirestore(
       const deletePromise = isDocPath(actionPath)
         ? (
             slashPathToFirestoreRef(
-              adminInstance.firestore(),
+              adminInstance.firestore,
               actionPath,
               options,
             ) as FirebaseFirestore.DocumentReference
@@ -263,7 +263,7 @@ export async function callFirestore(
         : deleteCollection(
             adminInstance.firestore(),
             slashPathToFirestoreRef(
-              adminInstance.firestore(),
+              adminInstance.firestore,
               actionPath,
               options,
             ) as
@@ -299,10 +299,10 @@ export async function callFirestore(
             : (undefined as any),
         );
     }
-    // "update" action
+    // "update" and "add" action
     return (
       slashPathToFirestoreRef(
-        adminInstance.firestore(),
+        adminInstance.firestore,
         actionPath,
         options,
       ) as any
