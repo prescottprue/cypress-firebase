@@ -5907,10 +5907,10 @@ csv-parse@^5.0.4:
   resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-5.0.4.tgz#97e5e654413bcf95f2714ce09bcb2be6de0eb8e3"
   integrity sha512-5AIdl8l6n3iYQYxan5djB5eKDa+vBnhfWZtRpJTcrETWfVLYN0WSj3L9RwvgYt+psoO77juUr8TG8qpfGZifVQ==
 
-cypress-firebase@2.2.2:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/cypress-firebase/-/cypress-firebase-2.2.2.tgz#493c8736cb80aceb7b3548d690a547b02cf72aa5"
-  integrity sha512-EfpSJ8z8WXnIM1ezbxFUk51Kt6jaFFnEZp6uOoSgb9DF58hwxJ+MoSw1rpyX8Kwuiv/14pFpDiI1U+ZvSTK5fg==
+cypress-firebase@2.2.5:
+  version "2.2.5"
+  resolved "https://registry.yarnpkg.com/cypress-firebase/-/cypress-firebase-2.2.5.tgz#07c30a9d01628abffa9b3a3c2b238744501d8ff6"
+  integrity sha512-KE2T+t37FB4LCJ5GceFBCN6V+svtljRKra/dzzS2+i8altuybllS7K4UP5/Pn5o2gZw/6dOz+GGRGTXVjpHlUg==
 
 cypress@12.2.0:
   version "12.2.0"
