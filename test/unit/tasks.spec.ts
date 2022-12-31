@@ -99,11 +99,10 @@ describe('tasks', () => {
 
       it('supports where with timestamp', async () => {
         const projectId = 'one-where-timestamp';
-        const pastDate = new Date();
-        pastDate.setDate(pastDate.getDate() - 2);
+        const currentDate = new Date();
         await projectsFirestoreRef
           .doc(projectId)
-          .set({ dateField: admin.firestore.Timestamp.fromDate(pastDate) });
+          .set({ dateField: admin.firestore.Timestamp.fromDate(currentDate) });
         const result = await tasks.callFirestore(
           adminApp,
           'get',
@@ -113,14 +112,14 @@ describe('tasks', () => {
             where: [
               'dateField',
               '==',
-              admin.firestore.Timestamp.fromDate(pastDate),
+              admin.firestore.Timestamp.fromDate(currentDate),
             ],
           },
         );
         expect(result[0]).to.have.property('id', projectId);
       });
 
-      it.only('supports multiple wheres with timestamps', async () => {
+      it('supports multiple wheres with timestamps', async () => {
         const projectId = 'multi-where-timestamp';
         const pastDate = new Date();
         pastDate.setDate(pastDate.getDate() - 2);
