@@ -1,5 +1,4 @@
 import type { AppOptions, app, firestore, credential } from 'firebase-admin';
-import { getServiceAccount } from './node-utils';
 import { CallFirestoreOptions, WhereOptions } from './attachCustomCommands';
 import { convertValueToTimestampOrGeoPointIfPossible } from './tasks';
 
@@ -34,6 +33,41 @@ function firestoreSettingsFromEnv(): FirebaseFirestore.Settings {
     servicePath,
     port: parseInt(portStr, 10),
   };
+}
+
+/* eslint-disable camelcase */
+interface ServiceAccount {
+  type: string;
+  project_id: string;
+  private_key_id: string;
+  private_key: string;
+  client_email: string;
+  client_id: string;
+  auth_uri: string;
+  token_uri: string;
+  auth_provider_x509_cert_url: string;
+  client_x509_cert_url: string;
+}
+/* eslint-enable camelcase */
+
+/**
+ * Get service account from either SERVICE_ACCOUNT environment variable
+ * @returns Service account object
+ */
+function getServiceAccount(): ServiceAccount | undefined {
+  // Environment variable
+  const serviceAccountEnvVar = process.env.SERVICE_ACCOUNT;
+  if (serviceAccountEnvVar) {
+    try {
+      return JSON.parse(serviceAccountEnvVar);
+    } catch (err) {
+      /* eslint-disable no-console */
+      console.warn(
+        `cypress-firebase: Issue parsing "SERVICE_ACCOUNT" environment variable from string to object, returning string`,
+      );
+      /* eslint-enable no-console */
+    }
+  }
 }
 
 /**
