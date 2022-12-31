@@ -41,7 +41,7 @@ describe('firebase-utils', () => {
       expect(initializeMock).to.have.been.calledWith({
         projectId,
         credential: mockCredential,
-        databaseURL: `http://localhost:9000?ns=${projectId}`,
+        databaseURL: `http://${process.env.FIREBASE_DATABASE_EMULATOR_HOST}?ns=${projectId}`,
       });
     });
 
@@ -49,7 +49,7 @@ describe('firebase-utils', () => {
       const returnedInstance = {};
       const initializeMock = sinon.spy(() => returnedInstance);
       const settingsMock = sinon.spy();
-      const databaseURL = 'http://localhost:9000?ns=test-namespace';
+      const databaseURL = `http://${process.env.FIREBASE_DATABASE_EMULATOR_HOST}?ns=test-namespace`;
       const projectId = 'test-project';
       const adminInstanceMock = {
         initializeApp: initializeMock,
@@ -75,7 +75,7 @@ describe('firebase-utils', () => {
       const initializeMock = sinon.spy(() => returnedInstance);
       const settingsMock = sinon.spy();
       const projectId = 'override-project-test';
-      const databaseURL = `http://localhost:9000?ns=${projectId}`;
+      const databaseURL = `http://${process.env.FIREBASE_DATABASE_EMULATOR_HOST}?ns=${projectId}`;
       const mockCredential: any = { projectId };
       const adminInstanceMock = {
         initializeApp: initializeMock,
