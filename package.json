@@ -30,7 +30,7 @@
   "devDependencies": {
     "@commitlint/cli": "17.4.2",
     "@commitlint/config-conventional": "17.4.2",
-    "@firebase/rules-unit-testing": "2.0.6",
+    "@firebase/rules-unit-testing": "2.0.7",
     "@istanbuljs/nyc-config-typescript": "1.0.2",
     "@size-limit/preset-small-lib": "8.1.2",
     "@size-limit/webpack": "8.1.2",
