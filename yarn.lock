@@ -8088,10 +8088,10 @@ sinon@15.0.1:
     nise "^5.1.2"
     supports-color "^7.2.0"
 
-size-limit@8.2.3:
-  version "8.2.3"
-  resolved "https://registry.yarnpkg.com/size-limit/-/size-limit-8.2.3.tgz#406652d100825e4b8ed147085b6ec15745175a06"
-  integrity sha512-05dCPH21ZKOHRSjMHdCzg88VUbHiI+UegSMqXo1U6+qHoM6jwb8WYMNPi/RPNhOLIlQCZGEry2O/h599C/o28A==
+size-limit@8.2.4:
+  version "8.2.4"
+  resolved "https://registry.yarnpkg.com/size-limit/-/size-limit-8.2.4.tgz#0ab0df7cbc89007d544a50b451f5fb4d110694ca"
+  integrity sha512-Un16nSreD1v2CYwSorattiJcHuAWqXvg4TsGgzpjnoByqQwsSfCIEQHuaD14HNStzredR8cdsO9oGH91ibypTA==
   dependencies:
     bytes-iec "^3.1.1"
     chokidar "^3.5.3"
