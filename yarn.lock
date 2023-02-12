@@ -1357,33 +1357,33 @@
   resolved "https://registry.yarnpkg.com/@sinonjs/text-encoding/-/text-encoding-0.7.2.tgz#5981a8db18b56ba38ef0efb7d995b12aa7b51918"
   integrity sha512-sXXKG+uL9IrKqViTtao2Ws6dy0znu9sOaP1di/jKGW1M6VssO8vlpXCQcpZ+jisQ1tTFAC5Jo/EOzFbggBagFQ==
 
-"@size-limit/esbuild@8.2.3":
-  version "8.2.3"
-  resolved "https://registry.yarnpkg.com/@size-limit/esbuild/-/esbuild-8.2.3.tgz#5012338e61e653f826c6c319e9a6fc49b9ce0de2"
-  integrity sha512-jqbg23dnheXNQg1YVItUiEViALwsFycaHpv94pldWakwEHqPApcIEH6WqbI3utdyQ9hYJzyhwT9BkcJIyzD2tg==
+"@size-limit/esbuild@8.2.4":
+  version "8.2.4"
+  resolved "https://registry.yarnpkg.com/@size-limit/esbuild/-/esbuild-8.2.4.tgz#20700c2e4b205c46d32c3a16c8426a219d973eab"
+  integrity sha512-kPgNfpwUvBD98s5axlf1UciFg4Ki4AYSl/cOmSyyYBuzksHiwW7Myeu0w4mTxtV9nwBFbkrrNXqszE7b+OhFLA==
   dependencies:
     esbuild "^0.17.7"
     nanoid "^3.3.4"
 
-"@size-limit/file@8.2.3":
-  version "8.2.3"
-  resolved "https://registry.yarnpkg.com/@size-limit/file/-/file-8.2.3.tgz#b826b13a5f60f5e83d3fb1b985cae4c302b85187"
-  integrity sha512-2H6XENiKr/45epwvvIGvYkZTr/pm5Pq4R1xR0aiVbElTrf4TiFQrd0p+U8vnaq68Y0Z//KQvflqhE+SdE7DLRQ==
+"@size-limit/file@8.2.4":
+  version "8.2.4"
+  resolved "https://registry.yarnpkg.com/@size-limit/file/-/file-8.2.4.tgz#3624527cc9644c700697322d533e157b4a809a2b"
+  integrity sha512-xLuF97W7m7lxrRJvqXRlxO/4t7cpXtfxOnjml/t4aRVUCMXLdyvebRr9OM4jjoK8Fmiz8jomCbETUCI3jVhLzA==
   dependencies:
     semver "7.3.8"
 
-"@size-limit/preset-small-lib@8.2.3":
-  version "8.2.3"
-  resolved "https://registry.yarnpkg.com/@size-limit/preset-small-lib/-/preset-small-lib-8.2.3.tgz#5d5cbdaa2a468b2fb20db2115d3253cd5bda3221"
-  integrity sha512-F2PhXWITMUkc3pzFSYBbwjcjinv5NFQAZ6mS976p36wej/IfMrzuqYXxfhxqD+zooPJFNNp1UnxogTDQHmocaQ==
+"@size-limit/preset-small-lib@8.2.4":
+  version "8.2.4"
+  resolved "https://registry.yarnpkg.com/@size-limit/preset-small-lib/-/preset-small-lib-8.2.4.tgz#66121bc8eb0dadf5b2e3dd72ac7e2708429a2b21"
+  integrity sha512-AL4384oBgMcDPlNblgWHreqFSSOui0J9NbgyHhegB1h8AgRyHbdVGC3yWLpEESYQXHYnKdbNrYeRE/TclsViog==
   dependencies:
-    "@size-limit/esbuild" "8.2.3"
-    "@size-limit/file" "8.2.3"
+    "@size-limit/esbuild" "8.2.4"
+    "@size-limit/file" "8.2.4"
 
-"@size-limit/webpack@8.2.3":
-  version "8.2.3"
-  resolved "https://registry.yarnpkg.com/@size-limit/webpack/-/webpack-8.2.3.tgz#32d0d06c57c5649f202191cd831c2b77ce73a0db"
-  integrity sha512-rAyqcQYXVYHuqD0jyHgTtK0gdGnhgZJ6YbbGDjElRymue+gWvHx3N52oys/CENGrcXlylFtxfnciT8vj8wzWKg==
+"@size-limit/webpack@8.2.4":
+  version "8.2.4"
+  resolved "https://registry.yarnpkg.com/@size-limit/webpack/-/webpack-8.2.4.tgz#e0dfb99f69236ec6b59b5d2df674ac8242fe8bb6"
+  integrity sha512-L6TSQpX89cSeWQ1BL31BsaYucao0MGNW1xySHVO7jlgmOwnHC7j5zq91QRN9G6eMG84W+F3uRV4AiyCdZxKz9g==
   dependencies:
     nanoid "^3.3.4"
     webpack "^5.75.0"
