@@ -2,6 +2,24 @@ import { expect } from 'chai';
 import sinon from 'sinon';
 import { isString, initializeFirebase } from '../../src/firebase-utils';
 
+const returnedInstance = {};
+const initializeMock = sinon.spy(() => returnedInstance);
+const settingsMock = sinon.spy();
+const projectId = 'test-project';
+const mockCredential = { project_id: projectId };
+const applicationDefaultMock = sinon.spy(() => mockCredential);
+const certMock = sinon.spy((input) => input);
+const adminInstanceMock = {
+  initializeApp: initializeMock,
+  credential: {
+    applicationDefault: applicationDefaultMock,
+    cert: certMock,
+  },
+  firestore: sinon.spy(() => ({
+    settings: settingsMock,
+  })),
+};
+
 describe('firebase-utils', () => {
   describe('isString', () => {
     it('Should return true if input is a string', () => {
@@ -22,41 +40,18 @@ describe('firebase-utils', () => {
 
   describe('initializeFirebase', () => {
     it('Should call initializeApp with projectId and databaseURL by default', () => {
-      const returnedInstance = {};
-      const initializeMock = sinon.spy(() => returnedInstance);
-      const settingsMock = sinon.spy();
-      const projectId = 'test-project';
-      const mockCredential = { projectId };
-      const adminInstanceMock = {
-        initializeApp: initializeMock,
-        credential: {
-          applicationDefault: sinon.spy(() => mockCredential),
-        },
-        firestore: sinon.spy(() => ({
-          settings: settingsMock,
-        })),
-      };
       const result = initializeFirebase(adminInstanceMock);
       expect(result).to.equal(returnedInstance);
       expect(initializeMock).to.have.been.calledWith({
         projectId,
         credential: mockCredential,
-        databaseURL: `http://localhost:9000?ns=${projectId}`,
+        databaseURL: `http://${process.env.FIREBASE_DATABASE_EMULATOR_HOST}?ns=${projectId}`,
       });
     });
 
     it('Should call initializeApp with databaseURL from config override', () => {
-      const returnedInstance = {};
-      const initializeMock = sinon.spy(() => returnedInstance);
-      const settingsMock = sinon.spy();
-      const databaseURL = 'http://localhost:9000?ns=test-namespace';
       const projectId = 'test-project';
-      const adminInstanceMock = {
-        initializeApp: initializeMock,
-        firestore: sinon.spy(() => ({
-          settings: settingsMock,
-        })),
-      };
+      const databaseURL = `http://${process.env.FIREBASE_DATABASE_EMULATOR_HOST}?ns=test-namespace`;
       const mockCredential: any = { projectId };
       const result = initializeFirebase(adminInstanceMock, {
         databaseURL,
@@ -71,13 +66,10 @@ describe('firebase-utils', () => {
     });
 
     it('Should call initializeApp with projectId from config override (and use projectId as database namespace)', () => {
-      const returnedInstance = {};
-      const initializeMock = sinon.spy(() => returnedInstance);
-      const settingsMock = sinon.spy();
       const projectId = 'override-project-test';
-      const databaseURL = `http://localhost:9000?ns=${projectId}`;
+      const databaseURL = `http://${process.env.FIREBASE_DATABASE_EMULATOR_HOST}?ns=${projectId}`;
       const mockCredential: any = { projectId };
-      const adminInstanceMock = {
+      const adminInstanceWithCredMock = {
         initializeApp: initializeMock,
         credential: {
           applicationDefault: sinon.spy(() => mockCredential),
@@ -86,13 +78,44 @@ describe('firebase-utils', () => {
           settings: settingsMock,
         })),
       };
-      const result = initializeFirebase(adminInstanceMock, { projectId });
+      const result = initializeFirebase(adminInstanceWithCredMock, {
+        projectId,
+      });
       expect(result).to.equal(returnedInstance);
       expect(initializeMock).to.have.been.calledWith({
         projectId,
         credential: mockCredential,
         databaseURL,
       });
+    });
+
+    it('Should use parsed SERVICE_ACCOUNT env variable as credential if it exists', () => {
+      const fileData = { type: 'service_account' };
+      process.env.SERVICE_ACCOUNT = JSON.stringify(fileData);
+      const databaseURL = `http://${process.env.FIREBASE_DATABASE_EMULATOR_HOST}?ns=${projectId}`;
+      initializeFirebase(adminInstanceMock, {
+        projectId,
+      });
+      expect(certMock).to.have.been.calledWith(fileData);
+      expect(initializeMock).to.have.been.calledWith({
+        projectId,
+        credential: fileData,
+        databaseURL,
+      });
+    });
+
+    it('Should throw if there is an issue parsing SERVICE_ACCOUNT env variable', () => {
+      process.env.SERVICE_ACCOUNT = '{{{{}';
+      try {
+        initializeFirebase(adminInstanceMock, {
+          projectId,
+        });
+      } catch (err) {
+        expect(err).to.have.property(
+          'message',
+          `cypress-firebase: Issue parsing "SERVICE_ACCOUNT" environment variable from string to object, returning string`,
+        );
+      }
     });
   });
 });

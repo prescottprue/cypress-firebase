@@ -1,0 +1,16 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>prescottprue/renovate-config:library"],
+  "packageRules": [
+    {
+      "description": "Prevent upgrade of Node build version past 16 (until build version updated)",
+      "matchPackageNames": ["node", "@types/node"],
+      "allowedVersions": "^16"
+    },
+    {
+      "description": "Disable dep updates to react-redux-firebase example (needs manual updating)",
+      "matchPaths": ["examples/react-redux-firebase/**"],
+      "enabled": false
+    }
+  ]
+}

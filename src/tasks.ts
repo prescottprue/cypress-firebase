@@ -64,18 +64,30 @@ function getAuth(
 }
 
 /**
+ * Convert unique data types which have been stringified and parsed back
+ * into their original type.
  * @param dataVal - Value of data
  * @param firestoreStatics - Statics from firestore instance
  * @returns Value converted into timestamp object if possible
  */
-function convertValueToTimestampOrGeoPointIfPossible(
+export function convertValueToTimestampOrGeoPointIfPossible(
   dataVal: any,
   firestoreStatics: typeof firestore,
 ): firestore.FieldValue {
-  /* eslint-disable-next-line no-underscore-dangle */
-  if (dataVal?._methodName === 'FieldValue.serverTimestamp') {
+  /* eslint-disable no-underscore-dangle */
+  if (
+    dataVal?._methodName === 'serverTimestamp' ||
+    dataVal?._methodName === 'FieldValue.serverTimestamp' // v8 and earlier
+  ) {
     return firestoreStatics.FieldValue.serverTimestamp();
   }
+  if (
+    dataVal?._methodName === 'deleteField' ||
+    dataVal?._methodName === 'FieldValue.delete' // v8 and earlier
+  ) {
+    return firestoreStatics.FieldValue.delete();
+  }
+  /* eslint-enable no-underscore-dangle */
   if (
     typeof dataVal?.seconds === 'number' &&
     typeof dataVal?.nanoseconds === 'number'
@@ -125,12 +137,16 @@ function getDataWithTimestampsAndGeoPoints(
       };
     }
     const value = Array.isArray(currData)
-      ? currData.map((dataItem) =>
-          convertValueToTimestampOrGeoPointIfPossible(
+      ? currData.map((dataItem) => {
+          const result = convertValueToTimestampOrGeoPointIfPossible(
             dataItem,
             firestoreStatics,
-          ),
-        )
+          );
+
+          return result.constructor === Object
+            ? getDataWithTimestampsAndGeoPoints(result, firestoreStatics)
+            : result;
+        })
       : convertValueToTimestampOrGeoPointIfPossible(currData, firestoreStatics);
 
     return {
@@ -217,7 +233,7 @@ export async function callFirestore(
     if (action === 'get') {
       const snap = await (
         slashPathToFirestoreRef(
-          adminInstance.firestore(),
+          adminInstance.firestore,
           actionPath,
           options,
         ) as any
@@ -239,7 +255,7 @@ export async function callFirestore(
       const deletePromise = isDocPath(actionPath)
         ? (
             slashPathToFirestoreRef(
-              adminInstance.firestore(),
+              adminInstance.firestore,
               actionPath,
               options,
             ) as FirebaseFirestore.DocumentReference
@@ -247,7 +263,7 @@ export async function callFirestore(
         : deleteCollection(
             adminInstance.firestore(),
             slashPathToFirestoreRef(
-              adminInstance.firestore(),
+              adminInstance.firestore,
               actionPath,
               options,
             ) as
@@ -283,10 +299,10 @@ export async function callFirestore(
             : (undefined as any),
         );
     }
-    // "update" action
+    // "update" and "add" action
     return (
       slashPathToFirestoreRef(
-        adminInstance.firestore(),
+        adminInstance.firestore,
         actionPath,
         options,
       ) as any

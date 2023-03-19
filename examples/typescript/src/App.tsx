@@ -1,5 +1,5 @@
 import React from 'react';
-import logo from './logo.svg';
+// import logo from './logo.svg';
 import initFirebase from './initFirebase'
 import RTDBProjects from './RTDBProjects'
 import NewProject from './NewProject'
@@ -12,7 +12,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+        {/* <img src={logo} className="App-logo" alt="logo" /> */}
         <h2>Data From RTDB</h2>
         <RTDBProjects />
         <NewProject />

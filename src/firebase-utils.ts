@@ -1,6 +1,6 @@
 import type { AppOptions, app, firestore, credential } from 'firebase-admin';
-import { getServiceAccount } from './node-utils';
-import { CallFirestoreOptions } from './attachCustomCommands';
+import { CallFirestoreOptions, WhereOptions } from './attachCustomCommands';
+import { convertValueToTimestampOrGeoPointIfPossible } from './tasks';
 
 /**
  * Check whether a value is a string or not
@@ -33,6 +33,41 @@ function firestoreSettingsFromEnv(): FirebaseFirestore.Settings {
     servicePath,
     port: parseInt(portStr, 10),
   };
+}
+
+/* eslint-disable camelcase */
+interface ServiceAccount {
+  type: string;
+  project_id: string;
+  private_key_id: string;
+  private_key: string;
+  client_email: string;
+  client_id: string;
+  auth_uri: string;
+  token_uri: string;
+  auth_provider_x509_cert_url: string;
+  client_x509_cert_url: string;
+}
+/* eslint-enable camelcase */
+
+/**
+ * Get service account from either SERVICE_ACCOUNT environment variable
+ * @returns Service account object
+ */
+function getServiceAccount(): ServiceAccount | undefined {
+  // Environment variable
+  const serviceAccountEnvVar = process.env.SERVICE_ACCOUNT;
+  if (serviceAccountEnvVar) {
+    try {
+      return JSON.parse(serviceAccountEnvVar);
+    } catch (err) {
+      /* eslint-disable no-console */
+      console.warn(
+        `cypress-firebase: Issue parsing "SERVICE_ACCOUNT" environment variable from string to object, returning string`,
+      );
+      /* eslint-enable no-console */
+    }
+  }
 }
 
 /**
@@ -173,15 +208,36 @@ export function isDocPath(slashPath: string): boolean {
 }
 
 /**
+ *
+ * @param ref
+ * @param whereSetting
+ * @param firestoreStatics
+ */
+export function applyWhere(
+  ref: firestore.CollectionReference | firestore.Query,
+  whereSetting: WhereOptions,
+  firestoreStatics: app.App['firestore'],
+): firestore.Query {
+  const [param, filterOp, val] = whereSetting as WhereOptions;
+  return ref.where(
+    param,
+    filterOp,
+    convertValueToTimestampOrGeoPointIfPossible(
+      val,
+      firestoreStatics as typeof firestore,
+    ),
+  );
+}
+
+/**
  * Convert slash path to Firestore reference
- * @param firestoreInstance - Instance on which to
- * create ref
+ * @param firestoreStatics - Firestore instance statics (invoking gets instance)
  * @param slashPath - Path to convert into firestore reference
  * @param options - Options object
  * @returns Ref at slash path
  */
 export function slashPathToFirestoreRef(
-  firestoreInstance: any,
+  firestoreStatics: app.App['firestore'],
   slashPath: string,
   options?: CallFirestoreOptions,
 ):
@@ -192,9 +248,13 @@ export function slashPathToFirestoreRef(
     throw new Error('Path is required to make Firestore Reference');
   }
 
-  let ref = isDocPath(slashPath)
-    ? firestoreInstance.doc(slashPath)
-    : firestoreInstance.collection(slashPath);
+  const firestoreInstance = firestoreStatics();
+  if (isDocPath(slashPath)) {
+    return firestoreInstance.doc(slashPath);
+  }
+
+  let ref: firestore.CollectionReference | firestore.Query =
+    firestoreInstance.collection(slashPath);
 
   // Apply orderBy to query if it exists
   if (options?.orderBy && typeof ref.orderBy === 'function') {
@@ -211,9 +271,18 @@ export function slashPathToFirestoreRef(
     typeof ref.where === 'function'
   ) {
     if (Array.isArray(options.where[0])) {
-      ref = ref.where(...options.where[0]).where(...options.where[1]);
+      const [where1, where2] = options.where as WhereOptions[];
+      ref = applyWhere(
+        applyWhere(ref, where1, options.statics || firestoreStatics),
+        where2,
+        options.statics || firestoreStatics,
+      );
     } else {
-      ref = ref.where(...options.where);
+      ref = applyWhere(
+        ref,
+        options.where as WhereOptions,
+        options.statics || firestoreStatics,
+      );
     }
   }
 

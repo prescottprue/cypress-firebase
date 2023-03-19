@@ -1,5 +1,8 @@
 import { expect } from 'chai';
-import * as firebase from '@firebase/rules-unit-testing';
+import {
+  initializeTestEnvironment,
+  RulesTestEnvironment,
+} from '@firebase/rules-unit-testing';
 import * as admin from 'firebase-admin';
 import sinon from 'sinon';
 import * as tasks from '../../src/tasks';
@@ -8,10 +11,13 @@ const PROJECTS_COLLECTION = 'projects';
 const PROJECT_ID = 'project-1';
 const PROJECT_PATH = `${PROJECTS_COLLECTION}/${PROJECT_ID}`;
 const testProject = { name: 'project 1' };
-
-const adminApp: any = firebase.initializeAdminApp({
+/**
+ * Initialize firebase-admin SDK with emulator settings for RTDB
+ */
+const adminApp = admin.initializeApp({
   projectId: process.env.GCLOUD_PROJECT,
-  databaseName: process.env.GCLOUD_PROJECT,
+  databaseURL: `http://${process.env.FIREBASE_DATABASE_EMULATOR_HOST}?ns=${process.env.GCLOUD_PROJECT}`,
+  credential: admin.credential.applicationDefault(),
 });
 
 const projectsFirestoreRef = adminApp
@@ -20,19 +26,25 @@ const projectsFirestoreRef = adminApp
 const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
 
 describe('tasks', () => {
+  let testEnv: RulesTestEnvironment;
+  before(async () => {
+    /**
+     * Initialize firebase-admin SDK with emulator settings for RTDB
+     */
+    testEnv = await initializeTestEnvironment({
+      projectId: process.env.GCLOUD_PROJECT,
+    });
+  });
   after(async () => {
     // Cleanup all apps (keeps active listeners from preventing JS from exiting)
     await adminApp.delete();
-    await Promise.all(firebase.apps().map((app) => app.delete()));
+    await testEnv.cleanup();
+
+    // Cleanup only this tests's instance of firebase-admin app
+    await Promise.all(admin.apps.map((app) => app?.delete()));
   });
 
   describe('callFirestore', () => {
-    beforeEach(async () => {
-      await firebase.clearFirestoreData({
-        projectId: process.env.GCLOUD_PROJECT || 'test-project',
-      });
-    });
-
     it('is exported', () => {
       expect(tasks).to.have.property('callFirestore');
       expect(tasks.callFirestore).to.be.a('function');
@@ -101,6 +113,56 @@ describe('tasks', () => {
         );
         expect(result[0]).to.have.property('id', secondProjectId);
         expect(result[0]).to.have.property('name', secondProject.name);
+      });
+
+      it('supports where with timestamp', async () => {
+        const projectId = 'one-where-timestamp';
+        const currentDate = new Date();
+        await projectsFirestoreRef
+          .doc(projectId)
+          .set({ dateField: admin.firestore.Timestamp.fromDate(currentDate) });
+        const result = await tasks.callFirestore(
+          adminApp,
+          'get',
+          PROJECTS_COLLECTION,
+          {
+            statics: { Timestamp: admin.firestore.Timestamp } as any,
+            where: [
+              'dateField',
+              '==',
+              admin.firestore.Timestamp.fromDate(currentDate),
+            ],
+          },
+        );
+        expect(result[0]).to.have.property('id', projectId);
+      });
+
+      it('supports multiple wheres with timestamps', async () => {
+        const projectId = 'multi-where-timestamp';
+        const pastDate = new Date();
+        pastDate.setDate(pastDate.getDate() - 2);
+        const fieldName = 'anotherField';
+        await projectsFirestoreRef
+          .doc(projectId)
+          .set({ [fieldName]: admin.firestore.Timestamp.fromDate(pastDate) });
+        const result = await tasks.callFirestore(
+          adminApp,
+          'get',
+          PROJECTS_COLLECTION,
+          {
+            statics: { Timestamp: admin.firestore.Timestamp } as any,
+            where: [
+              [
+                fieldName,
+                '>=',
+                admin.firestore.Timestamp.fromDate(new Date('1/1/21')),
+              ],
+              [fieldName, '<=', admin.firestore.Timestamp.fromDate(new Date())],
+            ],
+          },
+        );
+        // TODO: Come up with a more stable way to verify here - data from other tests can cause fails
+        expect(result[0]).to.have.property('id', projectId);
       });
 
       it('supports multi-where', async () => {
@@ -371,6 +433,70 @@ describe('tasks', () => {
         expect(resultSnap.data()).to.have.property('some', testValue);
       });
 
+      it('supports deleting a field from a document using deleteField', async () => {
+        const originalDoc = { some: 'other', another: 'one', keep: 'asdf' };
+        await projectFirestoreRef.set(originalDoc);
+        // cy.task stringifies and parses the data past to it resulting in the following value
+        const legacyStringifiedFieldDelete = {
+          _methodName: 'FieldValue.delete',
+        };
+        // V9 syntax
+        const stringifiedFieldDelete = {
+          _methodName: 'deleteField',
+        };
+
+        await tasks.callFirestore(
+          adminApp,
+          'update',
+          PROJECT_PATH,
+          { statics: admin.firestore, merge: true },
+          { some: legacyStringifiedFieldDelete },
+        );
+        await tasks.callFirestore(
+          adminApp,
+          'update',
+          PROJECT_PATH,
+          { statics: admin.firestore, merge: true },
+          { another: stringifiedFieldDelete },
+        );
+        const resultSnap = await projectFirestoreRef.get();
+        expect(resultSnap.data()).to.not.have.property('some');
+        expect(resultSnap.data()).to.not.have.property('another');
+        expect(resultSnap.data()).to.have.property('keep', originalDoc.keep);
+      });
+
+      it('supports deleting a nested field from a document using deleteField', async () => {
+        const originalDoc = {
+          top: {
+            second: {
+              some: 'other',
+              keep: 'asdf',
+            },
+          },
+        };
+        await projectFirestoreRef.set(originalDoc);
+        // cy.task stringifies and parses the data past to it resulting in the following value
+        const stringifiedFieldDelete = {
+          _methodName: 'deleteField',
+        };
+
+        await tasks.callFirestore(
+          adminApp,
+          'set',
+          PROJECT_PATH,
+          { statics: admin.firestore, merge: true },
+          { top: { second: { some: stringifiedFieldDelete } } },
+        );
+        const resultSnap = await projectFirestoreRef.get();
+        expect(resultSnap.data()).to.not.have.nested.property(
+          'top.second.some',
+        );
+        expect(resultSnap.data()).to.have.nested.property(
+          'top.second.keep',
+          originalDoc.top.second.keep,
+        );
+      });
+
       describe('with timestamps', () => {
         let stub: sinon.SinonStub;
         const correctTimestamp = {
@@ -429,7 +555,13 @@ describe('tasks', () => {
             'update',
             PROJECT_PATH,
             { statics: admin.firestore },
-            { time: { nested: stringifiedServerTimestamp } },
+            {
+              time: {
+                nested: stringifiedServerTimestamp,
+                arrayNested: [stringifiedServerTimestamp],
+                mapInArrayNested: [{ nested: stringifiedServerTimestamp }],
+              },
+            },
           );
 
           const resultSnap = await projectFirestoreRef.get();
@@ -440,6 +572,22 @@ describe('tasks', () => {
           );
           expect(resultSnap.data()).to.have.nested.property(
             'time.nested._nanoseconds',
+            correctTimestamp._nanoseconds,
+          );
+          expect(resultSnap.data()).to.have.nested.property(
+            'time.arrayNested[0]._seconds',
+            correctTimestamp._seconds,
+          );
+          expect(resultSnap.data()).to.have.nested.property(
+            'time.arrayNested[0]._nanoseconds',
+            correctTimestamp._nanoseconds,
+          );
+          expect(resultSnap.data()).to.have.nested.property(
+            'time.mapInArrayNested[0].nested._seconds',
+            correctTimestamp._seconds,
+          );
+          expect(resultSnap.data()).to.have.nested.property(
+            'time.mapInArrayNested[0].nested._nanoseconds',
             correctTimestamp._nanoseconds,
           );
           /* eslint-enable no-underscore-dangle */

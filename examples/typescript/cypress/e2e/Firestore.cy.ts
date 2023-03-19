@@ -1,3 +1,5 @@
+import { deleteField, Timestamp } from "firebase/firestore";
+
 describe('callFirestore', () => {
   describe('get', () => {
     before(() => {
@@ -31,6 +33,20 @@ describe('callFirestore', () => {
       cy.callFirestore('add', 'projects', { name: uniqueName })
       cy.callFirestore('get', 'projects', {
         where: ['name', '==', uniqueName],
+      }).then((results) => {
+        cy.log('get respond', results);
+        expect(results).to.exist;
+        expect(results).to.have.length(1);
+      });  
+    })
+
+    it('should query with where with timestamp', () => {
+      const uniqueName = 'Test Where'
+      const futureDate = new Date()
+      futureDate.setDate(futureDate.getDate() - 2)
+      cy.callFirestore('add', 'projects', { name: uniqueName, createdAt: Timestamp.fromDate(futureDate) })
+      cy.callFirestore('get', 'projects', {
+        // where: ['createdAt', '<=', Timestamp.now()],
       }).then((results) => {
         cy.log('get respond', results);
         expect(results).to.exist;
@@ -124,5 +140,24 @@ describe('callFirestore', () => {
         expect(projectsAfterDelete).to.exist
       });
     });
+  });
+
+  it('write nested timestamp field', () => {
+    const time = Timestamp.fromDate(new Date())
+    cy.callFirestore('set', 'test/foo', { test: [{ time }] })
+    cy.callFirestore('get', 'test/foo').then((doc) => {
+      expect(doc).to.have.nested.property('test.0.time._seconds')
+      expect(doc).to.have.nested.property('test.0.time._nanoseconds')
+    })
+  });
+
+  it('update should allow deleting of a field', () => {
+    const originalDoc = { name: 'toDelete', some: 'asdf' }
+    cy.callFirestore('set', 'my-collection/doc-id', originalDoc)
+    cy.callFirestore('update', 'my-collection/doc-id', { some: deleteField() });
+    cy.callFirestore('get', 'my-collection/doc-id').then((doc) => {
+      expect(doc).to.not.have.property('some')
+      expect(doc).to.have.property('name', originalDoc.name)
+    })
   });
 });

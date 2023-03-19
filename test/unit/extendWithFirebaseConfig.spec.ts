@@ -1,5 +1,7 @@
 import { expect } from 'chai';
-import extendWithFirebaseConfig from '../../src/extendWithFirebaseConfig';
+import extendWithFirebaseConfig, {
+  ExtendedCypressConfig,
+} from '../../src/extendWithFirebaseConfig';
 
 describe('extendWithFirebaseConfig', () => {
   const projectName = process.env.GCLOUD_PROJECT;
@@ -13,14 +15,14 @@ describe('extendWithFirebaseConfig', () => {
   });
 
   it('returns an object', () => {
-    const originalConfig = {};
+    const originalConfig = {} as Cypress.PluginConfigOptions;
     expect(extendWithFirebaseConfig(originalConfig)).to.be.an('object');
   });
 
   it('attaches GCLOUD_PROJECT to cypress env', () => {
     const projectName = 'test-project';
     process.env.GCLOUD_PROJECT = projectName;
-    const originalConfig = {};
+    const originalConfig = {} as Cypress.PluginConfigOptions;
     expect(extendWithFirebaseConfig(originalConfig)).to.have.nested.property(
       'env.GCLOUD_PROJECT',
       projectName,
@@ -32,7 +34,7 @@ describe('extendWithFirebaseConfig', () => {
     process.env.GCLOUD_PROJECT = 'another-project';
     const originalConfig = {
       env: { GCLOUD_PROJECT: projectName },
-    };
+    } as ExtendedCypressConfig;
     expect(extendWithFirebaseConfig(originalConfig)).to.have.nested.property(
       'env.GCLOUD_PROJECT',
       projectName,
@@ -42,7 +44,7 @@ describe('extendWithFirebaseConfig', () => {
   it('attaches FIREBASE_AUTH_EMULATOR_HOST to cypress env', () => {
     const emulatorHost = 'localhost:9000';
     process.env.FIREBASE_AUTH_EMULATOR_HOST = emulatorHost;
-    const originalConfig = {};
+    const originalConfig = {} as ExtendedCypressConfig;
     expect(extendWithFirebaseConfig(originalConfig)).to.have.nested.property(
       'env.FIREBASE_AUTH_EMULATOR_HOST',
       emulatorHost,
@@ -52,7 +54,7 @@ describe('extendWithFirebaseConfig', () => {
   it('attaches FIREBASE_DATABASE_EMULATOR_HOST to cypress env', () => {
     const emulatorHost = 'localhost:9000';
     process.env.FIREBASE_DATABASE_EMULATOR_HOST = emulatorHost;
-    const originalConfig = {};
+    const originalConfig = {} as ExtendedCypressConfig;
     expect(extendWithFirebaseConfig(originalConfig)).to.have.nested.property(
       'env.FIREBASE_DATABASE_EMULATOR_HOST',
       emulatorHost,
@@ -64,7 +66,7 @@ describe('extendWithFirebaseConfig', () => {
     process.env.FIREBASE_DATABASE_EMULATOR_HOST = 'localhost:1000';
     const originalConfig = {
       env: { FIREBASE_DATABASE_EMULATOR_HOST: emulatorHost },
-    };
+    } as ExtendedCypressConfig;
     expect(extendWithFirebaseConfig(originalConfig)).to.have.nested.property(
       'env.FIREBASE_DATABASE_EMULATOR_HOST',
       emulatorHost,
@@ -74,7 +76,7 @@ describe('extendWithFirebaseConfig', () => {
   it('attaches FIRESTORE_EMULATOR_HOST to cypress env', () => {
     const emulatorHost = 'localhost:8080';
     process.env.FIRESTORE_EMULATOR_HOST = emulatorHost;
-    const originalConfig = {};
+    const originalConfig = {} as ExtendedCypressConfig;
     expect(extendWithFirebaseConfig(originalConfig)).to.have.nested.property(
       'env.FIRESTORE_EMULATOR_HOST',
       emulatorHost,
@@ -86,7 +88,7 @@ describe('extendWithFirebaseConfig', () => {
     process.env.FIRESTORE_EMULATOR_HOST = emulatorHost;
     const originalConfig = {
       env: { FIRESTORE_EMULATOR_HOST: emulatorHost },
-    };
+    } as ExtendedCypressConfig;
     expect(extendWithFirebaseConfig(originalConfig)).to.have.nested.property(
       'env.FIRESTORE_EMULATOR_HOST',
       emulatorHost,
