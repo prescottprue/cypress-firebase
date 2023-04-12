@@ -36,6 +36,8 @@ If you are interested in what drove the need for this checkout [the why section]
 1. Generate and download a service account as described in [the firebase-admin setup documentation](https://firebase.google.com/docs/admin/setup#initialize-sdk). Save this to a local file within the project which you confirm is within your `.gitignore` - often `./serviceAccount.json`. Make sure YOU DO NOT COMMIT THIS FILE - it is sensitive and will give others admin access to your project.
 1. Set the following config in your `cypress.config.js` or `cypress.config.ts`
 
+ With [Firebase Web SDK versions up to 8](https://firebase.google.com/docs/web/modular-upgrade)
+
    ```js
    import admin from 'firebase-admin';
    import { defineConfig } from 'cypress';
@@ -47,9 +49,13 @@ If you are interested in what drove the need for this checkout [the why section]
        // NOTE: Add "supportFile" setting if separate location is used
        setupNodeEvents(on, config) {
          // e2e testing node events setup code
-         return cypressFirebasePlugin(on, config, admin);
-         // NOTE: If not setting GCLOUD_PROJECT env variable, project can be set like so:
-         // return cypressFirebasePlugin(on, config, admin, { projectId: 'some-project' });
+         return cypressFirebasePlugin(on, config, admin,{
+             // Here is where you can pass special options. 
+             // If you have not set the GCLOUD_PROJECT environment variable, give the projectId here, like so:
+             //    projectId: 'some-project',
+             // if your databaseURL is not just your projectId plus ".firebaseio.com", then you _must_ give it here, like so:
+             //    databaseURL: 'some-project-default-rtdb.europe-west1.firebasedatabase.app',
+         });
        },
      },
    });
@@ -68,9 +74,13 @@ If you are interested in what drove the need for this checkout [the why section]
        // NOTE: Make supportFile exists if separate location is provided
        setupNodeEvents(on, config) {
          // e2e testing node events setup code
-         return cypressFirebasePlugin(on, config, admin);
-         // NOTE: If not setting GCLOUD_PROJECT env variable, project can be set like so:
-         // return cypressFirebasePlugin(on, config, admin, { projectId: 'some-project' });
+         return cypressFirebasePlugin(on, config, admin,{
+             // Here is where you can pass special options. 
+             // If you have not set the GCLOUD_PROJECT environment variable, give the projectId here, like so:
+             //    projectId: 'some-project',
+             // if your databaseURL is not just your projectId plus ".firebaseio.com", then you _must_ give it here, like so:
+             //    databaseURL: 'some-project-default-rtdb.europe-west1.firebasedatabase.app',
+         });
        },
      },
    });
@@ -490,6 +500,9 @@ export default cypressConfig;
    ```
 
 1. Make sure you also have init logic in `cypress/support/commands.js` or `cypress/support/index.js`:
+
+With [Firebase Web SDK versions up to 8](https://firebase.google.com/docs/web/modular-upgrade)
+
 
    ```js
    import firebase from 'firebase/app';
