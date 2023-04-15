@@ -264,8 +264,9 @@ export function slashPathToFirestoreRef(
       ref = ref.orderBy(options.orderBy);
     }
   }
-  // Apply where to query if it exists
-  if (
+ 
+ // Apply where to query if it exists
+ if (
     options && options.where &&
     Array.isArray(options.where) &&
     typeof ref.where === 'function'
@@ -362,7 +363,7 @@ export function deleteCollection(
 
   // Limit to batches to set batchSize or 500
   if (!(options && options.limit)) {
-    baseQuery = refOrQuery.limit(options && options.batchSize || 500);
+    baseQuery = refOrQuery.limit((options && options.batchSize) || 500);
   }
 
   return new Promise((resolve, reject) => {
