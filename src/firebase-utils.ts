@@ -152,7 +152,7 @@ export function initializeFirebase(
     // Add projectId to fb config if it doesn't already exist
     if (!fbConfig.projectId) {
       const projectId =
-        process.env.GCLOUD_PROJECT || (fbConfig.credential as any)?.projectId; // eslint-disable-line camelcase
+        process.env.GCLOUD_PROJECT || (fbConfig.credential as any)&&(fbConfig.credential as any).projectId; // eslint-disable-line camelcase
       if (projectId) {
         fbConfig.projectId = projectId;
       }
@@ -257,7 +257,7 @@ export function slashPathToFirestoreRef(
     firestoreInstance.collection(slashPath);
 
   // Apply orderBy to query if it exists
-  if (options?.orderBy && typeof ref.orderBy === 'function') {
+  if (options && options.orderBy && typeof ref.orderBy === 'function') {
     if (Array.isArray(options.orderBy)) {
       ref = ref.orderBy(...options.orderBy);
     } else {
@@ -266,7 +266,7 @@ export function slashPathToFirestoreRef(
   }
   // Apply where to query if it exists
   if (
-    options?.where &&
+    options && options.where &&
     Array.isArray(options.where) &&
     typeof ref.where === 'function'
   ) {
@@ -287,12 +287,12 @@ export function slashPathToFirestoreRef(
   }
 
   // Apply limit to query if it exists
-  if (options?.limit && typeof ref.limit === 'function') {
+  if (options && options.limit && typeof ref.limit === 'function') {
     ref = ref.limit(options.limit);
   }
 
   // Apply limitToLast to query if it exists
-  if (options?.limitToLast && typeof ref.limitToLast === 'function') {
+  if (options && options.limitToLast && typeof ref.limitToLast === 'function') {
     ref = ref.limitToLast(options.limitToLast);
   }
 
@@ -356,13 +356,13 @@ export function deleteCollection(
   let baseQuery = refOrQuery.orderBy('__name__');
 
   // If no ordering is applied, order by id (__name__) to have groups in order
-  if (!options?.orderBy) {
+  if (!(options && options.orderBy)) {
     baseQuery = refOrQuery.orderBy('__name__');
   }
 
   // Limit to batches to set batchSize or 500
-  if (!options?.limit) {
-    baseQuery = refOrQuery.limit(options?.batchSize || 500);
+  if (!(options && options.limit)) {
+    baseQuery = refOrQuery.limit(options && options.batchSize || 500);
   }
 
   return new Promise((resolve, reject) => {
