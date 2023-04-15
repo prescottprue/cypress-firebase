@@ -15,7 +15,7 @@
     "test:emulate": "cross-env FIREBASE_AUTH_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.auth.port)\" FIREBASE_DATABASE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.database.port)\" FIRESTORE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.firestore.port)\" yarn test:open"
   },
   "dependencies": {
-    "firebase": "9.17.2",
+    "firebase": "9.19.1",
     "react": "18.2.0",
     "react-dom": "18.2.0"
   },
@@ -24,16 +24,16 @@
     "@testing-library/react": "13.4.0",
     "@testing-library/user-event": "14.4.3",
     "@types/jest": "29.5.0",
-    "@types/node": "16.18.16",
-    "@types/react": "18.0.28",
+    "@types/node": "16.18.23",
+    "@types/react": "18.0.35",
     "@types/react-dom": "18.0.11",
     "cross-env": "7.0.3",
     "cypress": "12.2.0",
     "cypress-firebase": "3.0.0",
     "eslint-plugin-chai-friendly": "0.7.2",
-    "eslint-plugin-cypress": "2.12.1",
+    "eslint-plugin-cypress": "2.13.2",
     "react-scripts": "5.0.1",
-    "firebase-admin": "11.5.0",
+    "firebase-admin": "11.6.0",
     "firebase-tools": "11.19.0",
     "typescript": "4.9.5",
     "web-vitals": "2.1.4"
