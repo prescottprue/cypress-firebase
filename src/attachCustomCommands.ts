@@ -338,7 +338,7 @@ export default function attachCustomCommands(
    * @name cy.login
    */
   Cypress.Commands.add(
-    options && options.commandNames && options.commandNames.login || 'login',
+    (options && options.commandNames && options.commandNames.login) || 'login',
     (
       uid?: string,
       customClaims?: any,
@@ -379,7 +379,7 @@ export default function attachCustomCommands(
    * cy.logout()
    */
   Cypress.Commands.add(
-    options && options.commandNames && options.commandNames.logout || 'logout',
+    (options && options.commandNames && options.commandNames.logout) || 'logout',
     (
       tenantId: string | undefined = Cypress.env('TEST_TENANT_ID'),
     ): Promise<any> =>
@@ -408,7 +408,7 @@ export default function attachCustomCommands(
    * @name cy.callRtdb
    */
   Cypress.Commands.add(
-    options && options.commandNames && options.commandNames.callRtdb || 'callRtdb',
+    (options && options.commandNames && options.commandNames.callRtdb) || 'callRtdb',
     (
       action: RTDBAction,
       actionPath: string,
@@ -456,7 +456,7 @@ export default function attachCustomCommands(
    * @name cy.callFirestore
    */
   Cypress.Commands.add(
-    options && options.commandNames && options.commandNames.callFirestore || 'callFirestore',
+    (options && options.commandNames && options.commandNames.callFirestore) || 'callFirestore',
     (
       action: FirestoreAction,
       actionPath: string,
@@ -503,7 +503,7 @@ export default function attachCustomCommands(
    * cy.getAuthUser()
    */
   Cypress.Commands.add(
-    options && options.commandNames && options.commandNames.getAuthUser || 'getAuthUser',
+    (options && options.commandNames && options.commandNames.getAuthUser) || 'getAuthUser',
     (uid: string): Promise<any> => cy.task('getAuthUser', uid),
   );
 }
