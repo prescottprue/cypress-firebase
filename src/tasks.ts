@@ -240,9 +240,9 @@ export async function callFirestore(
       ).get();
 
       if (
-        snap && 
-        snap.docs && 
-        snap.docs.length && 
+        snap &&
+        snap.docs &&
+        snap.docs.length &&
         typeof snap.docs.map === 'function'
       ) {
         return snap.docs.map((docSnap: FirebaseFirestore.DocumentSnapshot) => ({
@@ -290,7 +290,8 @@ export async function callFirestore(
       data,
       // Use static option if passed (tests), otherwise fallback to statics on adminInstance
       // Tests do not have statics since they are using @firebase/testing
-      (options && options.statics) || (adminInstance.firestore as typeof firestore),
+      (options && options.statics) ||
+        (adminInstance.firestore as typeof firestore),
     );
 
     if (action === 'set') {
@@ -300,7 +301,9 @@ export async function callFirestore(
         .set(
           dataToSet,
           options && options.merge
-            ? ({ merge: options && options.merge } as FirebaseFirestore.SetOptions)
+            ? ({
+                merge: options && options.merge,
+              } as FirebaseFirestore.SetOptions)
             : (undefined as any),
         );
     }
@@ -336,7 +339,9 @@ export function createCustomToken(
   settings?: any,
 ): Promise<string> {
   // Use custom claims or default to { isTesting: true }
-  const customClaims = (settings && settings.customClaims) || { isTesting: true };
+  const customClaims = (settings && settings.customClaims) || {
+    isTesting: true,
+  };
 
   // Create auth token
   return getAuth(adminInstance, settings.tenantId).createCustomToken(

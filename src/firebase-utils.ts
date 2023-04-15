@@ -152,8 +152,8 @@ export function initializeFirebase(
     // Add projectId to fb config if it doesn't already exist
     if (!fbConfig.projectId) {
       const projectId =
-        process.env.GCLOUD_PROJECT || 
-            (((fbConfig as any) && (fbConfig.credential as any)) || {}).projectId; // eslint-disable-line camelcase
+        process.env.GCLOUD_PROJECT ||
+        (((fbConfig as any) && (fbConfig.credential as any)) || {}).projectId; // eslint-disable-line camelcase
       if (projectId) {
         fbConfig.projectId = projectId;
       }
@@ -265,9 +265,10 @@ export function slashPathToFirestoreRef(
       ref = ref.orderBy(options.orderBy);
     }
   }
- // Apply where to query if it exists
- if (
-    options && options.where &&
+  // Apply where to query if it exists
+  if (
+    options &&
+    options.where &&
     Array.isArray(options.where) &&
     typeof ref.where === 'function'
   ) {
