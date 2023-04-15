@@ -52,7 +52,7 @@ export default function extendWithFirebaseConfig(
     ...cypressConfig,
     env: {
       ...valuesFromEnv,
-      ...(cypressConfig && cypressConfig.env || {}),
+      ...((cypressConfig && cypressConfig.env) || {}),
     },
   };
 }
