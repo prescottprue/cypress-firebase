@@ -456,7 +456,7 @@ export default function attachCustomCommands(
    * @name cy.callFirestore
    */
   Cypress.Commands.add(
-    options && options.commandName && options.commandNames.callFirestore || 'callFirestore',
+    options && options.commandNames && options.commandNames.callFirestore || 'callFirestore',
     (
       action: FirestoreAction,
       actionPath: string,
@@ -503,7 +503,7 @@ export default function attachCustomCommands(
    * cy.getAuthUser()
    */
   Cypress.Commands.add(
-    options && options.commandName && options.commandNames.getAuthUser || 'getAuthUser',
+    options && options.commandNames && options.commandNames.getAuthUser || 'getAuthUser',
     (uid: string): Promise<any> => cy.task('getAuthUser', uid),
   );
 }
