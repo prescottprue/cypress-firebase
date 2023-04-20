@@ -24,7 +24,7 @@
     "@testing-library/react": "13.4.0",
     "@testing-library/user-event": "14.4.3",
     "@types/jest": "29.5.1",
-    "@types/node": "16.18.23",
+    "@types/node": "16.18.24",
     "@types/react": "18.0.37",
     "@types/react-dom": "18.0.11",
     "cross-env": "7.0.3",
