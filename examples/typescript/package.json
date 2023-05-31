@@ -34,7 +34,7 @@
     "eslint-plugin-cypress": "2.13.3",
     "react-scripts": "5.0.1",
     "firebase-admin": "11.9.0",
-    "firebase-tools": "11.19.0",
+    "firebase-tools": "11.30.0",
     "typescript": "5.0.4",
     "web-vitals": "2.1.4"
   },
