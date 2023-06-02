@@ -6108,10 +6108,10 @@ firebase-admin@11.9.0:
     "@google-cloud/firestore" "^6.6.0"
     "@google-cloud/storage" "^6.9.5"
 
-firebase-tools@12.2.1:
-  version "12.2.1"
-  resolved "https://registry.yarnpkg.com/firebase-tools/-/firebase-tools-12.2.1.tgz#ea632265bb266c1c06139d0ff4a9cc8720e1fbfd"
-  integrity sha512-9QjNJRFf+v5kgkRO0yXmVYNUZ8fZI6FrOTrgp7YQ2fhqytaIpEQrKSbKZebGlSjDGvcX87daKEsUEjqj0LuSvw==
+firebase-tools@12.3.0:
+  version "12.3.0"
+  resolved "https://registry.yarnpkg.com/firebase-tools/-/firebase-tools-12.3.0.tgz#1e01575a70ca09f1cc70cb764f5ac48d824ce0c1"
+  integrity sha512-Z6Pl3Vp1wMKEroqCvT8Fm9UDXhWK+Bdq5zQjfTngTBqLL2FlL0/C4aG+D69aCLg5Q9Xyq8mc2pWnaEge40GqFw==
   dependencies:
     "@google-cloud/pubsub" "^3.0.1"
     abort-controller "^3.0.0"
