@@ -43,7 +43,7 @@
     "@typescript-eslint/parser": "5.60.0",
     "chai": "4.3.7",
     "cypress": "12.14.0",
-    "eslint": "8.42.0",
+    "eslint": "8.43.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-babel": "5.3.1",
