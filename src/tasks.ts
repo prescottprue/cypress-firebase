@@ -76,27 +76,27 @@ export function convertValueToTimestampOrGeoPointIfPossible(
 ): firestore.FieldValue {
   /* eslint-disable no-underscore-dangle */
   if (
-    dataVal?._methodName === 'serverTimestamp' ||
-    dataVal?._methodName === 'FieldValue.serverTimestamp' // v8 and earlier
+    (dataVal && dataVal._methodName) === 'serverTimestamp' ||
+    (dataVal && dataVal._methodName) === 'FieldValue.serverTimestamp' // v8 and earlier
   ) {
     return firestoreStatics.FieldValue.serverTimestamp();
   }
   if (
-    dataVal?._methodName === 'deleteField' ||
-    dataVal?._methodName === 'FieldValue.delete' // v8 and earlier
+    (dataVal && dataVal._methodName) === 'deleteField' ||
+    (dataVal && dataVal._methodName) === 'FieldValue.delete' // v8 and earlier
   ) {
     return firestoreStatics.FieldValue.delete();
   }
   /* eslint-enable no-underscore-dangle */
   if (
-    typeof dataVal?.seconds === 'number' &&
-    typeof dataVal?.nanoseconds === 'number'
+    typeof (dataVal && dataVal.seconds) === 'number' &&
+    typeof (dataVal && dataVal.nanoseconds) === 'number'
   ) {
     return new firestoreStatics.Timestamp(dataVal.seconds, dataVal.nanoseconds);
   }
   if (
-    typeof dataVal?.latitude === 'number' &&
-    typeof dataVal?.longitude === 'number'
+    typeof (dataVal && dataVal.latitude) === 'number' &&
+    typeof (dataVal && dataVal.longitude) === 'number'
   ) {
     return new firestoreStatics.GeoPoint(dataVal.latitude, dataVal.longitude);
   }
@@ -239,7 +239,12 @@ export async function callFirestore(
         ) as any
       ).get();
 
-      if (snap?.docs?.length && typeof snap.docs.map === 'function') {
+      if (
+        snap &&
+        snap.docs &&
+        snap.docs.length &&
+        typeof snap.docs.map === 'function'
+      ) {
         return snap.docs.map((docSnap: FirebaseFirestore.DocumentSnapshot) => ({
           ...docSnap.data(),
           id: docSnap.id,
@@ -247,7 +252,7 @@ export async function callFirestore(
       }
       // Falling back to null in the case of falsey value prevents Cypress error with message:
       // "You must return a promise, a value, or null to indicate that the task was handled."
-      return (typeof snap?.data === 'function' && snap.data()) || null;
+      return (typeof (snap && snap.data) === 'function' && snap.data()) || null;
     }
 
     if (action === 'delete') {
@@ -285,7 +290,8 @@ export async function callFirestore(
       data,
       // Use static option if passed (tests), otherwise fallback to statics on adminInstance
       // Tests do not have statics since they are using @firebase/testing
-      options?.statics || (adminInstance.firestore as typeof firestore),
+      (options && options.statics) ||
+        (adminInstance.firestore as typeof firestore),
     );
 
     if (action === 'set') {
@@ -294,8 +300,10 @@ export async function callFirestore(
         .doc(actionPath)
         .set(
           dataToSet,
-          options?.merge
-            ? ({ merge: options?.merge } as FirebaseFirestore.SetOptions)
+          options && options.merge
+            ? ({
+                merge: options && options.merge,
+              } as FirebaseFirestore.SetOptions)
             : (undefined as any),
         );
     }
@@ -331,7 +339,9 @@ export function createCustomToken(
   settings?: any,
 ): Promise<string> {
   // Use custom claims or default to { isTesting: true }
-  const customClaims = settings?.customClaims || { isTesting: true };
+  const customClaims = (settings && settings.customClaims) || {
+    isTesting: true,
+  };
 
   // Create auth token
   return getAuth(adminInstance, settings.tenantId).createCustomToken(
