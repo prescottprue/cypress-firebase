@@ -469,7 +469,7 @@ export default cypressConfig;
    const shouldUseEmulator = window.location.hostname === 'localhost'; // or other logic to determine when to use
    // Emulate RTDB
    if (shouldUseEmulator) {
-     fbConfig.databaseURL = `http://localhost:9000?ns=${fbConfig.projectId}`;
+     fbConfig.databaseURL = `http://localhost:9000?ns=${fbConfig.projectId}`; // from node v17 use 127.0.0.1 instad of localhost
      console.debug(`Using RTDB emulator: ${fbConfig.databaseURL}`);
    }
 
