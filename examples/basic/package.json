@@ -22,7 +22,7 @@
   },
   "devDependencies": {
     "cross-env": "7.0.3",
-    "cypress": "12.17.2",
+    "cypress": "12.17.3",
     "cypress-firebase": "3.0.1",
     "eslint-plugin-chai-friendly": "0.7.2",
     "eslint-plugin-cypress": "2.13.3",
