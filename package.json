@@ -55,7 +55,7 @@
     "firebase-admin": "11.10.1",
     "firebase-tools": "12.4.7",
     "husky": "8.0.3",
-    "lint-staged": "13.2.3",
+    "lint-staged": "13.3.0",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
     "prettier": "2.8.8",
