@@ -90,6 +90,7 @@ export function convertValueToTimestampOrGeoPointIfPossible(
   /* eslint-enable no-underscore-dangle */
   if (
     typeof dataVal !== 'undefined' &&
+    dataVal !== null &&
     typeof dataVal.seconds === 'number' &&
     typeof dataVal.nanoseconds === 'number'
   ) {
@@ -97,6 +98,7 @@ export function convertValueToTimestampOrGeoPointIfPossible(
   }
   if (
     typeof dataVal !== 'undefined' &&
+    dataVal !== null &&
     typeof dataVal.latitude === 'number' &&
     typeof dataVal.longitude === 'number'
   ) {
