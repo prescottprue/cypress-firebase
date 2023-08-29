@@ -209,10 +209,11 @@ export function isDocPath(slashPath: string): boolean {
 }
 
 /**
- *
- * @param ref
- * @param whereSetting
- * @param firestoreStatics
+ * Apply where setting to reference
+ * @param ref - Reference
+ * @param whereSetting - Where options
+ * @param firestoreStatics - Firestore statics
+ * @returns Refere with where applied
  */
 export function applyWhere(
   ref: firestore.CollectionReference | firestore.Query,

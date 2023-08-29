@@ -89,14 +89,18 @@ export function convertValueToTimestampOrGeoPointIfPossible(
   }
   /* eslint-enable no-underscore-dangle */
   if (
-    typeof (dataVal && dataVal.seconds) === 'number' &&
-    typeof (dataVal && dataVal.nanoseconds) === 'number'
+    typeof dataVal !== 'undefined' &&
+    dataVal !== null &&
+    typeof dataVal.seconds === 'number' &&
+    typeof dataVal.nanoseconds === 'number'
   ) {
     return new firestoreStatics.Timestamp(dataVal.seconds, dataVal.nanoseconds);
   }
   if (
-    typeof (dataVal && dataVal.latitude) === 'number' &&
-    typeof (dataVal && dataVal.longitude) === 'number'
+    typeof dataVal !== 'undefined' &&
+    dataVal !== null &&
+    typeof dataVal.latitude === 'number' &&
+    typeof dataVal.longitude === 'number'
   ) {
     return new firestoreStatics.GeoPoint(dataVal.latitude, dataVal.longitude);
   }

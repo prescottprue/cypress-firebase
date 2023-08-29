@@ -297,8 +297,8 @@ describe('tasks', () => {
         expect(result).to.have.property('some', extraVal.some);
       });
 
-      it('sets a document with null data', async () => {
-        const extraVal = { some: 'other', another: null };
+      it('sets a document with object containing null and 0', async () => {
+        const extraVal = { some: 'other', another: null, zeroField: 0 };
         await tasks.callFirestore(
           adminApp,
           'set',
@@ -311,6 +311,7 @@ describe('tasks', () => {
         expect(result).to.have.property('name', testProject.name);
         expect(result).to.have.property('some', extraVal.some);
         expect(result).to.have.property('another', null);
+        expect(result).to.have.property('zeroField', 0);
       });
 
       describe('with timestamps', () => {
