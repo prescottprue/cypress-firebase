@@ -6157,10 +6157,10 @@ firebase-admin@11.10.1:
     "@google-cloud/firestore" "^6.6.0"
     "@google-cloud/storage" "^6.9.5"
 
-firebase-tools@12.4.7:
-  version "12.4.7"
-  resolved "https://registry.yarnpkg.com/firebase-tools/-/firebase-tools-12.4.7.tgz#3c581b9ef32d39221eaa11735bbb59a299d6d74a"
-  integrity sha512-L5nULzh0PElm2OK5lXsj7zkIwBBB4KsGOg0CvCnjdvJ1ROMN2IqffJ0KR/8paXuGWf5SA0VJj2QjG37jFxrAjg==
+firebase-tools@12.5.2:
+  version "12.5.2"
+  resolved "https://registry.yarnpkg.com/firebase-tools/-/firebase-tools-12.5.2.tgz#d73a561a6c5d934f725a48ddc0f6b81f714f197f"
+  integrity sha512-sd/nWoLPYN4fRGgCv4EQdXrp+cezgQM/Z5fYyLqiCZgDhsz1POxzUb17k4mdJNlI+YkkAVPNzpErjdbwKGaZoA==
   dependencies:
     "@google-cloud/pubsub" "^3.0.1"
     abort-controller "^3.0.0"
