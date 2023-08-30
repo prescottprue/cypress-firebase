@@ -4996,10 +4996,10 @@ csv-parse@^5.0.4:
   resolved "https://registry.yarnpkg.com/csv-parse/-/csv-parse-5.4.0.tgz#6793210a4a49a9a74b3fde3f9d00f3f52044fd89"
   integrity sha512-JiQosUWiOFgp4hQn0an+SBoV9IKdqzhROM0iiN4LB7UpfJBlsSJlWl9nq4zGgxgMAzHJ6V4t29VAVD+3+2NJAg==
 
-cypress-firebase@3.0.1:
-  version "3.0.1"
-  resolved "https://registry.yarnpkg.com/cypress-firebase/-/cypress-firebase-3.0.1.tgz#9e8a24470c8a17f22aeeec43b950592d911f83b8"
-  integrity sha512-Hc+x71gwD6MFPG/CtvT+1hMmRcc78/qasqCBWhwi4XmXfhMAx5e3fBAZIHMHEJrphCgkf9AJoO2DSFaPMawSjw==
+cypress-firebase@3.0.2:
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/cypress-firebase/-/cypress-firebase-3.0.2.tgz#b153f066584506fca200f7b4f86285464b086edc"
+  integrity sha512-tlVH2MPSxtSo45CCksTmDHq+QY9CRxaDwzA+LbpPifKIUeIo6adfwRKYvjjKLjM4SDZwIqz4Vp+8oTCAl8CleA==
 
 cypress@12.17.3:
   version "12.17.3"
