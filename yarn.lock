@@ -1645,10 +1645,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.2.5.tgz#26d295f3570323b2837d322180dfbf1ba156fefb"
   integrity sha512-JJulVEQXmiY9Px5axXHeYGLSjhkZEnD+MDPDGbCbIAbMslkKwmygtZFy1X6s/075Yo94sf8GuSlFfPzysQrWZQ==
 
-"@types/node@16.18.46":
-  version "16.18.46"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.18.46.tgz#9f2102d0ba74a318fcbe170cbff5463f119eab59"
-  integrity sha512-Mnq3O9Xz52exs3mlxMcQuA7/9VFe/dXcrgAyfjLkABIqxXKOgBRjyazTxUbjsxDa4BP7hhPliyjVTP9RDP14xg==
+"@types/node@16.18.50":
+  version "16.18.50"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.18.50.tgz#93003cf0251a2ecd26dad6dc757168d648519805"
+  integrity sha512-OiDU5xRgYTJ203v4cprTs0RwOCd5c5Zjv+K5P8KSqfiCsB1W3LcamTUMcnQarpq5kOYbhHfSOgIEJvdPyb5xyw==
 
 "@types/node@20.4.7":
   version "20.4.7"
