@@ -1484,15 +1484,15 @@
   resolved "https://registry.yarnpkg.com/@tsconfig/node14/-/node14-1.0.3.tgz#e4386316284f00b98435bf40f72f75a09dabf6c1"
   integrity sha512-ysT8mhdixWK6Hw3i1V2AeRqZ5WfXg1G43mqoYlM2nc6388Fq5jcXyr5mRsqViLx/GJYdoL0bfXD8nmF+Zn/Iow==
 
-"@tsconfig/node16@16.1.1":
-  version "16.1.1"
-  resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-16.1.1.tgz#b9322bcacf7b7a487ab4e078f88455bde47f3780"
-  integrity sha512-+pio93ejHN4nINX4pXqfnR/fPLRtJBaT4ORaa5RH0Oc1zoYmo2B2koG+M328CQhHKn1Wj6FcOxCDFXAot9NhvA==
-
 "@tsconfig/node16@^1.0.2":
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/@tsconfig/node16/-/node16-1.0.4.tgz#0b92dcc0cc1c81f6f306a381f28e31b1a56536e9"
   integrity sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==
+
+"@tsconfig/node18@18.2.2":
+  version "18.2.2"
+  resolved "https://registry.yarnpkg.com/@tsconfig/node18/-/node18-18.2.2.tgz#81fb16ecff0d400b1cbadbf76713b50f331029ce"
+  integrity sha512-d6McJeGsuoRlwWZmVIeE8CUA27lu6jLjvv1JzqmpsytOYYbVi1tHZEnwCNVOXnj4pyLvneZlFlpXUK+X9wBWyw==
 
 "@types/body-parser@*":
   version "1.19.2"
@@ -1645,10 +1645,10 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.2.5.tgz#26d295f3570323b2837d322180dfbf1ba156fefb"
   integrity sha512-JJulVEQXmiY9Px5axXHeYGLSjhkZEnD+MDPDGbCbIAbMslkKwmygtZFy1X6s/075Yo94sf8GuSlFfPzysQrWZQ==
 
-"@types/node@16.18.52":
-  version "16.18.52"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.18.52.tgz#70c56b55d0d7e15fafa875127e95a92605c59c9b"
-  integrity sha512-sm2aph6cRSsTMFYFgI+RpPLunXO9ClJkpizUVdT7KmGeyfQ14xnjTMT/f3MHcfKqevXqGT6BgVFzW8wcEoDUtA==
+"@types/node@18.17.18":
+  version "18.17.18"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.17.18.tgz#acae19ad9011a2ab3d792232501c95085ba1838f"
+  integrity sha512-/4QOuy3ZpV7Ya1GTRz5CYSz3DgkKpyUptXuQ5PPce7uuyJAOR7r9FhkmxJfvcNUXyklbC63a+YvB3jxy7s9ngw==
 
 "@types/node@20.4.7":
   version "20.4.7"
