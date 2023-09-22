@@ -3,14 +3,10 @@
   "version": "0.0.0-development",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
-  "module": "lib-esm/index.js",
-  "jsnext:main": "lib-esm/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
     "clean": "rimraf lib lib-esm",
-    "build": "yarn build:lib && yarn build:esm",
-    "build:lib": "tsc",
-    "build:esm": "tsc -m es6 --outDir lib-esm",
+    "build": "tsc",
     "watch": "yarn build:lib --watch",
     "watch:es": "yarn build:esm --watch",
     "lint": "eslint . --ext .js,.ts",
@@ -32,8 +28,8 @@
     "@commitlint/config-conventional": "17.7.0",
     "@firebase/rules-unit-testing": "2.0.7",
     "@istanbuljs/nyc-config-typescript": "1.0.2",
-    "@size-limit/preset-small-lib": "8.2.6",
-    "@size-limit/webpack": "8.2.6",
+    "@size-limit/preset-small-lib": "9.0.0",
+    "@size-limit/webpack": "9.0.0",
     "@tsconfig/node18": "18.2.2",
     "@types/chai": "4.3.6",
     "@types/mocha": "10.0.1",
@@ -62,9 +58,9 @@
     "rimraf": "5.0.1",
     "sinon": "15.2.0",
     "sinon-chai": "3.7.0",
-    "size-limit": "8.2.6",
+    "size-limit": "9.0.0",
     "ts-node": "10.9.1",
-    "typescript": "5.1.6"
+    "typescript": "5.2.2"
   },
   "keywords": [
     "cypress",
