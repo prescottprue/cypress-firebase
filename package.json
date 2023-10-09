@@ -36,7 +36,7 @@
     "@size-limit/webpack": "8.2.6",
     "@tsconfig/node16": "16.1.1",
     "@types/chai": "4.3.6",
-    "@types/mocha": "10.0.1",
+    "@types/mocha": "10.0.2",
     "@types/node": "16.18.52",
     "@types/sinon-chai": "3.2.9",
     "@typescript-eslint/eslint-plugin": "6.7.0",
