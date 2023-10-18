@@ -35,7 +35,7 @@
     "@size-limit/preset-small-lib": "8.2.6",
     "@size-limit/webpack": "8.2.6",
     "@tsconfig/node16": "16.1.1",
-    "@types/chai": "4.3.8",
+    "@types/chai": "4.3.9",
     "@types/mocha": "10.0.2",
     "@types/node": "16.18.58",
     "@types/sinon-chai": "3.2.10",
