@@ -1666,10 +1666,10 @@
     "@types/mime" "*"
     "@types/node" "*"
 
-"@types/sinon-chai@3.2.10":
-  version "3.2.10"
-  resolved "https://registry.yarnpkg.com/@types/sinon-chai/-/sinon-chai-3.2.10.tgz#fb876d4766847b63107b379844f82a8819153b05"
-  integrity sha512-D+VFqUjMqeku/FGl4Ioo+fDeWOaIfbZ6Oj+glgFUgz5m5RJ4kgCER3FdV1uvhmEt0A+FRz+juPdybFlg5Hxfow==
+"@types/sinon-chai@3.2.11":
+  version "3.2.11"
+  resolved "https://registry.yarnpkg.com/@types/sinon-chai/-/sinon-chai-3.2.11.tgz#d32faab4c5f593f7b877fcdd8f74e0f6d884ddba"
+  integrity sha512-1C5SBFzwn9hjiMr1xfqbULcSI9qXVpkGZT/LYbbd3jWiTo2MSvA+iFfwODlSoAXGeCgBw6S509dxy8zSIacr3Q==
   dependencies:
     "@types/chai" "*"
     "@types/sinon" "*"
