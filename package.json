@@ -51,7 +51,7 @@
     "eslint-plugin-jsdoc": "46.8.2",
     "eslint-plugin-jsx-a11y": "6.7.1",
     "eslint-plugin-prettier": "4.2.1",
-    "firebase": "10.5.0",
+    "firebase": "10.5.2",
     "firebase-admin": "11.11.0",
     "firebase-tools": "12.7.0",
     "husky": "8.0.3",
