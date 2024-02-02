@@ -36,7 +36,7 @@
     "firebase-admin": "11.11.1",
     "firebase-tools": "12.9.1",
     "typescript": "5.1.6",
-    "web-vitals": "3.5.0"
+    "web-vitals": "3.5.2"
   },
   "eslintConfig": {
     "extends": [
