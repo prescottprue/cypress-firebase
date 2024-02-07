@@ -215,35 +215,80 @@ declare global {
       ) => Chainable;
 
       /**
-       * Call Firestore instance with some specified action. Supports get, set, update,
-       * add, and delete. Authentication is through serviceAccount.json or SERVICE_ACCOUNT
+       * Delete a collection or document from Firestore. Authentication is through serviceAccount.json or SERVICE_ACCOUNT
        * environment variable.
-       * @param action - The action type to call with (set, push, update, remove)
-       * @param actionPath - Path within RTDB that action should be applied
-       * @param dataOrOptions - Data to be used in write action or options to be used for query
-       * @param options - Options object
-       * @see https://github.com/prescottprue/cypress-firebase#cycallfirestore
+       * @param action This call will perform a deletion
+       * @param deletePath The path within Firestore to delete - if it has an odd number of segments, it will delete
+       *                     the document, otherwise it will delete the collection
+       * @param options Options to be used when calling Firestore
+       * @example <caption>Delete a document</caption>
+       * cy.callFirestore('delete', 'project/test-project')
+       * @example <caption>Delete all documents in a collection</caption>
+       * cy.callFirestore('delete', 'project')
+       */
+      callFirestore(
+        action: 'delete',
+        deletePath: string,
+        options?: CallFirestoreOptions,
+      ): Chainable;
+
+      /**
+       * Set, or add a document to Firestore. Authentication is through serviceAccount.json or SERVICE_ACCOUNT
+       * environment variable.
+       * @param action This call will add or set a document
+       * @param writePath The path within Firestore where the data should be written
+       * @param data The data to be used in the write action
+       * @param options Options to be used when calling Firestore
        * @example <caption>Set Data</caption>
        * const project = { some: 'data' }
        * cy.callFirestore('set', 'project/test-project', project)
        * @example <caption>Add New Document</caption>
        * const project = { some: 'data' }
        * cy.callFirestore('add', 'projects', project)
-       * @example <caption>Basic Get</caption>
-       * cy.callFirestore('get', 'projects/test-project').then((project) => {
-       *   cy.log('Project:', project)
-       * })
        * @example <caption>Passing A Fixture</caption>
        * cy.fixture('fakeProject.json').then((project) => {
        *   cy.callFirestore('add', 'projects', project)
        * })
        */
-      callFirestore: (
-        action: FirestoreAction,
-        actionPath: string,
-        dataOrOptions?: FixtureData | string | boolean | CallFirestoreOptions,
+      callFirestore<T = firestore.DocumentData>(
+        action: 'set' | 'add',
+        writePath: string,
+        data: firestore.PartialWithFieldValue<T>,
         options?: CallFirestoreOptions,
-      ) => Chainable;
+      ): Chainable;
+
+      /**
+       * Update an existing document in Firestore. Authentication is through serviceAccount.json or SERVICE_ACCOUNT
+       * environment variable.
+       * @param action This call will update an existing document
+       * @param writePath The path within Firestore where the existing document is
+       * @param data The data to be used in the update action, which is a partial update of the document, with field paths
+       * @param options Options to be used when calling Firestore
+       */
+      callFirestore<T = firestore.DocumentData>(
+        action: 'update',
+        writePath: string,
+        data: firestore.UpdateData<T>,
+        options?: CallFirestoreOptions,
+      ): Chainable;
+
+      /**
+       * Get an existing document from Firestore. Authentication is through serviceAccount.json or SERVICE_ACCOUNT
+       * environment variable.
+       * @param action This call will get an existing document
+       * @param getPath The path within Firestore where the existing document is
+       * @param options Options to be used when calling Firestore
+       * @see https://github.com/prescottprue/cypress-firebase#cycallfirestore
+       * @example <caption>Basic Get</caption>
+       * cy.callFirestore('get', 'projects/test-project').then((project) => {
+       *   cy.log('Project:', project)
+       * })
+       */
+      callFirestore(
+        action: 'get',
+        getPath: string,
+        options?: CallFirestoreOptions,
+      ): Chainable;
     }
   }
 }
