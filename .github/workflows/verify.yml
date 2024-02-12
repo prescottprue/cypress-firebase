@@ -57,13 +57,10 @@ jobs:
       - name: Run Build
         run: yarn build
 
-      # Skipped due to Error: "npm ERR! Missing script: "size-build""
-      # - name: Size Check
-      #   uses: andresz1/size-limit-action@v1.0.0
-      #   env:
-      #     CI_JOB_NUMBER: 1
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Size Check
-        run: yarn size-limit
+        uses: andresz1/size-limit-action@v1
+        env:
+          CI_JOB_NUMBER: 1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          skip_step: build # Skip install and build since they happen above
