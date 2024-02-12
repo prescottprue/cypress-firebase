@@ -10,3 +10,10 @@ es
 .nyc_output/**
 coverage/**
 **/*.eslintcache
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

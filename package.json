@@ -18,19 +18,19 @@
     "test": "firebase emulators:exec --only firestore,database \"yarn test:base\"",
     "test:cov": "firebase emulators:exec --only firestore,database \"yarn test:cov:base\"",
     "size": "yarn build && size-limit",
-    "prepare": "husky install && yarn clean && yarn build"
+    "prepare": "husky"
   },
   "peerDependencies": {
     "firebase-admin": "^11.0.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "17.8.1",
-    "@commitlint/config-conventional": "17.8.1",
+    "@commitlint/cli": "18.6.0",
+    "@commitlint/config-conventional": "18.6.0",
     "@firebase/rules-unit-testing": "2.0.7",
     "@istanbuljs/nyc-config-typescript": "1.0.2",
     "@size-limit/preset-small-lib": "9.0.0",
     "@size-limit/webpack": "9.0.0",
-    "@tsconfig/node18": "18.2.2",
+    "@tsconfig/node20": "20.1.2",
     "@types/chai": "4.3.6",
     "@types/mocha": "10.0.1",
     "@types/node": "18.17.18",
@@ -44,14 +44,14 @@
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-babel": "5.3.1",
     "eslint-plugin-import": "2.29.1",
-    "eslint-plugin-jsdoc": "46.10.1",
+    "eslint-plugin-jsdoc": "48.0.6",
     "eslint-plugin-jsx-a11y": "6.8.0",
-    "eslint-plugin-prettier": "4.2.1",
+    "eslint-plugin-prettier": "5.1.3",
     "firebase": "10.8.0",
     "firebase-admin": "11.11.1",
     "firebase-tools": "12.9.1",
-    "husky": "8.0.3",
-    "lint-staged": "14.0.1",
+    "husky": "9.0.10",
+    "lint-staged": "15.2.2",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
     "prettier": "2.8.8",
@@ -60,7 +60,7 @@
     "sinon-chai": "3.7.0",
     "size-limit": "9.0.0",
     "ts-node": "10.9.1",
-    "typescript": "5.2.2"
+    "typescript": "5.3.3"
   },
   "keywords": [
     "cypress",
@@ -130,5 +130,6 @@
       "limit": "3kb",
       "webpack": false
     }
-  ]
+  ],
+  "packageManager": "yarn@4.1.0"
 }
