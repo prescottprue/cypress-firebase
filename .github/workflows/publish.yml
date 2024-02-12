@@ -30,15 +30,14 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - name: Get cache settings
-        id: cache-settings
         run: |
-          echo "::set-output name=firebase-tools::$(yarn list -s --depth=0 --pattern firebase-tools | tail -n 1 | sed 's/.*@//g')"
+          echo "FIREBASE_TOOLS_VERSION=$(yarn info firebase-tools --json --name-only | sed 's/.*@npm\://g' | sed 's/"$//')" >> $GITHUB_OUTPUT
 
       - name: Cache Firebase Emulator Binaries
         uses: actions/cache@v3
         with:
           path: ~/.cache/firebase/emulators
-          key: ${{ runner.os }}-firebase-${{ steps.cache-settings.outputs.firebase-tools }}
+          key: ${{ runner.os }}-${{ matrix.node-version }}-firebase-${{ env.FIREBASE_TOOLS_VERSION }}
 
       - name: Configure package manager
         env:
