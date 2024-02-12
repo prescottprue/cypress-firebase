@@ -8,8 +8,7 @@
   "scripts": {
     "clean": "rimraf lib lib-esm",
     "build": "tsc",
-    "watch": "yarn build:lib --watch",
-    "watch:es": "yarn build:esm --watch",
+    "watch": "yarn build --watch",
     "lint": "eslint . --ext .js,.ts",
     "lint:fix": "yarn lint --fix",
     "format:check": "prettier --check .",
@@ -92,7 +91,6 @@
     "bin",
     "cmds",
     "lib",
-    "lib-esm",
     "index.d.ts"
   ],
   "lint-staged": {
@@ -116,20 +114,6 @@
       "path": "lib/index.js",
       "import": "{ plugin }",
       "limit": "7kb",
-      "webpack": false
-    },
-    {
-      "name": "ESM: attachCustomCommands",
-      "path": "lib-esm/index.js",
-      "import": "{ attachCustomCommands }",
-      "limit": "1kb",
-      "webpack": false
-    },
-    {
-      "name": "ESM: plugin",
-      "path": "lib-esm/index.js",
-      "import": "{ plugin }",
-      "limit": "3kb",
       "webpack": false
     }
   ],
