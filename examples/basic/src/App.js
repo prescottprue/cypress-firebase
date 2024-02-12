@@ -1,11 +1,11 @@
 import React from 'react';
-import initFirebase from './initFirebase'
-import RTDBProjects from './RTDBProjects'
-import NewProject from './NewProject'
-import FirestoreProjects from './FirestoreProjects'
+import initFirebase from './initFirebase';
+import RTDBProjects from './RTDBProjects';
+import NewProject from './NewProject';
+import FirestoreProjects from './FirestoreProjects';
 import './App.css';
 
-initFirebase()
+initFirebase();
 
 function App() {
   return (
@@ -18,7 +18,7 @@ function App() {
         <FirestoreProjects />
       </header>
     </div>
-  )
+  );
 }
 
 export default App;

@@ -1,12 +1,17 @@
 {
-  "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
-    "moduleResolution": "node",
+    "lib": ["es2023"],
+    "module": "node16",
+    "target": "es2022",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node16",
     "declaration": true,
     "outDir": "lib",
     "rootDir": "./src",
     "importHelpers": true,
-    "esModuleInterop": true,
     "downlevelIteration": true,
     "allowSyntheticDefaultImports": true
   },

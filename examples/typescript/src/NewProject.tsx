@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { getDatabase, ref, push, serverTimestamp } from 'firebase/database'
-import { getAuth } from 'firebase/auth'
+import { getDatabase, ref, push, serverTimestamp } from 'firebase/database';
+import { getAuth } from 'firebase/auth';
 import { ProjectData } from './Project';
 
 export default function NewProject() {
-  const [projectName, setProjectName] = useState('')
+  const [projectName, setProjectName] = useState('');
   function addProject() {
     const newProjectData: ProjectData = {
       name: projectName,
-      createdAt: serverTimestamp()
-    }
-    const auth = getAuth()
+      createdAt: serverTimestamp(),
+    };
+    const auth = getAuth();
     if (auth.currentUser?.uid) {
-      newProjectData.createdBy = auth.currentUser.uid
+      newProjectData.createdBy = auth.currentUser.uid;
     }
-    return push(ref(getDatabase(), 'projects'), newProjectData)
+    return push(ref(getDatabase(), 'projects'), newProjectData);
   }
 
   return (
@@ -26,5 +26,5 @@ export default function NewProject() {
       />
       <button onClick={addProject}>Add Project</button>
     </div>
-  )
+  );
 }

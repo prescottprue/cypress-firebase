@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = {
-  require: ['ts-node/register', './test/setup.ts'],
+  require: ['./test/setup.ts'],
   recursive: true,
-  timeout: 5000
+  timeout: 5000,
 };

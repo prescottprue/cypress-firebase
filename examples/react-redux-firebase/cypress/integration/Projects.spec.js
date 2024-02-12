@@ -1,10 +1,9 @@
 describe('Projects View', () => {
-
   describe('when not authenticated', () => {
     it('Shows login message and button', () => {
-      cy.get('[data-test=login]').click()
+      cy.get('[data-test=login]').click();
     });
-  })
+  });
 
   describe('when authenticated', () => {
     before(() => {
@@ -19,11 +18,10 @@ describe('Projects View', () => {
     after(() => {
       // TODO: Use cy.setRtdb() to set projects created by authed user
       // cy.callRtdb('remove')
-    })
+    });
 
     it('Shows projects if logged in', () => {
-      cy.get('[data-test=projects]').should('exist')
+      cy.get('[data-test=projects]').should('exist');
     });
-  })
-
+  });
 });

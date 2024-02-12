@@ -3,41 +3,38 @@
   "version": "0.0.0-development",
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
-  "module": "lib-esm/index.js",
-  "jsnext:main": "lib-esm/index.js",
   "types": "lib/index.d.ts",
+  "type": "commonjs",
   "scripts": {
     "clean": "rimraf lib lib-esm",
-    "build": "yarn build:lib && yarn build:esm",
-    "build:lib": "tsc",
-    "build:esm": "tsc -m es6 --outDir lib-esm",
-    "watch": "yarn build:lib --watch",
-    "watch:es": "yarn build:esm --watch",
+    "build": "tsc",
+    "watch": "yarn build --watch",
     "lint": "eslint . --ext .js,.ts",
     "lint:fix": "yarn lint --fix",
-    "test:base": "GCLOUD_PROJECT=test-project mocha ./test/unit/**/*.spec.ts",
+    "format:check": "prettier --check .",
+    "format": "prettier --write .",
+    "test:base": "GCLOUD_PROJECT=test-project NODE_OPTIONS='--import tsx' mocha ./test/unit/**/*.spec.ts",
     "test:cov:base": "nyc --reporter=lcov --reporter=html yarn test:base",
     "test:watch": "yarn test:base --watch",
     "emulators": "firebase emulators:start --only firestore,database --project test-project",
     "test": "firebase emulators:exec --only firestore,database \"yarn test:base\"",
     "test:cov": "firebase emulators:exec --only firestore,database \"yarn test:cov:base\"",
     "size": "yarn build && size-limit",
-    "prepare": "husky install && yarn clean && yarn build"
+    "prepare": "husky"
   },
   "peerDependencies": {
     "firebase-admin": "^11.0.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "17.8.1",
-    "@commitlint/config-conventional": "17.8.1",
-    "@firebase/rules-unit-testing": "2.0.7",
+    "@commitlint/cli": "18.6.0",
+    "@commitlint/config-conventional": "18.6.0",
+    "@firebase/rules-unit-testing": "3.0.1",
     "@istanbuljs/nyc-config-typescript": "1.0.2",
-    "@size-limit/preset-small-lib": "8.2.6",
-    "@size-limit/webpack": "8.2.6",
-    "@tsconfig/node16": "16.1.1",
-    "@types/chai": "4.3.11",
-    "@types/mocha": "10.0.6",
-    "@types/node": "16.18.79",
+    "@size-limit/preset-small-lib": "9.0.0",
+    "@size-limit/webpack": "9.0.0",
+    "@types/chai": "4.3.6",
+    "@types/mocha": "10.0.1",
+    "@types/node": "20.11.17",
     "@types/sinon-chai": "3.2.12",
     "@typescript-eslint/eslint-plugin": "6.21.0",
     "@typescript-eslint/parser": "6.21.0",
@@ -48,23 +45,23 @@
     "eslint-config-prettier": "9.1.0",
     "eslint-plugin-babel": "5.3.1",
     "eslint-plugin-import": "2.29.1",
-    "eslint-plugin-jsdoc": "46.10.1",
+    "eslint-plugin-jsdoc": "48.0.6",
     "eslint-plugin-jsx-a11y": "6.8.0",
-    "eslint-plugin-prettier": "4.2.1",
+    "eslint-plugin-prettier": "5.1.3",
     "firebase": "10.8.0",
     "firebase-admin": "11.11.1",
-    "firebase-tools": "12.9.1",
-    "husky": "8.0.3",
-    "lint-staged": "14.0.1",
+    "firebase-tools": "13.2.1",
+    "husky": "9.0.10",
+    "lint-staged": "15.2.2",
     "mocha": "10.2.0",
     "nyc": "15.1.0",
-    "prettier": "2.8.8",
+    "prettier": "3.2.5",
     "rimraf": "5.0.5",
     "sinon": "15.2.0",
     "sinon-chai": "3.7.0",
-    "size-limit": "8.2.6",
-    "ts-node": "10.9.2",
-    "typescript": "5.1.6"
+    "size-limit": "9.0.0",
+    "tsx": "4.7.1",
+    "typescript": "5.3.3"
   },
   "keywords": [
     "cypress",
@@ -94,7 +91,6 @@
     "bin",
     "cmds",
     "lib",
-    "lib-esm",
     "index.d.ts"
   ],
   "lint-staged": {
@@ -119,20 +115,12 @@
       "import": "{ plugin }",
       "limit": "7kb",
       "webpack": false
-    },
-    {
-      "name": "ESM: attachCustomCommands",
-      "path": "lib-esm/index.js",
-      "import": "{ attachCustomCommands }",
-      "limit": "1kb",
-      "webpack": false
-    },
-    {
-      "name": "ESM: plugin",
-      "path": "lib-esm/index.js",
-      "import": "{ plugin }",
-      "limit": "3kb",
-      "webpack": false
     }
-  ]
+  ],
+  "nyc": {
+    "include": [
+      "src"
+    ]
+  },
+  "packageManager": "yarn@4.1.0"
 }

@@ -2,9 +2,9 @@ module.exports = {
   parser: '@typescript-eslint/parser',
   extends: [
     'airbnb-base',
-    'prettier',
     'plugin:@typescript-eslint/recommended',
     'plugin:jsdoc/recommended',
+    'prettier',
   ],
   root: true,
   plugins: ['@typescript-eslint', 'prettier', 'jsdoc'],
@@ -16,7 +16,7 @@ module.exports = {
       },
     },
     react: {
-      version: '16.0',
+      version: '18.0',
     },
   },
   env: {

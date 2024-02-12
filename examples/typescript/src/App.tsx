@@ -1,12 +1,12 @@
 import React from 'react';
 // import logo from './logo.svg';
-import initFirebase from './initFirebase'
-import RTDBProjects from './RTDBProjects'
-import NewProject from './NewProject'
-import FirestoreProjects from './FirestoreProjects'
+import initFirebase from './initFirebase';
+import RTDBProjects from './RTDBProjects';
+import NewProject from './NewProject';
+import FirestoreProjects from './FirestoreProjects';
 import './App.css';
 
-initFirebase()
+initFirebase();
 
 function App() {
   return (
