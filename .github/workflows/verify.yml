@@ -64,5 +64,4 @@ jobs:
           CI_JOB_NUMBER: 1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          skip_step: build # Skip install and build since they happen above
-          build_script: build
+          skip_step: install # Skip install since it happens above
