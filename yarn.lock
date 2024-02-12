@@ -2371,9 +2371,9 @@ __metadata:
   linkType: hard
 
 "@types/sizzle@npm:^2.3.2":
-  version: 2.3.4
-  resolution: "@types/sizzle@npm:2.3.4"
-  checksum: 10c0/d8cd1c14178860849da81e30febed3593d57764a11efc3eca9c65ea55bb94e299b4b9ee70759870a17482fca1e8bcfa8678f0a877e0dcc156967b456afc5335d
+  version: 2.3.8
+  resolution: "@types/sizzle@npm:2.3.8"
+  checksum: 10c0/ab5460147ae6680cc20c2223a8f17d9f7c97144b70f00a222a1c32d68b5207696d48177ab9784dda88c74d93ed5a78dd31f74d271b15382520b423c81b4aac89
   languageName: node
   linkType: hard
 
@@ -2385,11 +2385,11 @@ __metadata:
   linkType: hard
 
 "@types/yauzl@npm:^2.9.1":
-  version: 2.10.1
-  resolution: "@types/yauzl@npm:2.10.1"
+  version: 2.10.3
+  resolution: "@types/yauzl@npm:2.10.3"
   dependencies:
     "@types/node": "npm:*"
-  checksum: 10c0/d44eb8ab5c7bd024644bdf07e71d1e2618b1d6a9eb10609555a5359264b3f012f91d7add53a49a114df2d3fd6b1787f6204340b03590ea1a6c0e52a71e3bca54
+  checksum: 10c0/f1b7c1b99fef9f2fe7f1985ef7426d0cebe48cd031f1780fcdc7451eec7e31ac97028f16f50121a59bcf53086a1fc8c856fd5b7d3e00970e43d92ae27d6b43dc
   languageName: node
   linkType: hard
 
@@ -3259,7 +3259,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"async@npm:^3.2.0, async@npm:^3.2.3, async@npm:^3.2.4":
+"async@npm:^3.2.0":
+  version: 3.2.5
+  resolution: "async@npm:3.2.5"
+  checksum: 10c0/1408287b26c6db67d45cb346e34892cee555b8b59e6c68e6f8c3e495cad5ca13b4f218180e871f3c2ca30df4ab52693b66f2f6ff43644760cab0b2198bda79c1
+  languageName: node
+  linkType: hard
+
+"async@npm:^3.2.3, async@npm:^3.2.4":
   version: 3.2.4
   resolution: "async@npm:3.2.4"
   checksum: 10c0/b5d02fed64717edf49e35b2b156debd9cf524934ea670108fa5528e7615ed66a5e0bf6c65f832c9483b63aa7f0bffe3e588ebe8d58a539b833798d324516e1c9
@@ -10356,10 +10363,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"punycode@npm:^2.1.0, punycode@npm:^2.1.1":
+"punycode@npm:^2.1.0":
   version: 2.3.0
   resolution: "punycode@npm:2.3.0"
   checksum: 10c0/8e6f7abdd3a6635820049e3731c623bbef3fedbf63bbc696b0d7237fdba4cefa069bc1fa62f2938b0fbae057550df7b5318f4a6bcece27f1907fc75c54160bee
+  languageName: node
+  linkType: hard
+
+"punycode@npm:^2.1.1":
+  version: 2.3.1
+  resolution: "punycode@npm:2.3.1"
+  checksum: 10c0/14f76a8206bc3464f794fb2e3d3cc665ae416c01893ad7a02b23766eb07159144ee612ad67af5e84fa4479ccfe67678c4feb126b0485651b302babf66f04f9e9
   languageName: node
   linkType: hard
 
@@ -11344,8 +11358,8 @@ __metadata:
   linkType: hard
 
 "sshpk@npm:^1.14.1":
-  version: 1.17.0
-  resolution: "sshpk@npm:1.17.0"
+  version: 1.18.0
+  resolution: "sshpk@npm:1.18.0"
   dependencies:
     asn1: "npm:~0.2.3"
     assert-plus: "npm:^1.0.0"
@@ -11360,7 +11374,7 @@ __metadata:
     sshpk-conv: bin/sshpk-conv
     sshpk-sign: bin/sshpk-sign
     sshpk-verify: bin/sshpk-verify
-  checksum: 10c0/cf5e7f4c72e8a505ef41daac9f9ca26da365cfe26ae265a01ce98a8868991943857a8526c1cf98a42ef0dc4edf1dbe4e77aeea378cfeb58054beb78505e85402
+  checksum: 10c0/e516e34fa981cfceef45fd2e947772cc70dbd57523e5c608e2cd73752ba7f8a99a04df7c3ed751588e8d91956b6f16531590b35d3489980d1c54c38bebcd41b1
   languageName: node
   linkType: hard
 
@@ -11819,9 +11833,9 @@ __metadata:
   linkType: hard
 
 "throttleit@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "throttleit@npm:1.0.0"
-  checksum: 10c0/e7c82628e5d7e3bf377878481203702a735e4310bb0c35f563a18c10ba291562332a6b61c57120c6445da1e17e7b0ff52f014b9dd310793843d4d92fa92baf2c
+  version: 1.0.1
+  resolution: "throttleit@npm:1.0.1"
+  checksum: 10c0/4d41a1bf467646b1aa7bec0123b78452a0e302d7344f6a67e43e68434f0a02ea3ba44df050a40c69adeb9cae3cbf6b36b38cfe94bcc3c4a8243c9b63e38e059b
   languageName: node
   linkType: hard
 
