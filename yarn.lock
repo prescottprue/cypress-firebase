@@ -1277,14 +1277,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@firebase/rules-unit-testing@npm:2.0.7":
-  version: 2.0.7
-  resolution: "@firebase/rules-unit-testing@npm:2.0.7"
+"@firebase/rules-unit-testing@npm:3.0.1":
+  version: 3.0.1
+  resolution: "@firebase/rules-unit-testing@npm:3.0.1"
   dependencies:
     node-fetch: "npm:2.6.7"
   peerDependencies:
-    firebase: ^9.0.0
-  checksum: 10c0/6b54517ffeb154129a61bece24cc819387724c76b0393681c23d0001d01b7ee28987151e1dac3670bd49e3c24ced671215dea39e28d6eaf9ce18dd461097fed6
+    firebase: ^10.0.0
+  checksum: 10c0/a4b38a6684352cd80e80e78ae67f04081239ddc1b920afcec74e287f710e2e0cdd110cd7e1b1dad038c51ca3345b675c375806f5c3d104ec6f6201e034b7243d
   languageName: node
   linkType: hard
 
@@ -1953,13 +1953,6 @@ __metadata:
   version: 1.0.4
   resolution: "@tsconfig/node16@npm:1.0.4"
   checksum: 10c0/05f8f2734e266fb1839eb1d57290df1664fe2aa3b0fdd685a9035806daa635f7519bf6d5d9b33f6e69dd545b8c46bd6e2b5c79acb2b1f146e885f7f11a42a5bb
-  languageName: node
-  linkType: hard
-
-"@tsconfig/node20@npm:20.1.2":
-  version: 20.1.2
-  resolution: "@tsconfig/node20@npm:20.1.2"
-  checksum: 10c0/e438fa9b93f0e6ea667affbbd3217692bf3f92db1b3dcbfba1dd141a7dbcd647c19ed87ce76871c723bed398759ec4a5590685f3e669b600c9371f143a19e0c1
   languageName: node
   linkType: hard
 
@@ -4349,11 +4342,10 @@ __metadata:
   dependencies:
     "@commitlint/cli": "npm:18.6.0"
     "@commitlint/config-conventional": "npm:18.6.0"
-    "@firebase/rules-unit-testing": "npm:2.0.7"
+    "@firebase/rules-unit-testing": "npm:3.0.1"
     "@istanbuljs/nyc-config-typescript": "npm:1.0.2"
     "@size-limit/preset-small-lib": "npm:9.0.0"
     "@size-limit/webpack": "npm:9.0.0"
-    "@tsconfig/node20": "npm:20.1.2"
     "@types/chai": "npm:4.3.6"
     "@types/mocha": "npm:10.0.1"
     "@types/node": "npm:18.17.18"

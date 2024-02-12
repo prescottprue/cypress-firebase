@@ -26,11 +26,10 @@
   "devDependencies": {
     "@commitlint/cli": "18.6.0",
     "@commitlint/config-conventional": "18.6.0",
-    "@firebase/rules-unit-testing": "2.0.7",
+    "@firebase/rules-unit-testing": "3.0.1",
     "@istanbuljs/nyc-config-typescript": "1.0.2",
     "@size-limit/preset-small-lib": "9.0.0",
     "@size-limit/webpack": "9.0.0",
-    "@tsconfig/node20": "20.1.2",
     "@types/chai": "4.3.6",
     "@types/mocha": "10.0.1",
     "@types/node": "18.17.18",
