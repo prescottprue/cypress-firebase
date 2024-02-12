@@ -43,11 +43,8 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.node-version }}-firebase-${{ steps.cache-settings.outputs.firebase-tools }}
 
       - name: Configure package manager
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
-          yarn config set npmAuthToken ${{ env.NPM_TOKEN }}
-          npm whoami
+          yarn config set npmAuthToken ${{ secrets.NPM_TOKEN }}
 
       - name: Install Dependencies
         run: yarn install --immutable
