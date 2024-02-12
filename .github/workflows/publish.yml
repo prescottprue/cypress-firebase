@@ -70,7 +70,7 @@ jobs:
       #     github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Size Check
-        run: $(yarn bin)/size-limit
+        run: yarn size-limit
 
       - name: Semantic Release
         uses: cycjimmy/semantic-release-action@v3

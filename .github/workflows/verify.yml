@@ -66,4 +66,4 @@ jobs:
       #     github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Size Check
-        run: $(yarn bin)/size-limit
+        run: yarn size-limit
