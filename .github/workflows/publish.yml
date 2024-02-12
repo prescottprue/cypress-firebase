@@ -23,7 +23,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Use Node ${{ env.NODE_VERSION }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
@@ -37,7 +37,7 @@ jobs:
           echo "firebase-tools=$fbToolsVersion" >> $GITHUB_OUTPUT
 
       - name: Cache Firebase Emulator Binaries
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/firebase/emulators
           key: ${{ runner.os }}-${{ matrix.node-version }}-firebase-${{ steps.cache-settings.outputs.firebase-tools }}
