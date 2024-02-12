@@ -1,7 +1,7 @@
 describe('callFirestore', () => {
   describe('get', () => {
     it('should return null for empty collection', () => {
-      cy.callFirestore('get', 'asdf').then(results => {
+      cy.callFirestore('get', 'asdf').then((results) => {
         cy.log('results:', results);
         expect(results).be.null;
       });
@@ -9,34 +9,34 @@ describe('callFirestore', () => {
 
     it('should return documents from collection', () => {
       cy.callFirestore('add', 'projects', { name: 'test' }).then(() => {
-        cy.callFirestore('get', 'projects').then(results => {
+        cy.callFirestore('get', 'projects').then((results) => {
           cy.log('results:', results);
           expect(results).to.exist;
         });
       });
     });
-  
+
     it('get with limit', () => {
-      cy.callFirestore('get', 'projects', { limit: 1 }).then(results => {
+      cy.callFirestore('get', 'projects', { limit: 1 }).then((results) => {
         cy.log('results:', results);
         expect(results).to.exist;
         expect(results).to.have.length(1);
       });
     });
-  })
+  });
 
   describe('set', () => {
     it('set', () => {
       cy.callFirestore('set', 'projects/123ABC', { some: 'value' }).then(
-        results => {
+        (results) => {
           cy.log('results:', results);
-          cy.callFirestore('get', 'projects/123ABC').then(result => {
+          cy.callFirestore('get', 'projects/123ABC').then((result) => {
             expect(result).to.exist;
           });
         },
       );
     });
-  })
+  });
 
   it('set with merge', () => {
     cy.callFirestore(
@@ -44,9 +44,9 @@ describe('callFirestore', () => {
       'projects/123ABCSet',
       { some: 'value' },
       { merge: true },
-    ).then(results => {
+    ).then((results) => {
       cy.log('results:', results);
-      cy.callFirestore('get', 'projects/123ABCSet').then(result => {
+      cy.callFirestore('get', 'projects/123ABCSet').then((result) => {
         expect(result).to.exist;
         expect(result).to.have.property('some', 'value');
       });
@@ -67,7 +67,7 @@ describe('callFirestore', () => {
         cy.callFirestore('update', 'projects/123ABCUpdate', {
           updatedValue,
         }).then(() => {
-          cy.callFirestore('get', 'projects/123ABCUpdate').then(result => {
+          cy.callFirestore('get', 'projects/123ABCUpdate').then((result) => {
             expect(result).to.have.exist;
             expect(result).to.have.property('updatedValue', updatedValue);
           });
@@ -79,11 +79,11 @@ describe('callFirestore', () => {
   it('add', () => {
     const newProjectName = `pushed project${Date.now()}`;
     cy.callFirestore('add', 'projects', { name: newProjectName }).then(() => {
-      cy.callFirestore('get', 'projects').then(results => {
+      cy.callFirestore('get', 'projects').then((results) => {
         cy.log('results:', results);
         expect(
           Object.values(results).filter(
-            project => project.name === newProjectName,
+            (project) => project.name === newProjectName,
           ),
         ).to.exist;
       });
@@ -91,23 +91,27 @@ describe('callFirestore', () => {
   });
 
   it('should delete collection of documents given collection name', () => {
-    cy.callFirestore('delete', 'projects')
+    cy.callFirestore('delete', 'projects');
     cy.callFirestore('get', 'projects').then((projects) => {
-      expect(projects).to.be.null
+      expect(projects).to.be.null;
     });
   });
 
   it('should delete collection of documents matching a query', () => {
-    cy.callFirestore('add', 'projects', { name: 'toDelete' })
-    cy.callFirestore('add', 'projects', { name: 'test' })
-    cy.callFirestore('delete', 'projects', { where: ['name', '==', 'toDelete'] }).then(() => {
+    cy.callFirestore('add', 'projects', { name: 'toDelete' });
+    cy.callFirestore('add', 'projects', { name: 'test' });
+    cy.callFirestore('delete', 'projects', {
+      where: ['name', '==', 'toDelete'],
+    }).then(() => {
       // Confirm project is deleted
-      cy.callFirestore('get', 'projects', { where: ['name', '==', 'toDelete'] }).then((projectsAfterDelete) => {
-        expect(projectsAfterDelete).to.be.null
+      cy.callFirestore('get', 'projects', {
+        where: ['name', '==', 'toDelete'],
+      }).then((projectsAfterDelete) => {
+        expect(projectsAfterDelete).to.be.null;
       });
       // Confirm other projects are not deleted
       cy.callFirestore('get', 'projects').then((projectsAfterDelete) => {
-        expect(projectsAfterDelete).to.exist
+        expect(projectsAfterDelete).to.exist;
       });
     });
   });

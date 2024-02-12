@@ -16,23 +16,23 @@ This project was bootstrapped with [Create React App](https://github.com/faceboo
 
 ```js
 export const firebase = {
-  apiKey: "AIzaSyCTUERDM-Pchn_UDTsfhVPiwM4TtNIxots",
-  authDomain: "redux-firebasev3.firebaseapp.com",
-  databaseURL: "https://redux-firebasev3.firebaseio.com",
-  projectId: "redux-firebasev3",
-  storageBucket: "redux-firebasev3.appspot.com",
-  messagingSenderId: "823357791673",
+  apiKey: 'AIzaSyCTUERDM-Pchn_UDTsfhVPiwM4TtNIxots',
+  authDomain: 'redux-firebasev3.firebaseapp.com',
+  databaseURL: 'https://redux-firebasev3.firebaseio.com',
+  projectId: 'redux-firebasev3',
+  storageBucket: 'redux-firebasev3.appspot.com',
+  messagingSenderId: '823357791673',
 };
 ```
 
 1. Add `src/initFirebase.js` - a util to import Firebase and initialize it (supports already initialized Firebase instance on window for testing):
 
 ```js
-import firebase from "firebase/app";
-import "firebase/auth";
-import "firebase/database";
-import "firebase/firestore"; // make sure you add this for firestore
-import { firebase as fbConfig } from "./config";
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/database';
+import 'firebase/firestore'; // make sure you add this for firestore
+import { firebase as fbConfig } from './config';
 
 let firebaseInstance;
 
@@ -57,12 +57,12 @@ export default function initFirebase(initialState, history) {
 1. Load Firebase data in the home component:
 
 ```jsx
-import React, { Component } from "react";
-import { invoke, map } from "lodash";
-import logo from "./logo.svg";
-import initFirebase from "./initFirebase";
-import Project from "./Project";
-import "./App.css";
+import React, { Component } from 'react';
+import { invoke, map } from 'lodash';
+import logo from './logo.svg';
+import initFirebase from './initFirebase';
+import Project from './Project';
+import './App.css';
 
 const fbInstance = initFirebase();
 
@@ -76,10 +76,10 @@ class App extends Component {
     this.setState({ loading: true });
     fbInstance
       .database()
-      .ref("projects")
+      .ref('projects')
       .limitToFirst(10)
       .on(
-        "value",
+        'value',
         (snap) => {
           this.setState({
             projects: snap.val(),
@@ -89,9 +89,9 @@ class App extends Component {
         (err) => {
           this.setState({
             loading: false,
-            error: invoke(err, "toString") || err,
+            error: invoke(err, 'toString') || err,
           });
-        }
+        },
       );
   }
 
@@ -141,11 +141,11 @@ SKIP_PREFLIGHT_CHECK=true
 1. Add the following your custom commands file (`cypress/support/commands.js`):
 
    ```js
-   import firebase from "firebase/app";
-   import "firebase/auth";
-   import "firebase/database";
-   import "firebase/firestore";
-   import { attachCustomCommands } from "cypress-firebase";
+   import firebase from 'firebase/app';
+   import 'firebase/auth';
+   import 'firebase/database';
+   import 'firebase/firestore';
+   import { attachCustomCommands } from 'cypress-firebase';
 
    const fbConfig = {
      // Your config from Firebase Console
@@ -159,7 +159,7 @@ SKIP_PREFLIGHT_CHECK=true
 1. Make sure that you load the custom commands file in an `cypress/support/index.js` like so:
 
    ```js
-   import "./commands";
+   import './commands';
    ```
 
    **NOTE**: This is a pattern which is setup by default by Cypress, so this file may already exist
@@ -167,8 +167,8 @@ SKIP_PREFLIGHT_CHECK=true
 1. Setup plugin adding following your plugins file (`cypress/plugins/index.js`):
 
    ```js
-   const admin = require("firebase-admin");
-   const cypressFirebasePlugin = require("cypress-firebase").plugin;
+   const admin = require('firebase-admin');
+   const cypressFirebasePlugin = require('cypress-firebase').plugin;
 
    module.exports = (on, config) => {
      const extendedConfig = cypressFirebasePlugin(on, config, admin);

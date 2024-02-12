@@ -36,55 +36,55 @@ If you are interested in what drove the need for this checkout [the why section]
 1. Generate and download a service account as described in [the firebase-admin setup documentation](https://firebase.google.com/docs/admin/setup#initialize-sdk). Save this to a local file within the project which you confirm is within your `.gitignore` - often `./serviceAccount.json`. Make sure YOU DO NOT COMMIT THIS FILE - it is sensitive and will give others admin access to your project.
 1. Set the following config in your `cypress.config.js` or `cypress.config.ts`
 
- With [Firebase Web SDK versions up to 8](https://firebase.google.com/docs/web/modular-upgrade)
+With [Firebase Web SDK versions up to 8](https://firebase.google.com/docs/web/modular-upgrade)
 
-   ```js
-   import admin from 'firebase-admin';
-   import { defineConfig } from 'cypress';
-   import { plugin as cypressFirebasePlugin } from 'cypress-firebase';
+```js
+import admin from 'firebase-admin';
+import { defineConfig } from 'cypress';
+import { plugin as cypressFirebasePlugin } from 'cypress-firebase';
 
-   export default defineConfig({
-     e2e: {
-       baseUrl: 'http://localhost:3000',
-       // NOTE: Add "supportFile" setting if separate location is used
-       setupNodeEvents(on, config) {
-         // e2e testing node events setup code
-         return cypressFirebasePlugin(on, config, admin,{
-             // Here is where you can pass special options. 
-             // If you have not set the GCLOUD_PROJECT environment variable, give the projectId here, like so:
-             //    projectId: 'some-project',
-             // if your databaseURL is not just your projectId plus ".firebaseio.com", then you _must_ give it here, like so:
-             //    databaseURL: 'some-project-default-rtdb.europe-west1.firebasedatabase.app',
-         });
-       },
-     },
-   });
-   ```
+export default defineConfig({
+  e2e: {
+    baseUrl: 'http://localhost:3000',
+    // NOTE: Add "supportFile" setting if separate location is used
+    setupNodeEvents(on, config) {
+      // e2e testing node events setup code
+      return cypressFirebasePlugin(on, config, admin, {
+        // Here is where you can pass special options.
+        // If you have not set the GCLOUD_PROJECT environment variable, give the projectId here, like so:
+        //    projectId: 'some-project',
+        // if your databaseURL is not just your projectId plus ".firebaseio.com", then you _must_ give it here, like so:
+        //    databaseURL: 'some-project-default-rtdb.europe-west1.firebasedatabase.app',
+      });
+    },
+  },
+});
+```
 
-   or if you are not using TS, then within `cypress.config.js`:
+or if you are not using TS, then within `cypress.config.js`:
 
-   ```js
-   const { defineConfig } = require('cypress');
-   const cypressFirebasePlugin = require('cypress-firebase').plugin;
-   const admin = require('firebase-admin');
+```js
+const { defineConfig } = require('cypress');
+const cypressFirebasePlugin = require('cypress-firebase').plugin;
+const admin = require('firebase-admin');
 
-   module.exports = defineConfig({
-     e2e: {
-       baseUrl: 'http://localhost:3000',
-       // NOTE: Make supportFile exists if separate location is provided
-       setupNodeEvents(on, config) {
-         // e2e testing node events setup code
-         return cypressFirebasePlugin(on, config, admin,{
-             // Here is where you can pass special options. 
-             // If you have not set the GCLOUD_PROJECT environment variable, give the projectId here, like so:
-             //    projectId: 'some-project',
-             // if your databaseURL is not just your projectId plus ".firebaseio.com", then you _must_ give it here, like so:
-             //    databaseURL: 'some-project-default-rtdb.europe-west1.firebasedatabase.app',
-         });
-       },
-     },
-   });
-   ```
+module.exports = defineConfig({
+  e2e: {
+    baseUrl: 'http://localhost:3000',
+    // NOTE: Make supportFile exists if separate location is provided
+    setupNodeEvents(on, config) {
+      // e2e testing node events setup code
+      return cypressFirebasePlugin(on, config, admin, {
+        // Here is where you can pass special options.
+        // If you have not set the GCLOUD_PROJECT environment variable, give the projectId here, like so:
+        //    projectId: 'some-project',
+        // if your databaseURL is not just your projectId plus ".firebaseio.com", then you _must_ give it here, like so:
+        //    databaseURL: 'some-project-default-rtdb.europe-west1.firebasedatabase.app',
+      });
+    },
+  },
+});
+```
 
 1. Add the following your custom commands file (`cypress/support/e2e.js` or `cypress/support/e2e.ts`):
 
@@ -503,43 +503,42 @@ export default cypressConfig;
 
 With [Firebase Web SDK versions up to 8](https://firebase.google.com/docs/web/modular-upgrade)
 
+```js
+import firebase from 'firebase/app';
+import 'firebase/auth';
+import 'firebase/database';
+import 'firebase/firestore';
+import { attachCustomCommands } from 'cypress-firebase';
 
-   ```js
-   import firebase from 'firebase/app';
-   import 'firebase/auth';
-   import 'firebase/database';
-   import 'firebase/firestore';
-   import { attachCustomCommands } from 'cypress-firebase';
+const fbConfig = {
+  // Your Firebase Config
+};
 
-   const fbConfig = {
-     // Your Firebase Config
-   };
+// Emulate RTDB if Env variable is passed
+const rtdbEmulatorHost = Cypress.env('FIREBASE_DATABASE_EMULATOR_HOST');
+if (rtdbEmulatorHost) {
+  fbConfig.databaseURL = `http://${rtdbEmulatorHost}?ns=${fbConfig.projectId}`;
+}
 
-   // Emulate RTDB if Env variable is passed
-   const rtdbEmulatorHost = Cypress.env('FIREBASE_DATABASE_EMULATOR_HOST');
-   if (rtdbEmulatorHost) {
-     fbConfig.databaseURL = `http://${rtdbEmulatorHost}?ns=${fbConfig.projectId}`;
-   }
+firebase.initializeApp(fbConfig);
 
-   firebase.initializeApp(fbConfig);
+// Emulate Firestore if Env variable is passed
+const firestoreEmulatorHost = Cypress.env('FIRESTORE_EMULATOR_HOST');
+if (firestoreEmulatorHost) {
+  firebase.firestore().settings({
+    host: firestoreEmulatorHost,
+    ssl: false,
+  });
+}
 
-   // Emulate Firestore if Env variable is passed
-   const firestoreEmulatorHost = Cypress.env('FIRESTORE_EMULATOR_HOST');
-   if (firestoreEmulatorHost) {
-     firebase.firestore().settings({
-       host: firestoreEmulatorHost,
-       ssl: false,
-     });
-   }
+const authEmulatorHost = Cypress.env('FIREBASE_AUTH_EMULATOR_HOST');
+if (authEmulatorHost) {
+  firebase.auth().useEmulator(`http://${authEmulatorHost}/`);
+  console.debug(`Using Auth emulator: http://${authEmulatorHost}/`);
+}
 
-   const authEmulatorHost = Cypress.env('FIREBASE_AUTH_EMULATOR_HOST');
-   if (authEmulatorHost) {
-     firebase.auth().useEmulator(`http://${authEmulatorHost}/`);
-     console.debug(`Using Auth emulator: http://${authEmulatorHost}/`);
-   }
-
-   attachCustomCommands({ Cypress, cy, firebase });
-   ```
+attachCustomCommands({ Cypress, cy, firebase });
+```
 
 With [Firebase Web SDK version 9](https://firebase.google.com/docs/web/modular-upgrade) in compat mode (same API as v8 with different import)
 

@@ -40,6 +40,9 @@ jobs:
       - name: Check For Lint
         run: yarn lint
 
+      - name: Check Formatting
+        run: yarn format:check
+
       - name: Run Unit Tests + Coverage
         run: yarn test:cov
 
