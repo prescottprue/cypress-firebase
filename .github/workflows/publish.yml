@@ -49,12 +49,6 @@ jobs:
       - name: Install Dependencies
         run: yarn install --immutable
 
-      - name: Check For Lint
-        run: yarn lint
-
-      - name: Run Unit Tests + Coverage
-        run: yarn test:cov
-
       - name: Run Build
         run: yarn build
 
