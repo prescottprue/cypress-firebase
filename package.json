@@ -4,6 +4,7 @@
   "description": "Utilities to help testing Firebase projects with Cypress.",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "type": "commonjs",
   "scripts": {
     "clean": "rimraf lib lib-esm",
     "build": "tsc",
