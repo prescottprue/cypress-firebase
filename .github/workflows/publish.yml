@@ -68,6 +68,9 @@ jobs:
               {name: 'alpha', prerelease: true}
             ]
 
+      - name: Run Unit Tests + Coverage
+        run: yarn test:cov
+
       - name: Upload Test Coverage
         uses: codecov/codecov-action@v4
         with:
