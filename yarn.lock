@@ -4352,7 +4352,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:7.0.2"
     "@typescript-eslint/parser": "npm:7.0.2"
     chai: "npm:4.4.1"
-    cypress: "npm:13.6.5"
+    cypress: "npm:13.6.6"
     eslint: "npm:8.56.0"
     eslint-config-airbnb-base: "npm:15.0.0"
     eslint-config-prettier: "npm:9.1.0"
@@ -4380,9 +4380,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"cypress@npm:13.6.5":
-  version: 13.6.5
-  resolution: "cypress@npm:13.6.5"
+"cypress@npm:13.6.6":
+  version: 13.6.6
+  resolution: "cypress@npm:13.6.6"
   dependencies:
     "@cypress/request": "npm:^3.0.0"
     "@cypress/xvfb": "npm:^1.2.4"
@@ -4428,7 +4428,7 @@ __metadata:
     yauzl: "npm:^2.10.0"
   bin:
     cypress: bin/cypress
-  checksum: 10c0/a880f99be886a12874ac374e12b734ff650f542248b039e85b485501468fd2e76630086bb752b1194957a1ab97b42820213593f8abd605a0b291017b49457314
+  checksum: 10c0/1f152ac3708fc35c822b6fe428c0856b568c9b2d3f03a22de0526b9f21d6c345139061ae3515a652538a9570a2a632516e4548b29b39843865b9c88288b2d668
   languageName: node
   linkType: hard
 
