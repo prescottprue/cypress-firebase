@@ -320,13 +320,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/config-conventional@npm:18.6.2":
-  version: 18.6.2
-  resolution: "@commitlint/config-conventional@npm:18.6.2"
+"@commitlint/config-conventional@npm:18.6.3":
+  version: 18.6.3
+  resolution: "@commitlint/config-conventional@npm:18.6.3"
   dependencies:
     "@commitlint/types": "npm:^18.6.1"
     conventional-changelog-conventionalcommits: "npm:^7.0.2"
-  checksum: 10c0/ff4ccff3c2992c209703eb7d08f8e1c6d8471d4f0778f384dc0fef490cc023227f1b662f7136a301804d650518e00c7f859aa3eb1a156448f837b2a50206430d
+  checksum: 10c0/047f84598f80f7f793bdb0ffc9cf9059c199da6c5bc12ab87084fa933faee08c9290e3331f6f0d7e07c4f0ffb0b5c678e5036025aeabb8e74af296b9146c6354
   languageName: node
   linkType: hard
 
@@ -4340,7 +4340,7 @@ __metadata:
   resolution: "cypress-firebase@workspace:."
   dependencies:
     "@commitlint/cli": "npm:18.6.1"
-    "@commitlint/config-conventional": "npm:18.6.2"
+    "@commitlint/config-conventional": "npm:18.6.3"
     "@firebase/rules-unit-testing": "npm:3.0.1"
     "@istanbuljs/nyc-config-typescript": "npm:1.0.2"
     "@size-limit/preset-small-lib": "npm:11.0.2"
