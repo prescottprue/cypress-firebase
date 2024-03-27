@@ -2904,7 +2904,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ansi-escapes@npm:^4.2.1, ansi-escapes@npm:^4.3.0":
+"ansi-escapes@npm:^4.2.1, ansi-escapes@npm:^4.3.0, ansi-escapes@npm:^4.3.2":
   version: 4.3.2
   resolution: "ansi-escapes@npm:4.3.2"
   dependencies:
@@ -3860,7 +3860,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chokidar@npm:3.5.3, chokidar@npm:^3.0.2, chokidar@npm:^3.5.3":
+"chokidar@npm:3.5.3, chokidar@npm:^3.0.2":
   version: 3.5.3
   resolution: "chokidar@npm:3.5.3"
   dependencies:
@@ -4543,7 +4543,7 @@ __metadata:
     eslint-plugin-prettier: "npm:5.1.3"
     firebase: "npm:10.8.1"
     firebase-admin: "npm:11.11.1"
-    firebase-tools: "npm:13.2.1"
+    firebase-tools: "npm:13.6.0"
     husky: "npm:9.0.11"
     lint-staged: "npm:15.2.2"
     mocha: "npm:10.3.0"
@@ -4721,6 +4721,16 @@ __metadata:
   dependencies:
     type-detect: "npm:^4.0.0"
   checksum: 10c0/ff34e8605d8253e1bf9fe48056e02c6f347b81d9b5df1c6650a1b0f6f847b4a86453b16dc226b34f853ef14b626e85d04e081b022e20b00cd7d54f079ce9bbdd
+  languageName: node
+  linkType: hard
+
+"deep-equal-in-any-order@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "deep-equal-in-any-order@npm:2.0.6"
+  dependencies:
+    lodash.mapvalues: "npm:^4.6.0"
+    sort-any: "npm:^2.0.0"
+  checksum: 10c0/3e1af25c134955c023bfd446bcfe73e79d95c8d2a502b299697d070ccca192ccdbc1f79f27b3743117f69a857091763ffb4296ac5f6d27bf662694ebf3ea1bb4
   languageName: node
   linkType: hard
 
@@ -6172,9 +6182,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-tools@npm:13.2.1":
-  version: 13.2.1
-  resolution: "firebase-tools@npm:13.2.1"
+"firebase-tools@npm:13.6.0":
+  version: 13.6.0
+  resolution: "firebase-tools@npm:13.6.0"
   dependencies:
     "@google-cloud/pubsub": "npm:^3.0.1"
     abort-controller: "npm:^3.0.0"
@@ -6192,15 +6202,18 @@ __metadata:
     cross-env: "npm:^5.1.3"
     cross-spawn: "npm:^7.0.3"
     csv-parse: "npm:^5.0.4"
+    deep-equal-in-any-order: "npm:^2.0.6"
     exegesis: "npm:^4.1.0"
     exegesis-express: "npm:^4.0.0"
     express: "npm:^4.16.4"
     filesize: "npm:^6.1.0"
     form-data: "npm:^4.0.0"
     fs-extra: "npm:^10.1.0"
+    fuzzy: "npm:^0.1.3"
     glob: "npm:^7.1.2"
     google-auth-library: "npm:^7.11.0"
-    inquirer: "npm:^8.2.0"
+    inquirer: "npm:^8.2.6"
+    inquirer-autocomplete-prompt: "npm:^2.0.1"
     js-yaml: "npm:^3.13.1"
     jsonwebtoken: "npm:^9.0.0"
     leven: "npm:^3.1.0"
@@ -6237,7 +6250,7 @@ __metadata:
     ws: "npm:^7.2.3"
   bin:
     firebase: lib/bin/firebase.js
-  checksum: 10c0/0b6bc38174a39c70cc233f2bdb43dfca58d05b9496348590ee2f32b01935e38498df34e4e87c768752598dd65653c5383174acd3ca53cca4289d6e7b168e0f16
+  checksum: 10c0/b9ec4ad0af769dd84762fe365a076ae537d995be71464ecc35a4a1c5a9b693ead7f0e314670c269afa7dcbf6e06a2a614c6eb1ab052bdc3a7937cab64559c2b5
   languageName: node
   linkType: hard
 
@@ -6510,6 +6523,13 @@ __metadata:
   version: 1.2.3
   resolution: "functions-have-names@npm:1.2.3"
   checksum: 10c0/33e77fd29bddc2d9bb78ab3eb854c165909201f88c75faa8272e35899e2d35a8a642a15e7420ef945e1f64a9670d6aa3ec744106b2aa42be68ca5114025954ca
+  languageName: node
+  linkType: hard
+
+"fuzzy@npm:^0.1.3":
+  version: 0.1.3
+  resolution: "fuzzy@npm:0.1.3"
+  checksum: 10c0/584fcd57a03431707a6d0c1c4a41f17368cdb23d37dcb176d6cbbeeaecaac51be15dec229b3547acfb7db052cb066fcd86db907d40112ac4a3d3a368f88e7105
   languageName: node
   linkType: hard
 
@@ -6850,7 +6870,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globby@npm:^14.0.0, globby@npm:^14.0.1":
+"globby@npm:^14.0.1":
   version: 14.0.1
   resolution: "globby@npm:14.0.1"
   dependencies:
@@ -7366,7 +7386,22 @@ __metadata:
   languageName: node
   linkType: hard
 
-"inquirer@npm:^8.2.0":
+"inquirer-autocomplete-prompt@npm:^2.0.1":
+  version: 2.0.1
+  resolution: "inquirer-autocomplete-prompt@npm:2.0.1"
+  dependencies:
+    ansi-escapes: "npm:^4.3.2"
+    figures: "npm:^3.2.0"
+    picocolors: "npm:^1.0.0"
+    run-async: "npm:^2.4.1"
+    rxjs: "npm:^7.5.4"
+  peerDependencies:
+    inquirer: ^8.0.0
+  checksum: 10c0/b9c196ec89d6bcae46d8e617df6b584e4cd01369a32f4159610f81c2c8f81eb054df02a79debf3d8c4754bc1be701d9dfdb8fcb2b1dc46d0415da85a9dd7c92e
+  languageName: node
+  linkType: hard
+
+"inquirer@npm:^8.2.6":
   version: 8.2.6
   resolution: "inquirer@npm:8.2.6"
   dependencies:
@@ -8495,7 +8530,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lilconfig@npm:3.0.0, lilconfig@npm:^3.0.0":
+"lilconfig@npm:3.0.0":
   version: 3.0.0
   resolution: "lilconfig@npm:3.0.0"
   checksum: 10c0/7f5ee7a658dc016cacf146815e8d88b06f06f4402823b8b0934e305a57a197f55ccc9c5cd4fb5ea1b2b821c8ccaf2d54abd59602a4931af06eabda332388d3e6
@@ -8730,6 +8765,13 @@ __metadata:
   version: 4.1.1
   resolution: "lodash.kebabcase@npm:4.1.1"
   checksum: 10c0/da5d8f41dbb5bc723d4bf9203d5096ca8da804d6aec3d2b56457156ba6c8d999ff448d347ebd97490da853cb36696ea4da09a431499f1ee8deb17b094ecf4e33
+  languageName: node
+  linkType: hard
+
+"lodash.mapvalues@npm:^4.6.0":
+  version: 4.6.0
+  resolution: "lodash.mapvalues@npm:4.6.0"
+  checksum: 10c0/a976bfc3923d4d8d2034e049ec4700e3aaf141a6143c973d06be3b2c87697923cd0158ee770484ad1af52dfed93ae90d2b76268413db95a42a2f46d7e1754828
   languageName: node
   linkType: hard
 
@@ -10969,7 +11011,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"run-async@npm:^2.4.0":
+"run-async@npm:^2.4.0, run-async@npm:^2.4.1":
   version: 2.4.1
   resolution: "run-async@npm:2.4.1"
   checksum: 10c0/35a68c8f1d9664f6c7c2e153877ca1d6e4f886e5ca067c25cdd895a6891ff3a1466ee07c63d6a9be306e9619ff7d509494e6d9c129516a36b9fd82263d579ee1
@@ -10985,7 +11027,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rxjs@npm:^7.5.1, rxjs@npm:^7.5.5":
+"rxjs@npm:^7.5.1, rxjs@npm:^7.5.4, rxjs@npm:^7.5.5":
   version: 7.8.1
   resolution: "rxjs@npm:7.8.1"
   dependencies:
@@ -11283,22 +11325,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"size-limit@npm:11.0.2":
-  version: 11.0.2
-  resolution: "size-limit@npm:11.0.2"
-  dependencies:
-    bytes-iec: "npm:^3.1.1"
-    chokidar: "npm:^3.5.3"
-    globby: "npm:^14.0.0"
-    lilconfig: "npm:^3.0.0"
-    nanospinner: "npm:^1.1.0"
-    picocolors: "npm:^1.0.0"
-  bin:
-    size-limit: bin.js
-  checksum: 10c0/943161c0d13bc600d264025b0755ffe247f6b956deb4b87ce2f6a2753444777ef38306f1529450fcf2bb742c1407a5f20d3c3b5e8ce72bc5fceb2f2e6f96e4e7
-  languageName: node
-  linkType: hard
-
 "size-limit@npm:11.0.3":
   version: 11.0.3
   resolution: "size-limit@npm:11.0.3"
@@ -11407,6 +11433,15 @@ __metadata:
     ip: "npm:^2.0.0"
     smart-buffer: "npm:^4.2.0"
   checksum: 10c0/43f69dbc9f34fc8220bc51c6eea1c39715ab3cfdb115d6e3285f6c7d1a603c5c75655668a5bbc11e3c7e2c99d60321fb8d7ab6f38cda6a215fadd0d6d0b52130
+  languageName: node
+  linkType: hard
+
+"sort-any@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "sort-any@npm:2.0.0"
+  dependencies:
+    lodash: "npm:^4.17.21"
+  checksum: 10c0/7ddedfae0de4c18fd9b209c7b6de99ec79a113cdb4e6a8b76608e1cc02dd5b0e665d2ff9f605be73e2b53426371473a2b5df59b671ac85b4320198b8af41c15d
   languageName: node
   linkType: hard
 
