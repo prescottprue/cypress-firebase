@@ -1,15 +1,14 @@
 import type { AppOptions } from 'firebase-admin';
+import type { TaskName } from './tasks';
 import extendWithFirebaseConfig, {
   ExtendedCypressConfig,
 } from './extendWithFirebaseConfig';
-import * as tasks from './tasks';
+import tasks, {
+  TaskNameToParams,
+  TaskNameToReturn,
+  taskSettingKeys,
+} from './tasks';
 import { initializeFirebase } from './firebase-utils';
-
-type TaskKey =
-  | 'callRtdb'
-  | 'callFirestore'
-  | 'createCustomToken'
-  | 'getAuthUser';
 
 /**
  * Cypress plugin which attaches tasks used by custom commands
@@ -30,35 +29,28 @@ export default function pluginWithTasks(
   overrideConfig?: AppOptions,
 ): ExtendedCypressConfig {
   // Only initialize admin instance if it hasn't already been initialized
-  if (adminInstance.apps && adminInstance.apps.length === 0) {
+  if (adminInstance.apps?.length === 0) {
     initializeFirebase(adminInstance, overrideConfig);
   }
   // Parse single argument from task into arguments for task methods while
   // also passing the admin instance
-  type tasksType = Record<TaskKey, (taskSettings: any) => Promise<any>>;
-  const tasksWithFirebase: tasksType = Object.keys(tasks).reduce(
-    (acc, taskName: string) => {
-      (acc as any)[taskName] = (taskSettings: any): any => {
-        if (taskSettings && taskSettings.uid) {
-          return (tasks as any)[taskName](
-            adminInstance,
-            taskSettings.uid,
-            taskSettings,
-          );
-        }
-        const { action, path: actionPath, options = {}, data } = taskSettings;
-        return (tasks as any)[taskName](
-          adminInstance,
-          action,
-          actionPath,
-          options,
-          data,
-        );
-      };
-      return acc;
-    },
-    {} as tasksType,
-  );
+  type tasksType = {
+    [TN in TaskName]: (
+      taskSettings: TaskNameToParams<TN>,
+    ) => TaskNameToReturn<TN>;
+  };
+  const tasksWithFirebase: tasksType = (
+    Object.keys(tasks) as TaskName[]
+  ).reduce((acc, taskName) => {
+    acc[taskName] = (taskSettings: any = {}): any => {
+      const taskArgs = taskSettingKeys[taskName].map(
+        (sk: string) => taskSettings[sk],
+      );
+      // @ts-expect-error - TS cannot know that the right amount of args are passed
+      return tasks[taskName](adminInstance, ...taskArgs);
+    };
+    return acc;
+  }, {} as tasksType);
 
   // Attach tasks to Cypress using on function
   cypressOnFunc('task', tasksWithFirebase);

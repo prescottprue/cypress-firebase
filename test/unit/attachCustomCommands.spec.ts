@@ -286,7 +286,10 @@ describe('attachCustomCommands', () => {
     it('calls task with uid', async () => {
       const uid = 'TESTING_USER_UID';
       await loadedCustomCommands.getAuthUser(uid);
-      expect(taskSpy).to.have.been.calledWith('getAuthUser', uid);
+      expect(taskSpy).to.have.been.calledWith('getAuthUser', {
+        uid,
+        tenantId: false,
+      });
     });
   });
 
