@@ -340,12 +340,18 @@ export function createAuthUser(
   adminInstance: any,
   properties: auth.CreateRequest,
   tenantId?: string,
-): Promise<auth.UserRecord | null> {
+): Promise<
+  | auth.UserRecord
+  | 'auth/email-already-exists'
+  | 'auth/phone-number-already-exists'
+> {
   return getAuth(adminInstance, tenantId)
     .createUser(properties)
     .catch((err) => {
-      if (err.code === 'auth/email-already-exists') return null;
-      if (err.code === 'auth/phone-number-already-exists') return null;
+      if (err.code === 'auth/email-already-exists')
+        return 'auth/email-already-exists';
+      if (err.code === 'auth/phone-number-already-exists')
+        return 'auth/phone-number-already-exists';
       throw err;
     });
 }
@@ -397,8 +403,13 @@ export function getAuthUser(
   adminInstance: any,
   uid: string,
   tenantId?: string,
-): Promise<auth.UserRecord> {
-  return getAuth(adminInstance, tenantId).getUser(uid);
+): Promise<auth.UserRecord | 'auth/user-not-found'> {
+  return getAuth(adminInstance, tenantId)
+    .getUser(uid)
+    .catch((err) => {
+      if (err.code === 'auth/user-not-found') return 'auth/user-not-found';
+      throw err;
+    });
 }
 /**
  * Get Firebase Auth user based on email
@@ -411,11 +422,11 @@ export function getAuthUserByEmail(
   adminInstance: any,
   email: string,
   tenantId?: string,
-): Promise<auth.UserRecord | null> {
+): Promise<auth.UserRecord | 'auth/user-not-found'> {
   return getAuth(adminInstance, tenantId)
     .getUserByEmail(email)
     .catch((err) => {
-      if (err.code === 'auth/user-not-found') return null;
+      if (err.code === 'auth/user-not-found') return 'auth/user-not-found';
       throw err;
     });
 }
@@ -430,11 +441,11 @@ export function getAuthUserByPhoneNumber(
   adminInstance: any,
   phoneNumber: string,
   tenantId?: string,
-): Promise<auth.UserRecord | null> {
+): Promise<auth.UserRecord | 'auth/user-not-found'> {
   return getAuth(adminInstance, tenantId)
     .getUserByPhoneNumber(phoneNumber)
     .catch((err) => {
-      if (err.code === 'auth/user-not-found') return null;
+      if (err.code === 'auth/user-not-found') return 'auth/user-not-found';
       throw err;
     });
 }
@@ -451,11 +462,11 @@ export function getAuthUserByProviderUid(
   providerId: string,
   uid: string,
   tenantId?: string,
-): Promise<auth.UserRecord | null> {
+): Promise<auth.UserRecord | 'auth/user-not-found'> {
   return getAuth(adminInstance, tenantId)
     .getUserByProviderUid(providerId, uid)
     .catch((err) => {
-      if (err.code === 'auth/user-not-found') return null;
+      if (err.code === 'auth/user-not-found') return 'auth/user-not-found';
       throw err;
     });
 }

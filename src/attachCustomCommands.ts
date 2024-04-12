@@ -928,6 +928,34 @@ export default function attachCustomCommands(
       tenantId: string = Cypress.env('TEST_TENANT_ID'),
     ): any =>
       typedTask(cy, 'createAuthUser', { properties, tenantId }).then((user) => {
+        if (user === 'auth/email-already-exists') {
+          if (!properties.email) {
+            throw new Error(
+              'User with email already exists yet no email was given',
+            );
+          }
+          cy.log('Auth user with given email already exists.');
+          return typedTask(cy, 'getAuthUserByEmail', {
+            email: properties.email,
+            tenantId,
+          }).then((user) =>
+            user === 'auth/user-not-found' ? null : user?.uid,
+          );
+        }
+        if (user === 'auth/phone-number-already-exists') {
+          if (!properties.phoneNumber) {
+            throw new Error(
+              'User with phone number already exists yet no phone number was given',
+            );
+          }
+          cy.log('Auth user with given phone number already exists.');
+          return typedTask(cy, 'getAuthUserByPhoneNumber', {
+            phoneNumber: properties.phoneNumber,
+            tenantId,
+          }).then((user) =>
+            user === 'auth/user-not-found' ? null : user?.uid,
+          );
+        }
         if (customClaims !== undefined && user) {
           return typedTask(cy, 'setAuthUserCustomClaims', {
             uid: user.uid,
@@ -1087,6 +1115,9 @@ export default function attachCustomCommands(
       return typedTask(cy, 'getAuthUser', {
         uid: userUid,
         tenantId: tenantId ?? Cypress.env('TEST_TENANT_ID'),
+      }).then((user) => {
+        if (user === 'auth/user-not-found') return null;
+        return user;
       });
     },
   );
@@ -1104,6 +1135,9 @@ export default function attachCustomCommands(
       return typedTask(cy, 'getAuthUserByEmail', {
         email: userEmail,
         tenantId: tenantId ?? Cypress.env('TEST_TENANT_ID'),
+      }).then((user) => {
+        if (user === 'auth/user-not-found') return null;
+        return user;
       });
     },
   );
@@ -1115,6 +1149,9 @@ export default function attachCustomCommands(
       typedTask(cy, 'getAuthUserByPhoneNumber', {
         phoneNumber: args[0],
         tenantId: args[1] ?? Cypress.env('TEST_TENANT_ID'),
+      }).then((user) => {
+        if (user === 'auth/user-not-found') return null;
+        return user;
       }),
   );
 
@@ -1133,6 +1170,9 @@ export default function attachCustomCommands(
         providerId,
         uid: userUid,
         tenantId: tenantId ?? Cypress.env('TEST_TENANT_ID'),
+      }).then((user) => {
+        if (user === 'auth/user-not-found') return null;
+        return user;
       });
     },
   );
