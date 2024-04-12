@@ -793,6 +793,7 @@ type CommandNames =
   | 'getAuthUserByEmail'
   | 'getAuthUserByPhoneNumber'
   | 'getAuthUserByProviderUid'
+  | 'getAuthUsers'
   | 'updateAuthUser'
   | 'setAuthUserClaims'
   | 'deleteAuthUser'
@@ -1183,6 +1184,15 @@ export default function attachCustomCommands(
         return user;
       });
     },
+  );
+
+  Cypress.Commands.add(
+    options?.commandNames?.getAuthUsers ?? 'getAuthUsers',
+    (...args: TaskNameToParams<'getAuthUsers'>) =>
+      typedTask(cy, 'getAuthUsers', {
+        identifiers: args[0],
+        tenantId: args[1] ?? Cypress.env('TEST_TENANT_ID'),
+      }),
   );
 
   Cypress.Commands.add(
