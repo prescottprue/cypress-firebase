@@ -507,7 +507,7 @@ export function updateAuthUser(
  * @param uid - UID of the user to edit
  * @param customClaims - The custom claims to set, null deletes the custom claims
  * @param tenantId - Optional ID of tenant used for multi-tenancy
- * @returns Promise that resolves with the current batch of downloaded users and the next page token
+ * @returns Promise that resolves with null when the operation completes
  */
 export function setAuthUserCustomClaims(
   adminInstance: any,
@@ -525,7 +525,7 @@ export function setAuthUserCustomClaims(
  * @param adminInstance - Admin SDK instance
  * @param uid - UID of the user to delete
  * @param tenantId - Optional ID of tenant used for multi-tenancy
- * @returns An empty Promise that resolves when user is deleted
+ * @returns Promise that resolves to null when user is deleted
  */
 export function deleteAuthUser(
   adminInstance: any,
@@ -782,7 +782,7 @@ export function updateProviderConfig(
  * @param adminInstance - Admin SDK instance
  * @param providerId - The provider ID
  * @param tenantId - Optional ID of tenant used for multi-tenancy
- * @returns Promise which resolves when the operation completes
+ * @returns Promise which resolves to null when the operation completes
  */
 export function deleteProviderConfig(
   adminInstance: any,

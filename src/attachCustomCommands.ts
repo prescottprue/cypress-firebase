@@ -279,7 +279,7 @@ declare global {
         properties: auth.CreateRequest,
         customClaims?: object | null,
         tenantId?: string,
-      ) => Chainable;
+      ) => Chainable<string | undefined>;
 
       /**
        * Import list of Firebase Auth users
@@ -294,7 +294,7 @@ declare global {
        */
       importAuthUsers: (
         ...args: TaskNameToParams<'importAuthUsers'>
-      ) => Chainable;
+      ) => Chainable<auth.UserImportResult>;
 
       /**
        * List Firebase Auth users
@@ -307,7 +307,9 @@ declare global {
        * @example
        * cy.listAuthUsers()
        */
-      listAuthUsers: (...args: TaskNameToParams<'listAuthUsers'>) => Chainable;
+      listAuthUsers: (
+        ...args: TaskNameToParams<'listAuthUsers'>
+      ) => Cypress.Chainable<auth.ListUsersResult>;
 
       /**
        * Login to Firebase auth as a user with either a passed uid or the TEST_UID
@@ -364,7 +366,9 @@ declare global {
        * @example
        * cy.getAuthUser('1234')
        */
-      getAuthUser: (...args: TaskNameToParams<'getAuthUser'>) => Chainable;
+      getAuthUser: (
+        ...args: TaskNameToParams<'getAuthUser'>
+      ) => Chainable<auth.UserRecord | null>;
       /**
        * Get Firebase auth user by email
        * @param email - Email of user to get
@@ -377,7 +381,7 @@ declare global {
        */
       getAuthUserByEmail: (
         ...args: TaskNameToParams<'getAuthUserByEmail'>
-      ) => Chainable;
+      ) => Chainable<auth.UserRecord | null>;
       /**
        * Get Firebase auth user by phone number
        * @param phoneNumber - Phone number of user to get
@@ -390,7 +394,7 @@ declare global {
        */
       getAuthUserByPhoneNumber: (
         ...args: TaskNameToParams<'getAuthUserByPhoneNumber'>
-      ) => Chainable;
+      ) => Chainable<auth.UserRecord | null>;
       /**
        * Get Firebase auth user by providerID and UID
        * @param providerId - Provider ID of user to get
@@ -404,7 +408,7 @@ declare global {
        */
       getAuthUserByProviderUid: (
         ...args: TaskNameToParams<'getAuthUserByProviderUid'>
-      ) => Chainable;
+      ) => Chainable<auth.UserRecord | null>;
 
       /**
        * Get Firebase Auth users based on identifiers
@@ -416,7 +420,9 @@ declare global {
        * @example
        * cy.getAuthUsers([{email: 'foobar@mail.com'}, {uid: "1234"}])
        */
-      getAuthUsers: (...args: TaskNameToParams<'getAuthUsers'>) => Chainable;
+      getAuthUsers: (
+        ...args: TaskNameToParams<'getAuthUsers'>
+      ) => Chainable<auth.GetUsersResult>;
 
       /**
        * Update an existing Firebase Auth user
@@ -431,7 +437,7 @@ declare global {
        */
       updateAuthUser: (
         ...args: TaskNameToParams<'updateAuthUser'>
-      ) => Chainable;
+      ) => Chainable<auth.UserRecord>;
       /**
        * Set custom claims of an existing Firebase Auth user
        * @param uid - UID of the user to edit
@@ -445,7 +451,7 @@ declare global {
        */
       setAuthUserClaims: (
         ...args: TaskNameToParams<'setAuthUserCustomClaims'>
-      ) => Chainable;
+      ) => Chainable<null>;
 
       /**
        * Delete a user from Firebase Auth with either a passed uid or the TEST_UID
@@ -460,7 +466,7 @@ declare global {
        */
       deleteAuthUser: (
         ...args: TaskNameToParams<'deleteAuthUser'>
-      ) => Chainable;
+      ) => Chainable<null>;
       /**
        * Delete a user from Firebase Auth with either a passed uid or the TEST_UID
        * environment variable
@@ -474,7 +480,7 @@ declare global {
        */
       deleteAuthUsers: (
         ...args: TaskNameToParams<'deleteAuthUsers'>
-      ) => Chainable;
+      ) => Chainable<auth.DeleteUsersResult>;
       /**
        * Delete all users from Firebase Auth
        * Resolves when all users have been deleted
@@ -486,7 +492,7 @@ declare global {
        * @example
        * cy.deleteAllAuthUsers()
        */
-      deleteAllAuthUsers: (tenantId?: string) => Chainable;
+      deleteAllAuthUsers: (tenantId?: string) => Chainable<void>;
 
       /**
        * Create a custom token for a user
@@ -501,7 +507,7 @@ declare global {
        */
       createCustomToken: (
         ...args: TaskNameToParams<'createCustomToken'>
-      ) => Chainable;
+      ) => Chainable<string>;
       /**
        * Create a session cookie for a user
        * @param idToken - ID token to create session cookie for
@@ -515,7 +521,7 @@ declare global {
        */
       createSessionCookie: (
         ...args: TaskNameToParams<'createSessionCookie'>
-      ) => Chainable;
+      ) => Chainable<string>;
       /**
        * Verify an ID token
        * @param idToken - ID token to verify
@@ -527,7 +533,9 @@ declare global {
        * @example
        * cy.verifyIdToken(idToken)
        */
-      verifyIdToken: (...args: TaskNameToParams<'verifyIdToken'>) => Chainable;
+      verifyIdToken: (
+        ...args: TaskNameToParams<'verifyIdToken'>
+      ) => Chainable<auth.DecodedIdToken>;
       /**
        * Revoke all refresh tokens for a user
        * @param uid - UID of user to revoke refresh tokens for
@@ -540,7 +548,7 @@ declare global {
        */
       revokeRefreshTokens: (
         ...args: TaskNameToParams<'revokeRefreshTokens'>
-      ) => Chainable;
+      ) => Chainable<void>;
       /**
        * Generate an email verification link
        * @param email - Email to generate verification link for
@@ -554,7 +562,7 @@ declare global {
        */
       generateEmailVerificationLink: (
         ...args: TaskNameToParams<'generateEmailVerificationLink'>
-      ) => Chainable;
+      ) => Chainable<string>;
       /**
        * Generate a password reset link
        * @param email - Email to generate password reset link for
@@ -568,7 +576,7 @@ declare global {
        */
       generatePasswordResetLink: (
         ...args: TaskNameToParams<'generatePasswordResetLink'>
-      ) => Chainable;
+      ) => Chainable<string>;
       /**
        * Generate a sign in with email link
        * @param email - Email to generate sign in link for
@@ -582,7 +590,7 @@ declare global {
        */
       generateSignInWithEmailLink: (
         ...args: TaskNameToParams<'generateSignInWithEmailLink'>
-      ) => Chainable;
+      ) => Chainable<string>;
 
       /**
        * Generate a verify and change email link
@@ -598,7 +606,7 @@ declare global {
        */
       generateVerifyAndChangeEmailLink: (
         ...args: TaskNameToParams<'generateVerifyAndChangeEmailLink'>
-      ) => Chainable;
+      ) => Chainable<string>;
 
       /**
        * Create a provider config
@@ -612,7 +620,7 @@ declare global {
        */
       createProviderConfig: (
         ...args: TaskNameToParams<'createProviderConfig'>
-      ) => Chainable;
+      ) => Chainable<auth.AuthProviderConfig>;
       /**
        * Get a provider config
        * @param providerId - The provider ID to get the config for
@@ -625,7 +633,7 @@ declare global {
        */
       getProviderConfig: (
         ...args: TaskNameToParams<'getProviderConfig'>
-      ) => Chainable;
+      ) => Chainable<auth.AuthProviderConfig>;
       /**
        * List provider configs
        * @param providerFilter - The provider ID to filter by, or null to list all
@@ -638,7 +646,7 @@ declare global {
        */
       listProviderConfigs: (
         ...args: TaskNameToParams<'listProviderConfigs'>
-      ) => Chainable;
+      ) => Chainable<auth.ListProviderConfigResults>;
       /**
        * Update a provider config
        * @param providerId - The provider ID to update the config for
@@ -652,7 +660,7 @@ declare global {
        */
       updateProviderConfig: (
         ...args: TaskNameToParams<'updateProviderConfig'>
-      ) => Chainable;
+      ) => Chainable<auth.AuthProviderConfig>;
       /**
        * Delete a provider config
        * @param providerId - The provider ID to delete the config for
@@ -665,7 +673,7 @@ declare global {
        */
       deleteProviderConfig: (
         ...args: TaskNameToParams<'deleteProviderConfig'>
-      ) => Chainable;
+      ) => Chainable<null>;
     }
   }
 }
@@ -748,7 +756,7 @@ function deleteAllAuthUsers(
   cy: AttachCustomCommandParams['cy'],
   tenantId?: string | undefined,
   pageToken?: string,
-): Promise<any> {
+): Promise<void> {
   return new Promise<void>((resolve, reject): any => {
     typedTask(cy, 'listAuthUsers', { tenantId, pageToken }).then(
       ({ users, pageToken: nextPageToken }) => {
@@ -926,7 +934,7 @@ export default function attachCustomCommands(
       properties: auth.CreateRequest,
       customClaims?: object | null,
       tenantId: string = Cypress.env('TEST_TENANT_ID'),
-    ): any =>
+    ) =>
       typedTask(cy, 'createAuthUser', { properties, tenantId }).then((user) => {
         if (user === 'auth/email-already-exists') {
           if (!properties.email) {
@@ -1202,7 +1210,7 @@ export default function attachCustomCommands(
     (
       uid?: string,
       tenantId: string | undefined = Cypress.env('TEST_TENANT_ID'),
-    ): any => {
+    ) => {
       const userUid = uid ?? Cypress.env('TEST_UID');
       // Handle UID which is passed in
       if (!userUid) {
@@ -1226,7 +1234,7 @@ export default function attachCustomCommands(
 
   Cypress.Commands.add(
     options?.commandNames?.deleteAllAuthUsers ?? 'deleteAllAuthUsers',
-    (tenantId: string | undefined = Cypress.env('TEST_TENANT_ID')): any =>
+    (tenantId: string | undefined = Cypress.env('TEST_TENANT_ID')) =>
       cy.wrap(deleteAllAuthUsers(cy, tenantId)),
   );
 
