@@ -34,6 +34,7 @@ If you are interested in what drove the need for this checkout [the why section]
    - _suggested_ Set `GCLOUD_PROJECT` environment variable to match the Google Project you would like to use. This needs to be on the process running cypress, so it should be before `cypress open` or `cypress run` in npm scripts. cross-env is a helpful way to do this to support multiple platforms and is how it is done in examples.
    - Pass `projectId` into `cypressFirebasePlugin` options when initializing (see comment in next step)
 1. Generate and download a service account as described in [the firebase-admin setup documentation](https://firebase.google.com/docs/admin/setup#initialize-sdk). Save this to a local file within the project which you confirm is within your `.gitignore` - often `./serviceAccount.json`. Make sure YOU DO NOT COMMIT THIS FILE - it is sensitive and will give others admin access to your project.
+   - **Note**: When running tests locally, ensure the `SERVICE_ACCOUNT` is in your environment variables. I.E. `SERVICE_ACCOUNT=$(cat ./serviceAccount.json) cypress open`
 1. Set the following config in your `cypress.config.js` or `cypress.config.ts`
 
 With [Firebase Web SDK versions up to 8](https://firebase.google.com/docs/web/modular-upgrade)
