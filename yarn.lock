@@ -3860,7 +3860,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chokidar@npm:3.5.3, chokidar@npm:^3.0.2, chokidar@npm:^3.5.3":
+"chokidar@npm:3.5.3, chokidar@npm:^3.0.2":
   version: 3.5.3
   resolution: "chokidar@npm:3.5.3"
   dependencies:
@@ -6850,7 +6850,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globby@npm:^14.0.0, globby@npm:^14.0.1":
+"globby@npm:^14.0.1":
   version: 14.0.1
   resolution: "globby@npm:14.0.1"
   dependencies:
@@ -8495,7 +8495,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lilconfig@npm:3.0.0, lilconfig@npm:^3.0.0":
+"lilconfig@npm:3.0.0":
   version: 3.0.0
   resolution: "lilconfig@npm:3.0.0"
   checksum: 10c0/7f5ee7a658dc016cacf146815e8d88b06f06f4402823b8b0934e305a57a197f55ccc9c5cd4fb5ea1b2b821c8ccaf2d54abd59602a4931af06eabda332388d3e6
@@ -11280,22 +11280,6 @@ __metadata:
     nise: "npm:^5.1.4"
     supports-color: "npm:^7.2.0"
   checksum: 10c0/c5eff6020f3cd7ffaed536fa3cd57428555e30d0f0892414304c7531e7355574d7162e62725b10d0f6bccf6f6e9fd33ecc5a8624080c2b6029a324e209df0f2b
-  languageName: node
-  linkType: hard
-
-"size-limit@npm:11.0.2":
-  version: 11.0.2
-  resolution: "size-limit@npm:11.0.2"
-  dependencies:
-    bytes-iec: "npm:^3.1.1"
-    chokidar: "npm:^3.5.3"
-    globby: "npm:^14.0.0"
-    lilconfig: "npm:^3.0.0"
-    nanospinner: "npm:^1.1.0"
-    picocolors: "npm:^1.0.0"
-  bin:
-    size-limit: bin.js
-  checksum: 10c0/943161c0d13bc600d264025b0755ffe247f6b956deb4b87ce2f6a2753444777ef38306f1529450fcf2bb742c1407a5f20d3c3b5e8ce72bc5fceb2f2e6f96e4e7
   languageName: node
   linkType: hard
 
