@@ -2110,10 +2110,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/chai@npm:4.3.12":
-  version: 4.3.12
-  resolution: "@types/chai@npm:4.3.12"
-  checksum: 10c0/e5d952726d7f053812579962b07d0e4965c160c6a90bf466580e639cd3a1f1d30da1abbfe782383538a043a07908f9dfb823fa9065b37752a5f27d62234f44d5
+"@types/chai@npm:4.3.15":
+  version: 4.3.15
+  resolution: "@types/chai@npm:4.3.15"
+  checksum: 10c0/a942fe35f7043e131efd68ca1822463768c417dc4ab263d7ef00f36d046e9700e24fadd0a92777dd0ea7e83d969035235fcbba32f6bde785a6c6f10aca543a7b
   languageName: node
   linkType: hard
 
@@ -4525,7 +4525,7 @@ __metadata:
     "@istanbuljs/nyc-config-typescript": "npm:1.0.2"
     "@size-limit/preset-small-lib": "npm:11.0.3"
     "@size-limit/webpack": "npm:11.0.3"
-    "@types/chai": "npm:4.3.12"
+    "@types/chai": "npm:4.3.15"
     "@types/mocha": "npm:10.0.6"
     "@types/node": "npm:20.12.8"
     "@types/sinon-chai": "npm:3.2.12"
