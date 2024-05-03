@@ -1442,14 +1442,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@firebase/rules-unit-testing@npm:3.0.1":
-  version: 3.0.1
-  resolution: "@firebase/rules-unit-testing@npm:3.0.1"
+"@firebase/rules-unit-testing@npm:3.0.2":
+  version: 3.0.2
+  resolution: "@firebase/rules-unit-testing@npm:3.0.2"
   dependencies:
+    "@types/node-fetch": "npm:2.6.4"
     node-fetch: "npm:2.6.7"
   peerDependencies:
     firebase: ^10.0.0
-  checksum: 10c0/a4b38a6684352cd80e80e78ae67f04081239ddc1b920afcec74e287f710e2e0cdd110cd7e1b1dad038c51ca3345b675c375806f5c3d104ec6f6201e034b7243d
+  checksum: 10c0/7f1d48e85993230e7bf66e3934bcc96d51cafdf1d4c5022f4bbcd099fb8bd92fa9b2257a0800a97dc3cd7eb8808b6e13d1c5ba967c7182822a7c54debf75e35c
   languageName: node
   linkType: hard
 
@@ -2310,6 +2311,16 @@ __metadata:
   version: 10.0.6
   resolution: "@types/mocha@npm:10.0.6"
   checksum: 10c0/4526c9e88388f9e1004c6d3937c5488a39908810f26b927173c58d52b43057f3895627dc06538e96706e08b88158885f869ec6311f6b58fd72bdef715f26d6c3
+  languageName: node
+  linkType: hard
+
+"@types/node-fetch@npm:2.6.4":
+  version: 2.6.4
+  resolution: "@types/node-fetch@npm:2.6.4"
+  dependencies:
+    "@types/node": "npm:*"
+    form-data: "npm:^3.0.0"
+  checksum: 10c0/e43e4670ed8b7693dbf660ac1450b14fcfcdd8efca1eb0f501b6ad95af2d1fa06f8541db03e9511e82a5fee510a238fe0913330c9a58f8ac6892b985f6dd993e
   languageName: node
   linkType: hard
 
@@ -4510,7 +4521,7 @@ __metadata:
   dependencies:
     "@commitlint/cli": "npm:19.3.0"
     "@commitlint/config-conventional": "npm:19.2.2"
-    "@firebase/rules-unit-testing": "npm:3.0.1"
+    "@firebase/rules-unit-testing": "npm:3.0.2"
     "@istanbuljs/nyc-config-typescript": "npm:1.0.2"
     "@size-limit/preset-small-lib": "npm:11.0.3"
     "@size-limit/webpack": "npm:11.0.3"
@@ -6315,6 +6326,17 @@ __metadata:
   version: 0.6.1
   resolution: "forever-agent@npm:0.6.1"
   checksum: 10c0/364f7f5f7d93ab661455351ce116a67877b66f59aca199559a999bd39e3cfadbfbfacc10415a915255e2210b30c23febe9aec3ca16bf2d1ff11c935a1000e24c
+  languageName: node
+  linkType: hard
+
+"form-data@npm:^3.0.0":
+  version: 3.0.1
+  resolution: "form-data@npm:3.0.1"
+  dependencies:
+    asynckit: "npm:^0.4.0"
+    combined-stream: "npm:^1.0.8"
+    mime-types: "npm:^2.1.12"
+  checksum: 10c0/1ccc3ae064a080a799923f754d49fcebdd90515a8924f0f54de557540b50e7f1fe48ba5f2bd0435a5664aa2d49729107e6aaf2155a9abf52339474c5638b4485
   languageName: node
   linkType: hard
 
