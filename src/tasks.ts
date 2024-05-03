@@ -35,7 +35,7 @@ function optionsToRtdbRef(
     'limitToFirst',
     'limitToLast',
   ].forEach((optionName: string) => {
-    if ((options as any)?.[optionName]) {
+    if (options && (options as any)[optionName]) {
       const args = (options as any)[optionName];
       // Spread arg arrays (such as startAfter and endBefore)
       if (Array.isArray(args)) {
@@ -77,14 +77,14 @@ export function convertValueToTimestampOrGeoPointIfPossible(
 ): firestore.FieldValue {
   /* eslint-disable no-underscore-dangle */
   if (
-    dataVal?._methodName === 'serverTimestamp' ||
-    dataVal?._methodName === 'FieldValue.serverTimestamp' // v8 and earlier
+    (dataVal && dataVal._methodName === 'serverTimestamp') ||
+    (dataVal && dataVal._methodName === 'FieldValue.serverTimestamp') // v8 and earlier
   ) {
     return firestoreStatics.FieldValue.serverTimestamp();
   }
   if (
-    dataVal?._methodName === 'deleteField' ||
-    dataVal?._methodName === 'FieldValue.delete' // v8 and earlier
+    (dataVal && dataVal._methodName === 'deleteField') ||
+    (dataVal && dataVal._methodName === 'FieldValue.delete') // v8 and earlier
   ) {
     return firestoreStatics.FieldValue.delete();
   }
@@ -203,7 +203,7 @@ export async function callRtdb(
     };
     type RTDBMethod = 'push' | 'remove' | 'set' | 'update' | 'get';
     const cleanedActionName: RTDBMethod =
-      (actionNameMap as any)[action] ?? action;
+      (actionNameMap as any)[action] || action;
     await dbRef[cleanedActionName](data);
     // Prevents Cypress error with message:
     // "You must return a promise, a value, or null to indicate that the task was handled."
@@ -257,7 +257,7 @@ export async function callFirestore(
       }
       // Falling back to null in the case of falsey value prevents Cypress error with message:
       // "You must return a promise, a value, or null to indicate that the task was handled."
-      return (typeof snap?.data === 'function' && snap.data()) || null;
+      return (snap && typeof snap.data === 'function' && snap.data()) || null;
     }
 
     if (action === 'delete') {
@@ -295,7 +295,8 @@ export async function callFirestore(
       data,
       // Use static option if passed (tests), otherwise fallback to statics on adminInstance
       // Tests do not have statics since they are using @firebase/testing
-      options?.statics ?? (adminInstance.firestore as typeof firestore),
+      (options && options.statics) ||
+        (adminInstance.firestore as typeof firestore),
     );
 
     if (action === 'set') {
@@ -304,9 +305,9 @@ export async function callFirestore(
         .doc(actionPath)
         .set(
           dataToSet,
-          options?.merge
+          options && options.merge
             ? ({
-                merge: options?.merge,
+                merge: options.merge,
               } as FirebaseFirestore.SetOptions)
             : (undefined as any),
         );
@@ -566,7 +567,7 @@ export function createCustomToken(
   tenantId?: string,
 ): Promise<string> {
   // Use custom claims or default to { isTesting: true }
-  const userCustomClaims = customClaims ?? {
+  const userCustomClaims = customClaims || {
     isTesting: true,
   };
 

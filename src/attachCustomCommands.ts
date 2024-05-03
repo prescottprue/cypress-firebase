@@ -834,7 +834,7 @@ export default function attachCustomCommands(
 ): void {
   const { Cypress, cy, firebase, app } = context;
 
-  const defaultApp = app ?? firebase.app(); // select default  app
+  const defaultApp = app || firebase.app(); // select default  app
 
   /**
    * Get firebase auth instance, with tenantId set if provided
@@ -850,7 +850,8 @@ export default function attachCustomCommands(
   }
 
   Cypress.Commands.add(
-    options?.commandNames?.callRtdb ?? 'callRtdb',
+    (options && options.commandNames && options.commandNames.callRtdb) ||
+      'callRtdb',
     (
       action: RTDBAction,
       actionPath: string,
@@ -868,7 +869,7 @@ export default function attachCustomCommands(
         const dataToWrite = dataIsObject ? { ...dataOrOptions } : dataOrOptions;
 
         // Add metadata to dataToWrite if specified by options
-        if (dataIsObject && options?.withMeta) {
+        if (dataIsObject && options && options.withMeta) {
           if (!dataToWrite.createdBy && Cypress.env('TEST_UID')) {
             dataToWrite.createdBy = Cypress.env('TEST_UID');
           }
@@ -890,7 +891,8 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.callFirestore ?? 'callFirestore',
+    (options && options.commandNames && options.commandNames.callFirestore) ||
+      'callFirestore',
     (
       action: FirestoreAction,
       actionPath: string,
@@ -908,7 +910,7 @@ export default function attachCustomCommands(
         const dataToWrite = dataIsObject ? { ...dataOrOptions } : dataOrOptions;
 
         // Add metadata to dataToWrite if specified by options
-        if (dataIsObject && options?.withMeta) {
+        if (dataIsObject && options && options.withMeta) {
           if (!dataToWrite.createdBy) {
             dataToWrite.createdBy = Cypress.env('TEST_UID');
           }
@@ -930,7 +932,8 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.createAuthUser ?? 'createAuthUser',
+    (options && options.commandNames && options.commandNames.createAuthUser) ||
+      'createAuthUser',
     (
       properties: auth.CreateRequest,
       customClaims?: object | null,
@@ -948,7 +951,9 @@ export default function attachCustomCommands(
             email: properties.email,
             tenantId,
           }).then((user) =>
-            user === 'auth/user-not-found' ? null : user?.uid,
+            user === 'auth/user-not-found'
+              ? null
+              : (user && user.uid) || undefined,
           );
         }
         if (user === 'auth/phone-number-already-exists') {
@@ -962,7 +967,9 @@ export default function attachCustomCommands(
             phoneNumber: properties.phoneNumber,
             tenantId,
           }).then((user) =>
-            user === 'auth/user-not-found' ? null : user?.uid,
+            user === 'auth/user-not-found'
+              ? null
+              : (user && user.uid) || undefined,
           );
         }
         if (customClaims !== undefined && user) {
@@ -972,38 +979,40 @@ export default function attachCustomCommands(
             tenantId,
           }).then(() => user.uid);
         }
-        return user?.uid;
+        return (user && user.uid) || undefined;
       }),
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.importAuthUsers ?? 'importAuthUsers',
+    (options && options.commandNames && options.commandNames.importAuthUsers) ||
+      'importAuthUsers',
     (...args: TaskNameToParams<'importAuthUsers'>) =>
       typedTask(cy, 'importAuthUsers', {
         usersImport: args[0],
         importOptions: args[1],
-        tenantId: args[2] ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: args[2] || Cypress.env('TEST_TENANT_ID'),
       }),
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.listAuthUsers ?? 'listAuthUsers',
+    (options && options.commandNames && options.commandNames.listAuthUsers) ||
+      'listAuthUsers',
     (...args: TaskNameToParams<'listAuthUsers'>) =>
       typedTask(cy, 'listAuthUsers', {
         maxResults: args[0],
         pageToken: args[1],
-        tenantId: args[2] ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: args[2] || Cypress.env('TEST_TENANT_ID'),
       }),
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.login ?? 'login',
+    (options && options.commandNames && options.commandNames.login) || 'login',
     (
       uid?: string,
       customClaims?: any,
       tenantId: string | undefined = Cypress.env('TEST_TENANT_ID'),
     ): any => {
-      const userUid = uid ?? Cypress.env('TEST_UID');
+      const userUid = uid || Cypress.env('TEST_UID');
       // Handle UID which is passed in
       if (!userUid) {
         throw new Error(
@@ -1012,7 +1021,7 @@ export default function attachCustomCommands(
       }
       const auth = getAuth(tenantId);
       // Resolve with current user if they already exist
-      if (userUid === auth.currentUser?.uid) {
+      if (auth.currentUser && userUid === auth.currentUser.uid) {
         cy.log('Authed user already exists, login complete.');
         return undefined;
       }
@@ -1029,7 +1038,9 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.loginWithEmailAndPassword ??
+    (options &&
+      options.commandNames &&
+      options.commandNames.loginWithEmailAndPassword) ||
       'loginWithEmailAndPassword',
     (
       email?: string,
@@ -1041,14 +1052,14 @@ export default function attachCustomCommands(
       tenantId: string | undefined = Cypress.env('TEST_TENANT_ID'),
     ): any => {
       const userUid = Cypress.env('TEST_UID');
-      const userEmail = email ?? Cypress.env('TEST_EMAIL');
+      const userEmail = email || Cypress.env('TEST_EMAIL');
       // Handle email which is passed in
       if (!userEmail) {
         throw new Error(
           'email must be passed or TEST_EMAIL set within environment to login',
         );
       }
-      const userPassword = password ?? Cypress.env('TEST_PASSWORD');
+      const userPassword = password || Cypress.env('TEST_PASSWORD');
       // Handle password which is passed in
       if (!userPassword) {
         throw new Error(
@@ -1057,7 +1068,7 @@ export default function attachCustomCommands(
       }
       const auth = getAuth(tenantId);
       // Resolve with current user if they already exist
-      if (userEmail === auth.currentUser?.email) {
+      if (auth.currentUser && userEmail === auth.currentUser.email) {
         cy.log('Authed user already exists, login complete.');
         return undefined;
       }
@@ -1091,7 +1102,8 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.logout ?? 'logout',
+    (options && options.commandNames && options.commandNames.logout) ||
+      'logout',
     (
       tenantId: string | undefined = Cypress.env('TEST_TENANT_ID'),
     ): Promise<any> =>
@@ -1112,9 +1124,10 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.getAuthUser ?? 'getAuthUser',
+    (options && options.commandNames && options.commandNames.getAuthUser) ||
+      'getAuthUser',
     (uid?: string, tenantId?: string) => {
-      const userUid = uid ?? Cypress.env('TEST_UID');
+      const userUid = uid || Cypress.env('TEST_UID');
       // Handle UID which is passed in
       if (!userUid) {
         throw new Error(
@@ -1123,7 +1136,7 @@ export default function attachCustomCommands(
       }
       return typedTask(cy, 'getAuthUser', {
         uid: userUid,
-        tenantId: tenantId ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: tenantId || Cypress.env('TEST_TENANT_ID'),
       }).then((user) => {
         if (user === 'auth/user-not-found') return null;
         return user;
@@ -1132,9 +1145,12 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.getAuthUserByEmail ?? 'getAuthUserByEmail',
+    (options &&
+      options.commandNames &&
+      options.commandNames.getAuthUserByEmail) ||
+      'getAuthUserByEmail',
     (email?: string, tenantId?: string) => {
-      const userEmail = email ?? Cypress.env('TEST_EMAIL');
+      const userEmail = email || Cypress.env('TEST_EMAIL');
       // Handle email which is passed in
       if (!userEmail) {
         throw new Error(
@@ -1143,7 +1159,7 @@ export default function attachCustomCommands(
       }
       return typedTask(cy, 'getAuthUserByEmail', {
         email: userEmail,
-        tenantId: tenantId ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: tenantId || Cypress.env('TEST_TENANT_ID'),
       }).then((user) => {
         if (user === 'auth/user-not-found') return null;
         return user;
@@ -1152,12 +1168,14 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.getAuthUserByPhoneNumber ??
+    (options &&
+      options.commandNames &&
+      options.commandNames.getAuthUserByPhoneNumber) ||
       'getAuthUserByPhoneNumber',
     (...args: TaskNameToParams<'getAuthUserByPhoneNumber'>) =>
       typedTask(cy, 'getAuthUserByPhoneNumber', {
         phoneNumber: args[0],
-        tenantId: args[1] ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: args[1] || Cypress.env('TEST_TENANT_ID'),
       }).then((user) => {
         if (user === 'auth/user-not-found') return null;
         return user;
@@ -1165,10 +1183,12 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.getAuthUserByProviderUid ??
+    (options &&
+      options.commandNames &&
+      options.commandNames.getAuthUserByProviderUid) ||
       'getAuthUserByProviderUid',
     (providerId: string, uid?: string, tenantId?: string) => {
-      const userUid = uid ?? Cypress.env('TEST_UID');
+      const userUid = uid || Cypress.env('TEST_UID');
       // Handle UID which is passed in
       if (!userUid) {
         throw new Error(
@@ -1178,7 +1198,7 @@ export default function attachCustomCommands(
       typedTask(cy, 'getAuthUserByProviderUid', {
         providerId,
         uid: userUid,
-        tenantId: tenantId ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: tenantId || Cypress.env('TEST_TENANT_ID'),
       }).then((user) => {
         if (user === 'auth/user-not-found') return null;
         return user;
@@ -1187,41 +1207,47 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.getAuthUsers ?? 'getAuthUsers',
+    (options && options.commandNames && options.commandNames.getAuthUsers) ||
+      'getAuthUsers',
     (...args: TaskNameToParams<'getAuthUsers'>) =>
       typedTask(cy, 'getAuthUsers', {
         identifiers: args[0],
-        tenantId: args[1] ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: args[1] || Cypress.env('TEST_TENANT_ID'),
       }),
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.updateAuthUser ?? 'updateAuthUser',
+    (options && options.commandNames && options.commandNames.updateAuthUser) ||
+      'updateAuthUser',
     (...args: TaskNameToParams<'updateAuthUser'>) =>
       typedTask(cy, 'updateAuthUser', {
         uid: args[0],
         properties: args[1],
-        tenantId: args[2] ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: args[2] || Cypress.env('TEST_TENANT_ID'),
       }),
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.setAuthUserClaims ?? 'setAuthUserClaims',
+    (options &&
+      options.commandNames &&
+      options.commandNames.setAuthUserClaims) ||
+      'setAuthUserClaims',
     (...args: TaskNameToParams<'setAuthUserCustomClaims'>) =>
       typedTask(cy, 'setAuthUserCustomClaims', {
         uid: args[0],
         customClaims: args[1],
-        tenantId: args[2] ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: args[2] || Cypress.env('TEST_TENANT_ID'),
       }),
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.deleteAuthUser ?? 'deleteAuthUser',
+    (options && options.commandNames && options.commandNames.deleteAuthUser) ||
+      'deleteAuthUser',
     (
       uid?: string,
       tenantId: string | undefined = Cypress.env('TEST_TENANT_ID'),
     ) => {
-      const userUid = uid ?? Cypress.env('TEST_UID');
+      const userUid = uid || Cypress.env('TEST_UID');
       // Handle UID which is passed in
       if (!userUid) {
         throw new Error(
@@ -1234,24 +1260,31 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.deleteAuthUsers ?? 'deleteAuthUsers',
+    (options && options.commandNames && options.commandNames.deleteAuthUsers) ||
+      'deleteAuthUsers',
     (...args: TaskNameToParams<'deleteAuthUsers'>) =>
       typedTask(cy, 'deleteAuthUsers', {
         uids: args[0],
-        tenantId: args[1] ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: args[1] || Cypress.env('TEST_TENANT_ID'),
       }),
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.deleteAllAuthUsers ?? 'deleteAllAuthUsers',
+    (options &&
+      options.commandNames &&
+      options.commandNames.deleteAllAuthUsers) ||
+      'deleteAllAuthUsers',
     (tenantId: string | undefined = Cypress.env('TEST_TENANT_ID')) =>
       cy.wrap(deleteAllAuthUsers(cy, tenantId)),
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.createCustomToken ?? 'createCustomToken',
+    (options &&
+      options.commandNames &&
+      options.commandNames.createCustomToken) ||
+      'createCustomToken',
     (uid?: string, customClaims?: object, tenantId?: string) => {
-      const userUid = uid ?? Cypress.env('TEST_UID');
+      const userUid = uid || Cypress.env('TEST_UID');
       // Handle UID which is passed in
       if (!userUid) {
         throw new Error(
@@ -1261,35 +1294,42 @@ export default function attachCustomCommands(
       return typedTask(cy, 'createCustomToken', {
         uid: userUid,
         customClaims,
-        tenantId: tenantId ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: tenantId || Cypress.env('TEST_TENANT_ID'),
       });
     },
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.createSessionCookie ?? 'createSessionCookie',
+    (options &&
+      options.commandNames &&
+      options.commandNames.createSessionCookie) ||
+      'createSessionCookie',
     (...args: TaskNameToParams<'createSessionCookie'>) =>
       typedTask(cy, 'createSessionCookie', {
         idToken: args[0],
         sessionCookieOptions: args[1],
-        tenantId: args[2] ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: args[2] || Cypress.env('TEST_TENANT_ID'),
       }),
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.verifyIdToken ?? 'verifyIdToken',
+    (options && options.commandNames && options.commandNames.verifyIdToken) ||
+      'verifyIdToken',
     (...args: TaskNameToParams<'verifyIdToken'>) =>
       typedTask(cy, 'verifyIdToken', {
         idToken: args[0],
         checkRevoked: args[1],
-        tenantId: args[2] ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: args[2] || Cypress.env('TEST_TENANT_ID'),
       }),
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.revokeRefreshTokens ?? 'revokeRefreshTokens',
+    (options &&
+      options.commandNames &&
+      options.commandNames.revokeRefreshTokens) ||
+      'revokeRefreshTokens',
     (uid?: string, tenantId?: string) => {
-      const userUid = uid ?? Cypress.env('TEST_UID');
+      const userUid = uid || Cypress.env('TEST_UID');
       // Handle UID which is passed in
       if (!userUid) {
         throw new Error(
@@ -1298,20 +1338,22 @@ export default function attachCustomCommands(
       }
       return typedTask(cy, 'revokeRefreshTokens', {
         uid: userUid,
-        tenantId: tenantId ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: tenantId || Cypress.env('TEST_TENANT_ID'),
       });
     },
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.generateEmailVerificationLink ??
+    (options &&
+      options.commandNames &&
+      options.commandNames.generateEmailVerificationLink) ||
       'generateEmailVerificationLink',
     (
       email?: string,
       actionCodeSettings?: auth.ActionCodeSettings,
       tenantId?: string,
     ) => {
-      const userEmail = email ?? Cypress.env('TEST_EMAIL');
+      const userEmail = email || Cypress.env('TEST_EMAIL');
       // Handle email which is passed in
       if (!userEmail) {
         throw new Error(
@@ -1321,20 +1363,22 @@ export default function attachCustomCommands(
       return typedTask(cy, 'generateEmailVerificationLink', {
         email: userEmail,
         actionCodeSettings,
-        tenantId: tenantId ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: tenantId || Cypress.env('TEST_TENANT_ID'),
       });
     },
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.generatePasswordResetLink ??
+    (options &&
+      options.commandNames &&
+      options.commandNames.generatePasswordResetLink) ||
       'generatePasswordResetLink',
     (
       email?: string,
       actionCodeSettings?: auth.ActionCodeSettings,
       tenantId?: string,
     ) => {
-      const userEmail = email ?? Cypress.env('TEST_EMAIL');
+      const userEmail = email || Cypress.env('TEST_EMAIL');
       // Handle email which is passed in
       if (!userEmail) {
         throw new Error(
@@ -1344,77 +1388,96 @@ export default function attachCustomCommands(
       return typedTask(cy, 'generatePasswordResetLink', {
         email: userEmail,
         actionCodeSettings,
-        tenantId: tenantId ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: tenantId || Cypress.env('TEST_TENANT_ID'),
       });
     },
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.generateSignInWithEmailLink ??
+    (options &&
+      options.commandNames &&
+      options.commandNames.generateSignInWithEmailLink) ||
       'generateSignInWithEmailLink',
     (...args: TaskNameToParams<'generateSignInWithEmailLink'>) =>
       typedTask(cy, 'generateSignInWithEmailLink', {
         email: args[0],
         actionCodeSettings: args[1],
-        tenantId: args[2] ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: args[2] || Cypress.env('TEST_TENANT_ID'),
       }),
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.generateVerifyAndChangeEmailLink ??
+    (options &&
+      options.commandNames &&
+      options.commandNames.generateVerifyAndChangeEmailLink) ||
       'generateVerifyAndChangeEmailLink',
     (...args: TaskNameToParams<'generateVerifyAndChangeEmailLink'>) =>
       typedTask(cy, 'generateVerifyAndChangeEmailLink', {
         email: args[0],
         newEmail: args[1],
         actionCodeSettings: args[2],
-        tenantId: args[3] ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: args[3] || Cypress.env('TEST_TENANT_ID'),
       }),
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.createProviderConfig ?? 'createProviderConfig',
+    (options &&
+      options.commandNames &&
+      options.commandNames.createProviderConfig) ||
+      'createProviderConfig',
     (...args: TaskNameToParams<'createProviderConfig'>) =>
       typedTask(cy, 'createProviderConfig', {
         providerConfig: args[0],
-        tenantId: args[1] ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: args[1] || Cypress.env('TEST_TENANT_ID'),
       }),
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.getProviderConfig ?? 'getProviderConfig',
+    (options &&
+      options.commandNames &&
+      options.commandNames.getProviderConfig) ||
+      'getProviderConfig',
     (...args: TaskNameToParams<'getProviderConfig'>) =>
       typedTask(cy, 'getProviderConfig', {
         providerId: args[0],
-        tenantId: args[1] ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: args[1] || Cypress.env('TEST_TENANT_ID'),
       }),
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.listProviderConfigs ?? 'listProviderConfigs',
+    (options &&
+      options.commandNames &&
+      options.commandNames.listProviderConfigs) ||
+      'listProviderConfigs',
     (...args: TaskNameToParams<'listProviderConfigs'>) =>
       typedTask(cy, 'listProviderConfigs', {
         providerFilter: args[0],
-        tenantId: args[1] ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: args[1] || Cypress.env('TEST_TENANT_ID'),
       }),
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.updateProviderConfig ?? 'updateProviderConfig',
+    (options &&
+      options.commandNames &&
+      options.commandNames.updateProviderConfig) ||
+      'updateProviderConfig',
     (...args: TaskNameToParams<'updateProviderConfig'>) =>
       typedTask(cy, 'updateProviderConfig', {
         providerId: args[0],
         providerConfig: args[1],
-        tenantId: args[2] ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: args[2] || Cypress.env('TEST_TENANT_ID'),
       }),
   );
 
   Cypress.Commands.add(
-    options?.commandNames?.deleteProviderConfig ?? 'deleteProviderConfig',
+    (options &&
+      options.commandNames &&
+      options.commandNames.deleteProviderConfig) ||
+      'deleteProviderConfig',
     (...args: TaskNameToParams<'deleteProviderConfig'>) =>
       typedTask(cy, 'deleteProviderConfig', {
         providerId: args[0],
-        tenantId: args[1] ?? Cypress.env('TEST_TENANT_ID'),
+        tenantId: args[1] || Cypress.env('TEST_TENANT_ID'),
       }),
   );
 }
