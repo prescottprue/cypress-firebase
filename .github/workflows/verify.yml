@@ -53,6 +53,7 @@ jobs:
         if: matrix.node-version == '20.x'
         with:
           fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Run Build
         run: yarn build
