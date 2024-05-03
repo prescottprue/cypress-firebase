@@ -138,7 +138,11 @@ export function initializeFirebase(
         FIREBASE_DATABASE_EMULATOR_HOST,
       );
       /* eslint-enable no-console */
-    } else if (protectProduction?.rtdb && protectProduction.rtdb !== 'none') {
+    } else if (
+      protectProduction &&
+      protectProduction.rtdb &&
+      protectProduction.rtdb !== 'none'
+    ) {
       /* eslint-disable no-console */
       console.warn(
         'cypress-firebase: FIREBASE_DATABASE_EMULATOR_HOST is not set, RTDB operations may alter production instead of emulator!',
@@ -158,7 +162,11 @@ export function initializeFirebase(
         process.env.FIREBASE_AUTH_EMULATOR_HOST,
       );
       /* eslint-enable no-console */
-    } else if (protectProduction?.auth && protectProduction.auth !== 'none') {
+    } else if (
+      protectProduction &&
+      protectProduction.auth &&
+      protectProduction.auth !== 'none'
+    ) {
       /* eslint-disable no-console */
       console.warn(
         'cypress-firebase: FIREBASE_AUTH_EMULATOR_HOST is not set, auth operations may alter production instead of emulator!',
@@ -209,7 +217,8 @@ export function initializeFirebase(
       /* eslint-enable no-console */
       adminInstance.firestore().settings(firestoreSettings);
     } else if (
-      protectProduction?.firestore &&
+      protectProduction &&
+      protectProduction.firestore &&
       protectProduction.firestore !== 'none'
     ) {
       /* eslint-disable no-console */

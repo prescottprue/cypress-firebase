@@ -40,7 +40,7 @@ export default function pluginWithTasks(
     initializeFirebase(
       adminInstance,
       overrideConfig,
-      pluginConfig?.protectProduction,
+      pluginConfig && pluginConfig.protectProduction,
     );
   }
   // Parse single argument from task into arguments for task methods while
