@@ -4442,7 +4442,7 @@ __metadata:
     firebase-tools: "npm:13.8.0"
     husky: "npm:9.0.11"
     lint-staged: "npm:15.2.2"
-    mocha: "npm:10.3.0"
+    mocha: "npm:10.4.0"
     nyc: "npm:15.1.0"
     prettier: "npm:3.2.5"
     rimraf: "npm:5.0.5"
@@ -9209,9 +9209,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mocha@npm:10.3.0":
-  version: 10.3.0
-  resolution: "mocha@npm:10.3.0"
+"mocha@npm:10.4.0":
+  version: 10.4.0
+  resolution: "mocha@npm:10.4.0"
   dependencies:
     ansi-colors: "npm:4.1.1"
     browser-stdout: "npm:1.3.1"
@@ -9236,7 +9236,7 @@ __metadata:
   bin:
     _mocha: bin/_mocha
     mocha: bin/mocha.js
-  checksum: 10c0/8dc93842468b2be5f820e5eb64208fb68ba3e5ee90cfe21a9f1d439f9ec031e8a8dc97f4d3206a376c9e05141cf689a812aedcf4545f71f69b3e9a51f312ec4a
+  checksum: 10c0/e572e9d8c164e98f64de7e9498608de042fd841c6a7441f456a5e216e9aed2299e2c568d9dc27f2be2de06521e6b2d1dd774ab58a243b1c7697d14aec2f0f7f7
   languageName: node
   linkType: hard
 
@@ -11287,22 +11287,6 @@ __metadata:
     nise: "npm:^5.1.4"
     supports-color: "npm:^7.2.0"
   checksum: 10c0/c5eff6020f3cd7ffaed536fa3cd57428555e30d0f0892414304c7531e7355574d7162e62725b10d0f6bccf6f6e9fd33ecc5a8624080c2b6029a324e209df0f2b
-  languageName: node
-  linkType: hard
-
-"size-limit@npm:11.0.3":
-  version: 11.0.3
-  resolution: "size-limit@npm:11.0.3"
-  dependencies:
-    bytes-iec: "npm:^3.1.1"
-    chokidar: "npm:^3.6.0"
-    globby: "npm:^14.0.1"
-    lilconfig: "npm:^3.1.1"
-    nanospinner: "npm:^1.1.0"
-    picocolors: "npm:^1.0.0"
-  bin:
-    size-limit: bin.js
-  checksum: 10c0/491a9069d9dff0e278d67291ccbbbcdce43261544ef9ce163396f1a485485ea677495e7c55e47a921370aa01bf75f8e04e0e8f0ef65e7c33a25c20067690baa5
   languageName: node
   linkType: hard
 
