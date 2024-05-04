@@ -4449,7 +4449,7 @@ __metadata:
     sinon: "npm:15.2.0"
     sinon-chai: "npm:3.7.0"
     size-limit: "npm:11.1.2"
-    tsx: "npm:4.8.2"
+    tsx: "npm:4.9.1"
     typescript: "npm:5.4.5"
   peerDependencies:
     firebase-admin: ^11.0.0
@@ -12077,9 +12077,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsx@npm:4.8.2":
-  version: 4.8.2
-  resolution: "tsx@npm:4.8.2"
+"tsx@npm:4.9.1":
+  version: 4.9.1
+  resolution: "tsx@npm:4.9.1"
   dependencies:
     esbuild: "npm:~0.20.2"
     fsevents: "npm:~2.3.3"
@@ -12089,7 +12089,7 @@ __metadata:
       optional: true
   bin:
     tsx: dist/cli.mjs
-  checksum: 10c0/113025f4518191b57a1600569eadbcf0b09d9fa50032a03b6d5b0c0e7e371f4ae7f9b483deff48267aecda60701ab08f1805217a1666204aac4d47d8f2045bb4
+  checksum: 10c0/83723016e0681519280b04e8b9aeaa47b48cffdc60606f20097b815a13f851eaa83f2b51c23f939b882a3ab14010f18ab9f3d555a6e44e59968cf9acd370d38d
   languageName: node
   linkType: hard
 
