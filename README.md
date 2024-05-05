@@ -14,10 +14,14 @@
 
 0 dependency plugin which adds [custom cypress commands](https://docs.cypress.io/api/cypress-api/custom-commands.html#Syntax) for interactions with Firebase:
 
-- [cy.login][1]
-- [cy.logout][4]
-- [cy.callRtdb][6]
-- [cy.callFirestore][9]
+- [cy.createUserWithClaims][createUserWClaims]
+- [cy.login][login]
+- [cy.loginWithEmailAndPassword][loginEmail]
+- [cy.logout][logout]
+- [cy.deleteAllAuthUsers][delAllUsers]
+- [cy.callRtdb][callRtdb]
+- [cy.callFirestore][callFirestore]
+- [cy.\[authFunction\]][authFunctions]
 
 If you are interested in what drove the need for this checkout [the why section](#why)
 
@@ -180,16 +184,48 @@ attachCustomCommands({ Cypress, cy, firebase, app: namedApp });
 
 #### Table of Contents
 
-- [cy.login][1]
-  - [Examples][2]
-- [cy.logout][4]
-  - [Examples][5]
-- [cy.callRtdb][6]
-  - [Parameters][7]
-  - [Examples][8]
-- [cy.callFirestore][9]
-  - [Parameters][10]
-  - [Examples][11]
+- [cy.createUserWithClaims][createUserWClaims]
+  - [Parameters][createUserWClaims-params]
+  - [Examples][createUserWClaims-ex]
+- [cy.login][login]
+  - [Parameters][login-params]
+  - [Examples][login-ex]
+- [cy.loginWithEmailAndPassword][loginEmail]
+  - [Parameters][loginEmail-params]
+  - [Examples][loginEmail-ex]
+- [cy.logout][logout]
+  - [Parameters][logout-params]
+  - [Examples][logout-ex]
+- [cy.deleteAllAuthUsers][delAllUsers]
+  - [Parameters][delAllUsers-params]
+  - [Examples][delAllUsers-ex]
+- [cy.callRtdb][callRtdb]
+  - [Parameters][callRtdb-params]
+  - [Examples][callRtdb-ex]
+- [cy.callFirestore][callFirestore]
+  - [Parameters][callFirestore-params]
+  - [Examples][callFirestore-ex]
+- [cy.\[authFunction\]][authFunctions]
+  - [Parameters][authFunctions-params]
+  - [Examples][authFunctions-ex]
+
+#### cy.createUserWithClaims
+
+Command to create a user and give the user custom claims in one command.
+
+##### Parameters
+
+- `properties` **[CreateRequest][firebase-createrequest]** The properties of the new user
+- `customClaims` **[object][mdn-object] | [null][mdn-null]** Optional custom claims to be set, or null to remove custom claims
+- `tenantId` **[string][mdn-string]** Optional ID of tenant used for multi-tenancy. Can also be set with environment variable TEST_TENANT_ID
+
+##### Examples
+
+```javascript
+const uid = '123SomeUid';
+const claims = { role: 'Admin' };
+cy.createUserWithClaims(uid, claims);
+```
 
 #### cy.login
 
@@ -197,22 +233,28 @@ Login to Firebase using custom auth token.
 
 To specify a tenant ID, either pass the ID as a parameter to `cy.login`, or set it as environment variable `TEST_TENANT_ID`. Read more about [Firebase multi-tenancy](https://cloud.google.com/identity-platform/docs/multi-tenancy-authentication).
 
+##### Parameters
+
+- `uid` **[string][mdn-string]** UID of user to login as. Can also be set with environment variable TEST_UID
+- `customClaims` **[string][mdn-string]** Optional custom claims to attach to the custom token
+- `tenantId` **[string][mdn-string]** Optional ID of tenant used for multi-tenancy. Can also be set with environment variable TEST_TENANT_ID
+
 ##### Examples
 
-Loading `TEST_UID` automatically from Cypress env:
+_Loading `TEST_UID` automatically from Cypress env_
 
 ```javascript
 cy.login();
 ```
 
-Passing a UID
+_Passing a UID_
 
 ```javascript
 const uid = '123SomeUid';
 cy.login(uid);
 ```
 
-Passing a tenant ID
+_Passing a tenant ID_
 
 ```javascript
 const uid = '123SomeUid';
@@ -220,14 +262,82 @@ const tenantId = '123SomeTenantId';
 cy.login(uid, undefined, tenantId);
 ```
 
+#### cy.loginWithEmailAndPassword
+
+Login to Firebase using an email and password account.
+
+##### Parameters
+
+- `email` **[string][mdn-string]** Email of user to login as. Can also be set with environment variable TEST_EMAIL
+- `password` **[string][mdn-string]** Password of user to login as. Can also be set with environment variable TEST_PASSWORD
+- `extraInfo` **[CreateRequest][firebase-createrequest]** Optional additional CreateRequest parameters except for email and password
+- `tenantId` **[string][mdn-string]** Optional ID of tenant used for multi-tenancy. Can also be set with environment variable TEST_TENANT_ID
+
+##### Examples
+
+_Loading `TEST_EMAIL` and `TEST_PASSWORD` automatically from Cypress env_
+
+```javascript
+cy.loginWithEmailAndPassword();
+```
+
+_Passing an email and password_
+
+```javascript
+const email = 'some@user.com';
+const psswd = 'password123';
+cy.loginWithEmailAndPassword(email, psswd);
+```
+
+_Passing a tenant ID_
+
+```javascript
+const email = 'some@user.com';
+const psswd = 'password123';
+const tenantId = '123SomeTenantId';
+cy.loginWithEmailAndPassword(email, psswd, undefined, tenantId);
+```
+
 #### cy.logout
 
 Log out of Firebase instance
+
+##### Parameters
+
+- `tenantId` **[string][mdn-string]** Optional ID of tenant used for multi-tenancy. Can also be set with environment variable TEST_TENANT_ID
 
 ##### Examples
 
 ```javascript
 cy.logout();
+```
+
+_Passing a tenant ID_
+
+```javascript
+const tenantId = '123SomeTenantId';
+cy.logout(tenantId);
+```
+
+#### cy.deleteAllAuthUsers
+
+Command to recursively delete all firebase auth users. The firebase deleteUsers function (cy.authDeleteUsers) can only remove a maximum amount of users at a time. This command calls the deleteUsers function recursively for every pageToken returned by the previous iteration.
+
+##### Parameters
+
+- `tenantId` **[string][mdn-string]** Optional ID of tenant used for multi-tenancy. Can also be set with environment variable TEST_TENANT_ID
+
+##### Examples
+
+```javascript
+cy.deleteAllAuthUsers();
+```
+
+_Passing a tenant ID_
+
+```javascript
+const tenantId = '123SomeTenantId';
+cy.deleteAllAuthUsers(tenantId);
 ```
 
 #### cy.callRtdb
@@ -236,17 +346,17 @@ Call Real Time Database path with some specified action such as `set`, `update` 
 
 ##### Parameters
 
-- `action` **[String][11]** The action type to call with (set, push, update, remove)
-- `actionPath` **[String][11]** Path within RTDB that action should be applied
-- `options` **[object][12]** Options
-  - `options.limitToFirst` **[number|boolean][13]** Limit to the first `<num>` results. If true is passed than query is limited to last 1 item.
-  - `options.limitToLast` **[number|boolean][13]** Limit to the last `<num>` results. If true is passed than query is limited to last 1 item.
-  - `options.orderByKey` **[boolean][13]** Order by key name
-  - `options.orderByValue` **[boolean][13]** Order by primitive value
-  - `options.orderByChild` **[string][11]** Select a child key by which to order results
-  - `options.equalTo` **[string][11]** Restrict results to `<val>` (based on specified ordering)
-  - `options.startAt` **[string][11]** Start results at `<val>` (based on specified ordering)
-  - `options.endAt` **[string][11]** End results at `<val>` (based on specified ordering)
+- `action` **[string][mdn-string]** The action type to call with (set, push, update, remove)
+- `actionPath` **[string][mdn-string]** Path within RTDB that action should be applied
+- `options` **[object][mdn-object]** Options
+  - `options.limitToFirst` **[number][mdn-number]|[boolean][mdn-boolean]** Limit to the first `<num>` results. If true is passed than query is limited to last 1 item.
+  - `options.limitToLast` **[number][mdn-number]|[boolean][mdn-boolean]** Limit to the last `<num>` results. If true is passed than query is limited to last 1 item.
+  - `options.orderByKey` **[boolean][mdn-boolean]** Order by key name
+  - `options.orderByValue` **[boolean][mdn-boolean]** Order by primitive value
+  - `options.orderByChild` **[string][mdn-string]** Select a child key by which to order results
+  - `options.equalTo` **[string][mdn-string]** Restrict results to `<val>` (based on specified ordering)
+  - `options.startAt` **[string][mdn-string]** Start results at `<val>` (based on specified ordering)
+  - `options.endAt` **[string][mdn-string]** End results at `<val>` (based on specified ordering)
 
 ##### Examples
 
@@ -326,19 +436,19 @@ level.
 
 ##### Parameters
 
-- `action` **[String][11]** The action type to call with (set, push, update, delete)
-- `actionPath` **[String][11]** Path within Firestore that action should be applied
-- `dataOrOptions` **[String|Object][11]** Data for write actions or options for get action
-- `options` **[Object][12]** Options
-  - `options.withMeta` **[boolean][13]** Whether or not to include `createdAt` and `createdBy`
-  - `options.merge` **[boolean][13]** Merge data during set
-  - `options.batchSize` **[number][13]** Size of batch to use while deleting
-  - `options.where` **[Array][13]** Filter documents by the specified field and the value should satisfy
+- `action` **[string][mdn-string]** The action type to call with (set, push, update, delete)
+- `actionPath` **[string][mdn-string]** Path within Firestore that action should be applied
+- `dataOrOptions` **[string][mdn-string]|[object][mdn-object]** Data for write actions or options for get action
+- `options` **[object][mdn-object]** Options
+  - `options.withMeta` **[boolean][mdn-boolean]** Whether or not to include `createdAt` and `createdBy`
+  - `options.merge` **[boolean][mdn-boolean]** Merge data during set
+  - `options.batchSize` **[number][mdn-number]** Size of batch to use while deleting
+  - `options.where` **[array][mdn-array]** Filter documents by the specified field and the value should satisfy
   * the relation constraint provided
-  - `options.orderBy` **[string|Array][13]** Order documents
-  - `options.limit` **[number][13]** Limit to n number of documents
-  - `options.limitToLast` **[number][13]** Limit to last n number of documents
-  - `options.statics` **[admin.firestore][13]** Firestore statics (i.e. `admin.firestore`). This should only be needed during testing due to @firebase/testing not containing statics
+  - `options.orderBy` **[string][mdn-string]|[array][mdn-array]** Order documents
+  - `options.limit` **[number][mdn-number]** Limit to n number of documents
+  - `options.limitToLast` **[number][mdn-number]** Limit to last n number of documents
+  - `options.statics` **admin.firestore** Firestore statics (i.e. `admin.firestore`). This should only be needed during testing due to @firebase/testing not containing statics
 
 ##### Examples
 
@@ -405,6 +515,56 @@ describe('Test firestore', () => {
     });
     cy.log('Ended test');
   });
+});
+```
+
+#### cy.[authFunction]
+
+Use any of the [firebase admin auth methods](https://firebase.google.com/docs/reference/admin/node/firebase-admin.auth.baseauth#methods):
+
+- `authCreateAuthUser`
+- `authImportAuthUsers`
+- `authListAuthUsers`
+- `authGetAuthUser`
+- `authGetAuthUserByEmail`
+- `authGetAuthUserByPhoneNumber`
+- `authGetAuthUserByProviderUid`
+- `authGetAuthUsers`
+- `authUpdateAuthUser`
+- `authSetAuthUserCustomClaims`
+- `authDeleteAuthUser`
+- `authDeleteAuthUsers`
+- `authCreateCustomToken`
+- `authCreateSessionCookie`
+- `authVerifyIdToken`
+- `authRevokeRefreshTokens`
+- `authGenerateEmailVerificationLink`
+- `authGeneratePasswordResetLink`
+- `authGenerateSignInWithEmailLink`
+- `authGenerateVerifyAndChangeEmailLink`
+- `authGreateProviderConfig`
+- `authGetProviderConfig`
+- `authListProviderConfigs`
+- `authUpdateProviderCondig`
+- `authDeleteProviderConfig`
+
+##### Parameters
+
+The parameters (and return type) depend on the function used. They are the same as for the firebase api function it refers to, with addition of an optional `tenantId` parameter as last parameter:
+
+- `tenantId` **[string][mdn-string]** Optional ID of tenant used for multi-tenancy. Can also be set with environment variable TEST_TENANT_ID
+
+##### Examples
+
+```javascript
+const uid = '123SomeUid';
+const email = 'some@user.com';
+cy.authCreateUser({ uid });
+cy.authUpdateUser(uid, { displayName: 'Test User', email });
+cy.authSetCustomUserClaims(uid, { role: 'admin' });
+cy.authGetUserByEmail(email).then((user) => {
+  console.log(user?.displayName); // Test User
+  console.log(user?.customClaims?.['role']); // admin
 });
 ```
 
@@ -813,20 +973,38 @@ If you experience this with an SDK version newer than v7 please create a new iss
 - Drop support for service account file in favor of application default credentails env variable (path to file set in `GOOGLE_APPLICATION_CREDENTIALS`)
 - Support for Auth emulators (this will become the suggested method instead of needing a service account)
 
-[1]: #cylogin
-[2]: #examples
-[3]: #currentuser
-[4]: #cylogout
-[5]: #examples-1
-[6]: #cycallrtdb
-[7]: #parameters
-[8]: #examples-2
-[9]: #cycallfirestore
-[10]: #parameters-1
-[11]: #examples-3
-[12]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
-[13]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
-[14]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[createUserWClaims]: #cycreateuserwithclaims
+[createUserWClaims-params]: #parameters
+[createUserWClaims-ex]: #examples
+[login]: #cylogin
+[login-params]: #parameters-1
+[login-ex]: #examples-1
+[loginEmail]: #cyloginwithemailandpassword
+[loginEmail-params]: #parameters-2
+[loginEmail-ex]: #examples-2
+[currentUser]: #currentuser
+[logout]: #cylogout
+[logout-params]: #parameters-3
+[logout-ex]: #examples-3
+[delAllUsers]: #cydeleteallauthusers
+[delAllUsers-params]: #examples-4
+[delAllUsers-ex]: #examples-4
+[callRtdb]: #cycallrtdb
+[callRtdb-params]: #parameters-5
+[callRtdb-ex]: #examples-5
+[callFirestore]: #cycallfirestore
+[callFirestore-params]: #parameters-6
+[callFirestore-ex]: #examples-6
+[authFunctions]: #cyauthfunction
+[authFunctions-params]: #parameters-7
+[authFunctions-ex]: #examples-7
+[mdn-string]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String
+[mdn-number]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Number
+[mdn-boolean]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean
+[mdn-object]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object
+[mdn-array]: https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array
+[mdn-null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/null
+[firebase-createrequest]: https://firebase.google.com/docs/reference/admin/node/firebase-admin.auth.createrequest.md#createrequest_interface
 [fireadmin-url]: https://fireadmin.io
 [fireadmin-source]: https://github.com/prescottprue/fireadmin
 [npm-image]: https://img.shields.io/npm/v/cypress-firebase.svg?style=flat-square
