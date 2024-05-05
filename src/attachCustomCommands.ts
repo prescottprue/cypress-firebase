@@ -277,9 +277,24 @@ declare global {
        */
       authCreateUser: (
         properties: auth.CreateRequest,
+        tenantId?: string,
+      ) => Chainable<auth.UserRecord | null>;
+
+      /**
+       * Create a Firebase Auth user with custom claims
+       * @param properties - The properties to set on the new user record to be created
+       * @param customClaims - Custom claims to attach to the new user
+       * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
+       * be set with environment variable TEST_TENANT_ID
+       * @name cy.createUserWithClaims
+       * @see https://github.com/prescottprue/cypress-firebase#cycreateuserwithclaims
+       * cy.createUserWithClaims()
+       */
+      createUserWithClaims: (
+        properties: auth.CreateRequest,
         customClaims?: object | null,
         tenantId?: string,
-      ) => Chainable<string | undefined>;
+      ) => Chainable<auth.UserRecord | null>;
 
       /**
        * Import list of Firebase Auth users
@@ -362,6 +377,8 @@ declare global {
        * @param uid - UID of user to get
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
+       * @name cy.authGetUser
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthgetuser
        * @example
        * cy.authGetUser('1234')
        */
@@ -783,6 +800,7 @@ type CommandNames =
   | 'callRtdb'
   | 'callFirestore'
   | 'authCreateUser'
+  | 'createUserWithClaims'
   | 'authImportUsers'
   | 'authListUsers'
   | 'login'
@@ -935,7 +953,6 @@ export default function attachCustomCommands(
       'authCreateUser',
     (
       properties: auth.CreateRequest,
-      customClaims?: object | null,
       tenantId: string = Cypress.env('TEST_TENANT_ID'),
     ) =>
       typedTask(cy, 'authCreateUser', { properties, tenantId }).then((user) => {
@@ -949,11 +966,7 @@ export default function attachCustomCommands(
           return typedTask(cy, 'authGetUserByEmail', {
             email: properties.email,
             tenantId,
-          }).then((user) =>
-            user === 'auth/user-not-found'
-              ? null
-              : (user && user.uid) || undefined,
-          );
+          }).then((user) => (user === 'auth/user-not-found' ? null : user));
         }
         if (user === 'auth/phone-number-already-exists') {
           if (!properties.phoneNumber) {
@@ -965,11 +978,46 @@ export default function attachCustomCommands(
           return typedTask(cy, 'authGetUserByPhoneNumber', {
             phoneNumber: properties.phoneNumber,
             tenantId,
-          }).then((user) =>
-            user === 'auth/user-not-found'
-              ? null
-              : (user && user.uid) || undefined,
-          );
+          }).then((user) => (user === 'auth/user-not-found' ? null : user));
+        }
+        return user;
+      }),
+  );
+
+  Cypress.Commands.add(
+    (options &&
+      options.commandNames &&
+      options.commandNames.createUserWithClaims) ||
+      'createUserWithClaims',
+    (
+      properties: auth.CreateRequest,
+      customClaims?: object | null,
+      tenantId: string = Cypress.env('TEST_TENANT_ID'),
+    ) => {
+      typedTask(cy, 'authCreateUser', { properties, tenantId }).then((user) => {
+        if (user === 'auth/email-already-exists') {
+          if (!properties.email) {
+            throw new Error(
+              'User with email already exists yet no email was given',
+            );
+          }
+          cy.log('Auth user with given email already exists.');
+          return typedTask(cy, 'authGetUserByEmail', {
+            email: properties.email,
+            tenantId,
+          }).then((user) => (user === 'auth/user-not-found' ? null : user));
+        }
+        if (user === 'auth/phone-number-already-exists') {
+          if (!properties.phoneNumber) {
+            throw new Error(
+              'User with phone number already exists yet no phone number was given',
+            );
+          }
+          cy.log('Auth user with given phone number already exists.');
+          return typedTask(cy, 'authGetUserByPhoneNumber', {
+            phoneNumber: properties.phoneNumber,
+            tenantId,
+          }).then((user) => (user === 'auth/user-not-found' ? null : user));
         }
         if (customClaims !== undefined && user) {
           return typedTask(cy, 'authSetCustomUserClaims', {
@@ -978,8 +1026,9 @@ export default function attachCustomCommands(
             tenantId,
           }).then(() => user.uid);
         }
-        return (user && user.uid) || undefined;
-      }),
+        return user;
+      });
+    },
   );
 
   Cypress.Commands.add(
