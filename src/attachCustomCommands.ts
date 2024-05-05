@@ -1,5 +1,6 @@
 import type { auth, firestore } from 'firebase-admin';
-import { typedTask, type createAuthUser, TaskNameToParams } from './tasks';
+import type { authCreateUser } from './tasks';
+import { typedTask, TaskNameToParams } from './tasks';
 
 /**
  * Params for attachCustomCommand function for
@@ -268,14 +269,13 @@ declare global {
       /**
        * Create a Firebase Auth user
        * @param properties - The properties to set on the new user record to be created
-       * @param customClaims - Custom claims to attach to the new user
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.createAuthUser
-       * @see https://github.com/prescottprue/cypress-firebase#cycreateauthuser
-       * cy.createAuthUser()
+       * @name cy.authCreateUser
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthcreateuser
+       * cy.authCreateUser()
        */
-      createAuthUser: (
+      authCreateUser: (
         properties: auth.CreateRequest,
         customClaims?: object | null,
         tenantId?: string,
@@ -287,13 +287,13 @@ declare global {
        * @param importOptions - Optional options for the user import
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.importAuthUsers
-       * @see https://github.com/prescottprue/cypress-firebase#cyimportauthusers
+       * @name cy.authImportUsers
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthimportusers
        * @example
-       * cy.importAuthUsers()
+       * cy.authImportUsers()
        */
-      importAuthUsers: (
-        ...args: TaskNameToParams<'importAuthUsers'>
+      authImportUsers: (
+        ...args: TaskNameToParams<'authImportUsers'>
       ) => Chainable<auth.UserImportResult>;
 
       /**
@@ -302,13 +302,13 @@ declare global {
        * @param pageToken - The next page token
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.listAuthUsers
-       * @see https://github.com/prescottprue/cypress-firebase#cylistauthusers
+       * @name cy.authListUsers
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthlistusers
        * @example
-       * cy.listAuthUsers()
+       * cy.authListUsers()
        */
-      listAuthUsers: (
-        ...args: TaskNameToParams<'listAuthUsers'>
+      authListUsers: (
+        ...args: TaskNameToParams<'authListUsers'>
       ) => Cypress.Chainable<auth.ListUsersResult>;
 
       /**
@@ -332,10 +332,11 @@ declare global {
        * email and password or the TEST_EMAIL and TEST_PASSWORD environment variables.
        * Authentication happens with serviceAccount.json or SERVICE_ACCOUNT env var.
        * @see https://github.com/prescottprue/cypress-firebase#cyloginwithemailandpassword
-       * @param email - email of user to login as
-       * @param password - password of user to login as
+       * @param email - Email of user to login as
+       * @param password - Password of user to login as
        * @param customClaims - Custom claims to attach to the custom token
-       * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also be set with environment variable TEST_TENANT_ID
+       * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
+       * be set with environment variable TEST_TENANT_ID
        * @example <caption>Env Based Login (TEST_EMAIL, TEST_PASSWORD)</caption>
        * cy.loginWithEmailAndPassword()
        * @example <caption>Passed email and password</caption>
@@ -361,39 +362,37 @@ declare global {
        * @param uid - UID of user to get
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.getAuthUser
-       * @see https://github.com/prescottprue/cypress-firebase#cygetauthuser
        * @example
-       * cy.getAuthUser('1234')
+       * cy.authGetUser('1234')
        */
-      getAuthUser: (
-        ...args: TaskNameToParams<'getAuthUser'>
+      authGetUser: (
+        ...args: TaskNameToParams<'authGetUser'>
       ) => Chainable<auth.UserRecord | null>;
       /**
        * Get Firebase auth user by email
        * @param email - Email of user to get
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.getAuthUserByEmail
-       * @see https://github.com/prescottprue/cypress-firebase#cygetauthuserbyemail
+       * @name cy.authGetUserByEmail
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthgetuserbyemail
        * @example
-       * cy.getAuthUserByEmail('foobar@mail.com')
+       * cy.authGetUserByEmail('foobar@mail.com')
        */
-      getAuthUserByEmail: (
-        ...args: TaskNameToParams<'getAuthUserByEmail'>
+      authGetUserByEmail: (
+        ...args: TaskNameToParams<'authGetUserByEmail'>
       ) => Chainable<auth.UserRecord | null>;
       /**
        * Get Firebase auth user by phone number
        * @param phoneNumber - Phone number of user to get
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.getAuthUserByPhoneNumber
-       * @see https://github.com/prescottprue/cypress-firebase#cygetauthuserbyphonenumber
+       * @name cy.authGetUserByPhoneNumber
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthgetuserbyphonenumber
        * @example
-       * cy.getAuthUserByPhoneNumber('1234567890')
+       * cy.authGetUserByPhoneNumber('1234567890')
        */
-      getAuthUserByPhoneNumber: (
-        ...args: TaskNameToParams<'getAuthUserByPhoneNumber'>
+      authGetUserByPhoneNumber: (
+        ...args: TaskNameToParams<'authGetUserByPhoneNumber'>
       ) => Chainable<auth.UserRecord | null>;
       /**
        * Get Firebase auth user by providerID and UID
@@ -401,13 +400,13 @@ declare global {
        * @param uid - UID of user to get
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.getAuthUserByProviderUid
-       * @see https://github.com/prescottprue/cypress-firebase#cygetauthuserbyprovideruid
+       * @name cy.authGetUserByProviderUid
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthgetuserbyprovideruid
        * @example
-       * cy.getAuthUserByProviderUid(providerId, uid)
+       * cy.authGetUserByProviderUid(providerId, uid)
        */
-      getAuthUserByProviderUid: (
-        ...args: TaskNameToParams<'getAuthUserByProviderUid'>
+      authGetUserByProviderUid: (
+        ...args: TaskNameToParams<'authGetUserByProviderUid'>
       ) => Chainable<auth.UserRecord | null>;
 
       /**
@@ -416,12 +415,12 @@ declare global {
        * @param identifiers - The identifiers used to indicate which user records should be returned.
        * @param tenantId - Optional ID of tenant used for multi-tenancy
        * @returns Promise which resolves with a GetUsersResult object
-       * @see https://github.com/prescottprue/cypress-firebase#cygetauthusers
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthgetusers
        * @example
-       * cy.getAuthUsers([{email: 'foobar@mail.com'}, {uid: "1234"}])
+       * cy.authGetUsers([{email: 'foobar@mail.com'}, {uid: "1234"}])
        */
-      getAuthUsers: (
-        ...args: TaskNameToParams<'getAuthUsers'>
+      authGetUsers: (
+        ...args: TaskNameToParams<'authGetUsers'>
       ) => Chainable<auth.GetUsersResult>;
 
       /**
@@ -430,13 +429,13 @@ declare global {
        * @param properties - The properties to update on the user
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.updateAuthUser
-       * @see https://github.com/prescottprue/cypress-firebase#cyupdateauthuser
+       * @name cy.authUpdateUser
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthupdateuser
        * @example
-       * cy.updateAuthUser(uid, {displayName: "New Name"})
+       * cy.authUpdateUser(uid, {displayName: "New Name"})
        */
-      updateAuthUser: (
-        ...args: TaskNameToParams<'updateAuthUser'>
+      authUpdateUser: (
+        ...args: TaskNameToParams<'authUpdateUser'>
       ) => Chainable<auth.UserRecord>;
       /**
        * Set custom claims of an existing Firebase Auth user
@@ -444,13 +443,13 @@ declare global {
        * @param customClaims - The custom claims to set, null deletes the custom claims
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.setAuthUserClaims
-       * @see https://github.com/prescottprue/cypress-firebase#cysetauthuserclaims
+       * @name cy.authSetCustomUserClaims
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthsetcustomuserclaims
        * @example
-       * cy.setUserClaims(uid, {some: 'claim'})
+       * cy.authSetCustomUserClaims(uid, {some: 'claim'})
        */
-      setAuthUserClaims: (
-        ...args: TaskNameToParams<'setAuthUserCustomClaims'>
+      authSetCustomUserClaims: (
+        ...args: TaskNameToParams<'authSetCustomUserClaims'>
       ) => Chainable<null>;
 
       /**
@@ -459,13 +458,13 @@ declare global {
        * @param uid = UID of user to delete
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.deleteAuthUser
-       * @see https://github.com/prescottprue/cypress-firebase#cydeleteauthuser
+       * @name cy.authDeleteUser
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthdeleteuser
        * @example
-       * cy.deleteAuthUser(uid)
+       * cy.authDeleteUser(uid)
        */
-      deleteAuthUser: (
-        ...args: TaskNameToParams<'deleteAuthUser'>
+      authDeleteUser: (
+        ...args: TaskNameToParams<'authDeleteUser'>
       ) => Chainable<null>;
       /**
        * Delete a user from Firebase Auth with either a passed uid or the TEST_UID
@@ -473,13 +472,13 @@ declare global {
        * @param uid = UID of user to delete
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.deleteAllAuthUsers
-       * @see https://github.com/prescottprue/cypress-firebase#cydeleteauthusers
+       * @name cy.authDeleteUsers
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthdeleteusers
        * @example
-       * cy.deleteAuthUsers([uid1, uid2])
+       * cy.authDeleteUsers([uid1, uid2])
        */
-      deleteAuthUsers: (
-        ...args: TaskNameToParams<'deleteAuthUsers'>
+      authDeleteUsers: (
+        ...args: TaskNameToParams<'authDeleteUsers'>
       ) => Chainable<auth.DeleteUsersResult>;
       /**
        * Delete all users from Firebase Auth
@@ -500,13 +499,13 @@ declare global {
        * @param customClaims - Custom claims to attach to the custom token
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.createCustomToken
-       * @see https://github.com/prescottprue/cypress-firebase#cycreatecustomtoken
+       * @name cy.authCreateCustomToken
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthcreatecustomtoken
        * @example
-       * cy.createCustomToken(uid)
+       * cy.authCreateCustomToken(uid)
        */
-      createCustomToken: (
-        ...args: TaskNameToParams<'createCustomToken'>
+      authCreateCustomToken: (
+        ...args: TaskNameToParams<'authCreateCustomToken'>
       ) => Chainable<string>;
       /**
        * Create a session cookie for a user
@@ -514,13 +513,13 @@ declare global {
        * @param sessionCookieOptions - Options for the session cookie
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.createSessionCookie
-       * @see https://github.com/prescottprue/cypress-firebase#cycreatesessioncookie
+       * @name cy.authCreateSessionCookie
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthcreatesessioncookie
        * @example
-       * cy.createSessionCookie(idToken)
+       * cy.authCreateSessionCookie(idToken)
        */
-      createSessionCookie: (
-        ...args: TaskNameToParams<'createSessionCookie'>
+      authCreateSessionCookie: (
+        ...args: TaskNameToParams<'authCreateSessionCookie'>
       ) => Chainable<string>;
       /**
        * Verify an ID token
@@ -528,26 +527,26 @@ declare global {
        * @param checkRevoked - Whether to check if the token has been revoked
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.verifyIdToken
-       * @see https://github.com/prescottprue/cypress-firebase#cyverifyidtoken
+       * @name cy.authVerifyIdToken
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthverifyidtoken
        * @example
-       * cy.verifyIdToken(idToken)
+       * cy.authVerifyIdToken(idToken)
        */
-      verifyIdToken: (
-        ...args: TaskNameToParams<'verifyIdToken'>
+      authVerifyIdToken: (
+        ...args: TaskNameToParams<'authVerifyIdToken'>
       ) => Chainable<auth.DecodedIdToken>;
       /**
        * Revoke all refresh tokens for a user
        * @param uid - UID of user to revoke refresh tokens for
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.revokeRefreshTokens
-       * @see https://github.com/prescottprue/cypress-firebase#cyrevokerefreshtokens
+       * @name cy.authRevokeRefreshTokens
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthrevokerefreshtokens
        * @example
-       * cy.revokeRefreshTokens(uid)
+       * cy.authRevokeRefreshTokens(uid)
        */
-      revokeRefreshTokens: (
-        ...args: TaskNameToParams<'revokeRefreshTokens'>
+      authRevokeRefreshTokens: (
+        ...args: TaskNameToParams<'authRevokeRefreshTokens'>
       ) => Chainable<void>;
       /**
        * Generate an email verification link
@@ -555,13 +554,13 @@ declare global {
        * @param actionCodeSettings - Action code settings for the email
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.generateEmailVerificationLink
-       * @see https://github.com/prescottprue/cypress-firebase#cygenerateemailverificationlink
+       * @name cy.authGenerateEmailVerificationLink
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthgenerateemailverificationlink
        * @example
-       * cy.generateEmailVerificationLink(email)
+       * cy.authGenerateEmailVerificationLink(email)
        */
-      generateEmailVerificationLink: (
-        ...args: TaskNameToParams<'generateEmailVerificationLink'>
+      authGenerateEmailVerificationLink: (
+        ...args: TaskNameToParams<'authGenerateEmailVerificationLink'>
       ) => Chainable<string>;
       /**
        * Generate a password reset link
@@ -569,13 +568,13 @@ declare global {
        * @param actionCodeSettings - Action code settings for the email
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.generatePasswordResetLink
-       * @see https://github.com/prescottprue/cypress-firebase#cygeneratepasswordresetlink
+       * @name cy.authGeneratePasswordResetLink
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthgeneratepasswordresetlink
        * @example
-       * cy.generatePasswordResetLink(email)
+       * cy.authGeneratePasswordResetLink(email)
        */
-      generatePasswordResetLink: (
-        ...args: TaskNameToParams<'generatePasswordResetLink'>
+      authGeneratePasswordResetLink: (
+        ...args: TaskNameToParams<'authGeneratePasswordResetLink'>
       ) => Chainable<string>;
       /**
        * Generate a sign in with email link
@@ -583,13 +582,13 @@ declare global {
        * @param actionCodeSettings - Action code settings for the email
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.generateSignInWithEmailLink
-       * @see https://github.com/prescottprue/cypress-firebase#cygeneratesigninwithemaillink
+       * @name cy.authGenerateSignInWithEmailLink
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthgeneratesigninwithemaillink
        * @example
-       * cy.generateSignInWithEmailLink(email, actionCodeSettings)
+       * cy.authGenerateSignInWithEmailLink(email, actionCodeSettings)
        */
-      generateSignInWithEmailLink: (
-        ...args: TaskNameToParams<'generateSignInWithEmailLink'>
+      authGenerateSignInWithEmailLink: (
+        ...args: TaskNameToParams<'authGenerateSignInWithEmailLink'>
       ) => Chainable<string>;
 
       /**
@@ -599,13 +598,13 @@ declare global {
        * @param actionCodeSettings - Action code settings for the email
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.generateVerifyAndChangeEmailLink
-       * @see https://github.com/prescottprue/cypress-firebase#cygenerateverifyandchangeemaillink
+       * @name cy.authGenerateVerifyAndChangeEmailLink
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthgenerateverifyandchangeemaillink
        * @example
-       * cy.generateVerifyAndChangeEmailLink(oldEmail, newEmail)
+       * cy.authGenerateVerifyAndChangeEmailLink(oldEmail, newEmail)
        */
-      generateVerifyAndChangeEmailLink: (
-        ...args: TaskNameToParams<'generateVerifyAndChangeEmailLink'>
+      authGenerateVerifyAndChangeEmailLink: (
+        ...args: TaskNameToParams<'authGenerateVerifyAndChangeEmailLink'>
       ) => Chainable<string>;
 
       /**
@@ -613,39 +612,39 @@ declare global {
        * @param providerConfig - The provider config to create
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.createProviderConfig
-       * @see https://github.com/prescottprue/cypress-firebase#cycreateproviderconfig
+       * @name cy.authCreateProviderConfig
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthcreateproviderconfig
        * @example
-       * cy.createProviderConfig(providerConfig)
+       * cy.authCreateProviderConfig(providerConfig)
        */
-      createProviderConfig: (
-        ...args: TaskNameToParams<'createProviderConfig'>
+      authCreateProviderConfig: (
+        ...args: TaskNameToParams<'authCreateProviderConfig'>
       ) => Chainable<auth.AuthProviderConfig>;
       /**
        * Get a provider config
        * @param providerId - The provider ID to get the config for
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.getProviderConfig
-       * @see https://github.com/prescottprue/cypress-firebase#cygetproviderconfig
+       * @name cy.authGetProviderConfig
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthgetproviderconfig
        * @example
-       * cy.getProviderConfig(providerId)
+       * cy.authGetProviderConfig(providerId)
        */
-      getProviderConfig: (
-        ...args: TaskNameToParams<'getProviderConfig'>
+      authGetProviderConfig: (
+        ...args: TaskNameToParams<'authGetProviderConfig'>
       ) => Chainable<auth.AuthProviderConfig>;
       /**
        * List provider configs
        * @param providerFilter - The provider ID to filter by, or null to list all
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.listProviderConfigs
-       * @see https://github.com/prescottprue/cypress-firebase#cylistproviderconfigs
+       * @name cy.authListProviderConfigs
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthlistproviderconfigs
        * @example
-       * cy.listProviderConfigs(providerFilter)
+       * cy.authListProviderConfigs(providerFilter)
        */
-      listProviderConfigs: (
-        ...args: TaskNameToParams<'listProviderConfigs'>
+      authListProviderConfigs: (
+        ...args: TaskNameToParams<'authListProviderConfigs'>
       ) => Chainable<auth.ListProviderConfigResults>;
       /**
        * Update a provider config
@@ -653,26 +652,26 @@ declare global {
        * @param providerConfig - The provider config to update to
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.updateProviderConfig
-       * @see https://github.com/prescottprue/cypress-firebase#cyupdateproviderconfig
+       * @name cy.authUpdateProviderConfig
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthupdateproviderconfig
        * @example
-       * cy.updateProviderConfig(providerId, providerConfig)
+       * cy.authUpdateProviderConfig(providerId, providerConfig)
        */
-      updateProviderConfig: (
-        ...args: TaskNameToParams<'updateProviderConfig'>
+      authUpdateProviderConfig: (
+        ...args: TaskNameToParams<'authUpdateProviderConfig'>
       ) => Chainable<auth.AuthProviderConfig>;
       /**
        * Delete a provider config
        * @param providerId - The provider ID to delete the config for
        * @param tenantId - Optional ID of tenant used for multi-tenancy. Can also
        * be set with environment variable TEST_TENANT_ID
-       * @name cy.deleteProviderConfig
-       * @see https://github.com/prescottprue/cypress-firebase#cydeleteproviderconfig
+       * @name cy.authDeleteProviderConfig
+       * @see https://github.com/prescottprue/cypress-firebase#cyauthdeleteproviderconfig
        * @example
-       * cy.deleteProviderConfig(providerId)
+       * cy.authDeleteProviderConfig(providerId)
        */
-      deleteProviderConfig: (
-        ...args: TaskNameToParams<'deleteProviderConfig'>
+      authDeleteProviderConfig: (
+        ...args: TaskNameToParams<'authDeleteProviderConfig'>
       ) => Chainable<null>;
     }
   }
@@ -752,18 +751,18 @@ function loginWithEmailAndPassword(
  * @param pageToken - Page token used for recursion
  * @returns Promise which resolves when all users have been deleted
  */
-function deleteAllAuthUsers(
+function authDeleteAllUsers(
   cy: AttachCustomCommandParams['cy'],
   tenantId?: string | undefined,
   pageToken?: string,
 ): Promise<void> {
   return new Promise<void>((resolve, reject): any => {
-    typedTask(cy, 'listAuthUsers', { tenantId, pageToken }).then(
+    typedTask(cy, 'authListUsers', { tenantId, pageToken }).then(
       ({ users, pageToken: nextPageToken }) => {
         if (users.length === 0) resolve();
         else {
           const uids = users.map((user) => user.uid);
-          typedTask(cy, 'deleteAuthUsers', { uids, tenantId }).then(
+          typedTask(cy, 'authDeleteUsers', { uids, tenantId }).then(
             ({ successCount, failureCount }) => {
               if (failureCount > successCount || successCount === 0)
                 reject(
@@ -771,7 +770,7 @@ function deleteAllAuthUsers(
                     `Too many deletes failed. ${successCount} users were deleted, ${failureCount} failed.`,
                   ),
                 );
-              deleteAllAuthUsers(cy, tenantId, nextPageToken).then(resolve);
+              authDeleteAllUsers(cy, tenantId, nextPageToken).then(resolve);
             },
           );
         }
@@ -783,35 +782,35 @@ function deleteAllAuthUsers(
 type CommandNames =
   | 'callRtdb'
   | 'callFirestore'
-  | 'createAuthUser'
-  | 'importAuthUsers'
-  | 'listAuthUsers'
+  | 'authCreateUser'
+  | 'authImportUsers'
+  | 'authListUsers'
   | 'login'
   | 'loginWithEmailAndPassword'
   | 'logout'
-  | 'getAuthUser'
-  | 'getAuthUserByEmail'
-  | 'getAuthUserByPhoneNumber'
-  | 'getAuthUserByProviderUid'
-  | 'getAuthUsers'
-  | 'updateAuthUser'
-  | 'setAuthUserClaims'
-  | 'deleteAuthUser'
-  | 'deleteAuthUsers'
+  | 'authGetUser'
+  | 'authGetUserByEmail'
+  | 'authGetUserByPhoneNumber'
+  | 'authGetUserByProviderUid'
+  | 'authGetUsers'
+  | 'authUpdateUser'
+  | 'authSetCustomUserClaims'
+  | 'authDeleteUser'
+  | 'authDeleteUsers'
   | 'deleteAllAuthUsers'
-  | 'createCustomToken'
-  | 'createSessionCookie'
-  | 'verifyIdToken'
-  | 'revokeRefreshTokens'
-  | 'generateEmailVerificationLink'
-  | 'generatePasswordResetLink'
-  | 'generateSignInWithEmailLink'
-  | 'generateVerifyAndChangeEmailLink'
-  | 'createProviderConfig'
-  | 'getProviderConfig'
-  | 'listProviderConfigs'
-  | 'updateProviderConfig'
-  | 'deleteProviderConfig';
+  | 'authCreateCustomToken'
+  | 'authCreateSessionCookie'
+  | 'authVerifyIdToken'
+  | 'authRevokeRefreshTokens'
+  | 'authGenerateEmailVerificationLink'
+  | 'authGeneratePasswordResetLink'
+  | 'authGenerateSignInWithEmailLink'
+  | 'authGenerateVerifyAndChangeEmailLink'
+  | 'authCreateProviderConfig'
+  | 'authGetProviderConfig'
+  | 'authListProviderConfigs'
+  | 'authUpdateProviderConfig'
+  | 'authDeleteProviderConfig';
 
 type CommandNamespacesConfig = {
   [N in CommandNames]?: string | boolean;
@@ -932,14 +931,14 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    (options && options.commandNames && options.commandNames.createAuthUser) ||
-      'createAuthUser',
+    (options && options.commandNames && options.commandNames.authCreateUser) ||
+      'authCreateUser',
     (
       properties: auth.CreateRequest,
       customClaims?: object | null,
       tenantId: string = Cypress.env('TEST_TENANT_ID'),
     ) =>
-      typedTask(cy, 'createAuthUser', { properties, tenantId }).then((user) => {
+      typedTask(cy, 'authCreateUser', { properties, tenantId }).then((user) => {
         if (user === 'auth/email-already-exists') {
           if (!properties.email) {
             throw new Error(
@@ -947,7 +946,7 @@ export default function attachCustomCommands(
             );
           }
           cy.log('Auth user with given email already exists.');
-          return typedTask(cy, 'getAuthUserByEmail', {
+          return typedTask(cy, 'authGetUserByEmail', {
             email: properties.email,
             tenantId,
           }).then((user) =>
@@ -963,7 +962,7 @@ export default function attachCustomCommands(
             );
           }
           cy.log('Auth user with given phone number already exists.');
-          return typedTask(cy, 'getAuthUserByPhoneNumber', {
+          return typedTask(cy, 'authGetUserByPhoneNumber', {
             phoneNumber: properties.phoneNumber,
             tenantId,
           }).then((user) =>
@@ -973,7 +972,7 @@ export default function attachCustomCommands(
           );
         }
         if (customClaims !== undefined && user) {
-          return typedTask(cy, 'setAuthUserCustomClaims', {
+          return typedTask(cy, 'authSetCustomUserClaims', {
             uid: user.uid,
             customClaims,
             tenantId,
@@ -984,10 +983,10 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    (options && options.commandNames && options.commandNames.importAuthUsers) ||
-      'importAuthUsers',
-    (...args: TaskNameToParams<'importAuthUsers'>) =>
-      typedTask(cy, 'importAuthUsers', {
+    (options && options.commandNames && options.commandNames.authImportUsers) ||
+      'authImportUsers',
+    (...args: TaskNameToParams<'authImportUsers'>) =>
+      typedTask(cy, 'authImportUsers', {
         usersImport: args[0],
         importOptions: args[1],
         tenantId: args[2] || Cypress.env('TEST_TENANT_ID'),
@@ -995,10 +994,10 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    (options && options.commandNames && options.commandNames.listAuthUsers) ||
-      'listAuthUsers',
-    (...args: TaskNameToParams<'listAuthUsers'>) =>
-      typedTask(cy, 'listAuthUsers', {
+    (options && options.commandNames && options.commandNames.authListUsers) ||
+      'authListUsers',
+    (...args: TaskNameToParams<'authListUsers'>) =>
+      typedTask(cy, 'authListUsers', {
         maxResults: args[0],
         pageToken: args[1],
         tenantId: args[2] || Cypress.env('TEST_TENANT_ID'),
@@ -1028,8 +1027,8 @@ export default function attachCustomCommands(
 
       cy.log('Creating custom token for login...');
 
-      // Generate a custom token using createCustomToken task (if tasks are enabled) then login
-      return typedTask(cy, 'createCustomToken', {
+      // Generate a custom token using authCreateCustomToken task (if tasks are enabled) then login
+      return typedTask(cy, 'authCreateCustomToken', {
         uid: userUid,
         customClaims,
         tenantId,
@@ -1046,7 +1045,7 @@ export default function attachCustomCommands(
       email?: string,
       password?: string,
       extraInfo?: Omit<
-        Parameters<typeof createAuthUser>[1],
+        Parameters<typeof authCreateUser>[1],
         'email' | 'password'
       >,
       tenantId: string | undefined = Cypress.env('TEST_TENANT_ID'),
@@ -1072,13 +1071,13 @@ export default function attachCustomCommands(
         cy.log('Authed user already exists, login complete.');
         return undefined;
       }
-      return typedTask(cy, 'getAuthUserByEmail', {
+      return typedTask(cy, 'authGetUserByEmail', {
         email: userEmail,
         tenantId,
       }).then((user) => {
         if (user)
           return loginWithEmailAndPassword(auth, userEmail, userPassword);
-        typedTask(cy, 'createAuthUser', {
+        typedTask(cy, 'authCreateUser', {
           properties: {
             uid: userUid,
             email: userEmail,
@@ -1088,7 +1087,7 @@ export default function attachCustomCommands(
           tenantId,
         });
         return cy
-          .task('createAuthUser', {
+          .task('authCreateUser', {
             properties: {
               email: userEmail,
               password: userPassword,
@@ -1124,8 +1123,8 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    (options && options.commandNames && options.commandNames.getAuthUser) ||
-      'getAuthUser',
+    (options && options.commandNames && options.commandNames.authGetUser) ||
+      'authGetUser',
     (uid?: string, tenantId?: string) => {
       const userUid = uid || Cypress.env('TEST_UID');
       // Handle UID which is passed in
@@ -1134,7 +1133,7 @@ export default function attachCustomCommands(
           'uid must be passed or TEST_UID set within environment to login',
         );
       }
-      return typedTask(cy, 'getAuthUser', {
+      return typedTask(cy, 'authGetUser', {
         uid: userUid,
         tenantId: tenantId || Cypress.env('TEST_TENANT_ID'),
       }).then((user) => {
@@ -1147,8 +1146,8 @@ export default function attachCustomCommands(
   Cypress.Commands.add(
     (options &&
       options.commandNames &&
-      options.commandNames.getAuthUserByEmail) ||
-      'getAuthUserByEmail',
+      options.commandNames.authGetUserByEmail) ||
+      'authGetUserByEmail',
     (email?: string, tenantId?: string) => {
       const userEmail = email || Cypress.env('TEST_EMAIL');
       // Handle email which is passed in
@@ -1157,7 +1156,7 @@ export default function attachCustomCommands(
           'email must be passed or TEST_EMAIL set within environment to login',
         );
       }
-      return typedTask(cy, 'getAuthUserByEmail', {
+      return typedTask(cy, 'authGetUserByEmail', {
         email: userEmail,
         tenantId: tenantId || Cypress.env('TEST_TENANT_ID'),
       }).then((user) => {
@@ -1170,10 +1169,10 @@ export default function attachCustomCommands(
   Cypress.Commands.add(
     (options &&
       options.commandNames &&
-      options.commandNames.getAuthUserByPhoneNumber) ||
-      'getAuthUserByPhoneNumber',
-    (...args: TaskNameToParams<'getAuthUserByPhoneNumber'>) =>
-      typedTask(cy, 'getAuthUserByPhoneNumber', {
+      options.commandNames.authGetUserByPhoneNumber) ||
+      'authGetUserByPhoneNumber',
+    (...args: TaskNameToParams<'authGetUserByPhoneNumber'>) =>
+      typedTask(cy, 'authGetUserByPhoneNumber', {
         phoneNumber: args[0],
         tenantId: args[1] || Cypress.env('TEST_TENANT_ID'),
       }).then((user) => {
@@ -1185,8 +1184,8 @@ export default function attachCustomCommands(
   Cypress.Commands.add(
     (options &&
       options.commandNames &&
-      options.commandNames.getAuthUserByProviderUid) ||
-      'getAuthUserByProviderUid',
+      options.commandNames.authGetUserByProviderUid) ||
+      'authGetUserByProviderUid',
     (providerId: string, uid?: string, tenantId?: string) => {
       const userUid = uid || Cypress.env('TEST_UID');
       // Handle UID which is passed in
@@ -1195,7 +1194,7 @@ export default function attachCustomCommands(
           'uid must be passed or TEST_UID set within environment to login',
         );
       }
-      typedTask(cy, 'getAuthUserByProviderUid', {
+      typedTask(cy, 'authGetUserByProviderUid', {
         providerId,
         uid: userUid,
         tenantId: tenantId || Cypress.env('TEST_TENANT_ID'),
@@ -1207,20 +1206,20 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    (options && options.commandNames && options.commandNames.getAuthUsers) ||
-      'getAuthUsers',
-    (...args: TaskNameToParams<'getAuthUsers'>) =>
-      typedTask(cy, 'getAuthUsers', {
+    (options && options.commandNames && options.commandNames.authGetUsers) ||
+      'authGetUsers',
+    (...args: TaskNameToParams<'authGetUsers'>) =>
+      typedTask(cy, 'authGetUsers', {
         identifiers: args[0],
         tenantId: args[1] || Cypress.env('TEST_TENANT_ID'),
       }),
   );
 
   Cypress.Commands.add(
-    (options && options.commandNames && options.commandNames.updateAuthUser) ||
-      'updateAuthUser',
-    (...args: TaskNameToParams<'updateAuthUser'>) =>
-      typedTask(cy, 'updateAuthUser', {
+    (options && options.commandNames && options.commandNames.authUpdateUser) ||
+      'authUpdateUser',
+    (...args: TaskNameToParams<'authUpdateUser'>) =>
+      typedTask(cy, 'authUpdateUser', {
         uid: args[0],
         properties: args[1],
         tenantId: args[2] || Cypress.env('TEST_TENANT_ID'),
@@ -1230,10 +1229,10 @@ export default function attachCustomCommands(
   Cypress.Commands.add(
     (options &&
       options.commandNames &&
-      options.commandNames.setAuthUserClaims) ||
-      'setAuthUserClaims',
-    (...args: TaskNameToParams<'setAuthUserCustomClaims'>) =>
-      typedTask(cy, 'setAuthUserCustomClaims', {
+      options.commandNames.authSetCustomUserClaims) ||
+      'authSetCustomUserClaims',
+    (...args: TaskNameToParams<'authSetCustomUserClaims'>) =>
+      typedTask(cy, 'authSetCustomUserClaims', {
         uid: args[0],
         customClaims: args[1],
         tenantId: args[2] || Cypress.env('TEST_TENANT_ID'),
@@ -1241,8 +1240,8 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    (options && options.commandNames && options.commandNames.deleteAuthUser) ||
-      'deleteAuthUser',
+    (options && options.commandNames && options.commandNames.authDeleteUser) ||
+      'authDeleteUser',
     (
       uid?: string,
       tenantId: string | undefined = Cypress.env('TEST_TENANT_ID'),
@@ -1255,15 +1254,15 @@ export default function attachCustomCommands(
         );
       }
 
-      return typedTask(cy, 'deleteAuthUser', { uid: userUid, tenantId });
+      return typedTask(cy, 'authDeleteUser', { uid: userUid, tenantId });
     },
   );
 
   Cypress.Commands.add(
-    (options && options.commandNames && options.commandNames.deleteAuthUsers) ||
-      'deleteAuthUsers',
-    (...args: TaskNameToParams<'deleteAuthUsers'>) =>
-      typedTask(cy, 'deleteAuthUsers', {
+    (options && options.commandNames && options.commandNames.authDeleteUsers) ||
+      'authDeleteUsers',
+    (...args: TaskNameToParams<'authDeleteUsers'>) =>
+      typedTask(cy, 'authDeleteUsers', {
         uids: args[0],
         tenantId: args[1] || Cypress.env('TEST_TENANT_ID'),
       }),
@@ -1275,14 +1274,14 @@ export default function attachCustomCommands(
       options.commandNames.deleteAllAuthUsers) ||
       'deleteAllAuthUsers',
     (tenantId: string | undefined = Cypress.env('TEST_TENANT_ID')) =>
-      cy.wrap(deleteAllAuthUsers(cy, tenantId)),
+      cy.wrap(authDeleteAllUsers(cy, tenantId)),
   );
 
   Cypress.Commands.add(
     (options &&
       options.commandNames &&
-      options.commandNames.createCustomToken) ||
-      'createCustomToken',
+      options.commandNames.authCreateCustomToken) ||
+      'authCreateCustomToken',
     (uid?: string, customClaims?: object, tenantId?: string) => {
       const userUid = uid || Cypress.env('TEST_UID');
       // Handle UID which is passed in
@@ -1291,7 +1290,7 @@ export default function attachCustomCommands(
           'uid must be passed or TEST_UID set within environment to login',
         );
       }
-      return typedTask(cy, 'createCustomToken', {
+      return typedTask(cy, 'authCreateCustomToken', {
         uid: userUid,
         customClaims,
         tenantId: tenantId || Cypress.env('TEST_TENANT_ID'),
@@ -1302,10 +1301,10 @@ export default function attachCustomCommands(
   Cypress.Commands.add(
     (options &&
       options.commandNames &&
-      options.commandNames.createSessionCookie) ||
-      'createSessionCookie',
-    (...args: TaskNameToParams<'createSessionCookie'>) =>
-      typedTask(cy, 'createSessionCookie', {
+      options.commandNames.authCreateSessionCookie) ||
+      'authCreateSessionCookie',
+    (...args: TaskNameToParams<'authCreateSessionCookie'>) =>
+      typedTask(cy, 'authCreateSessionCookie', {
         idToken: args[0],
         sessionCookieOptions: args[1],
         tenantId: args[2] || Cypress.env('TEST_TENANT_ID'),
@@ -1313,10 +1312,12 @@ export default function attachCustomCommands(
   );
 
   Cypress.Commands.add(
-    (options && options.commandNames && options.commandNames.verifyIdToken) ||
-      'verifyIdToken',
-    (...args: TaskNameToParams<'verifyIdToken'>) =>
-      typedTask(cy, 'verifyIdToken', {
+    (options &&
+      options.commandNames &&
+      options.commandNames.authVerifyIdToken) ||
+      'authVerifyIdToken',
+    (...args: TaskNameToParams<'authVerifyIdToken'>) =>
+      typedTask(cy, 'authVerifyIdToken', {
         idToken: args[0],
         checkRevoked: args[1],
         tenantId: args[2] || Cypress.env('TEST_TENANT_ID'),
@@ -1326,8 +1327,8 @@ export default function attachCustomCommands(
   Cypress.Commands.add(
     (options &&
       options.commandNames &&
-      options.commandNames.revokeRefreshTokens) ||
-      'revokeRefreshTokens',
+      options.commandNames.authRevokeRefreshTokens) ||
+      'authRevokeRefreshTokens',
     (uid?: string, tenantId?: string) => {
       const userUid = uid || Cypress.env('TEST_UID');
       // Handle UID which is passed in
@@ -1336,7 +1337,7 @@ export default function attachCustomCommands(
           'uid must be passed or TEST_UID set within environment to login',
         );
       }
-      return typedTask(cy, 'revokeRefreshTokens', {
+      return typedTask(cy, 'authRevokeRefreshTokens', {
         uid: userUid,
         tenantId: tenantId || Cypress.env('TEST_TENANT_ID'),
       });
@@ -1346,8 +1347,8 @@ export default function attachCustomCommands(
   Cypress.Commands.add(
     (options &&
       options.commandNames &&
-      options.commandNames.generateEmailVerificationLink) ||
-      'generateEmailVerificationLink',
+      options.commandNames.authGenerateEmailVerificationLink) ||
+      'authGenerateEmailVerificationLink',
     (
       email?: string,
       actionCodeSettings?: auth.ActionCodeSettings,
@@ -1360,7 +1361,7 @@ export default function attachCustomCommands(
           'email must be passed or TEST_EMAIL set within environment to login',
         );
       }
-      return typedTask(cy, 'generateEmailVerificationLink', {
+      return typedTask(cy, 'authGenerateEmailVerificationLink', {
         email: userEmail,
         actionCodeSettings,
         tenantId: tenantId || Cypress.env('TEST_TENANT_ID'),
@@ -1371,8 +1372,8 @@ export default function attachCustomCommands(
   Cypress.Commands.add(
     (options &&
       options.commandNames &&
-      options.commandNames.generatePasswordResetLink) ||
-      'generatePasswordResetLink',
+      options.commandNames.authGeneratePasswordResetLink) ||
+      'authGeneratePasswordResetLink',
     (
       email?: string,
       actionCodeSettings?: auth.ActionCodeSettings,
@@ -1385,7 +1386,7 @@ export default function attachCustomCommands(
           'email must be passed or TEST_EMAIL set within environment to login',
         );
       }
-      return typedTask(cy, 'generatePasswordResetLink', {
+      return typedTask(cy, 'authGeneratePasswordResetLink', {
         email: userEmail,
         actionCodeSettings,
         tenantId: tenantId || Cypress.env('TEST_TENANT_ID'),
@@ -1396,10 +1397,10 @@ export default function attachCustomCommands(
   Cypress.Commands.add(
     (options &&
       options.commandNames &&
-      options.commandNames.generateSignInWithEmailLink) ||
-      'generateSignInWithEmailLink',
-    (...args: TaskNameToParams<'generateSignInWithEmailLink'>) =>
-      typedTask(cy, 'generateSignInWithEmailLink', {
+      options.commandNames.authGenerateSignInWithEmailLink) ||
+      'authGenerateSignInWithEmailLink',
+    (...args: TaskNameToParams<'authGenerateSignInWithEmailLink'>) =>
+      typedTask(cy, 'authGenerateSignInWithEmailLink', {
         email: args[0],
         actionCodeSettings: args[1],
         tenantId: args[2] || Cypress.env('TEST_TENANT_ID'),
@@ -1409,10 +1410,10 @@ export default function attachCustomCommands(
   Cypress.Commands.add(
     (options &&
       options.commandNames &&
-      options.commandNames.generateVerifyAndChangeEmailLink) ||
-      'generateVerifyAndChangeEmailLink',
-    (...args: TaskNameToParams<'generateVerifyAndChangeEmailLink'>) =>
-      typedTask(cy, 'generateVerifyAndChangeEmailLink', {
+      options.commandNames.authGenerateVerifyAndChangeEmailLink) ||
+      'authGenerateVerifyAndChangeEmailLink',
+    (...args: TaskNameToParams<'authGenerateVerifyAndChangeEmailLink'>) =>
+      typedTask(cy, 'authGenerateVerifyAndChangeEmailLink', {
         email: args[0],
         newEmail: args[1],
         actionCodeSettings: args[2],
@@ -1423,10 +1424,10 @@ export default function attachCustomCommands(
   Cypress.Commands.add(
     (options &&
       options.commandNames &&
-      options.commandNames.createProviderConfig) ||
-      'createProviderConfig',
-    (...args: TaskNameToParams<'createProviderConfig'>) =>
-      typedTask(cy, 'createProviderConfig', {
+      options.commandNames.authCreateProviderConfig) ||
+      'authCreateProviderConfig',
+    (...args: TaskNameToParams<'authCreateProviderConfig'>) =>
+      typedTask(cy, 'authCreateProviderConfig', {
         providerConfig: args[0],
         tenantId: args[1] || Cypress.env('TEST_TENANT_ID'),
       }),
@@ -1435,10 +1436,10 @@ export default function attachCustomCommands(
   Cypress.Commands.add(
     (options &&
       options.commandNames &&
-      options.commandNames.getProviderConfig) ||
-      'getProviderConfig',
-    (...args: TaskNameToParams<'getProviderConfig'>) =>
-      typedTask(cy, 'getProviderConfig', {
+      options.commandNames.authGetProviderConfig) ||
+      'authGetProviderConfig',
+    (...args: TaskNameToParams<'authGetProviderConfig'>) =>
+      typedTask(cy, 'authGetProviderConfig', {
         providerId: args[0],
         tenantId: args[1] || Cypress.env('TEST_TENANT_ID'),
       }),
@@ -1447,10 +1448,10 @@ export default function attachCustomCommands(
   Cypress.Commands.add(
     (options &&
       options.commandNames &&
-      options.commandNames.listProviderConfigs) ||
-      'listProviderConfigs',
-    (...args: TaskNameToParams<'listProviderConfigs'>) =>
-      typedTask(cy, 'listProviderConfigs', {
+      options.commandNames.authListProviderConfigs) ||
+      'authListProviderConfigs',
+    (...args: TaskNameToParams<'authListProviderConfigs'>) =>
+      typedTask(cy, 'authListProviderConfigs', {
         providerFilter: args[0],
         tenantId: args[1] || Cypress.env('TEST_TENANT_ID'),
       }),
@@ -1459,10 +1460,10 @@ export default function attachCustomCommands(
   Cypress.Commands.add(
     (options &&
       options.commandNames &&
-      options.commandNames.updateProviderConfig) ||
-      'updateProviderConfig',
-    (...args: TaskNameToParams<'updateProviderConfig'>) =>
-      typedTask(cy, 'updateProviderConfig', {
+      options.commandNames.authUpdateProviderConfig) ||
+      'authUpdateProviderConfig',
+    (...args: TaskNameToParams<'authUpdateProviderConfig'>) =>
+      typedTask(cy, 'authUpdateProviderConfig', {
         providerId: args[0],
         providerConfig: args[1],
         tenantId: args[2] || Cypress.env('TEST_TENANT_ID'),
@@ -1472,10 +1473,10 @@ export default function attachCustomCommands(
   Cypress.Commands.add(
     (options &&
       options.commandNames &&
-      options.commandNames.deleteProviderConfig) ||
-      'deleteProviderConfig',
-    (...args: TaskNameToParams<'deleteProviderConfig'>) =>
-      typedTask(cy, 'deleteProviderConfig', {
+      options.commandNames.authDeleteProviderConfig) ||
+      'authDeleteProviderConfig',
+    (...args: TaskNameToParams<'authDeleteProviderConfig'>) =>
+      typedTask(cy, 'authDeleteProviderConfig', {
         providerId: args[0],
         tenantId: args[1] || Cypress.env('TEST_TENANT_ID'),
       }),
