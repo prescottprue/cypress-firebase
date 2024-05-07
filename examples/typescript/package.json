@@ -15,9 +15,9 @@
     "test:emulate": "cross-env FIREBASE_AUTH_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.auth.port)\" FIREBASE_DATABASE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.database.port)\" FIRESTORE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.firestore.port)\" yarn test:open"
   },
   "dependencies": {
-    "firebase": "10.8.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "firebase": "10.11.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "6.4.5",
