@@ -4452,7 +4452,7 @@ __metadata:
     eslint-plugin-prettier: "npm:5.1.3"
     firebase: "npm:10.11.1"
     firebase-admin: "npm:11.11.1"
-    firebase-tools: "npm:13.8.1"
+    firebase-tools: "npm:13.8.3"
     husky: "npm:9.0.11"
     lint-staged: "npm:15.2.2"
     mocha: "npm:10.4.0"
@@ -6029,9 +6029,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-tools@npm:13.8.1":
-  version: 13.8.1
-  resolution: "firebase-tools@npm:13.8.1"
+"firebase-tools@npm:13.8.3":
+  version: 13.8.3
+  resolution: "firebase-tools@npm:13.8.3"
   dependencies:
     "@google-cloud/cloud-sql-connector": "npm:^1.2.3"
     "@google-cloud/pubsub": "npm:^3.0.1"
@@ -6101,7 +6101,7 @@ __metadata:
     yaml: "npm:^2.4.1"
   bin:
     firebase: lib/bin/firebase.js
-  checksum: 10c0/7cd213e75bc7189569594635e11099736580b78829cf306ef9e2c36141eb1c6bb21a04dff9ff9513dc73a84a953449c0c1f07161b27b5ae48d550e2c8266e245
+  checksum: 10c0/4de1ff1eba513de65adbe8bf44cf3bece92ce21f5831078400bcf3fd4e71dcc8b4dc8d7de3fdb51a1d1fa546697d180a9e46c74aefb100f29b7c5b70df70efc1
   languageName: node
   linkType: hard
 
