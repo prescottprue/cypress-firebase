@@ -4667,7 +4667,7 @@ __metadata:
     eslint-config-prettier: "npm:9.1.0"
     eslint-plugin-babel: "npm:5.3.1"
     eslint-plugin-import: "npm:2.29.1"
-    eslint-plugin-jsdoc: "npm:48.2.7"
+    eslint-plugin-jsdoc: "npm:48.2.9"
     eslint-plugin-jsx-a11y: "npm:6.8.0"
     eslint-plugin-prettier: "npm:5.1.3"
     firebase: "npm:10.12.2"
@@ -5664,9 +5664,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsdoc@npm:48.2.7":
-  version: 48.2.7
-  resolution: "eslint-plugin-jsdoc@npm:48.2.7"
+"eslint-plugin-jsdoc@npm:48.2.9":
+  version: 48.2.9
+  resolution: "eslint-plugin-jsdoc@npm:48.2.9"
   dependencies:
     "@es-joy/jsdoccomment": "npm:~0.43.1"
     are-docs-informative: "npm:^0.0.2"
@@ -5678,7 +5678,7 @@ __metadata:
     spdx-expression-parse: "npm:^4.0.0"
   peerDependencies:
     eslint: ^7.0.0 || ^8.0.0 || ^9.0.0
-  checksum: 10c0/74d0f95b3d880dd4221dbc0b9341266a6cce3b8ca8d3e30032223af3552364643d6b82ad733d9bc06a20f0d640f21e4d8f5a4b00901d1771572625178b8c40c3
+  checksum: 10c0/93f2f9cc8baa8b525d900cf033ca9a7acbcbf18625d8cc0a48362b1755136ba9832868f6cc3c845888e98d105310ef4dfd6fba6bdfee6b5731c56e8d5e28d511
   languageName: node
   linkType: hard
 
