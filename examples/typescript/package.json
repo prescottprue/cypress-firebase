@@ -15,27 +15,27 @@
     "test:emulate": "cross-env FIREBASE_AUTH_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.auth.port)\" FIREBASE_DATABASE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.database.port)\" FIRESTORE_EMULATOR_HOST=\"localhost:$(cat firebase.json | jq .emulators.firestore.port)\" yarn test:open"
   },
   "dependencies": {
-    "firebase": "10.8.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "firebase": "10.12.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
   },
   "devDependencies": {
-    "@testing-library/jest-dom": "6.4.2",
-    "@testing-library/react": "14.2.1",
+    "@testing-library/jest-dom": "6.4.6",
+    "@testing-library/react": "14.3.1",
     "@testing-library/user-event": "14.5.2",
     "@types/jest": "29.5.12",
-    "@types/node": "16.18.87",
-    "@types/react": "18.2.64",
-    "@types/react-dom": "18.2.21",
+    "@types/node": "20.14.2",
+    "@types/react": "18.3.3",
+    "@types/react-dom": "18.3.0",
     "cross-env": "7.0.3",
-    "cypress": "13.6.6",
-    "cypress-firebase": "3.0.2",
-    "eslint-plugin-chai-friendly": "0.7.4",
-    "eslint-plugin-cypress": "2.15.1",
+    "cypress": "13.11.0",
+    "cypress-firebase": "4.0.0",
+    "eslint-plugin-chai-friendly": "0.8.0",
+    "eslint-plugin-cypress": "2.15.2",
     "react-scripts": "5.0.1",
     "firebase-admin": "11.11.1",
-    "firebase-tools": "12.9.1",
-    "typescript": "5.4.2",
+    "firebase-tools": "13.11.2",
+    "typescript": "5.4.5",
     "web-vitals": "3.5.2"
   },
   "eslintConfig": {

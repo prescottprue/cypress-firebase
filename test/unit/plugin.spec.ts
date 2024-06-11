@@ -59,9 +59,9 @@ describe('plugin', () => {
     );
     expect(results).to.be.an('object');
     expect(onFuncSpy).to.have.been.calledOnceWith('task');
-    expect(assignedTasksObj).to.have.property('createCustomToken');
+    expect(assignedTasksObj).to.have.property('authCreateCustomToken');
     const uid = 'SomeUid';
-    (assignedTasksObj as any).createCustomToken({ uid });
+    (assignedTasksObj as any).authCreateCustomToken({ uid });
     expect(createCustomTokenSpy).to.have.been.calledWith(uid);
   });
 
