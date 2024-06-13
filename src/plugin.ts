@@ -10,12 +10,6 @@ import tasks, {
 } from './tasks';
 import { protectProduction, initializeFirebase } from './firebase-utils';
 
-type TaskKey =
-  | 'callRtdb'
-  | 'callFirestore'
-  | 'createCustomToken'
-  | 'getAuthUser';
-
 export type PluginConfig = {
   protectProduction?: protectProduction;
 };
