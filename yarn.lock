@@ -2431,12 +2431,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:20.14.2":
-  version: 20.14.2
-  resolution: "@types/node@npm:20.14.2"
+"@types/node@npm:20.14.12":
+  version: 20.14.12
+  resolution: "@types/node@npm:20.14.12"
   dependencies:
     undici-types: "npm:~5.26.4"
-  checksum: 10c0/2d86e5f2227aaa42212e82ea0affe72799111b888ff900916376450b02b09b963ca888b20d9c332d8d2b833ed4781987867a38eaa2e4863fa8439071468b0a6f
+  checksum: 10c0/59bc5fa11fdd23fd517f859063118f54a1ab53d3399ef63c926f8902429d7453abc0db22ef4b0a6110026b6ab81b6472fee894e1d235c24b01a0b3e10cfae0bb
   languageName: node
   linkType: hard
 
@@ -4656,7 +4656,7 @@ __metadata:
     "@size-limit/webpack": "npm:11.1.4"
     "@types/chai": "npm:4.3.16"
     "@types/mocha": "npm:10.0.6"
-    "@types/node": "npm:20.14.2"
+    "@types/node": "npm:20.14.12"
     "@types/sinon-chai": "npm:3.2.12"
     "@typescript-eslint/eslint-plugin": "npm:7.13.0"
     "@typescript-eslint/parser": "npm:7.13.0"
