@@ -1468,15 +1468,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@firebase/rules-unit-testing@npm:3.0.3":
-  version: 3.0.3
-  resolution: "@firebase/rules-unit-testing@npm:3.0.3"
+"@firebase/rules-unit-testing@npm:3.0.4":
+  version: 3.0.4
+  resolution: "@firebase/rules-unit-testing@npm:3.0.4"
   dependencies:
     "@types/node-fetch": "npm:2.6.4"
     node-fetch: "npm:2.6.7"
   peerDependencies:
     firebase: ^10.0.0
-  checksum: 10c0/97f832b408c7baea691786224263854058c87597c04c3fe51d8cb411750ef6becef767180be287ecb19f03bbce36eebb50fd0ee7add6ba23383f891b35d811de
+  checksum: 10c0/1094d85148057c0a86c951f73eba44ad43d9a4f022f2fa2011061361123b11077fef19e4244f23b14ab6cc583360d1c275531e97bd2fb6deb42b2f7ab7f943cf
   languageName: node
   linkType: hard
 
@@ -4650,7 +4650,7 @@ __metadata:
   dependencies:
     "@commitlint/cli": "npm:19.3.0"
     "@commitlint/config-conventional": "npm:19.2.2"
-    "@firebase/rules-unit-testing": "npm:3.0.3"
+    "@firebase/rules-unit-testing": "npm:3.0.4"
     "@istanbuljs/nyc-config-typescript": "npm:1.0.2"
     "@size-limit/preset-small-lib": "npm:11.1.4"
     "@size-limit/webpack": "npm:11.1.4"
