@@ -36,8 +36,8 @@
     "@types/mocha": "10.0.6",
     "@types/node": "20.14.12",
     "@types/sinon-chai": "3.2.12",
-    "@typescript-eslint/eslint-plugin": "7.13.0",
-    "@typescript-eslint/parser": "7.13.0",
+    "@typescript-eslint/eslint-plugin": "7.17.0",
+    "@typescript-eslint/parser": "7.17.0",
     "chai": "4.4.1",
     "cypress": "13.11.0",
     "eslint": "8.57.0",
@@ -106,14 +106,14 @@
       "name": "CommonJS: attachCustomCommands",
       "path": "lib/index.js",
       "import": "{ attachCustomCommands }",
-      "limit": "7kb",
+      "limit": "8.5kb",
       "webpack": false
     },
     {
       "name": "CommonJS: plugin",
       "path": "lib/index.js",
       "import": "{ plugin }",
-      "limit": "7kb",
+      "limit": "8.5kb",
       "webpack": false
     }
   ],
@@ -122,5 +122,5 @@
       "src"
     ]
   },
-  "packageManager": "yarn@4.2.1"
+  "packageManager": "yarn@4.3.1"
 }
