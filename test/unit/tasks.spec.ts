@@ -168,8 +168,17 @@ describe('tasks', () => {
       it('supports multi-where', async () => {
         await projectFirestoreRef.set(testProject);
         const secondProjectId = 'some';
-        const secondProject = { name: 'another', status: 'asdf' };
+        const secondProject = {
+          name: 'another',
+          status: 'asdf',
+          anotherProperty: 'ghjk',
+        };
         await projectsFirestoreRef.doc(secondProjectId).set(secondProject);
+        await projectsFirestoreRef.doc('confounding').set({
+          name: 'another',
+          status: 'asdf',
+          anotherProperty: 'we-must-not-match-this',
+        });
         const result = await tasks.callFirestore(
           adminApp,
           'get',
@@ -178,9 +187,11 @@ describe('tasks', () => {
             where: [
               ['name', '==', secondProject.name],
               ['status', '==', secondProject.status],
+              ['anotherProperty', '==', secondProject.anotherProperty],
             ],
           },
         );
+        expect(result).to.have.length(1);
         expect(result[0]).to.have.property('id', secondProjectId);
         expect(result[0]).to.have.property('name', secondProject.name);
         expect(result[0]).to.have.property('status', secondProject.status);

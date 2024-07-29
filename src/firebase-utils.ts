@@ -274,12 +274,13 @@ export function slashPathToFirestoreRef(
     typeof ref.where === 'function'
   ) {
     if (Array.isArray(options.where[0])) {
-      const [where1, where2] = options.where as WhereOptions[];
-      ref = applyWhere(
-        applyWhere(ref, where1, options.statics || firestoreStatics),
-        where2,
-        options.statics || firestoreStatics,
-      );
+      (options.where as WhereOptions[]).forEach((whereCondition) => {
+        ref = applyWhere(
+          ref,
+          whereCondition,
+          options.statics || firestoreStatics,
+        );
+      });
     } else {
       ref = applyWhere(
         ref,
