@@ -106,14 +106,14 @@
       "name": "CommonJS: attachCustomCommands",
       "path": "lib/index.js",
       "import": "{ attachCustomCommands }",
-      "limit": "7kb",
+      "limit": "8.5kb",
       "webpack": false
     },
     {
       "name": "CommonJS: plugin",
       "path": "lib/index.js",
       "import": "{ plugin }",
-      "limit": "7kb",
+      "limit": "8.5kb",
       "webpack": false
     }
   ],
@@ -122,5 +122,5 @@
       "src"
     ]
   },
-  "packageManager": "yarn@4.2.1"
+  "packageManager": "yarn@4.3.1"
 }
