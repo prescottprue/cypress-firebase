@@ -594,6 +594,50 @@ const cypressConfig = defineConfig({
 export default cypressConfig;
 ```
 
+#### Plugin Configuration
+
+A fifth argument is used for further configuration of the plugin.
+
+##### protectProduction
+
+The plugin tries to detect whether or not the firebase emulators are running, based on the respective environment variables being set or not. When the an emulator isn't running, production could be targeted instead which might be dangerous. The `protectProduction` key configures the behaviour when the emulator for a specific firebase service hasn't been detected. The options for the behaviour when an emalator is not running are:
+
+- `'none'` _(default)_ no protection is granted in this case, nor will a warning be output to the console. Production could be targeted.
+- `'warn'` a warning will be output to the console, but no further protection is granted. Production could be targeted.
+- `'error'` an error is thrown, preventing cypress starting alltogether. This makes sure your production cannot be targeted for this service.
+
+```js
+import admin from 'firebase-admin';
+import { defineConfig } from 'cypress';
+import { plugin as cypressFirebasePlugin } from 'cypress-firebase';
+
+const cypressConfig = defineConfig({
+  e2e: {
+    baseUrl: 'http://localhost:3000',
+    setupNodeEvents(on, config) {
+      return cypressFirebasePlugin(
+        on,
+        config,
+        admin,
+        {}, // AppOptions override
+        {
+          protectProduction: {
+            // when rtdb emulator isn't detected, a console warning will appear
+            rtdb: 'warn',
+            // plugin will be indifferent to the firestore emulator running or not
+            firestore: 'none',
+            // when auth emulator isn't detected, an error is thrown halting cypress
+            auth: 'error',
+          },
+        },
+      );
+    },
+  },
+});
+
+export default cypressConfig;
+```
+
 ## Recipes
 
 ### Using Emulators

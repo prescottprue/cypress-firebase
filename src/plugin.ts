@@ -8,7 +8,11 @@ import tasks, {
   TaskNameToReturn,
   taskSettingKeys,
 } from './tasks';
-import { initializeFirebase } from './firebase-utils';
+import { protectProduction, initializeFirebase } from './firebase-utils';
+
+export type PluginConfig = {
+  protectProduction?: protectProduction;
+};
 
 /**
  * Cypress plugin which attaches tasks used by custom commands
@@ -20,6 +24,7 @@ import { initializeFirebase } from './firebase-utils';
  * @param cypressConfig - Cypress config
  * @param adminInstance - firebase-admin instance
  * @param overrideConfig - Override config for firebase instance
+ * @param pluginConfig - Plugin config
  * @returns Extended Cypress config
  */
 export default function pluginWithTasks(
@@ -27,10 +32,15 @@ export default function pluginWithTasks(
   cypressConfig: Cypress.PluginConfigOptions,
   adminInstance: any,
   overrideConfig?: AppOptions,
+  pluginConfig?: PluginConfig,
 ): ExtendedCypressConfig {
   // Only initialize admin instance if it hasn't already been initialized
   if (adminInstance.apps && adminInstance.apps.length === 0) {
-    initializeFirebase(adminInstance, overrideConfig);
+    initializeFirebase(
+      adminInstance,
+      overrideConfig,
+      pluginConfig && pluginConfig.protectProduction,
+    );
   }
   // Parse single argument from task into arguments for task methods while
   // also passing the admin instance
