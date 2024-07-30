@@ -24,7 +24,7 @@
     "cross-env": "7.0.3",
     "cypress": "13.13.1",
     "cypress-firebase": "4.2.0",
-    "eslint-plugin-chai-friendly": "0.8.0",
+    "eslint-plugin-chai-friendly": "1.0.1",
     "eslint-plugin-cypress": "2.15.2",
     "firebase-admin": "11.11.1",
     "firebase-tools": "13.14.2",
