@@ -2261,12 +2261,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:20.14.13, @types/node@npm:^20.10.3":
+"@types/node@npm:20.14.13":
   version: 20.14.13
   resolution: "@types/node@npm:20.14.13"
   dependencies:
     undici-types: "npm:~5.26.4"
   checksum: 10c0/10bb3ece675308742301c652ab8c6cb88b1ebddebed22316103c58f94fe7eff131edd5f679e487c19077fadb6b5e6b1ad9a60a2cee2869aa1f20452b9761d570
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^22.0.1":
+  version: 22.1.0
+  resolution: "@types/node@npm:22.1.0"
+  dependencies:
+    undici-types: "npm:~6.13.0"
+  checksum: 10c0/553dafcb842b889c036d43b390d464e8ffcf3ca455ddd5b1a1ef98396381eafbeb0c112a15cc6bf9662b72bc25fc45efc4b6f604760e1e84c410f1b7936c488b
   languageName: node
   linkType: hard
 
@@ -4509,7 +4518,7 @@ __metadata:
     eslint-plugin-jsx-a11y: "npm:6.9.0"
     eslint-plugin-prettier: "npm:5.2.1"
     firebase: "npm:10.12.4"
-    firebase-admin: "npm:12.3.0"
+    firebase-admin: "npm:12.3.1"
     firebase-tools: "npm:13.14.2"
     husky: "npm:9.1.4"
     lint-staged: "npm:15.2.7"
@@ -6355,16 +6364,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-admin@npm:12.3.0":
-  version: 12.3.0
-  resolution: "firebase-admin@npm:12.3.0"
+"firebase-admin@npm:12.3.1":
+  version: 12.3.1
+  resolution: "firebase-admin@npm:12.3.1"
   dependencies:
     "@fastify/busboy": "npm:^3.0.0"
     "@firebase/database-compat": "npm:^1.0.2"
     "@firebase/database-types": "npm:^1.0.0"
     "@google-cloud/firestore": "npm:^7.7.0"
     "@google-cloud/storage": "npm:^7.7.0"
-    "@types/node": "npm:^20.10.3"
+    "@types/node": "npm:^22.0.1"
     farmhash-modern: "npm:^1.1.0"
     jsonwebtoken: "npm:^9.0.0"
     jwks-rsa: "npm:^3.1.0"
@@ -6375,7 +6384,7 @@ __metadata:
       optional: true
     "@google-cloud/storage":
       optional: true
-  checksum: 10c0/f7dd1dac01781f0db53cba2e4d7f2400fed22966c87d12ae5ea17e84cedf779c44038b641370acd982e8bfac96ccd51eab27471d927ea9cf4def1e8f62541f95
+  checksum: 10c0/9d26c79902765471b1bbdb3a88a7704a3dacf441ceb9fda46877f92e6da86eb4804ba1d8d4ec1681bea07f7966a3105edf544d6d7a46c474a2d363d7529b2ad4
   languageName: node
   linkType: hard
 
@@ -12852,6 +12861,13 @@ __metadata:
   version: 5.26.5
   resolution: "undici-types@npm:5.26.5"
   checksum: 10c0/bb673d7876c2d411b6eb6c560e0c571eef4a01c1c19925175d16e3a30c4c428181fb8d7ae802a261f283e4166a0ac435e2f505743aa9e45d893f9a3df017b501
+  languageName: node
+  linkType: hard
+
+"undici-types@npm:~6.13.0":
+  version: 6.13.0
+  resolution: "undici-types@npm:6.13.0"
+  checksum: 10c0/2de55181f569c77a4f08063f8bf2722fcbb6ea312a26a9e927bd1f5ea5cf3a281c5ddf23155061db083e0a25838f54813543ff13b0ac34d230d5c1205ead66c1
   languageName: node
   linkType: hard
 
