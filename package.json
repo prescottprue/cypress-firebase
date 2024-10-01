@@ -51,7 +51,7 @@
     "firebase": "10.12.4",
     "firebase-admin": "12.3.0",
     "firebase-tools": "13.14.2",
-    "husky": "9.1.4",
+    "husky": "9.1.6",
     "lint-staged": "15.2.7",
     "mocha": "10.7.3",
     "nyc": "17.0.0",
