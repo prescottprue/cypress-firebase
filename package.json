@@ -26,8 +26,8 @@
     "firebase-admin": "^11.0.0 || ^12.0.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "19.3.0",
-    "@commitlint/config-conventional": "19.2.2",
+    "@commitlint/cli": "19.5.0",
+    "@commitlint/config-conventional": "19.5.0",
     "@firebase/rules-unit-testing": "3.0.4",
     "@istanbuljs/nyc-config-typescript": "1.0.2",
     "@size-limit/preset-small-lib": "11.1.6",
