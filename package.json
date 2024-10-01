@@ -59,7 +59,7 @@
     "rimraf": "6.0.1",
     "sinon": "15.2.0",
     "sinon-chai": "4.0.0",
-    "size-limit": "11.1.4",
+    "size-limit": "11.1.6",
     "tsx": "4.16.2",
     "typescript": "5.5.4"
   },
