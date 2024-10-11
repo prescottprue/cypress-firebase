@@ -2301,10 +2301,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/mocha@npm:10.0.8":
-  version: 10.0.8
-  resolution: "@types/mocha@npm:10.0.8"
-  checksum: 10c0/af01f70cf2888762e79e91219dcc28b5d82c85d9a1c8ba4606d3ae30748be7e2cb9f06d680ad36112c78f5e568d0423a65ba8b7c53d02d37b193787bbc03d088
+"@types/mocha@npm:10.0.9":
+  version: 10.0.9
+  resolution: "@types/mocha@npm:10.0.9"
+  checksum: 10c0/76dd782ac7e971ea159d4a7fd40c929afa051e040be3f41187ff03a2d7b3279e19828ddaa498ba1757b3e6b91316263bb7640db0e906938275b97a06e087b989
   languageName: node
   linkType: hard
 
@@ -4598,7 +4598,7 @@ __metadata:
     "@size-limit/preset-small-lib": "npm:11.1.6"
     "@size-limit/webpack": "npm:11.1.6"
     "@types/chai": "npm:4.3.20"
-    "@types/mocha": "npm:10.0.8"
+    "@types/mocha": "npm:10.0.9"
     "@types/node": "npm:20.16.10"
     "@types/sinon-chai": "npm:4.0.0"
     "@typescript-eslint/eslint-plugin": "npm:7.18.0"
