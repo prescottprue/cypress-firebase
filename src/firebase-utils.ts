@@ -60,7 +60,7 @@ function getServiceAccount(): ServiceAccount | undefined {
   if (serviceAccountEnvVar) {
     try {
       return JSON.parse(serviceAccountEnvVar);
-    } catch (err) {
+    } catch {
       /* eslint-disable no-console */
       console.warn(
         `cypress-firebase: Issue parsing "SERVICE_ACCOUNT" environment variable from string to object, returning string`,
