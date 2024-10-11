@@ -43,6 +43,8 @@ jobs:
         run: yarn lint
 
       - name: Check Formatting
+        # NOTE: Node 18 giving erroneous formatting errors on package.json
+        if: matrix.node-version == '20.x'
         run: yarn format:check
 
       - name: Run Unit Tests + Coverage
