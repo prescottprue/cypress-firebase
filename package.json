@@ -10,7 +10,7 @@
     "build": "tsc",
     "watch": "yarn build --watch",
     "format": "biome format --write",
-    "format-check": "biome format",
+    "format:check": "biome format",
     "lint": "biome lint",
     "lint:fix": "biome lint --write",
     "test:base": "GCLOUD_PROJECT=test-project NODE_OPTIONS='--import tsx' mocha ./test/unit/**/*.spec.ts",
