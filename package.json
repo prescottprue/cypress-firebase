@@ -9,10 +9,10 @@
     "clean": "rimraf lib lib-esm",
     "build": "tsc",
     "watch": "yarn build --watch",
-    "lint": "eslint . --ext .js,.ts",
-    "lint:fix": "yarn lint --fix",
-    "format:check": "prettier --check .",
-    "format": "prettier --write .",
+    "format": "biome format --write",
+    "format-check": "biome format",
+    "lint": "biome lint",
+    "lint:fix": "biome lint --write",
     "test:base": "GCLOUD_PROJECT=test-project NODE_OPTIONS='--import tsx' mocha ./test/unit/**/*.spec.ts",
     "test:cov:base": "nyc --reporter=lcov --reporter=html yarn test:base",
     "test:watch": "yarn test:base --watch",
@@ -26,6 +26,7 @@
     "firebase-admin": "^11.0.0 || ^12.0.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.3",
     "@commitlint/cli": "19.5.0",
     "@commitlint/config-conventional": "19.5.0",
     "@firebase/rules-unit-testing": "3.0.4",
@@ -36,18 +37,8 @@
     "@types/mocha": "10.0.9",
     "@types/node": "20.16.11",
     "@types/sinon-chai": "4.0.0",
-    "@typescript-eslint/eslint-plugin": "8.8.1",
-    "@typescript-eslint/parser": "8.8.1",
     "chai": "4.5.0",
     "cypress": "13.15.0",
-    "eslint": "8.57.1",
-    "eslint-config-airbnb-base": "15.0.0",
-    "eslint-config-prettier": "9.1.0",
-    "eslint-plugin-babel": "5.3.1",
-    "eslint-plugin-import": "2.31.0",
-    "eslint-plugin-jsdoc": "50.3.1",
-    "eslint-plugin-jsx-a11y": "6.10.0",
-    "eslint-plugin-prettier": "5.2.1",
     "firebase": "10.14.1",
     "firebase-admin": "12.3.0",
     "firebase-tools": "13.22.0",
@@ -55,7 +46,6 @@
     "lint-staged": "15.2.10",
     "mocha": "10.7.3",
     "nyc": "17.1.0",
-    "prettier": "3.3.3",
     "rimraf": "6.0.1",
     "sinon": "15.2.0",
     "sinon-chai": "4.0.0",
@@ -87,19 +77,9 @@
     "os": false,
     "path": false
   },
-  "files": [
-    "bin",
-    "cmds",
-    "lib",
-    "index.d.ts"
-  ],
+  "files": ["bin", "cmds", "lib", "index.d.ts"],
   "lint-staged": {
-    "*.{json,md,yaml,yml}": [
-      "prettier --write"
-    ],
-    "*.{js,ts}": [
-      "eslint --fix"
-    ]
+    "*.{js,ts,json,md,yaml,yml}": ["biome check --write"]
   },
   "size-limit": [
     {
@@ -118,9 +98,7 @@
     }
   ],
   "nyc": {
-    "include": [
-      "src"
-    ]
+    "include": ["src"]
   },
   "packageManager": "yarn@4.5.0"
 }

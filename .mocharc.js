@@ -1,3 +1,4 @@
+// biome-ignore lint/suspicious/noRedundantUseStrict: preserve
 'use strict';
 
 module.exports = {

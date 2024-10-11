@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import extendWithFirebaseConfig, {
-  ExtendedCypressConfig,
+  type ExtendedCypressConfig,
 } from '../../src/extendWithFirebaseConfig';
 
 describe('extendWithFirebaseConfig', () => {

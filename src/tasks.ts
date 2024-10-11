@@ -1,16 +1,16 @@
-import type { database, firestore, auth, app } from 'firebase-admin';
-import {
-  FixtureData,
-  FirestoreAction,
-  RTDBAction,
-  CallRtdbOptions,
-  CallFirestoreOptions,
+import type { app, auth, database, firestore } from 'firebase-admin';
+import type {
   AttachCustomCommandParams,
+  CallFirestoreOptions,
+  CallRtdbOptions,
+  FirestoreAction,
+  FixtureData,
+  RTDBAction,
 } from './attachCustomCommands';
 import {
-  slashPathToFirestoreRef,
   deleteCollection,
   isDocPath,
+  slashPathToFirestoreRef,
 } from './firebase-utils';
 
 /**
@@ -23,6 +23,7 @@ function optionsToRtdbRef(
   options?: CallRtdbOptions,
 ): database.Reference | database.Query {
   let newRef = baseRef;
+  // biome-ignore lint/complexity/noForEach: small list
   [
     'orderByChild',
     'orderByKey',
@@ -75,7 +76,6 @@ export function convertValueToTimestampOrGeoPointIfPossible(
   dataVal: any,
   firestoreStatics: typeof firestore,
 ): firestore.FieldValue {
-  /* eslint-disable no-underscore-dangle */
   if (
     (dataVal && dataVal._methodName === 'serverTimestamp') ||
     (dataVal && dataVal._methodName === 'FieldValue.serverTimestamp') // v8 and earlier
@@ -88,7 +88,6 @@ export function convertValueToTimestampOrGeoPointIfPossible(
   ) {
     return firestoreStatics.FieldValue.delete();
   }
-  /* eslint-enable no-underscore-dangle */
   if (
     typeof dataVal !== 'undefined' &&
     dataVal !== null &&
@@ -128,12 +127,12 @@ function getDataWithTimestampsAndGeoPoints(
       typeof currData === 'object' &&
       currData !== null &&
       !Array.isArray(currData) &&
-      /* eslint-disable-next-line no-underscore-dangle */
       !currData._methodName &&
       !currData.seconds &&
       !(currData.latitude && currData.longitude)
     ) {
       return {
+        // biome-ignore lint/performance/noAccumulatingSpread: will switch when changing src
         ...acc,
         [currKey]: getDataWithTimestampsAndGeoPoints(
           currData,
@@ -155,6 +154,7 @@ function getDataWithTimestampsAndGeoPoints(
       : convertValueToTimestampOrGeoPointIfPossible(currData, firestoreStatics);
 
     return {
+      // biome-ignore lint/performance/noAccumulatingSpread: will switch when changing src
       ...acc,
       [currKey]: value,
     };
@@ -209,12 +209,11 @@ export async function callRtdb(
     // "You must return a promise, a value, or null to indicate that the task was handled."
     return null;
   } catch (err) {
-    /* eslint-disable no-console */
+    // biome-ignore lint/suspicious/noConsole: Intentional logging
     console.error(
       `cypress-firebase: Error with RTDB "${action}" at path "${actionPath}" :`,
       err,
     );
-    /* eslint-enable no-console */
     throw err;
   }
 }
@@ -321,12 +320,11 @@ export async function callFirestore(
       ) as any
     )[action](dataToSet);
   } catch (err) {
-    /* eslint-disable no-console */
+    // biome-ignore lint/suspicious/noConsole: Intentional logging
     console.error(
       `cypress-firebase: Error with Firestore "${action}" at path "${actionPath}" :`,
       err,
     );
-    /* eslint-enable no-console */
     throw err;
   }
 }

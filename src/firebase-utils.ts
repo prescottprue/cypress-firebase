@@ -1,5 +1,8 @@
-import type { AppOptions, app, firestore, credential } from 'firebase-admin';
-import { CallFirestoreOptions, WhereOptions } from './attachCustomCommands';
+import type { AppOptions, app, credential, firestore } from 'firebase-admin';
+import type {
+  CallFirestoreOptions,
+  WhereOptions,
+} from './attachCustomCommands';
 import { convertValueToTimestampOrGeoPointIfPossible } from './tasks';
 
 /**
@@ -31,11 +34,10 @@ function firestoreSettingsFromEnv(): FirebaseFirestore.Settings {
   const [servicePath, portStr] = FIRESTORE_EMULATOR_HOST.split(':');
   return {
     servicePath,
-    port: parseInt(portStr, 10),
+    port: Number.parseInt(portStr, 10),
   };
 }
 
-/* eslint-disable camelcase */
 interface ServiceAccount {
   type: string;
   project_id: string;
@@ -48,7 +50,6 @@ interface ServiceAccount {
   auth_provider_x509_cert_url: string;
   client_x509_cert_url: string;
 }
-/* eslint-enable camelcase */
 
 /**
  * Get service account from either SERVICE_ACCOUNT environment variable
@@ -61,11 +62,10 @@ function getServiceAccount(): ServiceAccount | undefined {
     try {
       return JSON.parse(serviceAccountEnvVar);
     } catch {
-      /* eslint-disable no-console */
+      // biome-ignore lint/suspicious/noConsole: Intentional logging
       console.warn(
         `cypress-firebase: Issue parsing "SERVICE_ACCOUNT" environment variable from string to object, returning string`,
       );
-      /* eslint-enable no-console */
     }
   }
 }
@@ -86,7 +86,8 @@ function getFirebaseCredential(
   // Add default credentials if they exist
   const defaultCredentials = adminInstance.credential.applicationDefault();
   if (defaultCredentials) {
-    console.log('cypress-firebase: Using default credentials'); // eslint-disable-line no-console
+    // biome-ignore lint/suspicious/noConsole: Intentional logging
+    console.log('cypress-firebase: Using default credentials');
     return defaultCredentials;
   }
 }
@@ -132,22 +133,20 @@ export function initializeFirebase(
     };
 
     if (FIREBASE_DATABASE_EMULATOR_HOST) {
-      /* eslint-disable no-console */
+      // biome-ignore lint/suspicious/noConsole: Intentional logging
       console.log(
         'cypress-firebase: Using RTDB emulator with host:',
         FIREBASE_DATABASE_EMULATOR_HOST,
       );
-      /* eslint-enable no-console */
     } else if (
       protectProduction &&
       protectProduction.rtdb &&
       protectProduction.rtdb !== 'none'
     ) {
-      /* eslint-disable no-console */
+      // biome-ignore lint/suspicious/noConsole: Intentional logging
       console.warn(
         'cypress-firebase: FIREBASE_DATABASE_EMULATOR_HOST is not set, RTDB operations may alter production instead of emulator!',
       );
-      /* eslint-enable no-console */
       if (protectProduction.rtdb === 'error') {
         throw new Error(
           'cypress-firebase: FIREBASE_DATABASE_EMULATOR_HOST is not set. Set FIREBASE_DATABASE_EMULATOR_HOST environment variable or change protectProduction.rtdb setting',
@@ -156,22 +155,20 @@ export function initializeFirebase(
     }
 
     if (process.env.FIREBASE_AUTH_EMULATOR_HOST) {
-      /* eslint-disable no-console */
+      // biome-ignore lint/suspicious/noConsole: Intentional logging
       console.log(
         'cypress-firebase: Using Auth emulator with port:',
         process.env.FIREBASE_AUTH_EMULATOR_HOST,
       );
-      /* eslint-enable no-console */
     } else if (
       protectProduction &&
       protectProduction.auth &&
       protectProduction.auth !== 'none'
     ) {
-      /* eslint-disable no-console */
+      // biome-ignore lint/suspicious/noConsole: Intentional logging
       console.warn(
         'cypress-firebase: FIREBASE_AUTH_EMULATOR_HOST is not set, auth operations may alter production instead of emulator!',
       );
-      /* eslint-enable no-console */
       if (protectProduction.auth === 'error') {
         throw new Error(
           'cypress-firebase: FIREBASE_AUTH_EMULATOR_HOST is not set. Set FIREBASE_AUTH_EMULATOR_HOST environment variable or change protectProduction.auth setting',
@@ -191,7 +188,7 @@ export function initializeFirebase(
     if (!fbConfig.projectId) {
       const projectId =
         process.env.GCLOUD_PROJECT ||
-        (((fbConfig as any) && (fbConfig.credential as any)) || {}).projectId; // eslint-disable-line camelcase
+        (((fbConfig as any) && (fbConfig.credential as any)) || {}).projectId;
       if (projectId) {
         fbConfig.projectId = projectId;
       }
@@ -209,45 +206,41 @@ export function initializeFirebase(
     // Initialize Firestore with emulator host settings
     if (process.env.FIRESTORE_EMULATOR_HOST) {
       const firestoreSettings = firestoreSettingsFromEnv();
-      /* eslint-disable no-console */
+      // biome-ignore lint/suspicious/noConsole: Intentional logging
       console.log(
         'cypress-firebase: Using Firestore emulator with settings:',
         firestoreSettings,
       );
-      /* eslint-enable no-console */
       adminInstance.firestore().settings(firestoreSettings);
     } else if (
       protectProduction &&
       protectProduction.firestore &&
       protectProduction.firestore !== 'none'
     ) {
-      /* eslint-disable no-console */
+      // biome-ignore lint/suspicious/noConsole: Intentional logging
       console.warn(
         'cypress-firebase: FIRESTORE_EMULATOR_HOST is not set, Firestore operations may alter production instead of emulator!',
       );
-      /* eslint-enable no-console */
       if (protectProduction.firestore === 'error') {
         throw new Error(
           'cypress-firebase: FIRESTORE_EMULATOR_HOST is not set. Set FIRESTORE_EMULATOR_HOST environment variable or change protectProduction.firestore setting',
         );
       }
     }
-    /* eslint-disable no-console */
     const dbUrlLog = fbConfig.databaseURL
       ? ` and databaseURL "${fbConfig.databaseURL}"`
       : '';
+    // biome-ignore lint/suspicious/noConsole: Intentional logging
     console.log(
       `cypress-firebase: Initialized Firebase app for project "${fbConfig.projectId}"${dbUrlLog}`,
     );
-    /* eslint-enable no-console */
     return fbInstance;
   } catch (err) {
-    /* eslint-disable no-console */
+    // biome-ignore lint/suspicious/noConsole: Intentional logging
     console.error(
       'cypress-firebase: Error initializing firebase-admin instance:',
       err instanceof Error && err.message,
     );
-    /* eslint-enable no-console */
     throw err;
   }
 }
@@ -327,6 +320,7 @@ export function slashPathToFirestoreRef(
     typeof ref.where === 'function'
   ) {
     if (Array.isArray(options.where[0])) {
+      // biome-ignore lint/complexity/noForEach: will change when updating src
       (options.where as WhereOptions[]).forEach((whereCondition) => {
         ref = applyWhere(
           ref,
@@ -378,6 +372,7 @@ function deleteQueryBatch(
 
       // Delete documents in a batch
       const batch = db.batch();
+      // biome-ignore lint/complexity/noForEach: will change when updating src
       snapshot.docs.forEach((doc: firestore.QueryDocumentSnapshot) => {
         batch.delete(doc.ref);
       });

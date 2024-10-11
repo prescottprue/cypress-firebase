@@ -1,8 +1,8 @@
-import { expect } from 'chai';
 import {
+  type RulesTestEnvironment,
   initializeTestEnvironment,
-  RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
+import { expect } from 'chai';
 import * as admin from 'firebase-admin';
 import sinon from 'sinon';
 import * as tasks from '../../src/tasks';
@@ -541,7 +541,6 @@ describe('tasks', () => {
           );
 
           const resultSnap = await projectFirestoreRef.get();
-          /* eslint-disable no-underscore-dangle */
           expect(resultSnap.data()).to.have.nested.property(
             'timeProperty._seconds',
             correctTimestamp._seconds,
@@ -550,7 +549,6 @@ describe('tasks', () => {
             'timeProperty._nanoseconds',
             correctTimestamp._nanoseconds,
           );
-          /* eslint-enable no-underscore-dangle */
         });
 
         it('updates a document with a nested timestamp value', async () => {
@@ -577,7 +575,6 @@ describe('tasks', () => {
           );
 
           const resultSnap = await projectFirestoreRef.get();
-          /* eslint-disable no-underscore-dangle */
           expect(resultSnap.data()).to.have.nested.property(
             'time.nested._seconds',
             correctTimestamp._seconds,
@@ -602,7 +599,6 @@ describe('tasks', () => {
             'time.mapInArrayNested[0].nested._nanoseconds',
             correctTimestamp._nanoseconds,
           );
-          /* eslint-enable no-underscore-dangle */
         });
       });
     });

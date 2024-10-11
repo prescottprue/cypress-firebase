@@ -3,8 +3,7 @@ test
 coverage
 .istanbul.yml
 .babelrc
-.eslintignore
-.eslintrc
+biome.json
 .github
 yarn.lock
 .travis.yml
