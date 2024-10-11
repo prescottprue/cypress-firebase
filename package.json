@@ -50,7 +50,7 @@
     "eslint-plugin-prettier": "5.2.1",
     "firebase": "10.14.1",
     "firebase-admin": "12.3.0",
-    "firebase-tools": "13.20.2",
+    "firebase-tools": "13.22.0",
     "husky": "9.1.6",
     "lint-staged": "15.2.10",
     "mocha": "10.7.3",
