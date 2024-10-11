@@ -261,7 +261,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@biomejs/biome@npm:^1.9.3":
+"@biomejs/biome@npm:1.9.3":
   version: 1.9.3
   resolution: "@biomejs/biome@npm:1.9.3"
   dependencies:
@@ -4198,7 +4198,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "cypress-firebase@workspace:."
   dependencies:
-    "@biomejs/biome": "npm:^1.9.3"
+    "@biomejs/biome": "npm:1.9.3"
     "@commitlint/cli": "npm:19.5.0"
     "@commitlint/config-conventional": "npm:19.5.0"
     "@firebase/rules-unit-testing": "npm:3.0.4"
