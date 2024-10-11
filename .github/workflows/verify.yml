@@ -43,9 +43,7 @@ jobs:
         run: yarn lint
 
       - name: Check Formatting
-        run: |
-          cat package.json
-          yarn format:check
+        run: yarn format:check
 
       - name: Run Unit Tests + Coverage
         run: yarn test:cov
