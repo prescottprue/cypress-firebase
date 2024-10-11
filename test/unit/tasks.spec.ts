@@ -9,6 +9,7 @@ import * as tasks from '../../src/tasks';
 
 const PROJECTS_COLLECTION = 'projects';
 const PROJECT_ID = 'project-1';
+const ORDER_BY_COLLECTION = 'order-by';
 const PROJECT_PATH = `${PROJECTS_COLLECTION}/${PROJECT_ID}`;
 const testProject = { name: 'project 1' };
 /**
@@ -23,6 +24,10 @@ const adminApp = admin.initializeApp({
 const projectsFirestoreRef = adminApp
   .firestore()
   .collection(PROJECTS_COLLECTION);
+// Separate collection for ordering to prevent collissions with projects ref
+const orderByCollectionRef = adminApp
+  .firestore()
+  .collection(ORDER_BY_COLLECTION);
 const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
 
 describe('tasks', () => {
@@ -243,15 +248,14 @@ describe('tasks', () => {
         expect(result[0]).to.have.property('name', testProject.name);
       });
 
-      it('supports orderBy', async function () {
-        this.retries(3);
+      it('supports orderBy', async () => {
         const secondProject = { name: 'aaaa' };
-        await projectsFirestoreRef.add({ name: 'zzzzz' });
-        await projectsFirestoreRef.add(secondProject);
+        await orderByCollectionRef.add({ name: 'zzzzz' });
+        await orderByCollectionRef.add(secondProject);
         const result = await tasks.callFirestore(
           adminApp,
           'get',
-          PROJECTS_COLLECTION,
+          ORDER_BY_COLLECTION,
           {
             orderBy: 'name',
           },
@@ -260,22 +264,20 @@ describe('tasks', () => {
         expect(result[0]).to.have.property('name', secondProject.name);
       });
 
-      it('supports orderBy with direction', async function () {
-        this.retries(3);
-        await projectFirestoreRef.set(testProject);
-        const secondProjectId = 'some';
+      it('supports orderBy with direction', async () => {
+        const secondOrderById = 'some';
         const secondProject = { name: 'zzzzz' };
-        await projectsFirestoreRef.doc(secondProjectId).set(secondProject);
+        await orderByCollectionRef.doc(secondOrderById).set(secondProject);
         const result = await tasks.callFirestore(
           adminApp,
           'get',
-          PROJECTS_COLLECTION,
+          ORDER_BY_COLLECTION,
           {
             orderBy: ['name', 'desc'],
           },
         );
         expect(result).to.be.an('array');
-        expect(result[0]).to.have.property('id', secondProjectId);
+        expect(result[0]).to.have.property('id', secondOrderById);
         expect(result[0]).to.have.property('name', secondProject.name);
       });
     });
