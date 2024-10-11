@@ -1,7 +1,7 @@
-import sinon from 'sinon';
 import { expect } from 'chai';
+import sinon from 'sinon';
+import type { protectProduction } from '../../src/firebase-utils';
 import pluginWithTasks from '../../src/plugin';
-import { protectProduction } from '../../src/firebase-utils';
 
 describe('plugin', () => {
   afterEach(() => {

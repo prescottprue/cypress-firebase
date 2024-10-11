@@ -1,14 +1,14 @@
 import type { AppOptions } from 'firebase-admin';
-import type { TaskName } from './tasks';
 import extendWithFirebaseConfig, {
-  ExtendedCypressConfig,
+  type ExtendedCypressConfig,
 } from './extendWithFirebaseConfig';
+import { initializeFirebase, type protectProduction } from './firebase-utils';
+import type { TaskName } from './tasks';
 import tasks, {
-  TaskNameToParams,
-  TaskNameToReturn,
+  type TaskNameToParams,
+  type TaskNameToReturn,
   taskSettingKeys,
 } from './tasks';
-import { protectProduction, initializeFirebase } from './firebase-utils';
 
 export type PluginConfig = {
   protectProduction?: protectProduction;

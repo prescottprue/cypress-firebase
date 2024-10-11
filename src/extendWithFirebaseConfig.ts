@@ -44,6 +44,7 @@ export default function extendWithFirebaseConfig(
     'GCLOUD_PROJECT',
   ].reduce(
     (acc, varKey) =>
+      // biome-ignore lint/performance/noAccumulatingSpread: list is small
       process.env[varKey] ? { ...acc, [varKey]: process.env[varKey] } : acc,
     {},
   );

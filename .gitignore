@@ -9,7 +9,6 @@ es
 *.log*
 .nyc_output/**
 coverage/**
-**/*.eslintcache
 .pnp.*
 .yarn/*
 !.yarn/patches

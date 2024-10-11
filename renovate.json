@@ -1,6 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>prescottprue/renovate-config:library"],
+  "extends": [
+    "github>prescottprue/renovate-config:library",
+    "customManagers:biomeVersions"
+  ],
   "packageRules": [
     {
       "description": "Disable dep updates to react-redux-firebase example (needs manual updating)",

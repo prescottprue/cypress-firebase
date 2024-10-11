@@ -1,6 +1,6 @@
 import type { auth, firestore } from 'firebase-admin';
 import type { authCreateUser } from './tasks';
-import { typedTask, TaskNameToParams } from './tasks';
+import { type TaskNameToParams, typedTask } from './tasks';
 
 /**
  * Params for attachCustomCommand function for
@@ -165,9 +165,7 @@ export interface CallRtdbOptions {
 
 // Add custom commands to the existing Cypress interface
 declare global {
-  /* eslint-disable @typescript-eslint/no-namespace */
   namespace Cypress {
-    /* eslint-enable @typescript-eslint/no-namespace,@typescript-eslint/no-unused-vars */
     interface Chainable {
       /**
        * Call Real Time Database path with some specified action. Authentication is through
@@ -944,6 +942,7 @@ export default function attachCustomCommands(
         // Attach options if they exist
         taskSettings.options = options;
       }
+      // biome-ignore lint/correctness/noVoidTypeReturn: keeping src the same
       return cy.task('callFirestore', taskSettings);
     },
   );
