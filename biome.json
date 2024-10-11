@@ -39,6 +39,12 @@
   },
   "overrides": [
     {
+      "include": ["**/package.json"],
+      "formatter": {
+        "lineWidth": 1
+      }
+    },
+    {
       "include": ["test/**"],
       "linter": {
         "rules": {

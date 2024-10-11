@@ -77,7 +77,12 @@
     "os": false,
     "path": false
   },
-  "files": ["bin", "cmds", "lib", "index.d.ts"],
+  "files": [
+    "bin",
+    "cmds",
+    "lib",
+    "index.d.ts"
+  ],
   "lint-staged": {
     "*.{js,ts,json,md,yaml,yml}": [
       "biome check --no-errors-on-unmatched --write"
@@ -100,7 +105,9 @@
     }
   ],
   "nyc": {
-    "include": ["src"]
+    "include": [
+      "src"
+    ]
   },
   "packageManager": "yarn@4.5.0"
 }
