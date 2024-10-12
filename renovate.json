@@ -9,6 +9,11 @@
       "description": "Disable dep updates to react-redux-firebase example (needs manual updating)",
       "matchPaths": ["examples/react-redux-firebase/**"],
       "enabled": false
+    },
+    {
+      "description": "Prevent update of chai to v5 - it requires ESM",
+      "matchPackageNames": ["chai", "@types/chai"],
+      "allowedVersions": "^4"
     }
   ]
 }
