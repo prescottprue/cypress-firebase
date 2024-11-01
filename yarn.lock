@@ -4146,7 +4146,7 @@ __metadata:
     cypress: "npm:13.15.1"
     firebase: "npm:10.14.1"
     firebase-admin: "npm:12.7.0"
-    firebase-tools: "npm:13.23.0"
+    firebase-tools: "npm:13.23.1"
     husky: "npm:9.1.6"
     lint-staged: "npm:15.2.10"
     mocha: "npm:10.8.2"
@@ -5404,9 +5404,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-tools@npm:13.23.0":
-  version: 13.23.0
-  resolution: "firebase-tools@npm:13.23.0"
+"firebase-tools@npm:13.23.1":
+  version: 13.23.1
+  resolution: "firebase-tools@npm:13.23.1"
   dependencies:
     "@electric-sql/pglite": "npm:^0.2.0"
     "@google-cloud/cloud-sql-connector": "npm:^1.3.3"
@@ -5462,7 +5462,6 @@ __metadata:
     sql-formatter: "npm:^15.3.0"
     stream-chain: "npm:^2.2.4"
     stream-json: "npm:^1.7.3"
-    strip-ansi: "npm:^6.0.1"
     superstatic: "npm:^9.0.3"
     tar: "npm:^6.1.11"
     tcp-port-used: "npm:^1.0.2"
@@ -5477,7 +5476,7 @@ __metadata:
     yaml: "npm:^2.4.1"
   bin:
     firebase: lib/bin/firebase.js
-  checksum: 10c0/4f22e02042ff133e9075a7b6d33336c9739c4099bb61f0eeb55f9f59cf712548371bc2608fb6074a603db8c8c37c66b78e7438e17c9bc6c311ac271f39f60285
+  checksum: 10c0/89824b6199c50aea7ac268b49f8be606bb027b309ac693fbc326b261c861e7f73c25a483796424cf745ee7420c624e611e331008176dcba06d63fc72f9788ac6
   languageName: node
   linkType: hard
 
