@@ -3498,10 +3498,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:^4.0.1":
-  version: 4.1.1
-  resolution: "commander@npm:4.1.1"
-  checksum: 10c0/84a76c08fe6cc08c9c93f62ac573d2907d8e79138999312c92d4155bc2325d487d64d13f669b2000c9f8caf70493c1be2dac74fec3c51d5a04f8bc3ae1830bab
+"commander@npm:^5.1.0":
+  version: 5.1.0
+  resolution: "commander@npm:5.1.0"
+  checksum: 10c0/da9d71dbe4ce039faf1fe9eac3771dca8c11d66963341f62602f7b66e36d2a3f8883407af4f9a37b1db1a55c59c0c1325f186425764c2e963dc1d67aec2a4b6d
   languageName: node
   linkType: hard
 
@@ -3841,7 +3841,7 @@ __metadata:
     cypress: "npm:13.16.0"
     firebase: "npm:10.14.1"
     firebase-admin: "npm:12.7.0"
-    firebase-tools: "npm:13.25.0"
+    firebase-tools: "npm:13.27.0"
     husky: "npm:9.1.7"
     lint-staged: "npm:15.2.10"
     mocha: "npm:10.8.2"
@@ -5022,9 +5022,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-tools@npm:13.25.0":
-  version: 13.25.0
-  resolution: "firebase-tools@npm:13.25.0"
+"firebase-tools@npm:13.27.0":
+  version: 13.27.0
+  resolution: "firebase-tools@npm:13.27.0"
   dependencies:
     "@electric-sql/pglite": "npm:^0.2.0"
     "@google-cloud/cloud-sql-connector": "npm:^1.3.3"
@@ -5038,7 +5038,7 @@ __metadata:
     cjson: "npm:^0.3.1"
     cli-table: "npm:0.3.11"
     colorette: "npm:^2.0.19"
-    commander: "npm:^4.0.1"
+    commander: "npm:^5.1.0"
     configstore: "npm:^5.0.1"
     cors: "npm:^2.8.5"
     cross-env: "npm:^5.1.3"
@@ -5094,7 +5094,7 @@ __metadata:
     yaml: "npm:^2.4.1"
   bin:
     firebase: lib/bin/firebase.js
-  checksum: 10c0/cba3e7f965cdeff8a141db0aa2d4afdd7f13b9501950ca1bb02d320aa1d41ce1355ee7f981fcb2c5f370a32cbd32e100af2412c82c92ccb52fbdd11aee712349
+  checksum: 10c0/9eaeaf34c8e09c32a3efc6897e761a7dc546aa0310322ed812a389e77823be1f3ea458898ff728a9e296b05f0fcfae7293738a8f07ce1bba0bc5b833dc7996c4
   languageName: node
   linkType: hard
 
