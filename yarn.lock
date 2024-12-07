@@ -3841,7 +3841,7 @@ __metadata:
     cypress: "npm:13.16.1"
     firebase: "npm:10.14.1"
     firebase-admin: "npm:12.7.0"
-    firebase-tools: "npm:13.27.0"
+    firebase-tools: "npm:13.28.0"
     husky: "npm:9.1.7"
     lint-staged: "npm:15.2.10"
     mocha: "npm:10.8.2"
@@ -5022,9 +5022,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-tools@npm:13.27.0":
-  version: 13.27.0
-  resolution: "firebase-tools@npm:13.27.0"
+"firebase-tools@npm:13.28.0":
+  version: 13.28.0
+  resolution: "firebase-tools@npm:13.28.0"
   dependencies:
     "@electric-sql/pglite": "npm:^0.2.0"
     "@google-cloud/cloud-sql-connector": "npm:^1.3.3"
@@ -5057,6 +5057,7 @@ __metadata:
     google-auth-library: "npm:^9.11.0"
     inquirer: "npm:^8.2.6"
     inquirer-autocomplete-prompt: "npm:^2.0.1"
+    js-yaml: "npm:^3.14.1"
     jsonwebtoken: "npm:^9.0.0"
     leven: "npm:^3.1.0"
     libsodium-wrappers: "npm:^0.7.10"
@@ -5080,7 +5081,7 @@ __metadata:
     sql-formatter: "npm:^15.3.0"
     stream-chain: "npm:^2.2.4"
     stream-json: "npm:^1.7.3"
-    superstatic: "npm:^9.0.3"
+    superstatic: "npm:^9.1.0"
     tar: "npm:^6.1.11"
     tcp-port-used: "npm:^1.0.2"
     tmp: "npm:^0.2.3"
@@ -5094,7 +5095,7 @@ __metadata:
     yaml: "npm:^2.4.1"
   bin:
     firebase: lib/bin/firebase.js
-  checksum: 10c0/9eaeaf34c8e09c32a3efc6897e761a7dc546aa0310322ed812a389e77823be1f3ea458898ff728a9e296b05f0fcfae7293738a8f07ce1bba0bc5b833dc7996c4
+  checksum: 10c0/b2783e7e43a653fa0d1a4cb6a45fd8599716802a0b1c4809b972874270d1e27a2c09a1a59593224c7729677467cb6f6d12923f04b8142c9c67478179a59aa836
   languageName: node
   linkType: hard
 
@@ -6199,6 +6200,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"is-promise@npm:4.0.0":
+  version: 4.0.0
+  resolution: "is-promise@npm:4.0.0"
+  checksum: 10c0/ebd5c672d73db781ab33ccb155fb9969d6028e37414d609b115cc534654c91ccd061821d5b987eefaa97cf4c62f0b909bb2f04db88306de26e91bfe8ddc01503
+  languageName: node
+  linkType: hard
+
 "is-stream-ended@npm:^0.1.4":
   version: 0.1.4
   resolution: "is-stream-ended@npm:0.1.4"
@@ -6485,7 +6493,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:^3.13.1":
+"js-yaml@npm:^3.13.1, js-yaml@npm:^3.14.1":
   version: 3.14.1
   resolution: "js-yaml@npm:3.14.1"
   dependencies:
@@ -8230,13 +8238,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"path-to-regexp@npm:0.1.7":
-  version: 0.1.7
-  resolution: "path-to-regexp@npm:0.1.7"
-  checksum: 10c0/50a1ddb1af41a9e68bd67ca8e331a705899d16fb720a1ea3a41e310480948387daf603abb14d7b0826c58f10146d49050a1291ba6a82b78a382d1c02c0b8f905
-  languageName: node
-  linkType: hard
-
 "path-to-regexp@npm:^1.8.0":
   version: 1.9.0
   resolution: "path-to-regexp@npm:1.9.0"
@@ -8246,7 +8247,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"path-to-regexp@npm:^8.1.0":
+"path-to-regexp@npm:^8.0.0, path-to-regexp@npm:^8.1.0":
   version: 8.2.0
   resolution: "path-to-regexp@npm:8.2.0"
   checksum: 10c0/ef7d0a887b603c0a142fad16ccebdcdc42910f0b14830517c724466ad676107476bba2fe9fffd28fd4c141391ccd42ea426f32bb44c2c82ecaefe10c37b90f5a
@@ -8922,18 +8923,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"router@npm:^1.3.1":
-  version: 1.3.8
-  resolution: "router@npm:1.3.8"
+"router@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "router@npm:2.0.0"
   dependencies:
     array-flatten: "npm:3.0.0"
-    debug: "npm:2.6.9"
+    is-promise: "npm:4.0.0"
     methods: "npm:~1.1.2"
     parseurl: "npm:~1.3.3"
-    path-to-regexp: "npm:0.1.7"
+    path-to-regexp: "npm:^8.0.0"
     setprototypeof: "npm:1.2.0"
     utils-merge: "npm:1.0.1"
-  checksum: 10c0/328adcea82ac4dc120aa84e29904003dd55bfd79bb444813a07ab7c08cf19f16ab5bfaecb88ff34f9e086b15a43ffa879ae95271693e689364fdaae9c5e4e304
+  checksum: 10c0/6d5345a98c7f9b4427599478701d3cbff4f92954dce870c81036e12ae5f204b570507821c00cdb30b39365b91bc2b3830e95aa11fc181476030faa25fafaca84
   languageName: node
   linkType: hard
 
@@ -9582,9 +9583,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"superstatic@npm:^9.0.3":
-  version: 9.0.3
-  resolution: "superstatic@npm:9.0.3"
+"superstatic@npm:^9.1.0":
+  version: 9.1.0
+  resolution: "superstatic@npm:9.1.0"
   dependencies:
     basic-auth-connect: "npm:^1.0.0"
     commander: "npm:^10.0.0"
@@ -9603,14 +9604,14 @@ __metadata:
     on-headers: "npm:^1.0.0"
     path-to-regexp: "npm:^1.8.0"
     re2: "npm:^1.17.7"
-    router: "npm:^1.3.1"
+    router: "npm:^2.0.0"
     update-notifier-cjs: "npm:^5.1.6"
   dependenciesMeta:
     re2:
       optional: true
   bin:
     superstatic: lib/bin/server.js
-  checksum: 10c0/33f76399543563f1af0cebad9ea74b33e1694146b290c1e68b0ac9f05265a07309d0ea7a32f6f879b235c1b1173921c578e122ed99a8cc4c9c4ad7a68bd527a5
+  checksum: 10c0/b01cdfb0d7fb068ef0d8c5226c90d6e0bc2d4f7a0a05f571e5c8d6306fea1340f63062426339b9e4859c4a65af4c779557d4799e37a7aee6d46ed639909329cc
   languageName: node
   linkType: hard
 
