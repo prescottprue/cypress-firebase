@@ -16,8 +16,8 @@
   },
   "dependencies": {
     "firebase": "10.14.1",
-    "react": "18.3.1",
-    "react-dom": "18.3.1"
+    "react": "19.0.0",
+    "react-dom": "19.0.0"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "6.6.3",
@@ -25,8 +25,8 @@
     "@testing-library/user-event": "14.5.2",
     "@types/jest": "29.5.14",
     "@types/node": "20.17.11",
-    "@types/react": "18.3.18",
-    "@types/react-dom": "18.3.5",
+    "@types/react": "19.0.2",
+    "@types/react-dom": "19.0.2",
     "cross-env": "7.0.3",
     "cypress": "13.17.0",
     "cypress-firebase": "4.2.1",
