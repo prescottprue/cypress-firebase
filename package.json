@@ -27,8 +27,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@commitlint/cli": "19.6.1",
-    "@commitlint/config-conventional": "19.6.0",
+    "@commitlint/cli": "19.7.1",
+    "@commitlint/config-conventional": "19.7.1",
     "@firebase/rules-unit-testing": "3.0.4",
     "@istanbuljs/nyc-config-typescript": "1.0.2",
     "@size-limit/preset-small-lib": "11.1.6",
