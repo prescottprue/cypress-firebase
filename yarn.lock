@@ -3936,7 +3936,7 @@ __metadata:
     cypress: "npm:13.17.0"
     firebase: "npm:10.14.1"
     firebase-admin: "npm:12.7.0"
-    firebase-tools: "npm:13.29.3"
+    firebase-tools: "npm:13.30.0"
     husky: "npm:9.1.7"
     lint-staged: "npm:15.4.3"
     mocha: "npm:10.8.2"
@@ -5126,9 +5126,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-tools@npm:13.29.3":
-  version: 13.29.3
-  resolution: "firebase-tools@npm:13.29.3"
+"firebase-tools@npm:13.30.0":
+  version: 13.30.0
+  resolution: "firebase-tools@npm:13.30.0"
   dependencies:
     "@electric-sql/pglite": "npm:^0.2.16"
     "@google-cloud/cloud-sql-connector": "npm:^1.3.3"
@@ -5200,7 +5200,7 @@ __metadata:
     yaml: "npm:^2.4.1"
   bin:
     firebase: lib/bin/firebase.js
-  checksum: 10c0/0dac86c1d6889df797e187d334374fc28a22c6b3c1a6798926c7a0fc290e03fbda0a2b43216fb95f3dcd407eb199ff64fb85acb07fb41ad2d98b56bf25097256
+  checksum: 10c0/f7c0c21d8bec20414f785b9ea264add018583c450172949f7d6b7ccca2934cb8e31690e2230c87455c715fe2236302ef761ab6ed1a603b56dee52337bb5e84b8
   languageName: node
   linkType: hard
 
