@@ -1986,12 +1986,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:20.17.19":
-  version: 20.17.19
-  resolution: "@types/node@npm:20.17.19"
+"@types/node@npm:20.17.24":
+  version: 20.17.24
+  resolution: "@types/node@npm:20.17.24"
   dependencies:
     undici-types: "npm:~6.19.2"
-  checksum: 10c0/930e554eadeb0c2848f9225007ef66ea9c7fe987c80e2f2c1a9f316b297036d4054bbc5459b67051cf32cd360a022344c2998dcb1ec7579109f631b6d5f21bf8
+  checksum: 10c0/2a39ce4c4cd4588a05b2a485cc0a1407cbea608dd1ab03e36add59d61712718d95c84b492ca5190753f0be2bce748aeeb0f2a1412e712775462befe3820b3ff9
   languageName: node
   linkType: hard
 
@@ -3743,7 +3743,7 @@ __metadata:
     "@size-limit/webpack": "npm:11.2.0"
     "@types/chai": "npm:4.3.20"
     "@types/mocha": "npm:10.0.10"
-    "@types/node": "npm:20.17.19"
+    "@types/node": "npm:20.17.24"
     "@types/sinon-chai": "npm:4.0.0"
     chai: "npm:4.5.0"
     cypress: "npm:13.17.0"
