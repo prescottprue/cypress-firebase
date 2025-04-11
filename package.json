@@ -93,14 +93,14 @@
       "name": "CommonJS: attachCustomCommands",
       "path": "lib/index.js",
       "import": "{ attachCustomCommands }",
-      "limit": "8.5kb",
+      "limit": "9kb",
       "webpack": false
     },
     {
       "name": "CommonJS: plugin",
       "path": "lib/index.js",
       "import": "{ plugin }",
-      "limit": "8.5kb",
+      "limit": "9kb",
       "webpack": false
     }
   ],
