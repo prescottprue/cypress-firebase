@@ -72,7 +72,7 @@ jobs:
         run: yarn test:cov
 
       - name: Upload Test Coverage
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
