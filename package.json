@@ -38,7 +38,7 @@
     "@types/node": "20.17.46",
     "@types/sinon-chai": "4.0.0",
     "chai": "4.5.0",
-    "cypress": "14.3.2",
+    "cypress": "14.3.3",
     "firebase": "10.14.1",
     "firebase-admin": "12.7.0",
     "firebase-tools": "13.35.1",
