@@ -27,31 +27,31 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@commitlint/cli": "19.7.1",
-    "@commitlint/config-conventional": "19.7.1",
+    "@commitlint/cli": "19.8.1",
+    "@commitlint/config-conventional": "19.8.1",
     "@firebase/rules-unit-testing": "3.0.4",
     "@istanbuljs/nyc-config-typescript": "1.0.2",
     "@size-limit/preset-small-lib": "11.2.0",
     "@size-limit/webpack": "11.2.0",
     "@types/chai": "4.3.20",
     "@types/mocha": "10.0.10",
-    "@types/node": "20.17.24",
+    "@types/node": "20.17.50",
     "@types/sinon-chai": "4.0.0",
     "chai": "4.5.0",
-    "cypress": "13.17.0",
+    "cypress": "14.4.0",
     "firebase": "10.14.1",
     "firebase-admin": "12.7.0",
-    "firebase-tools": "13.32.0",
+    "firebase-tools": "13.35.1",
     "husky": "9.1.7",
-    "lint-staged": "15.4.3",
+    "lint-staged": "16.1.2",
     "mocha": "10.8.2",
     "nyc": "17.1.0",
     "rimraf": "6.0.1",
-    "sinon": "19.0.2",
+    "sinon": "20.0.0",
     "sinon-chai": "4.0.0",
     "size-limit": "11.2.0",
-    "tsx": "4.19.3",
-    "typescript": "5.7.3"
+    "tsx": "4.19.4",
+    "typescript": "5.8.3"
   },
   "keywords": [
     "cypress",
@@ -93,14 +93,14 @@
       "name": "CommonJS: attachCustomCommands",
       "path": "lib/index.js",
       "import": "{ attachCustomCommands }",
-      "limit": "8.5kb",
+      "limit": "9kb",
       "webpack": false
     },
     {
       "name": "CommonJS: plugin",
       "path": "lib/index.js",
       "import": "{ plugin }",
-      "limit": "8.5kb",
+      "limit": "9kb",
       "webpack": false
     }
   ],
@@ -109,5 +109,5 @@
       "src"
     ]
   },
-  "packageManager": "yarn@4.5.1"
+  "packageManager": "yarn@4.9.2"
 }
