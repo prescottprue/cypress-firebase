@@ -3779,7 +3779,7 @@ __metadata:
     "@types/node": "npm:20.17.50"
     "@types/sinon-chai": "npm:4.0.0"
     chai: "npm:4.5.0"
-    cypress: "npm:14.4.0"
+    cypress: "npm:14.5.2"
     firebase: "npm:10.14.1"
     firebase-admin: "npm:12.7.0"
     firebase-tools: "npm:13.35.1"
@@ -3798,9 +3798,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"cypress@npm:14.4.0":
-  version: 14.4.0
-  resolution: "cypress@npm:14.4.0"
+"cypress@npm:14.5.2":
+  version: 14.5.2
+  resolution: "cypress@npm:14.5.2"
   dependencies:
     "@cypress/request": "npm:^3.0.8"
     "@cypress/xvfb": "npm:^1.2.4"
@@ -3828,6 +3828,7 @@ __metadata:
     figures: "npm:^3.2.0"
     fs-extra: "npm:^9.1.0"
     getos: "npm:^3.2.1"
+    hasha: "npm:5.2.2"
     is-installed-globally: "npm:~0.4.0"
     lazy-ass: "npm:^1.6.0"
     listr2: "npm:^3.8.3"
@@ -3847,7 +3848,7 @@ __metadata:
     yauzl: "npm:^2.10.0"
   bin:
     cypress: bin/cypress
-  checksum: 10c0/bca4d04b3245dab4e7c57f36014f4b9b6920caba7b7c7b602c1bdd4e467fd3f9eeec0ca18ea82c3cdfa5aa5c2e396060fea2bd2c63325bc45bd7895c501f4a0b
+  checksum: 10c0/55d1ba4773dc7d22769e6566bbdd5a78fd16dde4a4806d474de18a2713ed313db3d0734486f774fe11b3078c66d6b03703dfac05c26746ee3d704317734ebc0e
   languageName: node
   linkType: hard
 
@@ -5587,7 +5588,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hasha@npm:^5.0.0":
+"hasha@npm:5.2.2, hasha@npm:^5.0.0":
   version: 5.2.2
   resolution: "hasha@npm:5.2.2"
   dependencies:
