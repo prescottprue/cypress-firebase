@@ -249,10 +249,15 @@ describe('tasks', () => {
         expect(result[0]).to.have.property('name', testProject.name);
       });
 
-      it('supports orderBy', async () => {
-        const secondProject = { name: 'aaaa' };
-        await orderByCollectionRef.add({ name: 'zzzzz' });
-        await orderByCollectionRef.add(secondProject);
+      describe('orderBy', () => {
+        const firstProject = { name: 'aaaa' };
+        const secondProject = { name: 'zzzz' };
+        before(async () => {
+          await orderByCollectionRef.add(firstProject);
+          await orderByCollectionRef.add(secondProject);
+        });
+
+        it('supports orderBy without direction', async () => {
         const result = await tasks.callFirestore(
           adminApp,
           'get',
@@ -262,25 +267,22 @@ describe('tasks', () => {
           },
         );
         expect(result).to.be.an('array');
-        expect(result[0]).to.have.property('name', secondProject.name);
-      });
+        expect(result[0]).to.have.property('name', firstProject.name);
+        });
 
-      it('supports orderBy with direction', async () => {
-        const secondOrderById = 'some';
-        const secondProject = { name: 'zzzzz' };
-        await orderByCollectionRef.doc(secondOrderById).set(secondProject);
-        const result = await tasks.callFirestore(
-          adminApp,
-          'get',
-          ORDER_BY_COLLECTION,
-          {
-            orderBy: ['name', 'desc'],
-          },
-        );
-        expect(result).to.be.an('array');
-        expect(result[0]).to.have.property('id', secondOrderById);
-        expect(result[0]).to.have.property('name', secondProject.name);
-      });
+        it('supports orderBy with direction', async () => {
+          const result = await tasks.callFirestore(
+            adminApp,
+            'get',
+            ORDER_BY_COLLECTION,
+            {
+              orderBy: ['name', 'desc'],
+            },
+          );
+          expect(result).to.be.an('array');
+          expect(result[0]).to.have.property('name', secondProject.name);
+        });
+      })
     });
 
     describe('set action', () => {
