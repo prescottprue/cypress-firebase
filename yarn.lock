@@ -1199,15 +1199,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@firebase/rules-unit-testing@npm:3.0.4":
-  version: 3.0.4
-  resolution: "@firebase/rules-unit-testing@npm:3.0.4"
-  dependencies:
-    "@types/node-fetch": "npm:2.6.4"
-    node-fetch: "npm:2.6.7"
+"@firebase/rules-unit-testing@npm:5.0.0":
+  version: 5.0.0
+  resolution: "@firebase/rules-unit-testing@npm:5.0.0"
   peerDependencies:
-    firebase: ^10.0.0
-  checksum: 10c0/1094d85148057c0a86c951f73eba44ad43d9a4f022f2fa2011061361123b11077fef19e4244f23b14ab6cc583360d1c275531e97bd2fb6deb42b2f7ab7f943cf
+    firebase: ^12.0.0
+  checksum: 10c0/2165daa55bd5356279aabfa23c8d3f4779f67dbc50be27f54bf563f642be8f9b1446a2353a92313fe74aa9755e0c43642641b6195541310c9a9f25faee0942a1
   languageName: node
   linkType: hard
 
@@ -1957,16 +1954,6 @@ __metadata:
   version: 10.0.10
   resolution: "@types/mocha@npm:10.0.10"
   checksum: 10c0/d2b8c48138cde6923493e42b38e839695eb42edd04629abe480a8f34c0e3f50dd82a55832c2e8d2b6e6f9e4deb492d7d733e600fbbdd5a0ceccbcfc6844ff9d5
-  languageName: node
-  linkType: hard
-
-"@types/node-fetch@npm:2.6.4":
-  version: 2.6.4
-  resolution: "@types/node-fetch@npm:2.6.4"
-  dependencies:
-    "@types/node": "npm:*"
-    form-data: "npm:^3.0.0"
-  checksum: 10c0/e43e4670ed8b7693dbf660ac1450b14fcfcdd8efca1eb0f501b6ad95af2d1fa06f8541db03e9511e82a5fee510a238fe0913330c9a58f8ac6892b985f6dd993e
   languageName: node
   linkType: hard
 
@@ -3770,7 +3757,7 @@ __metadata:
     "@biomejs/biome": "npm:1.9.4"
     "@commitlint/cli": "npm:19.8.1"
     "@commitlint/config-conventional": "npm:19.8.1"
-    "@firebase/rules-unit-testing": "npm:3.0.4"
+    "@firebase/rules-unit-testing": "npm:5.0.0"
     "@istanbuljs/nyc-config-typescript": "npm:1.0.2"
     "@size-limit/preset-small-lib": "npm:11.2.0"
     "@size-limit/webpack": "npm:11.2.0"
@@ -5051,17 +5038,6 @@ __metadata:
     mime-types: "npm:^2.1.12"
     safe-buffer: "npm:^5.2.1"
   checksum: 10c0/af7cb13fc8423ff95fd59c62d101c84b5458a73e1e426b0bc459afbf5b93b1e447dc6c225ac31c6df59f36b209904a3f1a10b4eb9e7a17e0fe394019749142cc
-  languageName: node
-  linkType: hard
-
-"form-data@npm:^3.0.0":
-  version: 3.0.2
-  resolution: "form-data@npm:3.0.2"
-  dependencies:
-    asynckit: "npm:^0.4.0"
-    combined-stream: "npm:^1.0.8"
-    mime-types: "npm:^2.1.12"
-  checksum: 10c0/1157ba53ce3a381ea3321b5506ae843ead4027e1b4567b74afa7d84df7043b33c5e518bb267dac56036c3dd8f4d8268be3e7181691488fff766bfccdc98d3bf7
   languageName: node
   linkType: hard
 
@@ -7566,20 +7542,6 @@ __metadata:
     emojilib: "npm:^2.4.0"
     skin-tone: "npm:^2.0.0"
   checksum: 10c0/9525defbd90a82a2131758c2470203fa2a2faa8edd177147a8654a26307fe03594e52847ecbe2746d06cfc5c50acd12bd500f035350a7609e8217c9894c19aad
-  languageName: node
-  linkType: hard
-
-"node-fetch@npm:2.6.7":
-  version: 2.6.7
-  resolution: "node-fetch@npm:2.6.7"
-  dependencies:
-    whatwg-url: "npm:^5.0.0"
-  peerDependencies:
-    encoding: ^0.1.0
-  peerDependenciesMeta:
-    encoding:
-      optional: true
-  checksum: 10c0/fcae80f5ac52fbf5012f5e19df2bd3915e67d3b3ad51cb5942943df2238d32ba15890fecabd0e166876a9f98a581ab50f3f10eb942b09405c49ef8da36b826c7
   languageName: node
   linkType: hard
 
