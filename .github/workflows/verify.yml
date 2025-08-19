@@ -46,6 +46,8 @@ jobs:
         run: yarn format:check
 
       - name: Run Unit Tests + Coverage
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.SERVICE_ACCOUNT }}
         run: yarn test:cov
 
       - name: Upload Test Coverage
