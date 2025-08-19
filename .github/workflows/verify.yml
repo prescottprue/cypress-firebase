@@ -45,9 +45,11 @@ jobs:
       - name: Check Formatting
         run: yarn format:check
 
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: '${{ secrets.SERVICE_ACCOUNT }}'
+
       - name: Run Unit Tests + Coverage
-        env:
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.SERVICE_ACCOUNT }}
         run: yarn test:cov
 
       - name: Upload Test Coverage
