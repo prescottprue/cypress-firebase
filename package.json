@@ -44,7 +44,7 @@
     "firebase-tools": "13.35.1",
     "husky": "9.1.7",
     "lint-staged": "16.1.2",
-    "mocha": "10.8.2",
+    "mocha": "11.7.1",
     "nyc": "17.1.0",
     "rimraf": "6.0.1",
     "sinon": "20.0.0",
