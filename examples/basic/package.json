@@ -21,7 +21,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "cross-env": "7.0.3",
+    "cross-env": "10.0.0",
     "cypress": "14.5.4",
     "cypress-firebase": "4.2.1",
     "eslint-plugin-chai-friendly": "0.8.0",
