@@ -43,7 +43,7 @@
     "firebase-admin": "12.7.0",
     "firebase-tools": "13.35.1",
     "husky": "9.1.7",
-    "lint-staged": "16.1.2",
+    "lint-staged": "16.1.5",
     "mocha": "11.7.1",
     "nyc": "17.1.0",
     "rimraf": "6.0.1",
