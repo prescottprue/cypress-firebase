@@ -258,16 +258,16 @@ describe('tasks', () => {
         });
 
         it('supports orderBy without direction', async () => {
-        const result = await tasks.callFirestore(
-          adminApp,
-          'get',
-          ORDER_BY_COLLECTION,
-          {
-            orderBy: 'name',
-          },
-        );
-        expect(result).to.be.an('array');
-        expect(result[0]).to.have.property('name', firstProject.name);
+          const result = await tasks.callFirestore(
+            adminApp,
+            'get',
+            ORDER_BY_COLLECTION,
+            {
+              orderBy: 'name',
+            },
+          );
+          expect(result).to.be.an('array');
+          expect(result[0]).to.have.property('name', firstProject.name);
         });
 
         it('supports orderBy with direction', async () => {
@@ -282,7 +282,7 @@ describe('tasks', () => {
           expect(result).to.be.an('array');
           expect(result[0]).to.have.property('name', secondProject.name);
         });
-      })
+      });
     });
 
     describe('set action', () => {
