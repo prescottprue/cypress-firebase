@@ -16,3 +16,9 @@ coverage/**
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+examples/*/.yarn/*
+!examples/*/.yarn/patches
+!examples/*/.yarn/plugins
+!examples/*/.yarn/releases
+!examples/*/.yarn/sdks
+!examples/*/.yarn/versions
