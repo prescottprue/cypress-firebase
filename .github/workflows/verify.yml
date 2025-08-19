@@ -51,7 +51,7 @@ jobs:
       
       - name: Ugh
         run: |
-          echo ${{ secrets.SERVICE_ACCOUNT }} > ./serviceAccount.json
+          echo "${{ secrets.SERVICE_ACCOUNT }}" > ./serviceAccount.json
           cat ./serviceAccount.json
 
       - name: Run Unit Tests + Coverage
