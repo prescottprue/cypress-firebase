@@ -48,6 +48,11 @@ jobs:
       - uses: google-github-actions/auth@v2
         with:
           credentials_json: '${{ secrets.SERVICE_ACCOUNT }}'
+      
+      - name: Ugh
+        run: |
+          echo ${{ secrets.SERVICE_ACCOUNT }} > ./serviceAccount.json
+          cat ./serviceAccount.json
 
       - name: Run Unit Tests + Coverage
         run: yarn test:cov
