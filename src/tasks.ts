@@ -23,7 +23,6 @@ function optionsToRtdbRef(
   options?: CallRtdbOptions,
 ): database.Reference | database.Query {
   let newRef = baseRef;
-  // biome-ignore lint/complexity/noForEach: small list
   [
     'orderByChild',
     'orderByKey',
@@ -35,7 +34,8 @@ function optionsToRtdbRef(
     'endAt',
     'limitToFirst',
     'limitToLast',
-  ].forEach((optionName: string) => {
+  ]
+    .forEach((optionName: string) => {
     if (options && (options as any)[optionName]) {
       const args = (options as any)[optionName];
       // Spread arg arrays (such as startAfter and endBefore)

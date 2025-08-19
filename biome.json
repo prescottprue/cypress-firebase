@@ -7,21 +7,19 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": [
-      ".yarn",
-      "node_modules",
-      "coverage",
-      "lib",
-      "lib-esm",
-      "examples"
+    "includes": [
+      "**",
+      "!**/.yarn",
+      "!**/node_modules",
+      "!**/coverage",
+      "!**/lib",
+      "!**/lib-esm",
+      "!**/examples"
     ]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space"
-  },
-  "organizeImports": {
-    "enabled": true
   },
   "linter": {
     "enabled": true,
@@ -39,13 +37,13 @@
   },
   "overrides": [
     {
-      "include": ["**/package.json"],
+      "includes": ["**/package.json"],
       "formatter": {
         "lineWidth": 1
       }
     },
     {
-      "include": ["test/**"],
+      "includes": ["test/**"],
       "linter": {
         "rules": {
           "complexity": {
@@ -59,7 +57,7 @@
       }
     },
     {
-      "include": ["src/**"],
+      "includes": ["src/**"],
       "linter": {
         "rules": {
           "complexity": {
