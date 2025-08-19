@@ -51,7 +51,7 @@
     "sinon-chai": "4.0.0",
     "size-limit": "11.2.0",
     "tsx": "4.20.4",
-    "typescript": "5.8.3"
+    "typescript": "5.9.2"
   },
   "keywords": [
     "cypress",
