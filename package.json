@@ -23,7 +23,7 @@
     "prepare": "husky"
   },
   "peerDependencies": {
-    "firebase-admin": "^11.0.0 || ^12.0.0 || ^13.0.0"
+    "firebase-admin": ">=11.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.0",

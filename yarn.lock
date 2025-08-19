@@ -4108,7 +4108,7 @@ __metadata:
     tsx: "npm:4.20.4"
     typescript: "npm:5.9.2"
   peerDependencies:
-    firebase-admin: ^11.0.0 || ^12.0.0 || ^13.0.0
+    firebase-admin: ">=11.0.0"
   languageName: unknown
   linkType: soft
 
