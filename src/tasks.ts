@@ -34,8 +34,7 @@ function optionsToRtdbRef(
     'endAt',
     'limitToFirst',
     'limitToLast',
-  ]
-    .forEach((optionName: string) => {
+  ].forEach((optionName: string) => {
     if (options && (options as any)[optionName]) {
       const args = (options as any)[optionName];
       // Spread arg arrays (such as startAfter and endBefore)
