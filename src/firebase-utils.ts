@@ -320,7 +320,6 @@ export function slashPathToFirestoreRef(
     typeof ref.where === 'function'
   ) {
     if (Array.isArray(options.where[0])) {
-      // biome-ignore lint/complexity/noForEach: will change when updating src
       (options.where as WhereOptions[]).forEach((whereCondition) => {
         ref = applyWhere(
           ref,
@@ -372,7 +371,6 @@ function deleteQueryBatch(
 
       // Delete documents in a batch
       const batch = db.batch();
-      // biome-ignore lint/complexity/noForEach: will change when updating src
       snapshot.docs.forEach((doc: firestore.QueryDocumentSnapshot) => {
         batch.delete(doc.ref);
       });

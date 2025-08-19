@@ -14,6 +14,7 @@ const PROJECT_PATH = `${PROJECTS_COLLECTION}/${PROJECT_ID}`;
 const testProject = { name: 'project 1' };
 /**
  * Initialize firebase-admin SDK with emulator settings for RTDB
+ * Using conditional credential handling for Node.js compatibility
  */
 const adminApp = admin.initializeApp({
   projectId: process.env.GCLOUD_PROJECT,

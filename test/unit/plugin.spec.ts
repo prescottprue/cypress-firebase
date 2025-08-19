@@ -10,7 +10,7 @@ describe('plugin', () => {
 
   it('Should add tasks to cypress', () => {
     let assignedTasksObj;
-    const onFuncSpy = sinon.spy((action, tasksObj) => {
+    const onFuncSpy = sinon.spy((_action, tasksObj) => {
       assignedTasksObj = tasksObj;
     });
     const results = pluginWithTasks(
@@ -46,7 +46,7 @@ describe('plugin', () => {
 
   it('Should pass uid as first argument to a task if it exists in settings', () => {
     let assignedTasksObj;
-    const onFuncSpy = sinon.spy((action, tasksObj) => {
+    const onFuncSpy = sinon.spy((_action, tasksObj) => {
       assignedTasksObj = tasksObj;
     });
     const createCustomTokenSpy = sinon.spy(() => 'asdf');

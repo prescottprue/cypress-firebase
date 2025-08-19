@@ -23,7 +23,6 @@ function optionsToRtdbRef(
   options?: CallRtdbOptions,
 ): database.Reference | database.Query {
   let newRef = baseRef;
-  // biome-ignore lint/complexity/noForEach: small list
   [
     'orderByChild',
     'orderByKey',
