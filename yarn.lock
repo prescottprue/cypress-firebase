@@ -4103,7 +4103,7 @@ __metadata:
     nyc: "npm:17.1.0"
     rimraf: "npm:6.0.1"
     sinon: "npm:21.0.0"
-    sinon-chai: "npm:4.0.0"
+    sinon-chai: "npm:4.0.1"
     size-limit: "npm:11.2.0"
     tsx: "npm:4.20.4"
     typescript: "npm:5.9.2"
@@ -9604,13 +9604,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sinon-chai@npm:4.0.0":
-  version: 4.0.0
-  resolution: "sinon-chai@npm:4.0.0"
+"sinon-chai@npm:4.0.1":
+  version: 4.0.1
+  resolution: "sinon-chai@npm:4.0.1"
   peerDependencies:
-    chai: ^5.0.0
+    chai: ^5.0.0 || ^6.0.0
     sinon: ">=4.0.0"
-  checksum: 10c0/c2be6f7d964fd05dcd0870807a1447bc180703aca0cdf5ba7ed21bf2a8a2e0c8d1d2e464b2289982870dfe1b58ae797000cc742e23eeac8dd2f6339dea7d717b
+  checksum: 10c0/3d49a66151143f05636b732d4cb3ed078703dac19c8f32dd422c6b207a5eeb8f3208fe770853cb01f183190af79cdc8b83ccd07ef85c3d1b932222cd2c18fcd3
   languageName: node
   linkType: hard
 
