@@ -4393,7 +4393,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.17.2, @types/node@npm:^22.8.7":
+"@types/node@npm:22.18.0":
+  version: 22.18.0
+  resolution: "@types/node@npm:22.18.0"
+  dependencies:
+    undici-types: "npm:~6.21.0"
+  checksum: 10c0/02cce4493eee8408e66e76fcad164f33c0600ed0854ad08e5519a76a06402da5b589b278cf71bc975c9e014f2668bdf758bc3be7fed63bdbfd0900495372797c
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^22.8.7":
   version: 22.17.2
   resolution: "@types/node@npm:22.17.2"
   dependencies:
@@ -18511,7 +18520,7 @@ __metadata:
     "@testing-library/react": "npm:16.3.0"
     "@testing-library/user-event": "npm:14.6.1"
     "@types/jest": "npm:30.0.0"
-    "@types/node": "npm:22.17.2"
+    "@types/node": "npm:22.18.0"
     "@types/react": "npm:19.1.11"
     "@types/react-dom": "npm:19.1.7"
     cross-env: "npm:10.0.0"
