@@ -9429,9 +9429,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-admin@npm:13.4.0":
-  version: 13.4.0
-  resolution: "firebase-admin@npm:13.4.0"
+"firebase-admin@npm:13.5.0":
+  version: 13.5.0
+  resolution: "firebase-admin@npm:13.5.0"
   dependencies:
     "@fastify/busboy": "npm:^3.0.0"
     "@firebase/database-compat": "npm:^2.0.0"
@@ -9440,6 +9440,7 @@ __metadata:
     "@google-cloud/storage": "npm:^7.14.0"
     "@types/node": "npm:^22.8.7"
     farmhash-modern: "npm:^1.1.0"
+    fast-deep-equal: "npm:^3.1.1"
     google-auth-library: "npm:^9.14.2"
     jsonwebtoken: "npm:^9.0.0"
     jwks-rsa: "npm:^3.1.0"
@@ -9450,7 +9451,7 @@ __metadata:
       optional: true
     "@google-cloud/storage":
       optional: true
-  checksum: 10c0/95bb1d8dc99d4dde42494fe7eb8c9b2b0dacf1cb27deef83ba42d9acd671d4903fc0841ebb9bf3640eb7c1f650b7fa578f835395dcf8095b4504d153c2a69e3a
+  checksum: 10c0/141a2c53b86773e9d83a606640aa7f73dced1892a475f33d5e2e6a81f4b9c48a999e96cda7fc9c9160e57211007b32ce0b71ea36cdd7920ea47f69dbcd4ed8f7
   languageName: node
   linkType: hard
 
@@ -18529,7 +18530,7 @@ __metadata:
     eslint-plugin-chai-friendly: "npm:0.8.0"
     eslint-plugin-cypress: "npm:5.1.1"
     firebase: "npm:12.1.0"
-    firebase-admin: "npm:13.4.0"
+    firebase-admin: "npm:13.5.0"
     firebase-tools: "npm:14.15.1"
     react: "npm:19.1.1"
     react-dom: "npm:19.1.1"
