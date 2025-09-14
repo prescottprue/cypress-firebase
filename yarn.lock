@@ -2231,12 +2231,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:22.18.1":
-  version: 22.18.1
-  resolution: "@types/node@npm:22.18.1"
+"@types/node@npm:22.18.3":
+  version: 22.18.3
+  resolution: "@types/node@npm:22.18.3"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10c0/1912b0ea6cb9ef59722b0fed64652388e13b41d52569c16198f1278a882837bbf4c8a4ec913e852893356f07c0c44b4e00fbca289ac7222741d03449104e22fe
+  checksum: 10c0/29ec5674a7eaac50c4c779e937c4449e813ff70c411eb525b6e12837e7b88c39219c3c2f29e39ea8f72cd6b7975f8696dc05f78c07bce35a241e0c9eaf5523a8
   languageName: node
   linkType: hard
 
@@ -4099,7 +4099,7 @@ __metadata:
     "@size-limit/webpack": "npm:11.2.0"
     "@types/chai": "npm:4.3.20"
     "@types/mocha": "npm:10.0.10"
-    "@types/node": "npm:22.18.1"
+    "@types/node": "npm:22.18.3"
     "@types/sinon-chai": "npm:4.0.0"
     chai: "npm:4.5.0"
     cypress: "npm:15.2.0"
