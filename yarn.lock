@@ -4100,7 +4100,7 @@ __metadata:
     firebase-admin: "npm:13.5.0"
     firebase-tools: "npm:14.17.0"
     husky: "npm:9.1.7"
-    lint-staged: "npm:16.2.1"
+    lint-staged: "npm:16.2.2"
     mocha: "npm:11.7.2"
     nyc: "npm:17.1.0"
     rimraf: "npm:6.0.1"
@@ -7020,9 +7020,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lint-staged@npm:16.2.1":
-  version: 16.2.1
-  resolution: "lint-staged@npm:16.2.1"
+"lint-staged@npm:16.2.2":
+  version: 16.2.2
+  resolution: "lint-staged@npm:16.2.2"
   dependencies:
     commander: "npm:^14.0.1"
     listr2: "npm:^9.0.4"
@@ -7033,7 +7033,7 @@ __metadata:
     yaml: "npm:^2.8.1"
   bin:
     lint-staged: bin/lint-staged.js
-  checksum: 10c0/0f3211aad41b39cc5cf8a7d56398df5c8bd86264960fd0cd988b8121f772416b91d8140690040027553c633680266796da5f030d3c9e20f0a37c97c45a53b40d
+  checksum: 10c0/b2bd97f537f5331aed4f304afd32123f2774d20456a8be4df2ecc39ec9438cd969372f468e174469655a99c5c7085516f006e94d8d0659d3a5d21715e3e5c1a4
   languageName: node
   linkType: hard
 
