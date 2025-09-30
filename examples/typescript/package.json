@@ -35,7 +35,7 @@
     "firebase-admin": "13.5.0",
     "firebase-tools": "14.17.0",
     "react-scripts": "5.0.1",
-    "typescript": "5.9.2",
+    "typescript": "5.9.3",
     "web-vitals": "5.1.0"
   },
   "eslintConfig": {
