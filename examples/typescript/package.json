@@ -26,7 +26,7 @@
     "@types/jest": "30.0.0",
     "@types/node": "22.18.10",
     "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.1",
+    "@types/react-dom": "19.2.2",
     "cross-env": "10.1.0",
     "cypress": "15.4.0",
     "cypress-firebase": "4.2.2",
