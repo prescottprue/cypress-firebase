@@ -4216,7 +4216,7 @@ __metadata:
     cypress: "npm:15.4.0"
     firebase: "npm:12.4.0"
     firebase-admin: "npm:13.5.0"
-    firebase-tools: "npm:14.19.1"
+    firebase-tools: "npm:14.20.0"
     husky: "npm:9.1.7"
     lint-staged: "npm:16.2.4"
     mocha: "npm:11.7.4"
@@ -5409,9 +5409,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-tools@npm:14.19.1":
-  version: 14.19.1
-  resolution: "firebase-tools@npm:14.19.1"
+"firebase-tools@npm:14.20.0":
+  version: 14.20.0
+  resolution: "firebase-tools@npm:14.20.0"
   dependencies:
     "@apphosting/build": "npm:^0.1.6"
     "@apphosting/common": "npm:^0.0.8"
@@ -5491,7 +5491,7 @@ __metadata:
     zod-to-json-schema: "npm:^3.24.5"
   bin:
     firebase: lib/bin/firebase.js
-  checksum: 10c0/51042ec50eab8d4d6b4cce3b71ea34347f8fd71552a8c7b0f5cd0ed192788f196d79f8b3181eb18593183cf7e79bb7ac911372a55fda57cc1a709e84b5f7cc36
+  checksum: 10c0/87ff1b93e1b6d34d181879b5bcdfab61a93c1731cf837c200c81a3d1fb6b404deffe9f307f72d442bcac9f5b37ad3cde12bd74e1b3b65e2c50d19184eb35d653
   languageName: node
   linkType: hard
 

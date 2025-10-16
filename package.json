@@ -41,7 +41,7 @@
     "cypress": "15.4.0",
     "firebase": "12.4.0",
     "firebase-admin": "13.5.0",
-    "firebase-tools": "14.19.1",
+    "firebase-tools": "14.20.0",
     "husky": "9.1.7",
     "lint-staged": "16.2.4",
     "mocha": "11.7.4",
