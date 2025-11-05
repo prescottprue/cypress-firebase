@@ -40,7 +40,7 @@
     "chai": "4.5.0",
     "cypress": "15.6.0",
     "firebase": "12.5.0",
-    "firebase-admin": "13.5.0",
+    "firebase-admin": "13.6.0",
     "firebase-tools": "14.23.0",
     "husky": "9.1.7",
     "lint-staged": "16.2.6",
