@@ -27,7 +27,7 @@
     "eslint-plugin-chai-friendly": "0.8.0",
     "eslint-plugin-cypress": "5.2.0",
     "firebase-admin": "13.6.0",
-    "firebase-tools": "14.24.1",
+    "firebase-tools": "14.24.2",
     "react-scripts": "5.0.1"
   },
   "eslintConfig": {
