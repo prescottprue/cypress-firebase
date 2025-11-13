@@ -39,7 +39,7 @@
     "@types/sinon-chai": "4.0.0",
     "chai": "4.5.0",
     "cypress": "15.6.0",
-    "firebase": "12.5.0",
+    "firebase": "12.6.0",
     "firebase-admin": "13.6.0",
     "firebase-tools": "14.24.2",
     "husky": "9.1.7",
