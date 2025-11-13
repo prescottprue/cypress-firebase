@@ -4298,7 +4298,7 @@ __metadata:
     cypress: "npm:15.6.0"
     firebase: "npm:12.5.0"
     firebase-admin: "npm:13.6.0"
-    firebase-tools: "npm:14.24.2"
+    firebase-tools: "npm:14.25.0"
     husky: "npm:9.1.7"
     lint-staged: "npm:16.2.6"
     mocha: "npm:11.7.5"
@@ -5508,9 +5508,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-tools@npm:14.24.2":
-  version: 14.24.2
-  resolution: "firebase-tools@npm:14.24.2"
+"firebase-tools@npm:14.25.0":
+  version: 14.25.0
+  resolution: "firebase-tools@npm:14.25.0"
   dependencies:
     "@apphosting/build": "npm:^0.1.6"
     "@apphosting/common": "npm:^0.0.8"
@@ -5574,7 +5574,7 @@ __metadata:
     sql-formatter: "npm:^15.3.0"
     stream-chain: "npm:^2.2.4"
     stream-json: "npm:^1.7.3"
-    superstatic: "npm:^9.2.0"
+    superstatic: "npm:^10.0.0"
     tar: "npm:^6.1.11"
     tcp-port-used: "npm:^1.0.2"
     tmp: "npm:^0.2.3"
@@ -5590,7 +5590,7 @@ __metadata:
     zod-to-json-schema: "npm:^3.24.5"
   bin:
     firebase: lib/bin/firebase.js
-  checksum: 10c0/a7288dc3196a800e51fb6e79554f9e77804d2606261056648688abc8bdd5d7889c309d260645c161a4b6c161202c21f91d7cb45f5c361446c5d4ea4238f589aa
+  checksum: 10c0/b0693e1b5e40015a976fa5c8a1ba1e292fa2d4ad2320b7d57d972d42332378fe7adb873b351b4004dd0f5fe18f9fb52d620ddfac47de24ea743a2236a09d253b
   languageName: node
   linkType: hard
 
@@ -10461,9 +10461,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"superstatic@npm:^9.2.0":
-  version: 9.2.0
-  resolution: "superstatic@npm:9.2.0"
+"superstatic@npm:^10.0.0":
+  version: 10.0.0
+  resolution: "superstatic@npm:10.0.0"
   dependencies:
     basic-auth-connect: "npm:^1.1.0"
     commander: "npm:^10.0.0"
@@ -10488,7 +10488,7 @@ __metadata:
       optional: true
   bin:
     superstatic: lib/bin/server.js
-  checksum: 10c0/f7f2b7ba3994b9ab23e8cd8f8b3cbe21fcb8c0b0d07bb864708ddcb8d35e6e6f7006c4f90881c8b664ad542b277e8a9bc85a885f96fb11fe5969be583f5db54f
+  checksum: 10c0/af83480c2b46e8b6098791a327c1520a8a2813dfc624ac29d91fa08d60019f257b400f1af5152d8d8d63fb5267ce58c1e2a5dca143b04f4ec5d2f686a2b51aff
   languageName: node
   linkType: hard
 
