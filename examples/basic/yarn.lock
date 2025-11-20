@@ -7436,7 +7436,7 @@ __metadata:
   resolution: "cypress-firebase-basic-example@workspace:."
   dependencies:
     cross-env: "npm:10.1.0"
-    cypress: "npm:15.6.0"
+    cypress: "npm:15.7.0"
     cypress-firebase: "npm:4.2.2"
     eslint-plugin-chai-friendly: "npm:0.8.0"
     eslint-plugin-cypress: "npm:5.2.0"
@@ -7459,9 +7459,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cypress@npm:15.6.0":
-  version: 15.6.0
-  resolution: "cypress@npm:15.6.0"
+"cypress@npm:15.7.0":
+  version: 15.7.0
+  resolution: "cypress@npm:15.7.0"
   dependencies:
     "@cypress/request": "npm:^3.0.9"
     "@cypress/xvfb": "npm:^1.2.4"
@@ -7499,7 +7499,6 @@ __metadata:
     process: "npm:^0.11.10"
     proxy-from-env: "npm:1.0.0"
     request-progress: "npm:^3.0.0"
-    semver: "npm:^7.7.1"
     supports-color: "npm:^8.1.1"
     systeminformation: "npm:5.27.7"
     tmp: "npm:~0.2.4"
@@ -7508,7 +7507,7 @@ __metadata:
     yauzl: "npm:^2.10.0"
   bin:
     cypress: bin/cypress
-  checksum: 10c0/55534a2ee8e86bb9c7adaf42aaa4160cbafb3f52f78f5d288cba48230e431565ef1654d0c626238e2122a6fb08765db7447725516e6c28c05b05b7c51f5e4624
+  checksum: 10c0/e0d25943862ae442c16320f1f5766fd1e38986a9a1b20592cec8247b7a6a5ec1066abecc283d8e5c7cbc4a447b20b55e5dbb662e86046ad846e0cff61c4b2056
   languageName: node
   linkType: hard
 
@@ -16859,15 +16858,6 @@ __metadata:
   bin:
     semver: bin/semver.js
   checksum: 10c0/4afe5c986567db82f44c8c6faef8fe9df2a9b1d98098fc1721f57c696c4c21cebd572f297fc21002f81889492345b8470473bc6f4aff5fb032a6ea59ea2bc45e
-  languageName: node
-  linkType: hard
-
-"semver@npm:^7.7.1":
-  version: 7.7.2
-  resolution: "semver@npm:7.7.2"
-  bin:
-    semver: bin/semver.js
-  checksum: 10c0/aca305edfbf2383c22571cb7714f48cadc7ac95371b4b52362fb8eeffdfbc0de0669368b82b2b15978f8848f01d7114da65697e56cd8c37b0dab8c58e543f9ea
   languageName: node
   linkType: hard
 
