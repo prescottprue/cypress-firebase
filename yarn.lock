@@ -4516,7 +4516,7 @@ __metadata:
     rimraf: "npm:6.1.2"
     sinon: "npm:21.0.0"
     sinon-chai: "npm:4.0.1"
-    size-limit: "npm:11.2.0"
+    size-limit: "npm:12.0.0"
     tsx: "npm:4.21.0"
     typescript: "npm:5.9.3"
   peerDependencies:
@@ -10114,6 +10114,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"size-limit@npm:12.0.0":
+  version: 12.0.0
+  resolution: "size-limit@npm:12.0.0"
+  dependencies:
+    bytes-iec: "npm:^3.1.1"
+    lilconfig: "npm:^3.1.3"
+    nanospinner: "npm:^1.2.2"
+    picocolors: "npm:^1.1.1"
+    tinyglobby: "npm:^0.2.15"
+  peerDependencies:
+    jiti: ^2.0.0
+  peerDependenciesMeta:
+    jiti:
+      optional: true
+  bin:
+    size-limit: bin.js
+  checksum: 10c0/b45169e976f82e5743c08d03bea86e1d4058b2f02da66d776e4b8f79fd1070216aa25d3ab270219ffb1bf7322d48999dae876389f229073e54b660f34d888e01
+  languageName: node
+  linkType: hard
+
 "skin-tone@npm:^2.0.0":
   version: 2.0.0
   resolution: "skin-tone@npm:2.0.0"
@@ -10755,7 +10775,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tinyglobby@npm:^0.2.11, tinyglobby@npm:^0.2.12":
+"tinyglobby@npm:^0.2.11, tinyglobby@npm:^0.2.12, tinyglobby@npm:^0.2.15":
   version: 0.2.15
   resolution: "tinyglobby@npm:0.2.15"
   dependencies:
