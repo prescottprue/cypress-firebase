@@ -4547,7 +4547,7 @@ __metadata:
     rimraf: "npm:6.1.2"
     sinon: "npm:21.0.0"
     sinon-chai: "npm:4.0.1"
-    size-limit: "npm:11.2.0"
+    size-limit: "npm:12.0.0"
     tsx: "npm:4.21.0"
     typescript: "npm:5.9.3"
   peerDependencies:
