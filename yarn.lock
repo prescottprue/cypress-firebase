@@ -344,13 +344,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/config-conventional@npm:20.4.2":
-  version: 20.4.2
-  resolution: "@commitlint/config-conventional@npm:20.4.2"
+"@commitlint/config-conventional@npm:20.4.3":
+  version: 20.4.3
+  resolution: "@commitlint/config-conventional@npm:20.4.3"
   dependencies:
-    "@commitlint/types": "npm:^20.4.0"
-    conventional-changelog-conventionalcommits: "npm:^9.1.0"
-  checksum: 10c0/d737b6682a4237914372b86802772c1ff1d3414f1a167510859fc611986d1c401c8976c41f16b9e06439bd133fcf67ab7b63a72608a0c18e5e79614c995339b4
+    "@commitlint/types": "npm:^20.4.3"
+    conventional-changelog-conventionalcommits: "npm:^9.2.0"
+  checksum: 10c0/c7c6fb0b3201b17fae3a3e488b20795e7facbda511017d96939029f83d320567c310576ec9074f9536a3c811ea5d8038b3ddc92905c198e24c00b1a2759a8c84
   languageName: node
   linkType: hard
 
@@ -514,6 +514,16 @@ __metadata:
     conventional-commits-parser: "npm:^6.2.1"
     picocolors: "npm:^1.1.1"
   checksum: 10c0/d469c74317d279c0e5adeeb2b0ef7cc9a5fd80cea77ab4e92fc60cf2e23a8b56ee1345c82e7f3725c329d5c87b80dcf39608dff6b356e8aa51f62f657529348c
+  languageName: node
+  linkType: hard
+
+"@commitlint/types@npm:^20.4.3":
+  version: 20.4.3
+  resolution: "@commitlint/types@npm:20.4.3"
+  dependencies:
+    conventional-commits-parser: "npm:^6.3.0"
+    picocolors: "npm:^1.1.1"
+  checksum: 10c0/2181f9696f95b828551521e576fe786f81de5b5669e0ac876808e86811587011f7b78644f97c1d6623cc2bad68e0592416327080f14f153deccc20c5d295367e
   languageName: node
   linkType: hard
 
@@ -2368,6 +2378,13 @@ __metadata:
   version: 1.1.0
   resolution: "@protobufjs/utf8@npm:1.1.0"
   checksum: 10c0/a3fe31fe3fa29aa3349e2e04ee13dc170cc6af7c23d92ad49e3eeaf79b9766264544d3da824dba93b7855bd6a2982fb40032ef40693da98a136d835752beb487
+  languageName: node
+  linkType: hard
+
+"@simple-libs/stream-utils@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@simple-libs/stream-utils@npm:1.2.0"
+  checksum: 10c0/2788ac7b167d1b6c81b8c6fae2f5d9688b1f02ab31e9e15b33c9dc2ae920cf7de87869de10679be8957f9adb645c91c8919e271f3e34b6b4ec56daf725522dc7
   languageName: node
   linkType: hard
 
@@ -4390,12 +4407,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"conventional-changelog-conventionalcommits@npm:^9.1.0":
-  version: 9.1.0
-  resolution: "conventional-changelog-conventionalcommits@npm:9.1.0"
+"conventional-changelog-conventionalcommits@npm:^9.2.0":
+  version: 9.2.0
+  resolution: "conventional-changelog-conventionalcommits@npm:9.2.0"
   dependencies:
     compare-func: "npm:^2.0.0"
-  checksum: 10c0/b1dfbb8ce5983bb80837c35f089fb0f9603a1b067f34be680f88fde20871792e461e29d119d468bc293f38a1ca916c1c40a841f8c049a0a1efaa40582f4fecc9
+  checksum: 10c0/1ea8f1b9a9044680c3faf9d7a963a95d65bcec45815426ebdd00f1bd2bfa26aa26c454ebaa3fb67f3dd2c1b69ad48f25f20dd7837b535210576d3e18d5e8f3a7
   languageName: node
   linkType: hard
 
@@ -4407,6 +4424,18 @@ __metadata:
   bin:
     conventional-commits-parser: dist/cli/index.js
   checksum: 10c0/217b3fff627802f7fd7cb09bdfe897aa76986865543dfaa99b7957e4717d039e1e12c4a9b72706f098a5716bbbbdae540ef0b2429f7219d5fc5be0f190f1bc1e
+  languageName: node
+  linkType: hard
+
+"conventional-commits-parser@npm:^6.3.0":
+  version: 6.3.0
+  resolution: "conventional-commits-parser@npm:6.3.0"
+  dependencies:
+    "@simple-libs/stream-utils": "npm:^1.2.0"
+    meow: "npm:^13.0.0"
+  bin:
+    conventional-commits-parser: dist/cli/index.js
+  checksum: 10c0/7b152db0b63617fb5f993c3422942c05f48ff42fef4350d7e73b1d8a9f24489050b126478f2aabee5e45f205dbd02cb0b486e4bb865f9c0b18c35b4d13952b25
   languageName: node
   linkType: hard
 
@@ -4575,7 +4604,7 @@ __metadata:
   dependencies:
     "@biomejs/biome": "npm:2.3.11"
     "@commitlint/cli": "npm:20.4.2"
-    "@commitlint/config-conventional": "npm:20.4.2"
+    "@commitlint/config-conventional": "npm:20.4.3"
     "@firebase/rules-unit-testing": "npm:5.0.0"
     "@istanbuljs/nyc-config-typescript": "npm:1.0.2"
     "@size-limit/preset-small-lib": "npm:12.0.0"
