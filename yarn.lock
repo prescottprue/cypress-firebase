@@ -4630,7 +4630,7 @@ __metadata:
     "@types/node": "npm:22.19.15"
     "@types/sinon-chai": "npm:4.0.0"
     chai: "npm:4.5.0"
-    cypress: "npm:15.11.0"
+    cypress: "npm:15.12.0"
     firebase: "npm:12.10.0"
     firebase-admin: "npm:13.7.0"
     firebase-tools: "npm:14.27.0"
@@ -4649,9 +4649,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"cypress@npm:15.11.0":
-  version: 15.11.0
-  resolution: "cypress@npm:15.11.0"
+"cypress@npm:15.12.0":
+  version: 15.12.0
+  resolution: "cypress@npm:15.12.0"
   dependencies:
     "@cypress/request": "npm:^3.0.10"
     "@cypress/xvfb": "npm:^1.2.4"
@@ -4698,7 +4698,7 @@ __metadata:
     yauzl: "npm:^2.10.0"
   bin:
     cypress: bin/cypress
-  checksum: 10c0/6e3e31954bf46802d3f48f84301b224daadfc800ad65c0e297f0c1292f347a0a2385c0db6ecc4215c0aaf991363859db03f0a6e0fba249aee39dbc0dfca7673f
+  checksum: 10c0/aa11220a2da53689de9334975b6c8cbe3d5aa586542ac755c8581c80186b1a12394932d77c44fbeaf4d5f442afb357b1ccb9e66f0e8e6f778ed386131787e6fb
   languageName: node
   linkType: hard
 
