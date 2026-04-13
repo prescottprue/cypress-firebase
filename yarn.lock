@@ -4302,7 +4302,7 @@ __metadata:
     rimraf: "npm:6.1.3"
     sinon: "npm:21.1.2"
     sinon-chai: "npm:4.0.1"
-    size-limit: "npm:12.0.1"
+    size-limit: "npm:12.1.0"
     tsx: "npm:4.21.0"
     typescript: "npm:5.9.3"
   peerDependencies:
@@ -8713,7 +8713,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"picomatch@npm:^4.0.3":
+"picomatch@npm:^4.0.3, picomatch@npm:^4.0.4":
   version: 4.0.4
   resolution: "picomatch@npm:4.0.4"
   checksum: 10c0/e2c6023372cc7b5764719a5ffb9da0f8e781212fa7ca4bd0562db929df8e117460f00dff3cb7509dacfc06b86de924b247f504d0ce1806a37fac4633081466b0
@@ -9579,6 +9579,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"size-limit@npm:12.1.0":
+  version: 12.1.0
+  resolution: "size-limit@npm:12.1.0"
+  dependencies:
+    bytes-iec: "npm:^3.1.1"
+    lilconfig: "npm:^3.1.3"
+    nanospinner: "npm:^1.2.2"
+    picocolors: "npm:^1.1.1"
+    tinyglobby: "npm:^0.2.16"
+  peerDependencies:
+    jiti: ^2.0.0
+  peerDependenciesMeta:
+    jiti:
+      optional: true
+  bin:
+    size-limit: bin.js
+  checksum: 10c0/74e7ded2d2a44ca8a45af0b4f86aa6eede483c672fbb3f20818e9d68c1c4e95b4f8ce850704079550c97692b413ad78a608755d4c29e19181bca13feb22bc193
+  languageName: node
+  linkType: hard
+
 "skin-tone@npm:^2.0.0":
   version: 2.0.0
   resolution: "skin-tone@npm:2.0.0"
@@ -10221,6 +10241,16 @@ __metadata:
     fdir: "npm:^6.5.0"
     picomatch: "npm:^4.0.3"
   checksum: 10c0/869c31490d0d88eedb8305d178d4c75e7463e820df5a9b9d388291daf93e8b1eb5de1dad1c1e139767e4269fe75f3b10d5009b2cc14db96ff98986920a186844
+  languageName: node
+  linkType: hard
+
+"tinyglobby@npm:^0.2.16":
+  version: 0.2.16
+  resolution: "tinyglobby@npm:0.2.16"
+  dependencies:
+    fdir: "npm:^6.5.0"
+    picomatch: "npm:^4.0.4"
+  checksum: 10c0/f2e09fd93dd95c41e522113b686ff6f7c13020962f8698a864a257f3d7737599afc47722b7ab726e12f8a813f779906187911ff8ee6701ede65072671a7e934b
   languageName: node
   linkType: hard
 
