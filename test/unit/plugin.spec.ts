@@ -203,4 +203,40 @@ describe('plugin', () => {
       });
     });
   });
+
+  describe('modular firebase-admin (v14+)', () => {
+    it('Should adapt instances without the legacy namespaced API', () => {
+      let assignedTasksObj: any;
+      const onFuncSpy = vi.fn((_action, tasksObj) => {
+        assignedTasksObj = tasksObj;
+      });
+      const initializeAppSpy = vi.fn(() => ({}));
+      const applicationDefaultSpy = vi.fn(() => ({
+        projectId: 'test-project',
+      }));
+
+      process.env.FIREBASE_DATABASE_EMULATOR_HOST = '';
+      process.env.FIRESTORE_EMULATOR_HOST = '';
+      process.env.FIREBASE_AUTH_EMULATOR_HOST = '';
+
+      const results = pluginWithTasks(
+        onFuncSpy as unknown as Cypress.PluginEvents,
+        {} as Cypress.PluginConfigOptions,
+        {
+          getApps: () => [],
+          getApp: () => ({}),
+          initializeApp: initializeAppSpy,
+          cert: vi.fn(),
+          applicationDefault: applicationDefaultSpy,
+        },
+      );
+      expect(results).toBeTypeOf('object');
+      expect(onFuncSpy).toHaveBeenCalledTimes(1);
+      expect(onFuncSpy).toHaveBeenCalledWith('task', expect.any(Object));
+      // Initialization goes through the adapted legacy-shaped instance
+      expect(applicationDefaultSpy).toHaveBeenCalledTimes(1);
+      expect(initializeAppSpy).toHaveBeenCalledTimes(1);
+      expect(assignedTasksObj).toHaveProperty('callFirestore');
+    });
+  });
 });

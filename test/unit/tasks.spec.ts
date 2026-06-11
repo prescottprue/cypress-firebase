@@ -13,6 +13,7 @@ import {
   it,
   vi,
 } from 'vitest';
+import { adaptModularAdmin } from '../../src/firebase-utils';
 import * as tasks from '../../src/tasks';
 
 const PROJECTS_COLLECTION = 'projects';
@@ -24,11 +25,14 @@ const testProject = { name: 'project 1' };
  * Initialize firebase-admin SDK with emulator settings for RTDB
  * Using conditional credential handling for Node.js compatibility
  */
-const adminApp = admin.initializeApp({
+admin.initializeApp({
   projectId: process.env.GCLOUD_PROJECT,
   databaseURL: `http://${process.env.FIREBASE_DATABASE_EMULATOR_HOST}?ns=${process.env.GCLOUD_PROJECT}`,
-  credential: admin.credential.applicationDefault(),
+  credential: admin.applicationDefault(),
 });
+
+// Legacy-shaped admin instance (matches what plugin.ts passes to tasks)
+const adminApp = adaptModularAdmin(admin);
 
 const projectsFirestoreRef = adminApp
   .firestore()
@@ -51,11 +55,8 @@ describe('tasks', () => {
   });
   afterAll(async () => {
     // Cleanup all apps (keeps active listeners from preventing JS from exiting)
-    await adminApp.delete();
+    await Promise.all(admin.getApps().map((app) => admin.deleteApp(app)));
     await testEnv.cleanup();
-
-    // Cleanup only this tests's instance of firebase-admin app
-    await Promise.all(admin.apps.map((app) => app?.delete()));
   });
 
   describe('callFirestore', () => {
@@ -132,19 +133,19 @@ describe('tasks', () => {
       it('supports where with timestamp', async () => {
         const projectId = 'one-where-timestamp';
         const currentDate = new Date();
-        await projectsFirestoreRef
-          .doc(projectId)
-          .set({ dateField: admin.firestore.Timestamp.fromDate(currentDate) });
+        await projectsFirestoreRef.doc(projectId).set({
+          dateField: adminApp.firestore.Timestamp.fromDate(currentDate),
+        });
         const result = await tasks.callFirestore(
           adminApp,
           'get',
           PROJECTS_COLLECTION,
           {
-            statics: { Timestamp: admin.firestore.Timestamp } as any,
+            statics: { Timestamp: adminApp.firestore.Timestamp } as any,
             where: [
               'dateField',
               '==',
-              admin.firestore.Timestamp.fromDate(currentDate),
+              adminApp.firestore.Timestamp.fromDate(currentDate),
             ],
           },
         );
@@ -156,22 +157,26 @@ describe('tasks', () => {
         const pastDate = new Date();
         pastDate.setDate(pastDate.getDate() - 2);
         const fieldName = 'anotherField';
-        await projectsFirestoreRef
-          .doc(projectId)
-          .set({ [fieldName]: admin.firestore.Timestamp.fromDate(pastDate) });
+        await projectsFirestoreRef.doc(projectId).set({
+          [fieldName]: adminApp.firestore.Timestamp.fromDate(pastDate),
+        });
         const result = await tasks.callFirestore(
           adminApp,
           'get',
           PROJECTS_COLLECTION,
           {
-            statics: { Timestamp: admin.firestore.Timestamp } as any,
+            statics: { Timestamp: adminApp.firestore.Timestamp } as any,
             where: [
               [
                 fieldName,
                 '>=',
-                admin.firestore.Timestamp.fromDate(new Date('1/1/21')),
+                adminApp.firestore.Timestamp.fromDate(new Date('1/1/21')),
               ],
-              [fieldName, '<=', admin.firestore.Timestamp.fromDate(new Date())],
+              [
+                fieldName,
+                '<=',
+                adminApp.firestore.Timestamp.fromDate(new Date()),
+              ],
             ],
           },
         );
@@ -345,7 +350,7 @@ describe('tasks', () => {
         };
         beforeEach(() => {
           vi.spyOn(
-            admin.firestore.FieldValue,
+            adminApp.firestore.FieldValue,
             'serverTimestamp',
           ).mockReturnValue(correctTimestamp as any);
         });
@@ -365,7 +370,7 @@ describe('tasks', () => {
             adminApp,
             'set',
             PROJECT_PATH,
-            { statics: admin.firestore },
+            { statics: adminApp.firestore },
             { timeProperty: stringifiedServerTimestamp },
           );
 
@@ -387,7 +392,7 @@ describe('tasks', () => {
             adminApp,
             'set',
             PROJECT_PATH,
-            { statics: admin.firestore },
+            { statics: adminApp.firestore },
             { timeArrProperty: [stringifiedServerTimestamp] },
           );
 
@@ -409,7 +414,7 @@ describe('tasks', () => {
             adminApp,
             'set',
             PROJECT_PATH,
-            { statics: admin.firestore },
+            { statics: adminApp.firestore },
             { time: { nested: stringifiedServerTimestamp } },
           );
 
@@ -428,7 +433,7 @@ describe('tasks', () => {
             adminApp,
             'set',
             PROJECT_PATH,
-            { statics: admin.firestore },
+            { statics: adminApp.firestore },
             {
               geoPointProperty: { latitude: 32.323443, longitude: 122.3954238 },
             },
@@ -436,7 +441,7 @@ describe('tasks', () => {
 
           const resultSnap = await projectFirestoreRef.get();
           expect(resultSnap.get('geoPointProperty')).toBeInstanceOf(
-            admin.firestore.GeoPoint,
+            adminApp.firestore.GeoPoint,
           );
         });
       });
@@ -474,14 +479,14 @@ describe('tasks', () => {
           adminApp,
           'update',
           PROJECT_PATH,
-          { statics: admin.firestore, merge: true },
+          { statics: adminApp.firestore, merge: true },
           { some: legacyStringifiedFieldDelete },
         );
         await tasks.callFirestore(
           adminApp,
           'update',
           PROJECT_PATH,
-          { statics: admin.firestore, merge: true },
+          { statics: adminApp.firestore, merge: true },
           { another: stringifiedFieldDelete },
         );
         const resultSnap = await projectFirestoreRef.get();
@@ -509,7 +514,7 @@ describe('tasks', () => {
           adminApp,
           'set',
           PROJECT_PATH,
-          { statics: admin.firestore, merge: true },
+          { statics: adminApp.firestore, merge: true },
           { top: { second: { some: stringifiedFieldDelete } } },
         );
         const resultSnap = await projectFirestoreRef.get();
@@ -527,7 +532,7 @@ describe('tasks', () => {
         };
         beforeEach(() => {
           vi.spyOn(
-            admin.firestore.FieldValue,
+            adminApp.firestore.FieldValue,
             'serverTimestamp',
           ).mockReturnValue(correctTimestamp as any);
         });
@@ -547,7 +552,7 @@ describe('tasks', () => {
             adminApp,
             'update',
             PROJECT_PATH,
-            { statics: admin.firestore },
+            { statics: adminApp.firestore },
             { timeProperty: stringifiedServerTimestamp },
           );
 
@@ -575,7 +580,7 @@ describe('tasks', () => {
             adminApp,
             'update',
             PROJECT_PATH,
-            { statics: admin.firestore },
+            { statics: adminApp.firestore },
             {
               time: {
                 nested: stringifiedServerTimestamp,

@@ -1,9 +1,12 @@
-import type { app, auth, database, firestore } from 'firebase-admin';
+import type * as auth from 'firebase-admin/auth';
+import type * as database from 'firebase-admin/database';
+import type * as firestore from 'firebase-admin/firestore';
 import type {
   AttachCustomCommandParams,
   CallFirestoreOptions,
   CallRtdbOptions,
   FirestoreAction,
+  FirestoreStatics,
   FixtureData,
   RTDBAction,
 } from './attachCustomCommands';
@@ -73,7 +76,7 @@ function getAuth(
  */
 export function convertValueToTimestampOrGeoPointIfPossible(
   dataVal: any,
-  firestoreStatics: typeof firestore,
+  firestoreStatics: FirestoreStatics,
 ): firestore.FieldValue {
   if (
     (dataVal && dataVal._methodName === 'serverTimestamp') ||
@@ -114,7 +117,7 @@ export function convertValueToTimestampOrGeoPointIfPossible(
  */
 function getDataWithTimestampsAndGeoPoints(
   data: firestore.DocumentData,
-  firestoreStatics: typeof firestore,
+  firestoreStatics: FirestoreStatics,
 ): Record<string, any> {
   // Exit if no statics are passed
   if (!firestoreStatics) {
@@ -226,7 +229,7 @@ export async function callRtdb(
  * @returns Promise which resolves with results of calling Firestore
  */
 export async function callFirestore(
-  adminInstance: app.App,
+  adminInstance: any,
   action: FirestoreAction,
   actionPath: string,
   options?: CallFirestoreOptions,
@@ -248,7 +251,7 @@ export async function callFirestore(
         snap.docs.length &&
         typeof snap.docs.map === 'function'
       ) {
-        return snap.docs.map((docSnap: FirebaseFirestore.DocumentSnapshot) => ({
+        return snap.docs.map((docSnap: firestore.DocumentSnapshot) => ({
           ...docSnap.data(),
           id: docSnap.id,
         }));
@@ -266,7 +269,7 @@ export async function callFirestore(
               adminInstance.firestore,
               actionPath,
               options,
-            ) as FirebaseFirestore.DocumentReference
+            ) as firestore.DocumentReference
           ).delete()
         : deleteCollection(
             adminInstance.firestore(),
@@ -274,9 +277,7 @@ export async function callFirestore(
               adminInstance.firestore,
               actionPath,
               options,
-            ) as
-              | FirebaseFirestore.CollectionReference
-              | FirebaseFirestore.Query,
+            ) as firestore.CollectionReference | firestore.Query,
             options,
           );
       await deletePromise;
@@ -294,7 +295,7 @@ export async function callFirestore(
       // Use static option if passed (tests), otherwise fallback to statics on adminInstance
       // Tests do not have statics since they are using @firebase/testing
       (options && options.statics) ||
-        (adminInstance.firestore as typeof firestore),
+        (adminInstance.firestore as FirestoreStatics),
     );
 
     if (action === 'set') {
@@ -306,7 +307,7 @@ export async function callFirestore(
           options && options.merge
             ? ({
                 merge: options.merge,
-              } as FirebaseFirestore.SetOptions)
+              } as firestore.SetOptions)
             : (undefined as any),
         );
     }
