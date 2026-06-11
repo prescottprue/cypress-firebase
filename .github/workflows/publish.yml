@@ -13,7 +13,7 @@ concurrency:
   group: publish-${{ github.ref }}
 
 env:
-  NODE_VERSION: 20.x
+  NODE_VERSION: 24.x
 
 jobs:
   publish-npm:
@@ -28,6 +28,12 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
           registry-url: https://registry.npmjs.org/
+
+      - name: Use Java 21 (required by firebase-tools emulators)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
 
       - name: Get cache settings
         id: cache-settings
