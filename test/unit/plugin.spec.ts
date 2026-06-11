@@ -1,74 +1,81 @@
-import { expect } from 'chai';
-import sinon from 'sinon';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { protectProduction } from '../../src/firebase-utils';
 import pluginWithTasks from '../../src/plugin';
 
 describe('plugin', () => {
   afterEach(() => {
-    sinon.restore();
+    vi.restoreAllMocks();
   });
 
-  it('Should add tasks to cypress', () => {
+  it('Should add tasks to cypress', async () => {
     let assignedTasksObj;
-    const onFuncSpy = sinon.spy((_action, tasksObj) => {
+    const onFuncSpy = vi.fn((_action, tasksObj) => {
       assignedTasksObj = tasksObj;
     });
     const results = pluginWithTasks(
-      onFuncSpy,
+      onFuncSpy as unknown as Cypress.PluginEvents,
       {} as Cypress.PluginConfigOptions,
       {},
     );
-    expect(results).to.be.an('object');
-    expect(onFuncSpy).to.have.been.calledOnceWith('task');
-    expect(assignedTasksObj).to.have.property('callRtdb');
-    (assignedTasksObj as any).callRtdb({});
+    expect(results).toBeTypeOf('object');
+    expect(onFuncSpy).toHaveBeenCalledTimes(1);
+    expect(onFuncSpy).toHaveBeenCalledWith('task', expect.any(Object));
+    expect(assignedTasksObj).toHaveProperty('callRtdb');
+    // Rejects since no actionPath is passed - only confirming the task is callable
+    await expect((assignedTasksObj as any).callRtdb({})).rejects.toThrow(
+      'actionPath is required for callRtdb. Use "/" for top level actions.',
+    );
   });
 
   it('Should initialize firebase if no apps exist', () => {
-    const onFuncSpy = sinon.spy();
-    const initializeSpy = sinon.spy(() => ({}));
+    const onFuncSpy = vi.fn();
+    const initializeSpy = vi.fn(() => ({}));
 
     const results = pluginWithTasks(
-      onFuncSpy,
+      onFuncSpy as unknown as Cypress.PluginEvents,
       {} as Cypress.PluginConfigOptions,
       {
         initializeApp: initializeSpy,
-        credential: { cert: () => ({}), applicationDefault: sinon.spy() },
+        credential: { cert: () => ({}), applicationDefault: vi.fn() },
         apps: [],
         firestore: () => ({ settings: () => ({}) }),
       },
     );
-    expect(results).to.be.an('object');
-    expect(onFuncSpy).to.have.been.calledOnceWith('task');
+    expect(results).toBeTypeOf('object');
+    expect(onFuncSpy).toHaveBeenCalledTimes(1);
+    expect(onFuncSpy).toHaveBeenCalledWith('task', expect.any(Object));
     // Not called if another test has already initialized firebase (in firebase-utils)
-    // expect(initializeSpy).to.have.been.calledOnce;
+    // expect(initializeSpy).toHaveBeenCalledTimes(1);
   });
 
   it('Should pass uid as first argument to a task if it exists in settings', () => {
     let assignedTasksObj;
-    const onFuncSpy = sinon.spy((_action, tasksObj) => {
+    const onFuncSpy = vi.fn((_action, tasksObj) => {
       assignedTasksObj = tasksObj;
     });
-    const createCustomTokenSpy = sinon.spy(() => 'asdf');
+    const createCustomTokenSpy = vi.fn(() => 'asdf');
     const results = pluginWithTasks(
-      onFuncSpy,
+      onFuncSpy as unknown as Cypress.PluginEvents,
       {} as Cypress.PluginConfigOptions,
       {
         auth: () => ({ createCustomToken: createCustomTokenSpy }),
       },
     );
-    expect(results).to.be.an('object');
-    expect(onFuncSpy).to.have.been.calledOnceWith('task');
-    expect(assignedTasksObj).to.have.property('authCreateCustomToken');
+    expect(results).toBeTypeOf('object');
+    expect(onFuncSpy).toHaveBeenCalledTimes(1);
+    expect(onFuncSpy).toHaveBeenCalledWith('task', expect.any(Object));
+    expect(assignedTasksObj).toHaveProperty('authCreateCustomToken');
     const uid = 'SomeUid';
     (assignedTasksObj as any).authCreateCustomToken({ uid });
-    expect(createCustomTokenSpy).to.have.been.calledWith(uid);
+    expect(createCustomTokenSpy).toHaveBeenCalledWith(uid, {
+      isTesting: true,
+    });
   });
 
   describe('configuration', () => {
     describe('protectProduction', () => {
       it('Should error without emulators', () => {
-        const initializeSpy = sinon.spy(() => ({}));
+        const initializeSpy = vi.fn(() => ({}));
         const pluginWithProtectProduction =
           (protectProduction: protectProduction) => () =>
             pluginWithTasks(
@@ -79,7 +86,7 @@ describe('plugin', () => {
                 apps: [],
                 credential: {
                   cert: () => ({}),
-                  applicationDefault: sinon.spy(),
+                  applicationDefault: vi.fn(),
                 },
               },
               {},
@@ -95,7 +102,7 @@ describe('plugin', () => {
             firestore: 'none',
             auth: 'none',
           }),
-        ).to.throw(
+        ).toThrow(
           'cypress-firebase: FIREBASE_DATABASE_EMULATOR_HOST is not set. Set FIREBASE_DATABASE_EMULATOR_HOST environment variable or change protectProduction.rtdb setting',
         );
         process.env.FIRESTORE_EMULATOR_HOST = '';
@@ -105,7 +112,7 @@ describe('plugin', () => {
             firestore: 'error',
             auth: 'none',
           }),
-        ).to.throw(
+        ).toThrow(
           'cypress-firebase: FIRESTORE_EMULATOR_HOST is not set. Set FIRESTORE_EMULATOR_HOST environment variable or change protectProduction.firestore setting',
         );
         process.env.FIREBASE_AUTH_EMULATOR_HOST = '';
@@ -115,27 +122,27 @@ describe('plugin', () => {
             firestore: 'none',
             auth: 'error',
           }),
-        ).to.throw(
+        ).toThrow(
           'cypress-firebase: FIREBASE_AUTH_EMULATOR_HOST is not set. Set FIREBASE_AUTH_EMULATOR_HOST environment variable or change protectProduction.auth setting',
         );
       });
 
       it('Should warn without emulators', () => {
-        const consoleSpy = sinon.spy(console, 'warn');
-        const onFuncSpy = sinon.spy();
-        const initializeSpy = sinon.spy(() => ({}));
+        const consoleSpy = vi.spyOn(console, 'warn');
+        const onFuncSpy = vi.fn();
+        const initializeSpy = vi.fn(() => ({}));
         const pluginWithProtectProduction = (
           protectProduction: protectProduction,
         ) =>
           pluginWithTasks(
-            onFuncSpy,
+            onFuncSpy as unknown as Cypress.PluginEvents,
             {} as Cypress.PluginConfigOptions,
             {
               initializeApp: initializeSpy,
               apps: [],
               credential: {
                 cert: () => ({}),
-                applicationDefault: sinon.spy(),
+                applicationDefault: vi.fn(),
               },
               firestore: () => ({ settings: () => ({}) }),
             },
@@ -151,7 +158,7 @@ describe('plugin', () => {
           firestore: 'none',
           auth: 'none',
         });
-        expect(consoleSpy).to.have.been.calledWith(
+        expect(consoleSpy).toHaveBeenCalledWith(
           'cypress-firebase: FIREBASE_DATABASE_EMULATOR_HOST is not set, RTDB operations may alter production instead of emulator!',
         );
         process.env.FIRESTORE_EMULATOR_HOST = '';
@@ -160,7 +167,7 @@ describe('plugin', () => {
           firestore: 'warn',
           auth: 'none',
         });
-        expect(consoleSpy).to.have.been.calledWith(
+        expect(consoleSpy).toHaveBeenCalledWith(
           'cypress-firebase: FIRESTORE_EMULATOR_HOST is not set, Firestore operations may alter production instead of emulator!',
         );
         process.env.FIREBASE_AUTH_EMULATOR_HOST = '';
@@ -169,30 +176,30 @@ describe('plugin', () => {
           firestore: 'none',
           auth: 'warn',
         });
-        expect(consoleSpy).to.have.been.calledWith(
+        expect(consoleSpy).toHaveBeenCalledWith(
           'cypress-firebase: FIREBASE_AUTH_EMULATOR_HOST is not set, auth operations may alter production instead of emulator!',
         );
       });
 
       it('Should work normally with everything set to none', () => {
-        const onFuncSpy = sinon.spy();
-        const initializeSpy = sinon.spy(() => ({}));
+        const onFuncSpy = vi.fn();
+        const initializeSpy = vi.fn(() => ({}));
 
         process.env.FIREBASE_DATABASE_EMULATOR_HOST = '';
         process.env.FIRESTORE_EMULATOR_HOST = '';
         process.env.FIREBASE_AUTH_EMULATOR_HOST = '';
 
         const results = pluginWithTasks(
-          onFuncSpy,
+          onFuncSpy as unknown as Cypress.PluginEvents,
           {} as Cypress.PluginConfigOptions,
           {
             initializeApp: initializeSpy,
-            credential: { cert: () => ({}), applicationDefault: sinon.spy() },
+            credential: { cert: () => ({}), applicationDefault: vi.fn() },
             apps: [],
             firestore: () => ({ settings: () => ({}) }),
           },
         );
-        expect(results).to.be.an('object');
+        expect(results).toBeTypeOf('object');
       });
     });
   });
