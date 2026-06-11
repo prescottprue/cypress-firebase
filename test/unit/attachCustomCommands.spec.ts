@@ -83,6 +83,8 @@ describe('attachCustomCommands', () => {
     });
     signInWithCustomToken = vi.fn(() => Promise.resolve());
     cy.task = taskSpy;
+    // Default to Cypress < 15.10 (no cy.env command) - cy.env tests set this
+    cy.env = undefined;
     addSpy = vi.fn((customCommandName: string, customCommandFunc: any) => {
       loadedCustomCommands[customCommandName] = customCommandFunc;
     });
@@ -779,6 +781,63 @@ describe('attachCustomCommands', () => {
   describe('cy.deleteAllAuthUsers', () => {
     it('is attached as a custom command', () => {
       expectCommandAttached(addSpy, 'deleteAllAuthUsers');
+    });
+  });
+
+  describe('cy.env support (Cypress >= 15.10)', () => {
+    it('reads environment values through cy.env when available', async () => {
+      const envCommandSpy = vi.fn((_keys: string[]) => ({
+        then: (envHandler: any) =>
+          envHandler({
+            TEST_UID: 'cy-env-uid',
+            TEST_TENANT_ID: 'cy-env-tenant',
+          }),
+      }));
+      cy.env = envCommandSpy;
+      await loadedCustomCommands.login();
+      expect(envCommandSpy).toHaveBeenCalledWith([
+        'TEST_UID',
+        'TEST_TENANT_ID',
+      ]);
+      expect(taskSpy).toHaveBeenCalledWith('authCreateCustomToken', {
+        uid: 'cy-env-uid',
+        customClaims: undefined,
+        tenantId: 'cy-env-tenant',
+      });
+      // Deprecated Cypress.env should not be used when cy.env exists
+      expect(envSpy).not.toHaveBeenCalled();
+    });
+
+    it('uses cy.env for tenantId defaults in auth commands', async () => {
+      cy.env = vi.fn((_keys: string[]) => ({
+        then: (envHandler: any) => envHandler({ TEST_TENANT_ID: 'cy-tenant' }),
+      }));
+      await loadedCustomCommands.authListUsers(3);
+      expect(taskSpy).toHaveBeenCalledWith('authListUsers', {
+        maxResults: 3,
+        pageToken: undefined,
+        tenantId: 'cy-tenant',
+      });
+      expect(envSpy).not.toHaveBeenCalled();
+    });
+
+    it('uses cy.env for withMeta createdBy in callFirestore', async () => {
+      cy.env = vi.fn((_keys: string[]) => ({
+        then: (envHandler: any) => envHandler({ TEST_UID: 'cy-env-uid' }),
+      }));
+      await loadedCustomCommands.callFirestore(
+        'set',
+        '123ABC',
+        { asdf: 'asdf' },
+        { withMeta: true },
+      );
+      expect(taskSpy).toHaveBeenCalledWith('callFirestore', {
+        action: 'set',
+        path: '123ABC',
+        data: { asdf: 'asdf', createdBy: 'cy-env-uid', createdAt: 'TIMESTAMP' },
+        options: { withMeta: true },
+      });
+      expect(envSpy).not.toHaveBeenCalled();
     });
   });
 

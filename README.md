@@ -416,11 +416,15 @@ cy.callRtdb('delete', 'projectsToDelete');
 _Get/Verify Data_
 
 ```javascript
-cy.callRtdb('get', 'projects/ABC123').then((project) => {
-  // Confirm new data has users uid
-  cy.wrap(project).its('createdBy').should('equal', Cypress.env('TEST_UID'));
+cy.env(['TEST_UID']).then(({ TEST_UID }) => {
+  cy.callRtdb('get', 'projects/ABC123').then((project) => {
+    // Confirm new data has users uid
+    cy.wrap(project).its('createdBy').should('equal', TEST_UID);
+  });
 });
 ```
+
+**Note**: On Cypress < 15.10 use `Cypress.env('TEST_UID')` instead of `cy.env()` (which was added in Cypress 15.10 along with the deprecation of `Cypress.env()`).
 
 _Other Args_
 
@@ -495,7 +499,6 @@ _Full_
 
 ```javascript
 describe('Test firestore', () => {
-  const TEST_UID = Cypress.env('TEST_UID');
   const mockAge = 8;
 
   beforeEach(() => {
@@ -506,11 +509,15 @@ describe('Test firestore', () => {
   it('read/write test', () => {
     cy.log('Starting test');
 
-    cy.callFirestore('set', `testCollection/${TEST_UID}`, {
-      name: 'axa',
-      age: 8,
+    cy.env(['TEST_UID']).then(({ TEST_UID }) => {
+      cy.callFirestore('set', `testCollection/${TEST_UID}`, {
+        name: 'axa',
+        age: 8,
+      });
     });
-    cy.callFirestore('get', `testCollection/${TEST_UID}`).then((r) => {
+    cy.env(['TEST_UID']).then(({ TEST_UID }) =>
+      cy.callFirestore('get', `testCollection/${TEST_UID}`),
+    ).then((r) => {
       cy.log('get returned: ', r);
       cy.wrap(r).its('data.age').should('equal', mockAge);
     });

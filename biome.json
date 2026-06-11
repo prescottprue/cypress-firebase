@@ -51,7 +51,8 @@
           },
           "suspicious": {
             "noImplicitAnyLet": "off",
-            "noExplicitAny": "off"
+            "noExplicitAny": "off",
+            "noThenProperty": "off"
           }
         }
       }
