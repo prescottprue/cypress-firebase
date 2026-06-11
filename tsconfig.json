@@ -12,7 +12,8 @@
     "outDir": "lib",
     "rootDir": "./src",
     "importHelpers": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "types": ["node"]
   },
   "typeRoots": ["./types", "./node_modules/@types"],
   "include": ["src/**/*"],

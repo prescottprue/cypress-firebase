@@ -1,8 +1,13 @@
-import type { AppOptions } from 'firebase-admin';
+import type { AppOptions } from 'firebase-admin/app';
 import extendWithFirebaseConfig, {
   type ExtendedCypressConfig,
 } from './extendWithFirebaseConfig';
-import { initializeFirebase, type protectProduction } from './firebase-utils';
+import {
+  adaptModularAdmin,
+  initializeFirebase,
+  isModularAdmin,
+  type protectProduction,
+} from './firebase-utils';
 import type { TaskName } from './tasks';
 import tasks, {
   type TaskNameToParams,
@@ -34,10 +39,15 @@ export default function pluginWithTasks(
   overrideConfig?: AppOptions,
   pluginConfig?: PluginConfig,
 ): ExtendedCypressConfig {
+  // Adapt modular firebase-admin (v14+) to the legacy namespaced shape used
+  // by tasks so the same code works across firebase-admin versions
+  const admin = isModularAdmin(adminInstance)
+    ? adaptModularAdmin(adminInstance)
+    : adminInstance;
   // Only initialize admin instance if it hasn't already been initialized
-  if (adminInstance.apps && adminInstance.apps.length === 0) {
+  if (admin.apps && admin.apps.length === 0) {
     initializeFirebase(
-      adminInstance,
+      admin,
       overrideConfig,
       pluginConfig && pluginConfig.protectProduction,
     );
@@ -57,7 +67,7 @@ export default function pluginWithTasks(
         (sk: string) => taskSettings[sk],
       );
       // @ts-expect-error - TS cannot know that the right amount of args are passed
-      return tasks[taskName](adminInstance, ...taskArgs);
+      return tasks[taskName](admin, ...taskArgs);
     };
     return acc;
   }, {} as tasksType);

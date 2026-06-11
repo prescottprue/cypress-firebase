@@ -43,8 +43,8 @@ The two sides are linked by `taskSettingKeys` in `src/tasks.ts` — an ordered m
 
 ### Constraints
 
-- `adminInstance` is intentionally typed `any` and accessed through the namespaced API (`admin.firestore()`, `admin.auth()`) so the same code works across firebase-admin versions; types are imported from `firebase-admin` as type-only imports.
-- The package is consumed in both browser and Node contexts; `package.json`'s `browser` field stubs `fs`/`os`/`path`. Don't add runtime dependencies (it's advertised as 0-dependency) or Node-only imports to browser-side code paths.
+- `adminInstance` is intentionally typed `any` and accessed through the legacy namespaced API shape (`admin.firestore()`, `admin.auth()`) so the same code works across firebase-admin versions. firebase-admin v14+ removed that API, so `plugin.ts` detects modular modules via `isModularAdmin` and wraps them with `adaptModularAdmin` (both in `firebase-utils.ts`) to recreate the legacy shape; the adapter lazily `require`s `firebase-admin/*` subpaths. Types are imported from `firebase-admin/*` subpaths as type-only imports.
+- The package is consumed in both browser and Node contexts; `package.json`'s `browser` field stubs `fs`/`os`/`path` and the `firebase-admin/*` subpaths used by the adapter. Don't add runtime dependencies (it's advertised as 0-dependency) or Node-only imports to browser-side code paths.
 - `size-limit` enforces a 9kb budget on each of the two exports (`attachCustomCommands`, `plugin`).
 - Biome handles lint + format (single quotes, spaces). `console` calls are errors; intentional logging uses `// biome-ignore lint/suspicious/noConsole: Intentional logging`.
 - Public API surface is only what `src/index.ts` exports: `attachCustomCommands` and `plugin` (plus types).

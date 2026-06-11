@@ -1,4 +1,6 @@
-import type { app, auth, database, firestore } from 'firebase-admin';
+import type * as auth from 'firebase-admin/auth';
+import type * as database from 'firebase-admin/database';
+import type * as firestore from 'firebase-admin/firestore';
 import type {
   AttachCustomCommandParams,
   CallFirestoreOptions,
@@ -226,7 +228,7 @@ export async function callRtdb(
  * @returns Promise which resolves with results of calling Firestore
  */
 export async function callFirestore(
-  adminInstance: app.App,
+  adminInstance: any,
   action: FirestoreAction,
   actionPath: string,
   options?: CallFirestoreOptions,
@@ -248,7 +250,7 @@ export async function callFirestore(
         snap.docs.length &&
         typeof snap.docs.map === 'function'
       ) {
-        return snap.docs.map((docSnap: FirebaseFirestore.DocumentSnapshot) => ({
+        return snap.docs.map((docSnap: firestore.DocumentSnapshot) => ({
           ...docSnap.data(),
           id: docSnap.id,
         }));
@@ -266,7 +268,7 @@ export async function callFirestore(
               adminInstance.firestore,
               actionPath,
               options,
-            ) as FirebaseFirestore.DocumentReference
+            ) as firestore.DocumentReference
           ).delete()
         : deleteCollection(
             adminInstance.firestore(),
@@ -274,9 +276,7 @@ export async function callFirestore(
               adminInstance.firestore,
               actionPath,
               options,
-            ) as
-              | FirebaseFirestore.CollectionReference
-              | FirebaseFirestore.Query,
+            ) as firestore.CollectionReference | firestore.Query,
             options,
           );
       await deletePromise;
@@ -306,7 +306,7 @@ export async function callFirestore(
           options && options.merge
             ? ({
                 merge: options.merge,
-              } as FirebaseFirestore.SetOptions)
+              } as firestore.SetOptions)
             : (undefined as any),
         );
     }

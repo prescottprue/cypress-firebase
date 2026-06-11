@@ -1,9 +1,64 @@
-import type { AppOptions, app, credential, firestore } from 'firebase-admin';
+import type { App, AppOptions, Credential } from 'firebase-admin/app';
+import type * as firestore from 'firebase-admin/firestore';
 import type {
   CallFirestoreOptions,
   WhereOptions,
 } from './attachCustomCommands';
 import { convertValueToTimestampOrGeoPointIfPossible } from './tasks';
+
+/**
+ * Firestore function from a firebase-admin instance (invoking gets the
+ * instance) which also carries statics such as FieldValue and Timestamp
+ */
+export type FirestoreStatics = (() => firestore.Firestore) & typeof firestore;
+
+/**
+ * Check whether the provided firebase-admin instance uses the modular API
+ * (firebase-admin v14+) which no longer includes the legacy namespaced API
+ * @param adminInstance - firebase-admin instance to check
+ * @returns Whether the instance is a modular firebase-admin module
+ */
+export function isModularAdmin(adminInstance: any): boolean {
+  return (
+    !!adminInstance &&
+    typeof adminInstance.getApps === 'function' &&
+    typeof adminInstance.firestore !== 'function'
+  );
+}
+
+/**
+ * Adapt a modular firebase-admin module (v14+) to the legacy namespaced
+ * shape used internally (i.e. admin.firestore(), admin.auth()). App lifecycle
+ * and credential functions come from the passed module; service accessors are
+ * loaded lazily from firebase-admin subpath entry points (a peer dependency)
+ * so they are only required in the node context - package.json's "browser"
+ * field stubs them out of browser bundles.
+ * @param adminInstance - Modular firebase-admin module (v14+)
+ * @returns Object matching the legacy namespaced firebase-admin API shape
+ */
+export function adaptModularAdmin(adminInstance: any): any {
+  const firestoreModule = require('firebase-admin/firestore');
+  const { getAuth } = require('firebase-admin/auth');
+  const { getDatabase } = require('firebase-admin/database');
+  const firestoreFn = (app?: any) =>
+    firestoreModule.getFirestore(app || adminInstance.getApp());
+  // Attach statics (FieldValue, Timestamp, GeoPoint, etc.) like the legacy API
+  Object.assign(firestoreFn, firestoreModule);
+  return {
+    get apps() {
+      return adminInstance.getApps();
+    },
+    initializeApp: (appOptions?: AppOptions) =>
+      adminInstance.initializeApp(appOptions),
+    credential: {
+      cert: adminInstance.cert,
+      applicationDefault: adminInstance.applicationDefault,
+    },
+    firestore: firestoreFn,
+    auth: (app?: any) => getAuth(app || adminInstance.getApp()),
+    database: (app?: any) => getDatabase(app || adminInstance.getApp()),
+  };
+}
 
 /**
  * Check whether a value is a string or not
@@ -20,7 +75,7 @@ export function isString(valToCheck: any): boolean {
  * defaults to port 8080 and servicePath "localhost".
  * @returns Firestore settings to be passed to firebase.firestore().settings
  */
-function firestoreSettingsFromEnv(): FirebaseFirestore.Settings {
+function firestoreSettingsFromEnv(): firestore.Settings {
   const { FIRESTORE_EMULATOR_HOST } = process.env;
   if (
     typeof FIRESTORE_EMULATOR_HOST === 'undefined' ||
@@ -74,9 +129,7 @@ function getServiceAccount(): ServiceAccount | undefined {
  * @param adminInstance - firebase-admin instance to initialize
  * @returns Firebase admin credential
  */
-function getFirebaseCredential(
-  adminInstance: any,
-): credential.Credential | undefined {
+function getFirebaseCredential(adminInstance: any): Credential | undefined {
   const serviceAccount = getServiceAccount();
   // Add service account credential if it exists so that custom auth tokens can be generated
   if (serviceAccount) {
@@ -122,7 +175,7 @@ export function initializeFirebase(
   adminInstance: any,
   overrideConfig?: AppOptions,
   protectProduction?: protectProduction,
-): app.App {
+): App {
   try {
     // TODO: Look into using @firebase/testing in place of admin here to allow for
     // usage of clearFirestoreData (see https://github.com/prescottprue/cypress-firebase/issues/73 for more info)
@@ -264,16 +317,13 @@ export function isDocPath(slashPath: string): boolean {
 export function applyWhere(
   ref: firestore.CollectionReference | firestore.Query,
   whereSetting: WhereOptions,
-  firestoreStatics: app.App['firestore'],
+  firestoreStatics: typeof firestore,
 ): firestore.Query {
   const [param, filterOp, val] = whereSetting as WhereOptions;
   return ref.where(
     param,
     filterOp,
-    convertValueToTimestampOrGeoPointIfPossible(
-      val,
-      firestoreStatics as typeof firestore,
-    ),
+    convertValueToTimestampOrGeoPointIfPossible(val, firestoreStatics),
   );
 }
 
@@ -285,7 +335,7 @@ export function applyWhere(
  * @returns Ref at slash path
  */
 export function slashPathToFirestoreRef(
-  firestoreStatics: app.App['firestore'],
+  firestoreStatics: FirestoreStatics,
   slashPath: string,
   options?: CallFirestoreOptions,
 ):
@@ -357,7 +407,7 @@ export function slashPathToFirestoreRef(
  */
 function deleteQueryBatch(
   db: any,
-  query: FirebaseFirestore.CollectionReference | FirebaseFirestore.Query,
+  query: firestore.CollectionReference | firestore.Query,
   resolve: (value?: any) => any,
   reject: any,
 ): void {
@@ -400,7 +450,7 @@ function deleteQueryBatch(
  */
 export function deleteCollection(
   db: any,
-  refOrQuery: FirebaseFirestore.CollectionReference | FirebaseFirestore.Query,
+  refOrQuery: firestore.CollectionReference | firestore.Query,
   options?: CallFirestoreOptions,
 ): Promise<any> {
   let baseQuery = refOrQuery.orderBy('__name__');

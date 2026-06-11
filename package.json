@@ -36,7 +36,7 @@
     "@vitest/coverage-v8": "4.1.8",
     "cypress": "15.17.0",
     "firebase": "12.14.0",
-    "firebase-admin": "13.10.0",
+    "firebase-admin": "14.0.0",
     "firebase-tools": "15.20.0",
     "husky": "9.1.7",
     "lint-staged": "17.0.7",
@@ -67,7 +67,11 @@
   "browser": {
     "fs": false,
     "os": false,
-    "path": false
+    "path": false,
+    "firebase-admin/app": false,
+    "firebase-admin/auth": false,
+    "firebase-admin/database": false,
+    "firebase-admin/firestore": false
   },
   "files": [
     "bin",

@@ -1,4 +1,5 @@
-import type { auth, firestore } from 'firebase-admin';
+import type * as auth from 'firebase-admin/auth';
+import type * as firestore from 'firebase-admin/firestore';
 import type { authCreateUser } from './tasks';
 import { type TaskNameToParams, typedTask } from './tasks';
 
@@ -25,7 +26,7 @@ export interface FixtureData {
   [k: string]: any;
 }
 
-export type WhereOptions = [string, FirebaseFirestore.WhereFilterOp, any];
+export type WhereOptions = [string, firestore.WhereFilterOp, any];
 
 /**
  * Options for callFirestore custom Cypress command.
@@ -51,7 +52,7 @@ export interface CallFirestoreOptions {
   /**
    * Order documents
    */
-  orderBy?: string | [string, FirebaseFirestore.OrderByDirection];
+  orderBy?: string | [string, firestore.OrderByDirection];
   /**
    * Limit to n number of documents
    */
