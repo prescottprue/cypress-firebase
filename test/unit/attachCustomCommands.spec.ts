@@ -1,25 +1,24 @@
-import { expect } from 'chai';
-import sinon from 'sinon';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { attachCustomCommands } from '../../src';
 
 let taskSpy: any;
-const cy: any = { log: sinon.spy() };
+const cy: any = { log: vi.fn() };
 const loadedCustomCommands: any = {};
 const testUserId = 'TEST_USER';
-let addSpy: sinon.SinonSpy;
-let envSpy: sinon.SinonSpy;
-let envStub: sinon.SinonStub<string[], string | number | boolean>;
+let addSpy: ReturnType<typeof vi.fn>;
+let envSpy: ReturnType<typeof vi.fn>;
+let envStub: ReturnType<typeof vi.fn>;
 let Cypress: any = {};
 let currentUser: any;
 let onAuthStateChanged: any;
 let signInWithCustomToken: any;
 const firebase = {
   app: () => firebase,
-  auth: sinon.spy(() => ({
+  auth: vi.fn(() => ({
     currentUser,
     onAuthStateChanged,
     signInWithCustomToken,
-    signOut: sinon.spy(() => Promise.resolve()),
+    signOut: vi.fn(() => Promise.resolve()),
   })),
   database: { ServerValue: { TIMESTAMP: 'TIMESTAMP' } },
   firestore: { Timestamp: { now: () => 'TIMESTAMP' } },
@@ -60,18 +59,31 @@ const allCommandNames = [
   'authDeleteProviderConfig',
 ];
 
+/**
+ * Assert that a command was attached with the provided name
+ * (second argument is always the command implementation)
+ * @param spy - Spy used as Cypress.Commands.add
+ * @param commandName - Name of the custom command
+ */
+function expectCommandAttached(
+  spy: ReturnType<typeof vi.fn>,
+  commandName: string,
+) {
+  expect(spy).toHaveBeenCalledWith(commandName, expect.any(Function));
+}
+
 describe('attachCustomCommands', () => {
   beforeEach(() => {
     currentUser = {};
-    taskSpy = sinon.spy(() => Promise.resolve());
-    envSpy = sinon.spy((param) => param === 'TEST_UID' && testUserId);
-    envStub = sinon.stub();
-    onAuthStateChanged = sinon.spy((authHandleFunc) => {
+    taskSpy = vi.fn(() => Promise.resolve());
+    envSpy = vi.fn((param) => param === 'TEST_UID' && testUserId);
+    envStub = vi.fn();
+    onAuthStateChanged = vi.fn((authHandleFunc) => {
       authHandleFunc({});
     });
-    signInWithCustomToken = sinon.spy(() => Promise.resolve());
+    signInWithCustomToken = vi.fn(() => Promise.resolve());
     cy.task = taskSpy;
-    addSpy = sinon.spy((customCommandName: string, customCommandFunc: any) => {
+    addSpy = vi.fn((customCommandName: string, customCommandFunc: any) => {
       loadedCustomCommands[customCommandName] = customCommandFunc;
     });
     Cypress = { Commands: { add: addSpy }, env: envSpy };
@@ -80,17 +92,17 @@ describe('attachCustomCommands', () => {
 
   describe('cy.login', () => {
     it('is attached as a custom command', () => {
-      expect(addSpy).to.have.been.calledWith('login');
+      expectCommandAttached(addSpy, 'login');
     });
 
     it('throws if no uid is passed or within environment', () => {
-      Cypress = { Commands: { add: addSpy }, env: sinon.spy() };
+      Cypress = { Commands: { add: addSpy }, env: vi.fn() };
       attachCustomCommands({ cy, Cypress, firebase });
       currentUser = undefined;
       try {
         loadedCustomCommands.login();
       } catch (err) {
-        expect(err).to.have.property(
+        expect(err).toHaveProperty(
           'message',
           'uid must be passed or TEST_UID set within environment to login',
         );
@@ -101,96 +113,103 @@ describe('attachCustomCommands', () => {
       const uid = '123ABC';
       currentUser = { uid };
       const returnVal = await loadedCustomCommands.login(uid);
-      expect(taskSpy).to.not.have.been.called;
-      expect(signInWithCustomToken).to.not.have.been.called;
-      expect(returnVal).to.be.undefined;
+      expect(taskSpy).not.toHaveBeenCalled();
+      expect(signInWithCustomToken).not.toHaveBeenCalled();
+      expect(returnVal).toBeUndefined();
     });
 
     it('calls task with parameters and custom claims', async () => {
       await loadedCustomCommands.login('123ABC');
-      expect(taskSpy).to.have.been.calledOnce;
-      expect(signInWithCustomToken).to.have.been.calledOnce;
+      expect(taskSpy).toHaveBeenCalledTimes(1);
+      expect(signInWithCustomToken).toHaveBeenCalledTimes(1);
     });
 
     it('calls task with environment test uid', async () => {
       Cypress = { Commands: { add: addSpy }, env: envStub };
       attachCustomCommands({ cy, Cypress, firebase });
-      envStub.withArgs('TEST_UID').returns('foo');
+      envStub.mockImplementation((param) =>
+        param === 'TEST_UID' ? 'foo' : undefined,
+      );
       await loadedCustomCommands.login();
-      expect(taskSpy).to.have.been.calledOnceWith('authCreateCustomToken', {
+      expect(taskSpy).toHaveBeenCalledTimes(1);
+      expect(taskSpy).toHaveBeenCalledWith('authCreateCustomToken', {
         uid: 'foo',
         customClaims: undefined,
         tenantId: undefined,
       });
-      expect(signInWithCustomToken).to.have.been.calledOnce;
+      expect(signInWithCustomToken).toHaveBeenCalledTimes(1);
     });
 
     it('calls task with tenantId', async () => {
       Cypress = { Commands: { add: addSpy }, env: envStub };
       attachCustomCommands({ cy, Cypress, firebase });
       await loadedCustomCommands.login('123ABC', undefined, 'tenant-id');
-      expect(taskSpy).to.have.been.calledOnceWith('authCreateCustomToken', {
+      expect(taskSpy).toHaveBeenCalledTimes(1);
+      expect(taskSpy).toHaveBeenCalledWith('authCreateCustomToken', {
         uid: '123ABC',
         customClaims: undefined,
         tenantId: 'tenant-id',
       });
-      expect(signInWithCustomToken).to.have.been.calledOnce;
+      expect(signInWithCustomToken).toHaveBeenCalledTimes(1);
     });
 
     it('calls task with environment test tenantId', async () => {
       Cypress = { Commands: { add: addSpy }, env: envStub };
       attachCustomCommands({ cy, Cypress, firebase });
-      envStub.withArgs('TEST_TENANT_ID').returns('env-tenant-id');
+      envStub.mockImplementation((param) =>
+        param === 'TEST_TENANT_ID' ? 'env-tenant-id' : undefined,
+      );
       await loadedCustomCommands.login('123ABC');
-      expect(taskSpy).to.have.been.calledOnceWith('authCreateCustomToken', {
+      expect(taskSpy).toHaveBeenCalledTimes(1);
+      expect(taskSpy).toHaveBeenCalledWith('authCreateCustomToken', {
         uid: '123ABC',
         customClaims: undefined,
         tenantId: 'env-tenant-id',
       });
-      expect(signInWithCustomToken).to.have.been.calledOnce;
+      expect(signInWithCustomToken).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('cy.loginWithEmailAndPassword', () => {
     it('is attached as a custom command', () => {
-      expect(addSpy).to.have.been.calledWith('loginWithEmailAndPassword');
+      expectCommandAttached(addSpy, 'loginWithEmailAndPassword');
     });
 
     // it('calls task', async () => {
     //   // Return empty auth so logout is resolved
-    //   onAuthStateChanged = sinon.spy((authHandleFunc) => {
+    //   onAuthStateChanged = vi.fn((authHandleFunc) => {
     //     authHandleFunc();
     //   });
     //   await loadedCustomCommands.logout();
-    //   expect(onAuthStateChanged).to.have.been.calledOnce;
+    //   expect(onAuthStateChanged).toHaveBeenCalledTimes(1);
     // });
   });
 
   describe('cy.logout', () => {
     it('is attached as a custom command', () => {
-      expect(addSpy).to.have.been.calledWith('logout');
+      expectCommandAttached(addSpy, 'logout');
     });
 
     it('calls task', async () => {
       // Return empty auth so logout is resolved
-      onAuthStateChanged = sinon.spy((authHandleFunc) => {
+      onAuthStateChanged = vi.fn((authHandleFunc) => {
         authHandleFunc();
       });
       await loadedCustomCommands.logout();
-      expect(onAuthStateChanged).to.have.been.calledOnce;
+      expect(onAuthStateChanged).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('cy.callFirestore', () => {
     it('is attached as a custom command', () => {
-      expect(addSpy).to.have.been.calledWith('callFirestore');
+      expectCommandAttached(addSpy, 'callFirestore');
     });
 
     it('calls task with get action (setting third argument as options)', async () => {
       const action = 'get';
       const actionPath = '123ABC';
       await loadedCustomCommands.callFirestore(action, actionPath);
-      expect(taskSpy).to.have.been.calledWith('callFirestore', {
+      expect(taskSpy).toHaveBeenCalledWith('callFirestore', {
         action,
         path: actionPath,
         options: undefined,
@@ -207,7 +226,7 @@ describe('attachCustomCommands', () => {
         testData,
         options,
       );
-      expect(taskSpy).to.have.been.calledWith('callFirestore', {
+      expect(taskSpy).toHaveBeenCalledWith('callFirestore', {
         action,
         path: actionPath,
         data: testData,
@@ -226,7 +245,7 @@ describe('attachCustomCommands', () => {
         testData,
         options,
       );
-      expect(taskSpy).to.have.been.calledWith('callFirestore', {
+      expect(taskSpy).toHaveBeenCalledWith('callFirestore', {
         action,
         path: actionPath,
         data: { ...testData, createdBy: testUserId, createdAt: 'TIMESTAMP' },
@@ -237,14 +256,14 @@ describe('attachCustomCommands', () => {
 
   describe('cy.callRtdb', () => {
     it('is attached as a custom command', () => {
-      expect(addSpy).to.have.been.calledWith('callRtdb');
+      expectCommandAttached(addSpy, 'callRtdb');
     });
 
     it('calls task with get action (setting third argument as options)', async () => {
       const action = 'get';
       const actionPath = '123ABC';
       await loadedCustomCommands.callRtdb(action, actionPath);
-      expect(taskSpy).to.have.been.calledWith('callRtdb', {
+      expect(taskSpy).toHaveBeenCalledWith('callRtdb', {
         action,
         path: actionPath,
         options: undefined,
@@ -262,7 +281,7 @@ describe('attachCustomCommands', () => {
         testData,
         options,
       );
-      expect(taskSpy).to.have.been.calledWith('callRtdb', {
+      expect(taskSpy).toHaveBeenCalledWith('callRtdb', {
         action,
         path: actionPath,
         data: testData,
@@ -281,7 +300,7 @@ describe('attachCustomCommands', () => {
         testData,
         options,
       );
-      expect(taskSpy).to.have.been.calledWith('callRtdb', {
+      expect(taskSpy).toHaveBeenCalledWith('callRtdb', {
         action,
         path: actionPath,
         data: { ...testData, createdBy: testUserId, createdAt: 'TIMESTAMP' },
@@ -300,7 +319,7 @@ describe('attachCustomCommands', () => {
         testData,
         options,
       );
-      expect(taskSpy).to.have.been.calledWith('callRtdb', {
+      expect(taskSpy).toHaveBeenCalledWith('callRtdb', {
         action,
         path: actionPath,
         data: testData,
@@ -319,7 +338,7 @@ describe('attachCustomCommands', () => {
         testData,
         options,
       );
-      expect(taskSpy).to.have.been.calledWith('callRtdb', {
+      expect(taskSpy).toHaveBeenCalledWith('callRtdb', {
         action,
         path: actionPath,
         data: testData,
@@ -331,13 +350,13 @@ describe('attachCustomCommands', () => {
   describe('firebase auth functions', () => {
     describe('cy.authCreateUser', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authCreateUser');
+        expectCommandAttached(addSpy, 'authCreateUser');
       });
 
       it('calls task with parameters', async () => {
         const uid = 'TESTING_USER_UID';
         await loadedCustomCommands.authCreateUser({ uid });
-        expect(taskSpy).to.have.been.calledWith('authCreateUser', {
+        expect(taskSpy).toHaveBeenCalledWith('authCreateUser', {
           properties: { uid },
           tenantId: false,
         });
@@ -345,7 +364,7 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authImportUsers', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authImportUsers');
+        expectCommandAttached(addSpy, 'authImportUsers');
       });
 
       it('calls task with parameters', async () => {
@@ -355,7 +374,7 @@ describe('attachCustomCommands', () => {
           { uid: uid1 },
           { uid: uid2 },
         ]);
-        expect(taskSpy).to.have.been.calledWith('authImportUsers', {
+        expect(taskSpy).toHaveBeenCalledWith('authImportUsers', {
           usersImport: [{ uid: uid1 }, { uid: uid2 }],
           importOptions: undefined,
           tenantId: false,
@@ -364,12 +383,12 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authListUsers', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authListUsers');
+        expectCommandAttached(addSpy, 'authListUsers');
       });
 
       it('calls task with parameters', async () => {
         await loadedCustomCommands.authListUsers(3);
-        expect(taskSpy).to.have.been.calledWith('authListUsers', {
+        expect(taskSpy).toHaveBeenCalledWith('authListUsers', {
           maxResults: 3,
           pageToken: undefined,
           tenantId: false,
@@ -378,13 +397,13 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authGetUser', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authGetUser');
+        expectCommandAttached(addSpy, 'authGetUser');
       });
 
       it('calls task with parameters', async () => {
         const uid = 'TESTING_USER_UID';
         await loadedCustomCommands.authGetUser(uid);
-        expect(taskSpy).to.have.been.calledWith('authGetUser', {
+        expect(taskSpy).toHaveBeenCalledWith('authGetUser', {
           uid,
           tenantId: false,
         });
@@ -392,13 +411,13 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authGetUserByEmail', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authGetUserByEmail');
+        expectCommandAttached(addSpy, 'authGetUserByEmail');
       });
 
       it('calls task with parameters', async () => {
         const email = 'testuser@email.com';
         await loadedCustomCommands.authGetUserByEmail(email);
-        expect(taskSpy).to.have.been.calledWith('authGetUserByEmail', {
+        expect(taskSpy).toHaveBeenCalledWith('authGetUserByEmail', {
           email,
           tenantId: false,
         });
@@ -406,13 +425,13 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authGetUserByPhoneNumber', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authGetUserByPhoneNumber');
+        expectCommandAttached(addSpy, 'authGetUserByPhoneNumber');
       });
 
       it('calls task with parameters', async () => {
         const phoneNumber = 'A_PHONE_NUMBER';
         await loadedCustomCommands.authGetUserByPhoneNumber(phoneNumber);
-        expect(taskSpy).to.have.been.calledWith('authGetUserByPhoneNumber', {
+        expect(taskSpy).toHaveBeenCalledWith('authGetUserByPhoneNumber', {
           phoneNumber,
           tenantId: false,
         });
@@ -420,14 +439,14 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authGetUserByProviderUid', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authGetUserByProviderUid');
+        expectCommandAttached(addSpy, 'authGetUserByProviderUid');
       });
 
       it('calls task with parameters', async () => {
         const providerId = 'PROVIDER_ID';
         const uid = 'TESTING_USER_UID';
         await loadedCustomCommands.authGetUserByProviderUid(providerId, uid);
-        expect(taskSpy).to.have.been.calledWith('authGetUserByProviderUid', {
+        expect(taskSpy).toHaveBeenCalledWith('authGetUserByProviderUid', {
           providerId,
           uid,
           tenantId: false,
@@ -436,7 +455,7 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authGetUsers', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authGetUsers');
+        expectCommandAttached(addSpy, 'authGetUsers');
       });
 
       it('calls task with parameters', async () => {
@@ -451,7 +470,7 @@ describe('attachCustomCommands', () => {
           { providerId, providerUid: uid },
         ];
         await loadedCustomCommands.authGetUsers(identifiers);
-        expect(taskSpy).to.have.been.calledWith('authGetUsers', {
+        expect(taskSpy).toHaveBeenCalledWith('authGetUsers', {
           identifiers,
           tenantId: false,
         });
@@ -459,14 +478,14 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authUpdateUser', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authUpdateUser');
+        expectCommandAttached(addSpy, 'authUpdateUser');
       });
 
       it('calls task with parameters', async () => {
         const uid = 'TESTING_USER_UID';
         const update = { displayName: 'Test User' };
         await loadedCustomCommands.authUpdateUser(uid, update);
-        expect(taskSpy).to.have.been.calledWith('authUpdateUser', {
+        expect(taskSpy).toHaveBeenCalledWith('authUpdateUser', {
           uid,
           properties: update,
           tenantId: false,
@@ -475,14 +494,14 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authSetCustomUserClaims', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authSetCustomUserClaims');
+        expectCommandAttached(addSpy, 'authSetCustomUserClaims');
       });
 
       it('calls task with parameters', async () => {
         const uid = 'TESTING_USER_UID';
         const claims = { role: 'Admin' };
         await loadedCustomCommands.authSetCustomUserClaims(uid, claims);
-        expect(taskSpy).to.have.been.calledWith('authSetCustomUserClaims', {
+        expect(taskSpy).toHaveBeenCalledWith('authSetCustomUserClaims', {
           uid,
           customClaims: claims,
           tenantId: false,
@@ -491,13 +510,13 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authDeleteUser', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authDeleteUser');
+        expectCommandAttached(addSpy, 'authDeleteUser');
       });
 
       it('calls task with parameters', async () => {
         const uid = 'TESTING_USER_UID';
         await loadedCustomCommands.authDeleteUser(uid);
-        expect(taskSpy).to.have.been.calledWith('authDeleteUser', {
+        expect(taskSpy).toHaveBeenCalledWith('authDeleteUser', {
           uid,
           tenantId: false,
         });
@@ -505,14 +524,14 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authDeleteUsers', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authDeleteUsers');
+        expectCommandAttached(addSpy, 'authDeleteUsers');
       });
 
       it('calls task with parameters', async () => {
         const uid1 = 'TESTING_USER_UID';
         const uid2 = 'TESTING_USER_UID';
         await loadedCustomCommands.authDeleteUsers([uid1, uid2]);
-        expect(taskSpy).to.have.been.calledWith('authDeleteUsers', {
+        expect(taskSpy).toHaveBeenCalledWith('authDeleteUsers', {
           uids: [uid1, uid2],
           tenantId: false,
         });
@@ -520,14 +539,14 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authCreateCustomToken', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authCreateCustomToken');
+        expectCommandAttached(addSpy, 'authCreateCustomToken');
       });
 
       it('calls task with parameters', async () => {
         const uid = 'TESTING_USER_UID';
         const claims = { role: 'Admin' };
         await loadedCustomCommands.authCreateCustomToken(uid, claims);
-        expect(taskSpy).to.have.been.calledWith('authCreateCustomToken', {
+        expect(taskSpy).toHaveBeenCalledWith('authCreateCustomToken', {
           uid,
           customClaims: claims,
           tenantId: false,
@@ -536,14 +555,14 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authCreateSessionCookie', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authCreateSessionCookie');
+        expectCommandAttached(addSpy, 'authCreateSessionCookie');
       });
 
       it('calls task with parameters', async () => {
         const idToken = 'TESTING';
         const cookieOpts = { expiresIn: 60 * 60 * 24 * 5 };
         await loadedCustomCommands.authCreateSessionCookie(idToken, cookieOpts);
-        expect(taskSpy).to.have.been.calledWith('authCreateSessionCookie', {
+        expect(taskSpy).toHaveBeenCalledWith('authCreateSessionCookie', {
           idToken,
           sessionCookieOptions: cookieOpts,
           tenantId: false,
@@ -552,14 +571,14 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authVerifyIdToken', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authVerifyIdToken');
+        expectCommandAttached(addSpy, 'authVerifyIdToken');
       });
 
       it('calls task with parameters', async () => {
         const idToken = 'TESTING';
         const checkRevoked = true;
         await loadedCustomCommands.authVerifyIdToken(idToken, checkRevoked);
-        expect(taskSpy).to.have.been.calledWith('authVerifyIdToken', {
+        expect(taskSpy).toHaveBeenCalledWith('authVerifyIdToken', {
           idToken,
           checkRevoked,
           tenantId: false,
@@ -568,13 +587,13 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authRevokeRefreshTokens', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authRevokeRefreshTokens');
+        expectCommandAttached(addSpy, 'authRevokeRefreshTokens');
       });
 
       it('calls task with parameters', async () => {
         const uid = 'TESTING_USER_UID';
         await loadedCustomCommands.authRevokeRefreshTokens(uid);
-        expect(taskSpy).to.have.been.calledWith('authRevokeRefreshTokens', {
+        expect(taskSpy).toHaveBeenCalledWith('authRevokeRefreshTokens', {
           uid,
           tenantId: false,
         });
@@ -582,9 +601,7 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authGenerateEmailVerificationLink', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith(
-          'authGenerateEmailVerificationLink',
-        );
+        expectCommandAttached(addSpy, 'authGenerateEmailVerificationLink');
       });
 
       it('calls task with parameters', async () => {
@@ -594,7 +611,7 @@ describe('attachCustomCommands', () => {
           email,
           actionCodeSettings,
         );
-        expect(taskSpy).to.have.been.calledWith(
+        expect(taskSpy).toHaveBeenCalledWith(
           'authGenerateEmailVerificationLink',
           {
             email,
@@ -606,7 +623,7 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authGeneratePasswordResetLink', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authGeneratePasswordResetLink');
+        expectCommandAttached(addSpy, 'authGeneratePasswordResetLink');
       });
 
       it('calls task with parameters', async () => {
@@ -616,21 +633,16 @@ describe('attachCustomCommands', () => {
           email,
           actionCodeSettings,
         );
-        expect(taskSpy).to.have.been.calledWith(
-          'authGeneratePasswordResetLink',
-          {
-            email,
-            actionCodeSettings,
-            tenantId: false,
-          },
-        );
+        expect(taskSpy).toHaveBeenCalledWith('authGeneratePasswordResetLink', {
+          email,
+          actionCodeSettings,
+          tenantId: false,
+        });
       });
     });
     describe('cy.authGenerateSignInWithEmailLink', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith(
-          'authGenerateSignInWithEmailLink',
-        );
+        expectCommandAttached(addSpy, 'authGenerateSignInWithEmailLink');
       });
 
       it('calls task with parameters', async () => {
@@ -640,7 +652,7 @@ describe('attachCustomCommands', () => {
           email,
           actionCodeSettings,
         );
-        expect(taskSpy).to.have.been.calledWith(
+        expect(taskSpy).toHaveBeenCalledWith(
           'authGenerateSignInWithEmailLink',
           {
             email,
@@ -652,9 +664,7 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authGenerateVerifyAndChangeEmailLink', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith(
-          'authGenerateVerifyAndChangeEmailLink',
-        );
+        expectCommandAttached(addSpy, 'authGenerateVerifyAndChangeEmailLink');
       });
 
       it('calls task with parameters', async () => {
@@ -666,7 +676,7 @@ describe('attachCustomCommands', () => {
           newEmail,
           actionCodeSettings,
         );
-        expect(taskSpy).to.have.been.calledWith(
+        expect(taskSpy).toHaveBeenCalledWith(
           'authGenerateVerifyAndChangeEmailLink',
           {
             email,
@@ -679,7 +689,7 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authCreateProviderConfig', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authCreateProviderConfig');
+        expectCommandAttached(addSpy, 'authCreateProviderConfig');
       });
 
       it('calls task with parameters', async () => {
@@ -688,7 +698,7 @@ describe('attachCustomCommands', () => {
           issuer: 'ISSUER',
         };
         await loadedCustomCommands.authCreateProviderConfig(providerConfig);
-        expect(taskSpy).to.have.been.calledWith('authCreateProviderConfig', {
+        expect(taskSpy).toHaveBeenCalledWith('authCreateProviderConfig', {
           providerConfig,
           tenantId: false,
         });
@@ -696,13 +706,13 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authGetProviderConfig', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authGetProviderConfig');
+        expectCommandAttached(addSpy, 'authGetProviderConfig');
       });
 
       it('calls task with parameters', async () => {
         const providerId = 'PROVIDER_ID';
         await loadedCustomCommands.authGetProviderConfig(providerId);
-        expect(taskSpy).to.have.been.calledWith('authGetProviderConfig', {
+        expect(taskSpy).toHaveBeenCalledWith('authGetProviderConfig', {
           providerId,
           tenantId: false,
         });
@@ -710,13 +720,13 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authListProviderConfigs', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authListProviderConfigs');
+        expectCommandAttached(addSpy, 'authListProviderConfigs');
       });
 
       it('calls task with parameters', async () => {
         const providerFilter = { type: 'oidc', maxResults: 2 };
         await loadedCustomCommands.authListProviderConfigs(providerFilter);
-        expect(taskSpy).to.have.been.calledWith('authListProviderConfigs', {
+        expect(taskSpy).toHaveBeenCalledWith('authListProviderConfigs', {
           providerFilter,
           tenantId: false,
         });
@@ -724,7 +734,7 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authUpdateProviderConfig', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authUpdateProviderConfig');
+        expectCommandAttached(addSpy, 'authUpdateProviderConfig');
       });
 
       it('calls task with parameters', async () => {
@@ -737,7 +747,7 @@ describe('attachCustomCommands', () => {
           providerId,
           providerConfig,
         );
-        expect(taskSpy).to.have.been.calledWith('authUpdateProviderConfig', {
+        expect(taskSpy).toHaveBeenCalledWith('authUpdateProviderConfig', {
           providerId,
           providerConfig,
           tenantId: false,
@@ -746,13 +756,13 @@ describe('attachCustomCommands', () => {
     });
     describe('cy.authDeleteProviderConfig', () => {
       it('is attached as a custom command', () => {
-        expect(addSpy).to.have.been.calledWith('authDeleteProviderConfig');
+        expectCommandAttached(addSpy, 'authDeleteProviderConfig');
       });
 
       it('calls task with parameters', async () => {
         const providerId = 'PROVIDER_ID';
         await loadedCustomCommands.authDeleteProviderConfig(providerId);
-        expect(taskSpy).to.have.been.calledWith('authDeleteProviderConfig', {
+        expect(taskSpy).toHaveBeenCalledWith('authDeleteProviderConfig', {
           providerId,
           tenantId: false,
         });
@@ -762,13 +772,13 @@ describe('attachCustomCommands', () => {
 
   describe('cy.createUserWithClaims', () => {
     it('is attached as a custom command', () => {
-      expect(addSpy).to.have.been.calledWith('createUserWithClaims');
+      expectCommandAttached(addSpy, 'createUserWithClaims');
     });
   });
 
   describe('cy.deleteAllAuthUsers', () => {
     it('is attached as a custom command', () => {
-      expect(addSpy).to.have.been.calledWith('deleteAllAuthUsers');
+      expectCommandAttached(addSpy, 'deleteAllAuthUsers');
     });
   });
 
@@ -777,11 +787,11 @@ describe('attachCustomCommands', () => {
       it(`Aliases ${commandName} command`, () => {
         const commandNames = { [commandName]: 'testing' };
         attachCustomCommands({ cy, Cypress, firebase }, { commandNames });
-        expect(addSpy).to.have.been.calledWith('testing');
+        expectCommandAttached(addSpy, 'testing');
         allCommandNames
           .filter((name) => name !== commandName)
           .forEach((name) => {
-            expect(addSpy).to.have.been.calledWith(name);
+            expectCommandAttached(addSpy, name);
           });
       });
     });
