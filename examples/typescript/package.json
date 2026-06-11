@@ -31,11 +31,11 @@
     "cypress": "15.17.0",
     "cypress-firebase": "4.2.2",
     "eslint-plugin-chai-friendly": "0.8.0",
-    "eslint-plugin-cypress": "5.3.0",
+    "eslint-plugin-cypress": "6.4.1",
     "firebase-admin": "13.10.0",
-    "firebase-tools": "14.27.0",
+    "firebase-tools": "15.20.0",
     "react-scripts": "5.0.1",
-    "typescript": "5.9.3",
+    "typescript": "6.0.3",
     "web-vitals": "5.3.0"
   },
   "eslintConfig": {
