@@ -12,12 +12,14 @@ let Cypress: any = {};
 let currentUser: any;
 let onAuthStateChanged: any;
 let signInWithCustomToken: any;
+let signInWithEmailAndPassword: any;
 const firebase = {
   app: () => firebase,
   auth: vi.fn(() => ({
     currentUser,
     onAuthStateChanged,
     signInWithCustomToken,
+    signInWithEmailAndPassword,
     signOut: vi.fn(() => Promise.resolve()),
   })),
   database: { ServerValue: { TIMESTAMP: 'TIMESTAMP' } },
@@ -82,7 +84,9 @@ describe('attachCustomCommands', () => {
       authHandleFunc({});
     });
     signInWithCustomToken = vi.fn(() => Promise.resolve());
+    signInWithEmailAndPassword = vi.fn(() => Promise.resolve());
     cy.task = taskSpy;
+    cy.wrap = vi.fn((value: any) => value);
     // Default to Cypress < 15.10 (no cy.env command) - cy.env tests set this
     cy.env = undefined;
     addSpy = vi.fn((customCommandName: string, customCommandFunc: any) => {
@@ -177,14 +181,63 @@ describe('attachCustomCommands', () => {
       expectCommandAttached(addSpy, 'loginWithEmailAndPassword');
     });
 
-    // it('calls task', async () => {
-    //   // Return empty auth so logout is resolved
-    //   onAuthStateChanged = vi.fn((authHandleFunc) => {
-    //     authHandleFunc();
-    //   });
-    //   await loadedCustomCommands.logout();
-    //   expect(onAuthStateChanged).toHaveBeenCalledTimes(1);
-    // });
+    it('throws if no email is passed or within environment', () => {
+      expect(() => loadedCustomCommands.loginWithEmailAndPassword()).toThrow(
+        'email must be passed or TEST_EMAIL set within environment to login',
+      );
+    });
+
+    it('throws if no password is passed or within environment', () => {
+      expect(() =>
+        loadedCustomCommands.loginWithEmailAndPassword('test@email.com'),
+      ).toThrow(
+        'password must be passed or TEST_PASSWORD set within environment to login',
+      );
+    });
+
+    it('returns undefined if passed email matches already logged in user', async () => {
+      const email = 'test@email.com';
+      currentUser = { email };
+      const returnVal = await loadedCustomCommands.loginWithEmailAndPassword(
+        email,
+        'password',
+      );
+      expect(taskSpy).not.toHaveBeenCalled();
+      expect(signInWithEmailAndPassword).not.toHaveBeenCalled();
+      expect(returnVal).toBeUndefined();
+    });
+
+    it('logs in directly if the user already exists', async () => {
+      const email = 'test@email.com';
+      const password = 'password';
+      taskSpy.mockImplementation((taskName: string) =>
+        taskName === 'authGetUserByEmail'
+          ? Promise.resolve({ uid: 'existing-uid', email })
+          : Promise.resolve(),
+      );
+      await loadedCustomCommands.loginWithEmailAndPassword(email, password);
+      expect(taskSpy).toHaveBeenCalledWith('authGetUserByEmail', {
+        email,
+        tenantId: false,
+      });
+      expect(signInWithEmailAndPassword).toHaveBeenCalledWith(email, password);
+    });
+
+    it('creates the user then logs in if the user does not exist', async () => {
+      const email = 'test@email.com';
+      const password = 'password';
+      taskSpy.mockImplementation((taskName: string) =>
+        taskName === 'authGetUserByEmail'
+          ? Promise.resolve(null)
+          : Promise.resolve(),
+      );
+      await loadedCustomCommands.loginWithEmailAndPassword(email, password);
+      expect(taskSpy).toHaveBeenCalledWith('authCreateUser', {
+        properties: { email, password },
+        tenantId: false,
+      });
+      expect(signInWithEmailAndPassword).toHaveBeenCalledWith(email, password);
+    });
   });
 
   describe('cy.logout', () => {
@@ -363,6 +416,78 @@ describe('attachCustomCommands', () => {
           tenantId: false,
         });
       });
+
+      it('falls back to getting the user by email if it already exists', async () => {
+        const email = 'test@email.com';
+        const existingUser = { uid: 'existing-uid', email };
+        taskSpy.mockImplementation((taskName: string) =>
+          taskName === 'authCreateUser'
+            ? Promise.resolve('auth/email-already-exists')
+            : Promise.resolve(existingUser),
+        );
+        const result = await loadedCustomCommands.authCreateUser({ email });
+        expect(taskSpy).toHaveBeenCalledWith('authGetUserByEmail', {
+          email,
+          tenantId: false,
+        });
+        expect(result).toEqual(existingUser);
+      });
+
+      it('throws if user with email exists but no email was given', async () => {
+        taskSpy.mockImplementation(() =>
+          Promise.resolve('auth/email-already-exists'),
+        );
+        await expect(loadedCustomCommands.authCreateUser({})).rejects.toThrow(
+          'User with email already exists yet no email was given',
+        );
+      });
+
+      it('falls back to getting the user by phone number if it already exists', async () => {
+        const phoneNumber = 'A_PHONE_NUMBER';
+        const existingUser = { uid: 'existing-uid', phoneNumber };
+        taskSpy.mockImplementation((taskName: string) =>
+          taskName === 'authCreateUser'
+            ? Promise.resolve('auth/phone-number-already-exists')
+            : Promise.resolve(existingUser),
+        );
+        const result = await loadedCustomCommands.authCreateUser({
+          phoneNumber,
+        });
+        expect(taskSpy).toHaveBeenCalledWith('authGetUserByPhoneNumber', {
+          phoneNumber,
+          tenantId: false,
+        });
+        expect(result).toEqual(existingUser);
+      });
+
+      it('throws if user with phone number exists but no phone number was given', async () => {
+        taskSpy.mockImplementation(() =>
+          Promise.resolve('auth/phone-number-already-exists'),
+        );
+        await expect(loadedCustomCommands.authCreateUser({})).rejects.toThrow(
+          'User with phone number already exists yet no phone number was given',
+        );
+      });
+    });
+
+    describe('cy.createUserWithClaims', () => {
+      it('sets custom claims after creating the user', async () => {
+        const uid = 'TESTING_USER_UID';
+        const customClaims = { role: 'Admin' };
+        taskSpy.mockImplementation((taskName: string) =>
+          taskName === 'authCreateUser'
+            ? Promise.resolve({ uid })
+            : Promise.resolve(),
+        );
+        loadedCustomCommands.createUserWithClaims({ uid }, customClaims);
+        await vi.waitFor(() =>
+          expect(taskSpy).toHaveBeenCalledWith('authSetCustomUserClaims', {
+            uid,
+            customClaims,
+            tenantId: false,
+          }),
+        );
+      });
     });
     describe('cy.authImportUsers', () => {
       it('is attached as a custom command', () => {
@@ -409,6 +534,14 @@ describe('attachCustomCommands', () => {
           uid,
           tenantId: false,
         });
+      });
+
+      it('returns null if the user is not found', async () => {
+        taskSpy.mockImplementation(() =>
+          Promise.resolve('auth/user-not-found'),
+        );
+        const result = await loadedCustomCommands.authGetUser('some-uid');
+        expect(result).toBeNull();
       });
     });
     describe('cy.authGetUserByEmail', () => {
@@ -522,6 +655,14 @@ describe('attachCustomCommands', () => {
           uid,
           tenantId: false,
         });
+      });
+
+      it('throws if no uid is passed or within environment', () => {
+        Cypress = { Commands: { add: addSpy }, env: vi.fn() };
+        attachCustomCommands({ cy, Cypress, firebase });
+        expect(() => loadedCustomCommands.authDeleteUser()).toThrow(
+          'uid must be passed or TEST_UID set within environment to login',
+        );
       });
     });
     describe('cy.authDeleteUsers', () => {
@@ -781,6 +922,27 @@ describe('attachCustomCommands', () => {
   describe('cy.deleteAllAuthUsers', () => {
     it('is attached as a custom command', () => {
       expectCommandAttached(addSpy, 'deleteAllAuthUsers');
+    });
+
+    it('deletes users in batches until none remain', async () => {
+      let listCallCount = 0;
+      taskSpy.mockImplementation((taskName: string) => {
+        if (taskName === 'authListUsers') {
+          listCallCount += 1;
+          return Promise.resolve(
+            listCallCount === 1
+              ? { users: [{ uid: '1' }, { uid: '2' }], pageToken: undefined }
+              : { users: [] },
+          );
+        }
+        return Promise.resolve({ successCount: 2, failureCount: 0 });
+      });
+      await loadedCustomCommands.deleteAllAuthUsers();
+      expect(taskSpy).toHaveBeenCalledWith('authDeleteUsers', {
+        uids: ['1', '2'],
+        tenantId: false,
+      });
+      expect(listCallCount).toBe(2);
     });
   });
 
