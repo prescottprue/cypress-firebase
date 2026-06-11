@@ -13,7 +13,7 @@ concurrency:
   group: publish-${{ github.ref }}
 
 env:
-  NODE_VERSION: 20.x
+  NODE_VERSION: 24.x
 
 jobs:
   publish-npm:
@@ -28,6 +28,12 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
           registry-url: https://registry.npmjs.org/
+
+      - name: Use Java 21 (required by firebase-tools emulators)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
 
       - name: Get cache settings
         id: cache-settings
@@ -54,7 +60,7 @@ jobs:
         run: yarn build
 
       - name: Semantic Release
-        uses: cycjimmy/semantic-release-action@v3
+        uses: cycjimmy/semantic-release-action@v6.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -72,7 +78,7 @@ jobs:
         run: yarn test:cov
 
       - name: Upload Test Coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}

@@ -1,21 +1,20 @@
-import { expect } from 'chai';
-import sinon from 'sinon';
-import { isString, initializeFirebase } from '../../src/firebase-utils';
+import { describe, expect, it, vi } from 'vitest';
+import { initializeFirebase, isString } from '../../src/firebase-utils';
 
 const returnedInstance = {};
-const initializeMock = sinon.spy(() => returnedInstance);
-const settingsMock = sinon.spy();
+const initializeMock = vi.fn(() => returnedInstance);
+const settingsMock = vi.fn();
 const projectId = 'test-project';
 const mockCredential = { project_id: projectId };
-const applicationDefaultMock = sinon.spy(() => mockCredential);
-const certMock = sinon.spy((input) => input);
+const applicationDefaultMock = vi.fn(() => mockCredential);
+const certMock = vi.fn((input) => input);
 const adminInstanceMock = {
   initializeApp: initializeMock,
   credential: {
     applicationDefault: applicationDefaultMock,
     cert: certMock,
   },
-  firestore: sinon.spy(() => ({
+  firestore: vi.fn(() => ({
     settings: settingsMock,
   })),
 };
@@ -23,26 +22,26 @@ const adminInstanceMock = {
 describe('firebase-utils', () => {
   describe('isString', () => {
     it('Should return true if input is a string', () => {
-      expect(isString('')).to.be.true;
-      expect(isString('asdfasdf')).to.be.true;
+      expect(isString('')).toBe(true);
+      expect(isString('asdfasdf')).toBe(true);
     });
 
     it('Should return true if input is an instance of String', () => {
-      expect(isString(String('asdf'))).to.be.true;
+      expect(isString(String('asdf'))).toBe(true);
     });
 
     it('Should return false if input is not a string', () => {
-      expect(isString([])).to.be.false;
-      expect(isString({})).to.be.false;
-      expect(isString(new Date())).to.be.false;
+      expect(isString([])).toBe(false);
+      expect(isString({})).toBe(false);
+      expect(isString(new Date())).toBe(false);
     });
   });
 
   describe('initializeFirebase', () => {
     it('Should call initializeApp with projectId and databaseURL by default', () => {
       const result = initializeFirebase(adminInstanceMock);
-      expect(result).to.equal(returnedInstance);
-      expect(initializeMock).to.have.been.calledWith({
+      expect(result).toBe(returnedInstance);
+      expect(initializeMock).toHaveBeenCalledWith({
         projectId,
         credential: mockCredential,
         databaseURL: `http://${process.env.FIREBASE_DATABASE_EMULATOR_HOST}?ns=${projectId}`,
@@ -57,8 +56,8 @@ describe('firebase-utils', () => {
         databaseURL,
         credential: mockCredential,
       });
-      expect(result).to.equal(returnedInstance);
-      expect(initializeMock).to.have.been.calledWith({
+      expect(result).toBe(returnedInstance);
+      expect(initializeMock).toHaveBeenCalledWith({
         projectId,
         databaseURL,
         credential: mockCredential,
@@ -72,17 +71,17 @@ describe('firebase-utils', () => {
       const adminInstanceWithCredMock = {
         initializeApp: initializeMock,
         credential: {
-          applicationDefault: sinon.spy(() => mockCredential),
+          applicationDefault: vi.fn(() => mockCredential),
         },
-        firestore: sinon.spy(() => ({
+        firestore: vi.fn(() => ({
           settings: settingsMock,
         })),
       };
       const result = initializeFirebase(adminInstanceWithCredMock, {
         projectId,
       });
-      expect(result).to.equal(returnedInstance);
-      expect(initializeMock).to.have.been.calledWith({
+      expect(result).toBe(returnedInstance);
+      expect(initializeMock).toHaveBeenCalledWith({
         projectId,
         credential: mockCredential,
         databaseURL,
@@ -96,8 +95,8 @@ describe('firebase-utils', () => {
       initializeFirebase(adminInstanceMock, {
         projectId,
       });
-      expect(certMock).to.have.been.calledWith(fileData);
-      expect(initializeMock).to.have.been.calledWith({
+      expect(certMock).toHaveBeenCalledWith(fileData);
+      expect(initializeMock).toHaveBeenCalledWith({
         projectId,
         credential: fileData,
         databaseURL,
@@ -111,7 +110,7 @@ describe('firebase-utils', () => {
           projectId,
         });
       } catch (err) {
-        expect(err).to.have.property(
+        expect(err).toHaveProperty(
           'message',
           `cypress-firebase: Issue parsing "SERVICE_ACCOUNT" environment variable from string to object, returning string`,
         );
