@@ -1,10 +1,16 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "pinVersions": false,
+  "rangeStrategy": "replace",
   "extends": [
     "github>prescottprue/renovate-config:library",
     "customManagers:biomeVersions"
   ],
   "packageRules": [
+    {
+      "matchDatasources": ["npm"],
+      "minimumReleaseAge": "7 days"
+    },
     {
       "description": "Disable dep updates to react-redux-firebase example (needs manual updating)",
       "matchPaths": ["examples/react-redux-firebase/**"],
