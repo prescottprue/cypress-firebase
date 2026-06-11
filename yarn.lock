@@ -4296,7 +4296,7 @@ __metadata:
     chai: "npm:4.5.0"
     cypress: "npm:15.17.0"
     firebase: "npm:12.14.0"
-    firebase-admin: "npm:13.8.0"
+    firebase-admin: "npm:13.10.0"
     firebase-tools: "npm:14.27.0"
     husky: "npm:9.1.7"
     lint-staged: "npm:16.4.0"
@@ -5395,9 +5395,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-admin@npm:13.8.0":
-  version: 13.8.0
-  resolution: "firebase-admin@npm:13.8.0"
+"firebase-admin@npm:13.10.0":
+  version: 13.10.0
+  resolution: "firebase-admin@npm:13.10.0"
   dependencies:
     "@fastify/busboy": "npm:^3.0.0"
     "@firebase/database-compat": "npm:^2.0.0"
@@ -5409,14 +5409,12 @@ __metadata:
     google-auth-library: "npm:^10.6.1"
     jsonwebtoken: "npm:^9.0.0"
     jwks-rsa: "npm:^3.1.0"
-    node-forge: "npm:^1.4.0"
-    uuid: "npm:^11.0.2"
   dependenciesMeta:
     "@google-cloud/firestore":
       optional: true
     "@google-cloud/storage":
       optional: true
-  checksum: 10c0/22e66bc1122d3c6ca4fb21f52db12c6b9cecaa275fe27aa1aa7ad1dd227ebdc91f0bb65acae88c9b813e9d9192bfe8e3bbe5666ea6e9b030fdf4ac9f2d02f902
+  checksum: 10c0/a647d91f05a644931ec27c217ebf2143841153f220b041ee97fd64bf402c08552f604112694c2597135fd84275144c2f19fc92920f8e01cb0caef4240b1e4974
   languageName: node
   linkType: hard
 
@@ -7954,13 +7952,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-forge@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "node-forge@npm:1.4.0"
-  checksum: 10c0/67330a5f1f95257a4c8a93b7d555abe87b5f15e350123aa396c97a21a8ca94f9c6549008eb2c73668a91e0d7e3a905785acbd8f8bd0751c29401292011f8f8e1
-  languageName: node
-  linkType: hard
-
 "node-gyp@npm:^12.2.0, node-gyp@npm:latest":
   version: 12.2.0
   resolution: "node-gyp@npm:12.2.0"
@@ -10454,15 +10445,6 @@ __metadata:
   version: 1.0.1
   resolution: "utils-merge@npm:1.0.1"
   checksum: 10c0/02ba649de1b7ca8854bfe20a82f1dfbdda3fb57a22ab4a8972a63a34553cf7aa51bc9081cf7e001b035b88186d23689d69e71b510e610a09a4c66f68aa95b672
-  languageName: node
-  linkType: hard
-
-"uuid@npm:^11.0.2":
-  version: 11.1.0
-  resolution: "uuid@npm:11.1.0"
-  bin:
-    uuid: dist/esm/bin/uuid
-  checksum: 10c0/34aa51b9874ae398c2b799c88a127701408cd581ee89ec3baa53509dd8728cbb25826f2a038f9465f8b7be446f0fbf11558862965b18d21c993684297628d4d3
   languageName: node
   linkType: hard
 
