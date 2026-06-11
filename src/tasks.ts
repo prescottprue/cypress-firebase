@@ -6,6 +6,7 @@ import type {
   CallFirestoreOptions,
   CallRtdbOptions,
   FirestoreAction,
+  FirestoreStatics,
   FixtureData,
   RTDBAction,
 } from './attachCustomCommands';
@@ -75,7 +76,7 @@ function getAuth(
  */
 export function convertValueToTimestampOrGeoPointIfPossible(
   dataVal: any,
-  firestoreStatics: typeof firestore,
+  firestoreStatics: FirestoreStatics,
 ): firestore.FieldValue {
   if (
     (dataVal && dataVal._methodName === 'serverTimestamp') ||
@@ -116,7 +117,7 @@ export function convertValueToTimestampOrGeoPointIfPossible(
  */
 function getDataWithTimestampsAndGeoPoints(
   data: firestore.DocumentData,
-  firestoreStatics: typeof firestore,
+  firestoreStatics: FirestoreStatics,
 ): Record<string, any> {
   // Exit if no statics are passed
   if (!firestoreStatics) {
@@ -294,7 +295,7 @@ export async function callFirestore(
       // Use static option if passed (tests), otherwise fallback to statics on adminInstance
       // Tests do not have statics since they are using @firebase/testing
       (options && options.statics) ||
-        (adminInstance.firestore as typeof firestore),
+        (adminInstance.firestore as FirestoreStatics),
     );
 
     if (action === 'set') {

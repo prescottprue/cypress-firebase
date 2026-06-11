@@ -29,6 +29,16 @@ export interface FixtureData {
 export type WhereOptions = [string, firestore.WhereFilterOp, any];
 
 /**
+ * Subset of Firestore statics used by cypress-firebase. Both the legacy
+ * namespaced API (i.e. admin.firestore on firebase-admin v11-13) and the
+ * modular firebase-admin/firestore module (v14+) satisfy this shape.
+ */
+export type FirestoreStatics = Pick<
+  typeof firestore,
+  'FieldValue' | 'Timestamp' | 'GeoPoint'
+>;
+
+/**
  * Options for callFirestore custom Cypress command.
  */
 export interface CallFirestoreOptions {
@@ -65,7 +75,7 @@ export interface CallFirestoreOptions {
    * Firestore statics (i.e. admin.firestore). This should only be needed during
    * testing due to @firebase/testing not containing statics
    */
-  statics?: typeof firestore;
+  statics?: FirestoreStatics;
 }
 
 /**

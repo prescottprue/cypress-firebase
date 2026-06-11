@@ -2,6 +2,7 @@ import type { App, AppOptions, Credential } from 'firebase-admin/app';
 import type * as firestore from 'firebase-admin/firestore';
 import type {
   CallFirestoreOptions,
+  FirestoreStatics,
   WhereOptions,
 } from './attachCustomCommands';
 import { convertValueToTimestampOrGeoPointIfPossible } from './tasks';
@@ -10,7 +11,8 @@ import { convertValueToTimestampOrGeoPointIfPossible } from './tasks';
  * Firestore function from a firebase-admin instance (invoking gets the
  * instance) which also carries statics such as FieldValue and Timestamp
  */
-export type FirestoreStatics = (() => firestore.Firestore) & typeof firestore;
+export type FirestoreFunctionWithStatics = (() => firestore.Firestore) &
+  FirestoreStatics;
 
 /**
  * Check whether the provided firebase-admin instance uses the modular API
@@ -317,7 +319,7 @@ export function isDocPath(slashPath: string): boolean {
 export function applyWhere(
   ref: firestore.CollectionReference | firestore.Query,
   whereSetting: WhereOptions,
-  firestoreStatics: typeof firestore,
+  firestoreStatics: FirestoreStatics,
 ): firestore.Query {
   const [param, filterOp, val] = whereSetting as WhereOptions;
   return ref.where(
@@ -335,7 +337,7 @@ export function applyWhere(
  * @returns Ref at slash path
  */
 export function slashPathToFirestoreRef(
-  firestoreStatics: FirestoreStatics,
+  firestoreStatics: FirestoreFunctionWithStatics,
   slashPath: string,
   options?: CallFirestoreOptions,
 ):
