@@ -23,6 +23,12 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
 
+      - name: Use Java 21 (required by firebase-tools emulators)
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+
       - name: Get cache settings
         id: cache-settings
         run: |
