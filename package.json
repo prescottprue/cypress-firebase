@@ -65,13 +65,13 @@
     "url": "https://github.com/prescottprue"
   },
   "browser": {
-    "fs": false,
-    "os": false,
-    "path": false,
     "firebase-admin/app": false,
     "firebase-admin/auth": false,
     "firebase-admin/database": false,
-    "firebase-admin/firestore": false
+    "firebase-admin/firestore": false,
+    "fs": false,
+    "os": false,
+    "path": false
   },
   "files": [
     "bin",
@@ -89,14 +89,14 @@
       "name": "CommonJS: attachCustomCommands",
       "path": "lib/index.js",
       "import": "{ attachCustomCommands }",
-      "limit": "9kb",
+      "limit": "10kb",
       "webpack": false
     },
     {
       "name": "CommonJS: plugin",
       "path": "lib/index.js",
       "import": "{ plugin }",
-      "limit": "9kb",
+      "limit": "10kb",
       "webpack": false
     }
   ],

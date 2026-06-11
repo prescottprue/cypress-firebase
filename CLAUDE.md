@@ -16,7 +16,7 @@ yarn format             # biome format --write
 yarn test               # starts firestore+database emulators, runs all unit tests
 yarn test:base          # run tests WITHOUT starting emulators (expects them running)
 yarn emulators          # start emulators standalone (for use with test:base / test:watch)
-yarn size               # build + size-limit check (9kb budget per export)
+yarn size               # build + size-limit check (10kb budget per export)
 ```
 
 Run a single test file (only `tasks.spec.ts` needs emulators running, e.g. via `yarn emulators` in another terminal):
@@ -33,9 +33,9 @@ Commits must follow conventional commits (commitlint + husky enforce this); rele
 
 The library has two halves that talk over Cypress's task IPC. This split exists because firebase-admin only runs in Node, while custom commands run in the browser:
 
-1. **Browser side — `src/attachCustomCommands.ts`**: registers all `cy.*` custom commands. Commands don't touch firebase-admin; they package their arguments into a settings object and invoke `cy.task(taskName, settings)`. Login/logout commands additionally use the client-side `firebase` instance (signing in with custom tokens minted by the node side).
+1. **Browser side — `src/attachCustomCommands.ts`**: registers all `cy.*` custom commands. Commands don't touch firebase-admin; they package their arguments into a settings object and invoke `cy.task(taskName, settings)`. Login/logout commands additionally use the client-side `firebase` instance (signing in with custom tokens minted by the node side). Environment values (`TEST_UID`, `TEST_TENANT_ID`, etc.) are read through the internal `getEnv` helper, which uses `cy.env()` on Cypress >= 15.10 (where `Cypress.env()` is deprecated; removed in Cypress 16) and falls back to a synchronous `Cypress.env()`-backed thenable on older versions — command bodies always chain off `getEnv(...).then(...)`.
 
-2. **Node side — `src/plugin.ts`**: runs in `setupNodeEvents`. Initializes firebase-admin (via `initializeFirebase` in `firebase-utils.ts`), wraps every task from `src/tasks.ts` to inject the admin instance, registers them with `on('task', ...)`, and returns the Cypress config extended with emulator env vars (`extendWithFirebaseConfig.ts` copies `GCLOUD_PROJECT`, `FIRESTORE_EMULATOR_HOST`, `FIREBASE_DATABASE_EMULATOR_HOST`, `FIREBASE_AUTH_EMULATOR_HOST` from `process.env` into `config.env`).
+2. **Node side — `src/plugin.ts`**: runs in `setupNodeEvents`. Initializes firebase-admin (via `initializeFirebase` in `firebase-utils.ts`), wraps every task from `src/tasks.ts` to inject the admin instance, registers them with `on('task', ...)`, and returns the Cypress config extended with emulator env vars (`extendWithFirebaseConfig.ts` copies `GCLOUD_PROJECT`, `FIRESTORE_EMULATOR_HOST`, `FIREBASE_DATABASE_EMULATOR_HOST`, `FIREBASE_AUTH_EMULATOR_HOST` from `process.env` into `config.env`, and — when the host Cypress is >= 15.10, detected via `config.version` — also into `config.expose` for synchronous browser access via `Cypress.expose()`).
 
 The two sides are linked by `taskSettingKeys` in `src/tasks.ts` — an ordered map from task name to its parameter names. The browser side builds the settings object with those keys; `plugin.ts` destructures them **in array order** back into positional task arguments. Adding or changing a task's parameters requires updating: the task function in `tasks.ts`, its entry in `taskSettingKeys` (order matters), and the corresponding command in `attachCustomCommands.ts`. `typedTask` derives type-safe `cy.task` signatures from these maps.
 
@@ -45,7 +45,7 @@ The two sides are linked by `taskSettingKeys` in `src/tasks.ts` — an ordered m
 
 - `adminInstance` is intentionally typed `any` and accessed through the legacy namespaced API shape (`admin.firestore()`, `admin.auth()`) so the same code works across firebase-admin versions. firebase-admin v14+ removed that API, so `plugin.ts` detects modular modules via `isModularAdmin` and wraps them with `adaptModularAdmin` (both in `firebase-utils.ts`) to recreate the legacy shape; the adapter lazily `require`s `firebase-admin/*` subpaths. Types are imported from `firebase-admin/*` subpaths as type-only imports.
 - The package is consumed in both browser and Node contexts; `package.json`'s `browser` field stubs `fs`/`os`/`path` and the `firebase-admin/*` subpaths used by the adapter. Don't add runtime dependencies (it's advertised as 0-dependency) or Node-only imports to browser-side code paths.
-- `size-limit` enforces a 9kb budget on each of the two exports (`attachCustomCommands`, `plugin`).
+- `size-limit` enforces a 10kb budget on each of the two exports (`attachCustomCommands`, `plugin`).
 - Biome handles lint + format (single quotes, spaces). `console` calls are errors; intentional logging uses `// biome-ignore lint/suspicious/noConsole: Intentional logging`.
 - Public API surface is only what `src/index.ts` exports: `attachCustomCommands` and `plugin` (plus types).
 
