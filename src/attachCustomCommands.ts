@@ -876,6 +876,37 @@ export default function attachCustomCommands(
   }
 
   /**
+   * Merge values read through cy.env with any values set at runtime via the
+   * deprecated Cypress.env(key, value) API (functional until Cypress 16).
+   * cy.env only returns values known to the config process, so without this
+   * runtime-set values like TEST_UID would silently stop being picked up.
+   * Cypress.env throws when allowCypressEnv is false, so failures to read
+   * are ignored.
+   * @param envKeys - Names of environment values being read
+   * @param envValues - Values returned by cy.env
+   * @returns Env values with runtime-set fallbacks applied
+   */
+  function mergeWithRuntimeEnv(
+    envKeys: string[],
+    envValues: Record<string, any>,
+  ): Record<string, any> {
+    if (typeof Cypress.env !== 'function') {
+      return envValues;
+    }
+    try {
+      return envKeys.reduce(
+        (acc, envKey) =>
+          acc[envKey] === undefined
+            ? Object.assign(acc, { [envKey]: Cypress.env(envKey) })
+            : acc,
+        { ...envValues },
+      );
+    } catch {
+      return envValues;
+    }
+  }
+
+  /**
    * Read values from the Cypress environment, preferring the cy.env command
    * (Cypress >= 15.10) over Cypress.env, which is deprecated in Cypress 15.10
    * and removed in Cypress 16. Returns a thenable so command bodies can chain
@@ -887,7 +918,15 @@ export default function attachCustomCommands(
     then: (envHandler: (envValues: Record<string, any>) => any) => any;
   } {
     if (typeof cy.env === 'function') {
-      return cy.env(envKeys);
+      return {
+        // biome-ignore lint/suspicious/noThenProperty: intentional thenable matching the cy.env chain shape
+        then: (envHandler) =>
+          cy
+            .env(envKeys)
+            .then((envValues: Record<string, any>) =>
+              envHandler(mergeWithRuntimeEnv(envKeys, envValues)),
+            ),
+      };
     }
     // Cypress < 15.10 fallback - values are available synchronously
     return {
@@ -1128,7 +1167,9 @@ export default function attachCustomCommands(
         // Resolve with current user if they already exist
         if (auth.currentUser && userUid === auth.currentUser.uid) {
           cy.log('Authed user already exists, login complete.');
-          return undefined;
+          // Explicitly yield undefined - returning undefined from a then
+          // callback would pass the cy.env subject (the env values) through
+          return cy.wrap(undefined, { log: false });
         }
 
         cy.log('Creating custom token for login...');
@@ -1183,7 +1224,9 @@ export default function attachCustomCommands(
         // Resolve with current user if they already exist
         if (auth.currentUser && userEmail === auth.currentUser.email) {
           cy.log('Authed user already exists, login complete.');
-          return undefined;
+          // Explicitly yield undefined - returning undefined from a then
+          // callback would pass the cy.env subject (the env values) through
+          return cy.wrap(undefined, { log: false });
         }
         return typedTask(cy, 'authGetUserByEmail', {
           email: userEmail,

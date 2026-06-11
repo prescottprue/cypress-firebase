@@ -1001,6 +1001,39 @@ describe('attachCustomCommands', () => {
       });
       expect(envSpy).not.toHaveBeenCalled();
     });
+
+    it('falls back to Cypress.env for values cy.env does not return (runtime-set values)', async () => {
+      // cy.env does not see values set at runtime via Cypress.env(key, value)
+      cy.env = vi.fn((_keys: string[]) => ({
+        then: (envHandler: any) => envHandler({}),
+      }));
+      await loadedCustomCommands.login();
+      expect(envSpy).toHaveBeenCalledWith('TEST_UID');
+      expect(taskSpy).toHaveBeenCalledWith('authCreateCustomToken', {
+        uid: testUserId,
+        customClaims: undefined,
+        tenantId: false,
+      });
+    });
+
+    it('ignores Cypress.env failures when reading fallbacks (allowCypressEnv: false)', async () => {
+      Cypress = {
+        Commands: { add: addSpy },
+        env: vi.fn(() => {
+          throw new Error('Cypress.env is disabled');
+        }),
+      };
+      attachCustomCommands({ cy, Cypress, firebase });
+      cy.env = vi.fn((_keys: string[]) => ({
+        then: (envHandler: any) => envHandler({ TEST_UID: 'strict-uid' }),
+      }));
+      await loadedCustomCommands.login();
+      expect(taskSpy).toHaveBeenCalledWith('authCreateCustomToken', {
+        uid: 'strict-uid',
+        customClaims: undefined,
+        tenantId: undefined,
+      });
+    });
   });
 
   describe('options', () => {
