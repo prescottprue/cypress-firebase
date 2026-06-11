@@ -19,13 +19,13 @@ yarn emulators          # start emulators standalone (for use with test:base / t
 yarn size               # build + size-limit check (9kb budget per export)
 ```
 
-Run a single test file (emulators must be running, e.g. via `yarn emulators` in another terminal):
+Run a single test file (only `tasks.spec.ts` needs emulators running, e.g. via `yarn emulators` in another terminal):
 
 ```bash
-GCLOUD_PROJECT=test-project NODE_OPTIONS='--import tsx' yarn mocha ./test/unit/tasks.spec.ts
+yarn vitest run test/unit/tasks.spec.ts
 ```
 
-Or wrap it in one command: `yarn firebase emulators:exec --only firestore,database "GCLOUD_PROJECT=test-project NODE_OPTIONS='--import tsx' mocha ./test/unit/tasks.spec.ts"`. Add `--grep 'pattern'` to filter tests. Tests use mocha + chai + sinon-chai; `.mocharc.js` loads `test/setup.ts`, which sets emulator env vars and globals (`projectId`, `databaseURL`).
+Or wrap it in one command: `yarn firebase emulators:exec --only firestore,database "vitest run test/unit/tasks.spec.ts"`. Add `-t 'pattern'` to filter tests by name. Tests use vitest (assertions and mocks via `expect`/`vi`); `vitest.config.ts` loads `test/setup.ts`, which sets emulator env vars and globals (`projectId`, `databaseURL`).
 
 Commits must follow conventional commits (commitlint + husky enforce this); releases are automated via semantic-release, so the commit type determines the published version.
 
