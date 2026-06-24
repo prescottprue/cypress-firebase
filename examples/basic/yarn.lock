@@ -7175,7 +7175,7 @@ __metadata:
     eslint-plugin-cypress: "npm:6.4.1"
     firebase: "npm:^12.0.0"
     firebase-admin: "npm:14.0.0"
-    firebase-tools: "npm:15.20.0"
+    firebase-tools: "npm:15.21.0"
     lodash: "npm:^4.17.21"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
@@ -7375,15 +7375,6 @@ __metadata:
   version: 0.7.0
   resolution: "dedent@npm:0.7.0"
   checksum: 10c0/7c3aa00ddfe3e5fcd477958e156156a5137e3bb6ff1493ca05edff4decf29a90a057974cc77e75951f8eb801c1816cb45aea1f52d628cdd000b82b36ab839d1b
-  languageName: node
-  linkType: hard
-
-"deep-equal-in-any-order@npm:^2.0.6":
-  version: 2.2.0
-  resolution: "deep-equal-in-any-order@npm:2.2.0"
-  dependencies:
-    sort-any: "npm:^4.0.0"
-  checksum: 10c0/eb81198a100fd96c5f7a33935aeada6beedbfb1dffdecfcb52319f53cf55ef0cfd8d8e9845ef089d9328cc9602fd88235808dc74cdb73273e46c6770ab3a6a78
   languageName: node
   linkType: hard
 
@@ -8958,13 +8949,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"filesize@npm:^6.1.0":
-  version: 6.4.0
-  resolution: "filesize@npm:6.4.0"
-  checksum: 10c0/1c317e59636d2079e64fcd38a69d415d5713a328496e0e5f1889b83e8adea8b47ceb9eb14726013b7cca02e76f5bd041eeab94edad8bed35d4ab1ecad55144d9
-  languageName: node
-  linkType: hard
-
 "filesize@npm:^8.0.6":
   version: 8.0.7
   resolution: "filesize@npm:8.0.7"
@@ -9088,9 +9072,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-tools@npm:15.20.0":
-  version: 15.20.0
-  resolution: "firebase-tools@npm:15.20.0"
+"firebase-tools@npm:15.21.0":
+  version: 15.21.0
+  resolution: "firebase-tools@npm:15.21.0"
   dependencies:
     "@apphosting/common": "npm:^0.0.8"
     "@electric-sql/pglite": "npm:^0.3.3"
@@ -9115,11 +9099,9 @@ __metadata:
     cross-env: "npm:^7.0.3"
     cross-spawn: "npm:^7.0.5"
     csv-parse: "npm:^5.0.4"
-    deep-equal-in-any-order: "npm:^2.0.6"
     exegesis: "npm:^4.2.0"
     exegesis-express: "npm:^4.0.0"
     express: "npm:^4.16.4"
-    filesize: "npm:^6.1.0"
     form-data: "npm:^4.0.1"
     fs-extra: "npm:^10.1.0"
     fuzzy: "npm:^0.1.3"
@@ -9129,7 +9111,6 @@ __metadata:
     ignore: "npm:^7.0.4"
     js-yaml: "npm:^3.14.2"
     jsonwebtoken: "npm:^9.0.2"
-    leven: "npm:^3.1.0"
     libsodium-wrappers: "npm:^0.7.10"
     lodash: "npm:^4.18.0"
     lsofi: "npm:^2.0.0"
@@ -9141,7 +9122,6 @@ __metadata:
     node-fetch: "npm:^2.6.7"
     open: "npm:^6.3.0"
     ora: "npm:^5.4.1"
-    p-limit: "npm:^3.0.1"
     pg: "npm:^8.11.3"
     pg-gateway: "npm:^0.3.0-beta.4"
     pglite-2: "npm:@electric-sql/pglite@0.2.17"
@@ -9160,7 +9140,6 @@ __metadata:
     triple-beam: "npm:^1.3.0"
     universal-analytics: "npm:^0.5.3"
     update-notifier-cjs: "npm:^5.1.6"
-    uuid: "npm:^11.1.1"
     winston: "npm:^3.0.0"
     winston-transport: "npm:^4.4.0"
     ws: "npm:^7.5.10"
@@ -9169,7 +9148,7 @@ __metadata:
     zod-to-json-schema: "npm:^3.24.5"
   bin:
     firebase: lib/bin/firebase.js
-  checksum: 10c0/8715f651ae08552bc0c6b278b02fe1057110319c3bd0665a64cdfca696e7d98e273a79a4d1221983d04e347dcc979a9aefaca70e19e975ba6168f2798af2ac23
+  checksum: 10c0/b886b4b81200d0568c9180c312c9f218e4a034f1d523d6fdddb36286c43802ae923a686213325943abe325fed4ad65a1a924ecca6beeca620b94356eb8d3674e
   languageName: node
   linkType: hard
 
@@ -16421,13 +16400,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sort-any@npm:^4.0.0":
-  version: 4.0.7
-  resolution: "sort-any@npm:4.0.7"
-  checksum: 10c0/fef92e659a516c05555286c35286ad84c5103f5e70210da5aaba8ca13121c4b17242e48428349e4d2e3b97c5536fdb913d49ca085e2b94d818e556e8389be310
-  languageName: node
-  linkType: hard
-
 "source-list-map@npm:^2.0.0, source-list-map@npm:^2.0.1":
   version: 2.0.1
   resolution: "source-list-map@npm:2.0.1"
@@ -17947,15 +17919,6 @@ __metadata:
   version: 1.0.1
   resolution: "utils-merge@npm:1.0.1"
   checksum: 10c0/02ba649de1b7ca8854bfe20a82f1dfbdda3fb57a22ab4a8972a63a34553cf7aa51bc9081cf7e001b035b88186d23689d69e71b510e610a09a4c66f68aa95b672
-  languageName: node
-  linkType: hard
-
-"uuid@npm:^11.1.1":
-  version: 11.1.1
-  resolution: "uuid@npm:11.1.1"
-  bin:
-    uuid: dist/esm/bin/uuid
-  checksum: 10c0/9e3af58eba872ece5a5e76f4773a94fc78a0ef2c2444c38dbe6b42f41dadf76c01850fd783604f27986f6195e6286aef064d45987d401b2a33127b98ddf7c0c5
   languageName: node
   linkType: hard
 
