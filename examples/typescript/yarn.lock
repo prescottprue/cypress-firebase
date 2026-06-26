@@ -9151,9 +9151,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-tools@npm:15.21.0":
-  version: 15.21.0
-  resolution: "firebase-tools@npm:15.21.0"
+"firebase-tools@npm:15.22.0":
+  version: 15.22.0
+  resolution: "firebase-tools@npm:15.22.0"
   dependencies:
     "@apphosting/common": "npm:^0.0.8"
     "@electric-sql/pglite": "npm:^0.3.3"
@@ -9188,7 +9188,7 @@ __metadata:
     glob: "npm:^10.5.0"
     google-auth-library: "npm:^9.11.0"
     ignore: "npm:^7.0.4"
-    js-yaml: "npm:^3.14.2"
+    js-yaml: "npm:^4.2.0"
     jsonwebtoken: "npm:^9.0.2"
     libsodium-wrappers: "npm:^0.7.10"
     lodash: "npm:^4.18.0"
@@ -9227,7 +9227,7 @@ __metadata:
     zod-to-json-schema: "npm:^3.24.5"
   bin:
     firebase: lib/bin/firebase.js
-  checksum: 10c0/b886b4b81200d0568c9180c312c9f218e4a034f1d523d6fdddb36286c43802ae923a686213325943abe325fed4ad65a1a924ecca6beeca620b94356eb8d3674e
+  checksum: 10c0/a1b35d2bfdaaee5a47310ecb90131feb611de1c5b1a53225e5c38661ec6b0cc76c01d17e7645dda2a4448d45098f3cb93a60a9848111f85bd358eb3aef73591e
   languageName: node
   linkType: hard
 
@@ -11925,7 +11925,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"js-yaml@npm:^3.13.1, js-yaml@npm:^3.14.2":
+"js-yaml@npm:^3.13.1":
   version: 3.14.2
   resolution: "js-yaml@npm:3.14.2"
   dependencies:
@@ -11945,6 +11945,17 @@ __metadata:
   bin:
     js-yaml: bin/js-yaml.js
   checksum: 10c0/561c7d7088c40a9bb53cc75becbfb1df6ae49b34b5e6e5a81744b14ae8667ec564ad2527709d1a6e7d5e5fa6d483aa0f373a50ad98d42fde368ec4a190d4fae7
+  languageName: node
+  linkType: hard
+
+"js-yaml@npm:^4.2.0":
+  version: 4.2.0
+  resolution: "js-yaml@npm:4.2.0"
+  dependencies:
+    argparse: "npm:^2.0.1"
+  bin:
+    js-yaml: bin/js-yaml.js
+  checksum: 10c0/1916456c118746603b067d74bbcbb0445d9a1d5e474ad4ae775e7b20525bed902e01d9d97dd0c81fcd8d4f596162309d0eb057f4aa38f3e9647f14075e9dea45
   languageName: node
   linkType: hard
 
@@ -17934,7 +17945,7 @@ __metadata:
     eslint-plugin-cypress: "npm:6.4.1"
     firebase: "npm:12.14.0"
     firebase-admin: "npm:14.0.0"
-    firebase-tools: "npm:15.21.0"
+    firebase-tools: "npm:15.22.0"
     react: "npm:19.2.7"
     react-dom: "npm:19.2.7"
     react-scripts: "npm:5.0.1"
