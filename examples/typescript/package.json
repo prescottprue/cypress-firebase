@@ -32,7 +32,7 @@
     "cypress-firebase": "4.4.0",
     "eslint-plugin-chai-friendly": "0.8.0",
     "eslint-plugin-cypress": "6.4.1",
-    "firebase-admin": "14.0.0",
+    "firebase-admin": "14.1.0",
     "firebase-tools": "15.22.1",
     "react-scripts": "5.0.1",
     "typescript": "6.0.3",
