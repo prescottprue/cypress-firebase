@@ -33,7 +33,7 @@
     "eslint-plugin-chai-friendly": "0.8.0",
     "eslint-plugin-cypress": "6.4.1",
     "firebase-admin": "14.1.0",
-    "firebase-tools": "15.22.2",
+    "firebase-tools": "15.22.3",
     "react-scripts": "5.0.1",
     "typescript": "6.0.3",
     "web-vitals": "5.3.0"
