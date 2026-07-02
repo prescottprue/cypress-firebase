@@ -7175,7 +7175,7 @@ __metadata:
     eslint-plugin-cypress: "npm:6.4.1"
     firebase: "npm:^12.0.0"
     firebase-admin: "npm:14.1.0"
-    firebase-tools: "npm:15.22.1"
+    firebase-tools: "npm:15.22.2"
     lodash: "npm:^4.17.21"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
@@ -9072,9 +9072,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-tools@npm:15.22.1":
-  version: 15.22.1
-  resolution: "firebase-tools@npm:15.22.1"
+"firebase-tools@npm:15.22.2":
+  version: 15.22.2
+  resolution: "firebase-tools@npm:15.22.2"
   dependencies:
     "@apphosting/common": "npm:^0.0.8"
     "@electric-sql/pglite": "npm:^0.3.3"
@@ -9144,11 +9144,10 @@ __metadata:
     winston-transport: "npm:^4.4.0"
     ws: "npm:^7.5.10"
     yaml: "npm:^2.8.3"
-    zod: "npm:^3.24.3"
-    zod-to-json-schema: "npm:^3.24.5"
+    zod: "npm:^4.0.0"
   bin:
     firebase: lib/bin/firebase.js
-  checksum: 10c0/8adb8cfeab291016c679540717b5434a8684107f93c5f871433a518e8774d58906375b48ef44867de16f9eff62fa6df34b12e51eb0bb8555d1500d1751d6b7ef
+  checksum: 10c0/d17f2bb7b9bb16b1af76e1848c1b181b29dcbf91b127a87373eb7fa63e768f43603b515c5b8ca0926005c49e09dbb66708d7f982d739fb0aefae3bc6960396e6
   languageName: node
   linkType: hard
 
@@ -18893,7 +18892,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod-to-json-schema@npm:^3.24.5, zod-to-json-schema@npm:^3.25.1":
+"zod-to-json-schema@npm:^3.25.1":
   version: 3.25.2
   resolution: "zod-to-json-schema@npm:3.25.2"
   peerDependencies:
@@ -18902,16 +18901,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.24.3":
-  version: 3.25.76
-  resolution: "zod@npm:3.25.76"
-  checksum: 10c0/5718ec35e3c40b600316c5b4c5e4976f7fee68151bc8f8d90ec18a469be9571f072e1bbaace10f1e85cf8892ea12d90821b200e980ab46916a6166a4260a983c
-  languageName: node
-  linkType: hard
-
 "zod@npm:^3.25 || ^4.0":
   version: 4.3.6
   resolution: "zod@npm:4.3.6"
   checksum: 10c0/860d25a81ab41d33aa25f8d0d07b091a04acb426e605f396227a796e9e800c44723ed96d0f53a512b57be3d1520f45bf69c0cb3b378a232a00787a2609625307
+  languageName: node
+  linkType: hard
+
+"zod@npm:^4.0.0":
+  version: 4.4.3
+  resolution: "zod@npm:4.4.3"
+  checksum: 10c0/7ea31b558e88f9faf44f31dd185e2e1cbf51fed3081787fb96cc2534749b50c0acfc6da7f0922a7353ed092dd358c7d50c28ea96c94d04af64191bd33152eca3
   languageName: node
   linkType: hard
