@@ -26,7 +26,7 @@
     "firebase-admin": ">=11.0.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.16",
+    "@biomejs/biome": "2.5.1",
     "@commitlint/cli": "21.1.0",
     "@commitlint/config-conventional": "21.1.0",
     "@firebase/rules-unit-testing": "5.0.1",
