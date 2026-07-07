@@ -206,35 +206,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/cli@npm:21.1.0":
-  version: 21.1.0
-  resolution: "@commitlint/cli@npm:21.1.0"
+"@commitlint/cli@npm:21.2.0":
+  version: 21.2.0
+  resolution: "@commitlint/cli@npm:21.2.0"
   dependencies:
-    "@commitlint/config-conventional": "npm:^21.1.0"
-    "@commitlint/format": "npm:^21.1.0"
-    "@commitlint/lint": "npm:^21.1.0"
-    "@commitlint/load": "npm:^21.1.0"
-    "@commitlint/read": "npm:^21.1.0"
-    "@commitlint/types": "npm:^21.1.0"
+    "@commitlint/config-conventional": "npm:^21.2.0"
+    "@commitlint/format": "npm:^21.2.0"
+    "@commitlint/lint": "npm:^21.2.0"
+    "@commitlint/load": "npm:^21.2.0"
+    "@commitlint/read": "npm:^21.2.0"
+    "@commitlint/types": "npm:^21.2.0"
     tinyexec: "npm:^1.0.0"
     yargs: "npm:^18.0.0"
   bin:
     commitlint: cli.js
-  checksum: 10c0/43df51dbeaeff7307a2993b337c13d05616f5bce240dfba396e11e3dfc805d509b7c7fbe9340b1bcf902fbb9a812d020c19c808d806e094a813456a618e469b3
+  checksum: 10c0/a89d0da140a8dad30cb25b8ef2d8f1874fafbb144ba704d1127a9ff729223965e16077576f701902ed597841827f84ae376a500eb1038bf0a0ac527969116e1a
   languageName: node
   linkType: hard
 
-"@commitlint/config-conventional@npm:21.1.0":
-  version: 21.1.0
-  resolution: "@commitlint/config-conventional@npm:21.1.0"
-  dependencies:
-    "@commitlint/types": "npm:^21.1.0"
-    conventional-changelog-conventionalcommits: "npm:^9.2.0"
-  checksum: 10c0/15cdf9c611976a29bef58fa1629d04979bde26ac09a65766c9e8350c48792fdc696970a6275e7c11658fa4cd4394e3d5012c78f0c5215b2fe91f9b678c8020d0
-  languageName: node
-  linkType: hard
-
-"@commitlint/config-conventional@npm:^21.1.0":
+"@commitlint/config-conventional@npm:21.2.0, @commitlint/config-conventional@npm:^21.2.0":
   version: 21.2.0
   resolution: "@commitlint/config-conventional@npm:21.2.0"
   dependencies:
@@ -271,7 +261,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/format@npm:^21.1.0":
+"@commitlint/format@npm:^21.2.0":
   version: 21.2.0
   resolution: "@commitlint/format@npm:21.2.0"
   dependencies:
@@ -291,7 +281,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/lint@npm:^21.1.0":
+"@commitlint/lint@npm:^21.2.0":
   version: 21.2.0
   resolution: "@commitlint/lint@npm:21.2.0"
   dependencies:
@@ -303,7 +293,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/load@npm:^21.1.0":
+"@commitlint/load@npm:^21.2.0":
   version: 21.2.0
   resolution: "@commitlint/load@npm:21.2.0"
   dependencies:
@@ -338,7 +328,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/read@npm:^21.1.0":
+"@commitlint/read@npm:^21.2.0":
   version: 21.2.0
   resolution: "@commitlint/read@npm:21.2.0"
   dependencies:
@@ -391,7 +381,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/types@npm:^21.1.0, @commitlint/types@npm:^21.2.0":
+"@commitlint/types@npm:^21.2.0":
   version: 21.2.0
   resolution: "@commitlint/types@npm:21.2.0"
   dependencies:
@@ -2927,13 +2917,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"array-ify@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "array-ify@npm:1.0.0"
-  checksum: 10c0/75c9c072faac47bd61779c0c595e912fe660d338504ac70d10e39e1b8a4a0c9c87658703d619b9d1b70d324177ae29dc8d07dda0d0a15d005597bc4c5a59c70c
-  languageName: node
-  linkType: hard
-
 "arrify@npm:^2.0.0":
   version: 2.0.1
   resolution: "arrify@npm:2.0.1"
@@ -3821,16 +3804,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"compare-func@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "compare-func@npm:2.0.0"
-  dependencies:
-    array-ify: "npm:^1.0.0"
-    dot-prop: "npm:^5.1.0"
-  checksum: 10c0/78bd4dd4ed311a79bd264c9e13c36ed564cde657f1390e699e0f04b8eee1fc06ffb8698ce2dfb5fbe7342d509579c82d4e248f08915b708f77f7b72234086cc3
-  languageName: node
-  linkType: hard
-
 "compress-commons@npm:^6.0.2":
   version: 6.0.2
   resolution: "compress-commons@npm:6.0.2"
@@ -3949,15 +3922,6 @@ __metadata:
   dependencies:
     "@conventional-changelog/template": "npm:^1.2.0"
   checksum: 10c0/8a1bf93c8336846c934b16e601c07d7a7321772c81fefb877e70c9e8ba2400f0f8029f28417b708f2608faad2abf513027353db3234428abf540a0f5b8a7db5d
-  languageName: node
-  linkType: hard
-
-"conventional-changelog-conventionalcommits@npm:^9.2.0":
-  version: 9.3.1
-  resolution: "conventional-changelog-conventionalcommits@npm:9.3.1"
-  dependencies:
-    compare-func: "npm:^2.0.0"
-  checksum: 10c0/e3d0dfe5680899da3660a7fbc859de1a92dd9358dc497624c3582596173713a80dcc8236d844116a3ba8403350e244c007c0c7fa5796631aea19e464cc6c2f44
   languageName: node
   linkType: hard
 
@@ -4116,8 +4080,8 @@ __metadata:
   resolution: "cypress-firebase@workspace:."
   dependencies:
     "@biomejs/biome": "npm:2.5.1"
-    "@commitlint/cli": "npm:21.1.0"
-    "@commitlint/config-conventional": "npm:21.1.0"
+    "@commitlint/cli": "npm:21.2.0"
+    "@commitlint/config-conventional": "npm:21.2.0"
     "@firebase/rules-unit-testing": "npm:5.0.1"
     "@size-limit/preset-small-lib": "npm:12.1.0"
     "@size-limit/webpack": "npm:12.1.0"
@@ -4335,7 +4299,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dot-prop@npm:^5.1.0, dot-prop@npm:^5.2.0":
+"dot-prop@npm:^5.2.0":
   version: 5.3.0
   resolution: "dot-prop@npm:5.3.0"
   dependencies:

@@ -27,8 +27,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.1",
-    "@commitlint/cli": "21.1.0",
-    "@commitlint/config-conventional": "21.1.0",
+    "@commitlint/cli": "21.2.0",
+    "@commitlint/config-conventional": "21.2.0",
     "@firebase/rules-unit-testing": "5.0.1",
     "@size-limit/preset-small-lib": "12.1.0",
     "@size-limit/webpack": "12.1.0",
