@@ -2138,49 +2138,49 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@size-limit/esbuild@npm:12.1.0":
-  version: 12.1.0
-  resolution: "@size-limit/esbuild@npm:12.1.0"
+"@size-limit/esbuild@npm:13.0.3":
+  version: 13.0.3
+  resolution: "@size-limit/esbuild@npm:13.0.3"
   dependencies:
-    esbuild: "npm:^0.28.0"
-    nanoid: "npm:^5.1.7"
+    esbuild: "npm:^0.28.1"
+    nanoid: "npm:^6.0.0"
   peerDependencies:
-    size-limit: 12.1.0
-  checksum: 10c0/aa0cca697fa59cc2d687ac6025ac327ea5ec5208467be274ce3da6f77bb7d405edd9de4e8b0894ee107df6e290e1500b6074ac61d88fefb25ed7a4dcbd5e0049
+    size-limit: 13.0.3
+  checksum: 10c0/e6a3c1642278114b530c933217f762f261ad274e155ad86020f5e0649d38e2341282c989ea76ed4c75d61858f561861c214d9835100115297e3d12a0eceea680
   languageName: node
   linkType: hard
 
-"@size-limit/file@npm:12.1.0":
-  version: 12.1.0
-  resolution: "@size-limit/file@npm:12.1.0"
+"@size-limit/file@npm:13.0.3":
+  version: 13.0.3
+  resolution: "@size-limit/file@npm:13.0.3"
   peerDependencies:
-    size-limit: 12.1.0
-  checksum: 10c0/14d9fb0267e56520cb960008631ef4b037a1085bbb34ac8e509d3cf3391578234129e5ffc3acc6f4eedfb69282e7499b407518e5d0765cc8d7d4e7b76baba569
+    size-limit: 13.0.3
+  checksum: 10c0/840414b8558064b967b92a2618f2a3387c96bedc2cfdb85459cc0fcb4548b2e2aac0b2b388256b705a0aa3897b97e089c45f0bb74fae5e3a8b3592c9c3eafaa0
   languageName: node
   linkType: hard
 
-"@size-limit/preset-small-lib@npm:12.1.0":
-  version: 12.1.0
-  resolution: "@size-limit/preset-small-lib@npm:12.1.0"
+"@size-limit/preset-small-lib@npm:13.0.3":
+  version: 13.0.3
+  resolution: "@size-limit/preset-small-lib@npm:13.0.3"
   dependencies:
-    "@size-limit/esbuild": "npm:12.1.0"
-    "@size-limit/file": "npm:12.1.0"
-    size-limit: "npm:12.1.0"
+    "@size-limit/esbuild": "npm:13.0.3"
+    "@size-limit/file": "npm:13.0.3"
+    size-limit: "npm:13.0.3"
   peerDependencies:
-    size-limit: 12.1.0
-  checksum: 10c0/b6e691ed54c91fc7eb76b17f3f7fe9b0033a2e161203160198fcb40db921fc58b5d64a9c267f51981e48749815fc72113b14d3982402b5f03282691b70f15277
+    size-limit: 13.0.3
+  checksum: 10c0/516d7b2b18153ab3c829f5a30d2547145e61710a894fa8e76a88358a95fc184a0cb1a8ddf9947199a28d15b0c7ee89045ed636ef7a3f156b65652bdd69a3dc55
   languageName: node
   linkType: hard
 
-"@size-limit/webpack@npm:12.1.0":
-  version: 12.1.0
-  resolution: "@size-limit/webpack@npm:12.1.0"
+"@size-limit/webpack@npm:13.0.3":
+  version: 13.0.3
+  resolution: "@size-limit/webpack@npm:13.0.3"
   dependencies:
-    nanoid: "npm:^5.1.7"
-    webpack: "npm:^5.106.1"
+    nanoid: "npm:^6.0.0"
+    webpack: "npm:^5.109.2"
   peerDependencies:
-    size-limit: 12.1.0
-  checksum: 10c0/fa89beac138156ea91f73bd15ee23133daeadc55c1b6197d6892c42ce5aa3cdcb6dfd563adb300bad144fcf79f333af83aeb9bf8f79448dfc6b86664a33249b8
+    size-limit: 13.0.3
+  checksum: 10c0/5a9c1f79f7e63258d2f4e46aa22c893252116be2ee820572ecb1404c2c348429e09e6b93d6f6eb4188ac355efb7472b220154562aa581d7b5d0308811045b690
   languageName: node
   linkType: hard
 
@@ -4004,8 +4004,8 @@ __metadata:
     "@commitlint/cli": "npm:21.2.1"
     "@commitlint/config-conventional": "npm:21.2.0"
     "@firebase/rules-unit-testing": "npm:5.0.1"
-    "@size-limit/preset-small-lib": "npm:12.1.0"
-    "@size-limit/webpack": "npm:12.1.0"
+    "@size-limit/preset-small-lib": "npm:13.0.3"
+    "@size-limit/webpack": "npm:13.0.3"
     "@types/node": "npm:24.13.3"
     "@vitest/coverage-v8": "npm:4.1.10"
     cypress: "npm:15.19.0"
@@ -4015,7 +4015,7 @@ __metadata:
     husky: "npm:9.1.7"
     lint-staged: "npm:17.2.0"
     rimraf: "npm:6.1.3"
-    size-limit: "npm:12.1.0"
+    size-limit: "npm:13.0.3"
     typescript: "npm:6.0.3"
     vitest: "npm:4.1.10"
   peerDependencies:
@@ -4439,7 +4439,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"esbuild@npm:^0.28.0":
+"esbuild@npm:^0.28.1":
   version: 0.28.1
   resolution: "esbuild@npm:0.28.1"
   dependencies:
@@ -7184,12 +7184,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nanoid@npm:^5.1.7":
-  version: 5.1.16
-  resolution: "nanoid@npm:5.1.16"
+"nanoid@npm:^6.0.0":
+  version: 6.0.1
+  resolution: "nanoid@npm:6.0.1"
   bin:
     nanoid: bin/nanoid.js
-  checksum: 10c0/04b4f96237f5639716da0e98f453361b313bebaf458bb67dea2d384724fc8b3340a28f032a4373052150bcf3b801d122e291d81ae4fc522969f55c134f4401a3
+  checksum: 10c0/5b362ad9822388dfebdf655849c76d3539e074d1003fbe6eb5dff8687faf93a9abbb19bdc5d134b9b8599f875f9b091feacfd7099b34b5fef23bc3f5be41dd10
   languageName: node
   linkType: hard
 
@@ -8573,23 +8573,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"size-limit@npm:12.1.0":
-  version: 12.1.0
-  resolution: "size-limit@npm:12.1.0"
+"size-limit@npm:13.0.3":
+  version: 13.0.3
+  resolution: "size-limit@npm:13.0.3"
   dependencies:
     bytes-iec: "npm:^3.1.1"
     lilconfig: "npm:^3.1.3"
     nanospinner: "npm:^1.2.2"
-    picocolors: "npm:^1.1.1"
-    tinyglobby: "npm:^0.2.16"
-  peerDependencies:
-    jiti: ^2.0.0
-  peerDependenciesMeta:
-    jiti:
-      optional: true
   bin:
     size-limit: bin.js
-  checksum: 10c0/74e7ded2d2a44ca8a45af0b4f86aa6eede483c672fbb3f20818e9d68c1c4e95b4f8ce850704079550c97692b413ad78a608755d4c29e19181bca13feb22bc193
+  checksum: 10c0/fff22b2f5ebb4b411e47ce7a80fdebc73326c40e4dd8d8cb59be72d149112389dbf393b7593c883280ca27197da9f2ac0d83e76fef16b7ba7d33ac4826411257
   languageName: node
   linkType: hard
 
@@ -9122,7 +9115,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tinyglobby@npm:^0.2.12, tinyglobby@npm:^0.2.15, tinyglobby@npm:^0.2.16, tinyglobby@npm:^0.2.17":
+"tinyglobby@npm:^0.2.12, tinyglobby@npm:^0.2.15, tinyglobby@npm:^0.2.17":
   version: 0.2.17
   resolution: "tinyglobby@npm:0.2.17"
   dependencies:
@@ -9677,7 +9670,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.106.1":
+"webpack@npm:^5.109.2":
   version: 5.109.2
   resolution: "webpack@npm:5.109.2"
   dependencies:
