@@ -6996,7 +6996,7 @@ __metadata:
     eslint-plugin-cypress: "npm:6.4.3"
     firebase: "npm:^12.0.0"
     firebase-admin: "npm:14.2.0"
-    firebase-tools: "npm:15.24.0"
+    firebase-tools: "npm:15.25.0"
     lodash: "npm:^4.17.21"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
@@ -8904,9 +8904,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-tools@npm:15.24.0":
-  version: 15.24.0
-  resolution: "firebase-tools@npm:15.24.0"
+"firebase-tools@npm:15.25.0":
+  version: 15.25.0
+  resolution: "firebase-tools@npm:15.25.0"
   dependencies:
     "@apphosting/common": "npm:^0.0.8"
     "@electric-sql/pglite": "npm:^0.3.3"
@@ -8975,12 +8975,12 @@ __metadata:
     update-notifier-cjs: "npm:^5.1.6"
     winston: "npm:^3.0.0"
     winston-transport: "npm:^4.4.0"
-    ws: "npm:^7.5.10"
+    ws: "npm:^8.21.1"
     yaml: "npm:^2.8.3"
     zod: "npm:^4.0.0"
   bin:
     firebase: lib/bin/firebase.js
-  checksum: 10c0/ca87d975b15b9f0c6c4702d6d3538c7280e4d92964391088a1188df30851f61c4f2764f0b7b0c76cbe081789a9a8a1f38d896cbc92fe735dce3f20bbfc8552cd
+  checksum: 10c0/244dc947600500c77a500526155143869b337e3b8a071ad865977bd503b37dc47e18db25d483fc136b378111a7d3256798f7e41d1357251dd1731e80cd34873e
   languageName: node
   linkType: hard
 
@@ -18356,7 +18356,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ws@npm:^7.4.6, ws@npm:^7.5.10":
+"ws@npm:^7.4.6":
   version: 7.5.13
   resolution: "ws@npm:7.5.13"
   peerDependencies:
@@ -18383,6 +18383,21 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 10c0/c4c6f1d95f6d465262de2037c57c715725d67e078dd49420ede4e19115668aba159cb64d85c5e89c06eb2826be599e62e5095860ad6cc54ff42e8bd7684e1db8
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.21.1":
+  version: 8.21.2
+  resolution: "ws@npm:8.21.2"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 10c0/82d687bbfbccce04e91266ff9911b27c67ca622fd8fbacc6a64d467a43fbd7ecaa3ef6d820b315c060682f901463f57cac01a02b00c4379f49c747ec7da83169
   languageName: node
   linkType: hard
 
