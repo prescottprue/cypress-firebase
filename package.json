@@ -35,7 +35,7 @@
     "@types/node": "24.13.3",
     "@vitest/coverage-v8": "4.1.10",
     "cypress": "15.19.0",
-    "firebase": "12.17.0",
+    "firebase": "12.17.1",
     "firebase-admin": "14.2.0",
     "firebase-tools": "15.25.1",
     "husky": "9.1.7",
