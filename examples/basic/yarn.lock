@@ -6993,7 +6993,7 @@ __metadata:
     cypress: "npm:15.19.0"
     cypress-firebase: "npm:4.4.0"
     eslint-plugin-chai-friendly: "npm:0.8.0"
-    eslint-plugin-cypress: "npm:6.4.3"
+    eslint-plugin-cypress: "npm:6.4.4"
     firebase: "npm:^12.0.0"
     firebase-admin: "npm:14.2.0"
     firebase-tools: "npm:15.25.1"
@@ -8015,18 +8015,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-cypress@npm:6.4.3":
-  version: 6.4.3
-  resolution: "eslint-plugin-cypress@npm:6.4.3"
+"eslint-plugin-cypress@npm:6.4.4":
+  version: 6.4.4
+  resolution: "eslint-plugin-cypress@npm:6.4.4"
   dependencies:
-    globals: "npm:^17.7.0"
+    globals: "npm:^17.8.0"
   peerDependencies:
     "@typescript-eslint/parser": ">=8"
     eslint: ">=9"
   peerDependenciesMeta:
     "@typescript-eslint/parser":
       optional: true
-  checksum: 10c0/461a99e767dc41555c617852b143af5e5a29e69d80104b28930aab63e93c58238dd8b3c8cc8ce760f3e83006e1ce176f5a83998aec0a25de3c6524625fa1ae78
+  checksum: 10c0/41114de372924be18ca020bd96e6912332903bfe203abe4805360c6c53b6e6c9688c5ddb4e008dd477090c8a97447a6b79980a9dfeb8fa5640d639fd014d2847
   languageName: node
   linkType: hard
 
@@ -9583,10 +9583,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"globals@npm:^17.7.0":
-  version: 17.8.0
-  resolution: "globals@npm:17.8.0"
-  checksum: 10c0/e31b36cef3befd446487674dc6ca7b8f8e62a3b76aadd975dbf80ffa732366b3ac58df8941999eb6b1406d97480103711db85d2a49c955da47ff5ec688bee9b5
+"globals@npm:^17.8.0":
+  version: 17.10.0
+  resolution: "globals@npm:17.10.0"
+  checksum: 10c0/b1035f63a1070ebb4361096bb8d0037d0d6bb5a023618ab6307ac1a635fd8daeafbd161f6ebbcc5e2f25b364919beed66788f374c46b07135a9abf3c7ac9a245
   languageName: node
   linkType: hard
 
