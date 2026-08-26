@@ -1199,12 +1199,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@firebase/rules-unit-testing@npm:5.0.1":
-  version: 5.0.1
-  resolution: "@firebase/rules-unit-testing@npm:5.0.1"
+"@firebase/rules-unit-testing@npm:5.0.2":
+  version: 5.0.2
+  resolution: "@firebase/rules-unit-testing@npm:5.0.2"
   peerDependencies:
     firebase: ^12.0.0
-  checksum: 10c0/fe7f2d4ad28522ec25c437ad41cc6994325c10ce471e385e5a2d868accbfda462ca83cdcc8fafbdab4b361f050b81728eddef31c01e429ecebc1eb9728c0ff10
+  checksum: 10c0/32e8546955180552e104738a990c23b9756135f4c205498bcb71e03237e40aaf7c8cf0ad3e96e007ec1d392c14fd438549d177619d9c4dcd8de400a33045aaba
   languageName: node
   linkType: hard
 
@@ -3996,7 +3996,7 @@ __metadata:
     "@biomejs/biome": "npm:2.5.1"
     "@commitlint/cli": "npm:21.2.2"
     "@commitlint/config-conventional": "npm:21.2.2"
-    "@firebase/rules-unit-testing": "npm:5.0.1"
+    "@firebase/rules-unit-testing": "npm:5.0.2"
     "@size-limit/preset-small-lib": "npm:12.1.0"
     "@size-limit/webpack": "npm:12.1.0"
     "@types/node": "npm:24.13.3"
