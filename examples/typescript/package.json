@@ -28,7 +28,7 @@
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.5",
     "cross-env": "10.1.0",
-    "cypress": "15.21.0",
+    "cypress": "15.21.1",
     "cypress-firebase": "4.4.0",
     "eslint-plugin-chai-friendly": "0.8.0",
     "eslint-plugin-cypress": "6.4.4",
