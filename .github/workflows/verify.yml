@@ -24,7 +24,7 @@ jobs:
           cache: 'yarn'
 
       - name: Use Java 21 (required by firebase-tools emulators)
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 21
