@@ -4273,12 +4273,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:19.2.5":
-  version: 19.2.5
-  resolution: "@types/react-dom@npm:19.2.5"
+"@types/react-dom@npm:19.2.6":
+  version: 19.2.6
+  resolution: "@types/react-dom@npm:19.2.6"
   peerDependencies:
     "@types/react": ^19.2.0
-  checksum: 10c0/7a59467b043debf392d109daa1ba672e791f20ce6f24ae81fb54715f890f8119d24967e61e3644b6307428603b695b7d59e69eaf531bd1963a74a6cb462f5f49
+  checksum: 10c0/06d8b2fab8c988d7939bf6520a72c351ff9616172765eee2e6a3803659d997ad50e09bae08e956e1e6cdf2cc317ed2a9d4ae104696e58c8ce071916b76c10549
   languageName: node
   linkType: hard
 
@@ -17710,7 +17710,7 @@ __metadata:
     "@types/jest": "npm:30.0.0"
     "@types/node": "npm:24.13.3"
     "@types/react": "npm:19.2.18"
-    "@types/react-dom": "npm:19.2.5"
+    "@types/react-dom": "npm:19.2.6"
     cross-env: "npm:10.1.0"
     cypress: "npm:15.21.1"
     cypress-firebase: "npm:4.4.0"
