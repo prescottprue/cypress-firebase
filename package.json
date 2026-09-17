@@ -36,7 +36,7 @@
     "@vitest/coverage-v8": "4.1.11",
     "cypress": "16.0.0",
     "firebase": "12.19.0",
-    "firebase-admin": "14.3.0",
+    "firebase-admin": "14.4.0",
     "firebase-tools": "15.30.0",
     "husky": "9.1.7",
     "lint-staged": "17.5.1",
