@@ -32,7 +32,7 @@
     "@firebase/rules-unit-testing": "5.0.2",
     "@size-limit/preset-small-lib": "13.0.3",
     "@size-limit/webpack": "13.0.3",
-    "@types/node": "24.13.3",
+    "@types/node": "24.13.4",
     "@vitest/coverage-v8": "4.1.11",
     "cypress": "16.0.0",
     "firebase": "12.19.0",
