@@ -6991,7 +6991,7 @@ __metadata:
     eslint-plugin-cypress: "npm:7.0.2"
     firebase: "npm:^12.0.0"
     firebase-admin: "npm:14.4.0"
-    firebase-tools: "npm:15.30.0"
+    firebase-tools: "npm:15.30.1"
     lodash: "npm:^4.17.21"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
@@ -8899,9 +8899,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-tools@npm:15.30.0":
-  version: 15.30.0
-  resolution: "firebase-tools@npm:15.30.0"
+"firebase-tools@npm:15.30.1":
+  version: 15.30.1
+  resolution: "firebase-tools@npm:15.30.1"
   dependencies:
     "@apphosting/common": "npm:^0.0.8"
     "@electric-sql/pglite": "npm:^0.3.3"
@@ -8975,7 +8975,7 @@ __metadata:
     zod: "npm:^4.0.0"
   bin:
     firebase: lib/bin/firebase.js
-  checksum: 10c0/0abb46dfa859995bd6a398389a7facbfa97ed4d9fc0f96d40b125024fe801ef225bd266c3eafaeb054c6aec502b53132f805c570d2285ece3ac156cf83b7abdc
+  checksum: 10c0/542b34d0043526598e65e76abea8f226e2d08ff6c10faf35d09d33b715d215a56bfd03c90ec5d71f10264721184fe1d4a8b0a835e04586800f108d4e1f9bb74f
   languageName: node
   linkType: hard
 
