@@ -34,7 +34,7 @@
     "@size-limit/webpack": "13.1.1",
     "@types/node": "24.13.5",
     "@vitest/coverage-v8": "4.1.11",
-    "cypress": "16.0.0",
+    "cypress": "16.1.0",
     "firebase": "12.19.0",
     "firebase-admin": "14.4.0",
     "firebase-tools": "15.30.1",
