@@ -2182,12 +2182,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:24.13.5":
-  version: 24.13.5
-  resolution: "@types/node@npm:24.13.5"
+"@types/node@npm:24.13.6":
+  version: 24.13.6
+  resolution: "@types/node@npm:24.13.6"
   dependencies:
     undici-types: "npm:~7.18.0"
-  checksum: 10c0/f6c7f564e7b16670bc72ce119f2aaba0f6d6ebb886c13d8cd3656a96e4825d91d826be3d0995fc776df4e19eceb4d3074e5e18d54ce1aebd3f6e0ba12b9108cb
+  checksum: 10c0/b6302b2ede891e3a583a6e9c75390e8bc0fb8a99ea81c61ed029c244426550f1508ebae4ba1acf32840fb22a7df461f1e87b449043a8f906240b31a090866c1a
   languageName: node
   linkType: hard
 
@@ -3891,7 +3891,7 @@ __metadata:
     "@firebase/rules-unit-testing": "npm:5.0.2"
     "@size-limit/preset-small-lib": "npm:13.1.1"
     "@size-limit/webpack": "npm:13.1.1"
-    "@types/node": "npm:24.13.5"
+    "@types/node": "npm:24.13.6"
     "@vitest/coverage-v8": "npm:4.1.11"
     cypress: "npm:16.1.0"
     firebase: "npm:12.19.0"
