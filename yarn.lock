@@ -3895,7 +3895,7 @@ __metadata:
     "@vitest/coverage-v8": "npm:4.1.11"
     cypress: "npm:16.1.0"
     firebase: "npm:12.19.0"
-    firebase-admin: "npm:14.4.0"
+    firebase-admin: "npm:14.5.0"
     firebase-tools: "npm:15.30.2"
     husky: "npm:9.1.7"
     lint-staged: "npm:17.5.1"
@@ -4871,9 +4871,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-admin@npm:14.4.0":
-  version: 14.4.0
-  resolution: "firebase-admin@npm:14.4.0"
+"firebase-admin@npm:14.5.0":
+  version: 14.5.0
+  resolution: "firebase-admin@npm:14.5.0"
   dependencies:
     "@fastify/busboy": "npm:^3.0.0"
     "@firebase/database-compat": "npm:^2.1.4"
@@ -4881,7 +4881,7 @@ __metadata:
     "@google-cloud/firestore": "npm:^9.1.0"
     "@google-cloud/storage": "npm:^8.1.0"
     fast-deep-equal: "npm:^3.1.1"
-    google-auth-library: "npm:^10.6.2"
+    google-auth-library: "npm:^11.1.0"
     jsonwebtoken: "npm:^9.0.0"
     jwks-rsa: "npm:^4.0.1"
   dependenciesMeta:
@@ -4889,7 +4889,7 @@ __metadata:
       optional: true
     "@google-cloud/storage":
       optional: true
-  checksum: 10c0/d0fd0c2def630ea273a3af3b717eb4bfb2cde8050cd01d8041ef9ef377320c95cf5047b75a38435ed93bfeedf49620521c00068f0ce7ec880df98444fb562b77
+  checksum: 10c0/1fe458a42ed0e12ec62cb04432d3e8b204efe2e9b562f940e4058b946744d673ec47536299e8b55397e5a1ce56cd22496a28668c56a8ddf45931fcfa388728b0
   languageName: node
   linkType: hard
 
@@ -5401,7 +5401,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"google-auth-library@npm:^11.0.0":
+"google-auth-library@npm:^11.0.0, google-auth-library@npm:^11.1.0":
   version: 11.1.0
   resolution: "google-auth-library@npm:11.1.0"
   dependencies:
