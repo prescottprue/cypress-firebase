@@ -33,7 +33,7 @@
     "@size-limit/preset-small-lib": "14.0.1",
     "@size-limit/webpack": "14.0.1",
     "@types/node": "24.13.6",
-    "@vitest/coverage-v8": "4.1.11",
+    "@vitest/coverage-v8": "5.0.2",
     "cypress": "16.1.0",
     "firebase": "12.19.0",
     "firebase-admin": "14.5.0",
@@ -43,7 +43,7 @@
     "rimraf": "6.1.3",
     "size-limit": "14.0.1",
     "typescript": "7.0.2",
-    "vitest": "4.1.11"
+    "vitest": "5.0.2"
   },
   "keywords": [
     "cypress",
