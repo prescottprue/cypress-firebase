@@ -17,13 +17,48 @@ export interface AttachCustomCommandParams {
 /**
  * Action for Firestore
  */
-export type FirestoreAction = 'get' | 'add' | 'set' | 'update' | 'delete';
+export type FirestoreAction =
+  | 'get'
+  | 'add'
+  | 'set'
+  | 'update'
+  | 'delete'
+  | 'batch';
 
 /**
  * Data from loaded fixture
  */
 export interface FixtureData {
   [k: string]: any;
+}
+
+/**
+ * A single write within a callFirestore "batch" action
+ */
+export interface FirestoreBatchOperation {
+  /**
+   * Write to perform. "add" creates a document with a generated ID in
+   * the collection at path.
+   */
+  action: 'set' | 'add' | 'update' | 'delete';
+  /**
+   * Path relative to the batch's base path. Document path for set, update
+   * and delete; collection path for add (defaults to the base path).
+   */
+  path?: string;
+  /**
+   * Data to write (required for set, add and update)
+   */
+  data?: FixtureData;
+  /**
+   * Options for this write
+   */
+  options?: {
+    /**
+     * Merge data during set
+     */
+    merge?: boolean;
+  };
 }
 
 export type WhereOptions = [string, firestore.WhereFilterOp, any];
@@ -51,7 +86,9 @@ export interface CallFirestoreOptions {
    */
   merge?: boolean;
   /**
-   * Size of batch to use while deleting
+   * Size of batch to use while deleting a collection, or the number of
+   * writes per commit for the "batch" action (default 500). Lower this if
+   * a batch exceeds Firestore's transaction size limit.
    */
   batchSize?: number;
   /**
@@ -272,6 +309,34 @@ declare global {
       callFirestore(
         action: 'get',
         getPath: string,
+        options?: CallFirestoreOptions,
+      ): Chainable;
+      /**
+       * Run many writes using Firestore batched writes. Operations are committed in
+       * chunks of options.batchSize (default 500), so the full set of writes is only
+       * atomic when it fits within a single chunk.
+       * @param action This call will run batched writes
+       * @param basePath Path prepended to each operation's path ("" to use full paths)
+       * @param operations Writes to run (set, add, update or delete)
+       * @param options Options to be used when calling Firestore (withMeta applies to each write)
+       * @see https://github.com/prescottprue/cypress-firebase#cycallfirestore
+       * @example <caption>Seed a collection</caption>
+       * cy.callFirestore(
+       *   'batch',
+       *   'projects',
+       *   projects.map((project) => ({ action: 'add', data: project })),
+       * )
+       * @example <caption>Mixed writes</caption>
+       * cy.callFirestore('batch', '', [
+       *   { action: 'set', path: 'projects/a', data: { name: 'A' } },
+       *   { action: 'update', path: 'projects/b', data: { name: 'B' } },
+       *   { action: 'delete', path: 'projects/c' },
+       * ])
+       */
+      callFirestore(
+        action: 'batch',
+        basePath: string,
+        operations: FirestoreBatchOperation[],
         options?: CallFirestoreOptions,
       ): Chainable;
 
@@ -1029,16 +1094,17 @@ export default function attachCustomCommands(
           action,
           path: actionPath,
         };
-        // Add data only for write actions
-        if (['set', 'update', 'add'].includes(action)) {
-          // If data is an object, create a copy to original object is not modified
-          const dataIsObject = getTypeStr(dataOrOptions) === 'object';
-          const dataToWrite = dataIsObject
-            ? { ...dataOrOptions }
-            : dataOrOptions;
-
-          // Add metadata to dataToWrite if specified by options
-          if (dataIsObject && options && options.withMeta) {
+        /**
+         * @param data - Data to be written
+         * @returns Copy of data (so original is not modified) with metadata
+         * added if specified by options
+         */
+        const withMetaIfEnabled = (data: any) => {
+          if (getTypeStr(data) !== 'object') {
+            return data;
+          }
+          const dataToWrite = { ...data };
+          if (options && options.withMeta) {
             if (!dataToWrite.createdBy) {
               dataToWrite.createdBy = envValues.TEST_UID;
             }
@@ -1046,7 +1112,20 @@ export default function attachCustomCommands(
               dataToWrite.createdAt = firebase.firestore.Timestamp.now();
             }
           }
-          taskSettings.data = dataToWrite;
+          return dataToWrite;
+        };
+        // Add data only for write actions
+        if (['set', 'update', 'add'].includes(action)) {
+          taskSettings.data = withMetaIfEnabled(dataOrOptions);
+        }
+        if (action === 'batch') {
+          taskSettings.data = Array.isArray(dataOrOptions)
+            ? dataOrOptions.map((operation: FirestoreBatchOperation) =>
+                operation && operation.action !== 'delete' && operation.data
+                  ? { ...operation, data: withMetaIfEnabled(operation.data) }
+                  : operation,
+              )
+            : dataOrOptions;
         }
         // Use third argument as options for get and delete actions
         if (action === 'get' || action === 'delete') {
