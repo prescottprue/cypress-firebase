@@ -444,6 +444,50 @@ describe('tasks', () => {
             adminApp.firestore.GeoPoint,
           );
         });
+
+        it('sets a document with a GeoPoint at 0,0', async () => {
+          const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
+
+          await tasks.callFirestore(
+            adminApp,
+            'set',
+            PROJECT_PATH,
+            { statics: adminApp.firestore },
+            { geoPointProperty: { latitude: 0, longitude: 0 } },
+          );
+
+          const resultSnap = await projectFirestoreRef.get();
+          const geoPoint = resultSnap.get('geoPointProperty');
+          expect(geoPoint).toBeInstanceOf(adminApp.firestore.GeoPoint);
+          expect(geoPoint.latitude).toBe(0);
+          expect(geoPoint.longitude).toBe(0);
+        });
+      });
+
+      describe('with stringified Timestamp', () => {
+        it('sets a document with a Timestamp at epoch 0', async () => {
+          const projectFirestoreRef = adminApp.firestore().doc(PROJECT_PATH);
+
+          // cy.task stringifies and parses Timestamps into plain objects
+          await tasks.callFirestore(
+            adminApp,
+            'set',
+            PROJECT_PATH,
+            { statics: adminApp.firestore },
+            {
+              epochProperty: { seconds: 0, nanoseconds: 0 },
+              nested: { epochProperty: { seconds: 0, nanoseconds: 0 } },
+            },
+          );
+
+          const resultSnap = await projectFirestoreRef.get();
+          const timestamp = resultSnap.get('epochProperty');
+          expect(timestamp).toBeInstanceOf(adminApp.firestore.Timestamp);
+          expect(timestamp.toMillis()).toBe(0);
+          expect(resultSnap.get('nested.epochProperty')).toBeInstanceOf(
+            adminApp.firestore.Timestamp,
+          );
+        });
       });
     });
 

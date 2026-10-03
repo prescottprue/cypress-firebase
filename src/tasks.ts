@@ -130,8 +130,15 @@ function getDataWithTimestampsAndGeoPoints(
       currData !== null &&
       !Array.isArray(currData) &&
       !currData._methodName &&
-      !currData.seconds &&
-      !(currData.latitude && currData.longitude)
+      // Check types instead of truthiness so 0 values (e.g. epoch 0 or the equator) are still converted
+      !(
+        typeof currData.seconds === 'number' &&
+        typeof currData.nanoseconds === 'number'
+      ) &&
+      !(
+        typeof currData.latitude === 'number' &&
+        typeof currData.longitude === 'number'
+      )
     ) {
       return {
         // biome-ignore lint/performance/noAccumulatingSpread: will switch when changing src
