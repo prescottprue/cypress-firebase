@@ -742,8 +742,37 @@ function loginWithCustomToken(auth: any, customToken: string): Promise<any> {
         resolve(auth);
       }
     });
-    auth.signInWithCustomToken(customToken).catch(reject);
+    auth.signInWithCustomToken(customToken).catch((err: any) => {
+      if (
+        err?.code === 'auth/invalid-custom-token' &&
+        isUnsignedToken(customToken)
+      ) {
+        reject(
+          new Error(
+            `${err.message} The custom token was created by the Auth emulator (FIREBASE_AUTH_EMULATOR_HOST is set where the cypress-firebase plugin runs), but the firebase instance passed to attachCustomCommands is not connected to the Auth emulator. Connect it with connectAuthEmulator (or auth().useEmulator), or unset FIREBASE_AUTH_EMULATOR_HOST to use a hosted Auth instance.`,
+          ),
+        );
+        return;
+      }
+      reject(err);
+    });
   });
+}
+
+/**
+ * Check whether a custom token is unsigned. firebase-admin creates unsigned
+ * tokens (alg "none") when FIREBASE_AUTH_EMULATOR_HOST is set - only the Auth
+ * emulator accepts these.
+ * @param token - Custom token (JWT)
+ * @returns Whether the token is unsigned
+ */
+function isUnsignedToken(token: string): boolean {
+  try {
+    const header = token.split('.')[0].replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(header)).alg === 'none';
+  } catch {
+    return false;
+  }
 }
 
 /**
