@@ -441,9 +441,9 @@ level.
 
 ##### Parameters
 
-- `action` **[string][mdn-string]** The action type to call with (get, set, add, update, delete, batch)
+- `action` **[string][mdn-string]** The action type to call with (get, set, add, create, update, delete, batch, count, aggregate). `create` fails if the document already exists
 - `actionPath` **[string][mdn-string]** Path within Firestore that action should be applied (for `batch`, a base path prepended to each operation's path - use `''` for full paths)
-- `dataOrOptions` **[string][mdn-string]|[object][mdn-object]|[array][mdn-array]** Data for write actions, an array of operations for `batch`, or options for get/delete actions
+- `dataOrOptions` **[string][mdn-string]|[object][mdn-object]|[array][mdn-array]** Data for write actions, an array of operations for `batch`, or options for get/delete/count/aggregate actions
 - `options` **[object][mdn-object]** Options
   - `options.withMeta` **[boolean][mdn-boolean]** Whether or not to include `createdAt` and `createdBy`
   - `options.merge` **[boolean][mdn-boolean]** Merge data during set
@@ -453,6 +453,9 @@ level.
   - `options.orderBy` **[string][mdn-string]|[array][mdn-array]** Order documents
   - `options.limit` **[number][mdn-number]** Limit to n number of documents
   - `options.limitToLast` **[number][mdn-number]** Limit to last n number of documents
+  - `options.recursive` **[boolean][mdn-boolean]** Also delete subcollections when deleting a document, collection or query results (default `false`)
+  - `options.aggregate` **[object][mdn-object]** Aggregations for the `aggregate` action, keyed by result alias: `['count']`, `['sum', field]` or `['average', field]`
+  - `options.timestampFormat` **[string][mdn-string]** Format of Timestamps returned by `get`: `'object'` (`{ seconds, nanoseconds }`, which can be written back), `'iso'` or `'millis'`. By default Timestamps are returned as Firestore serializes them (`{ _seconds, _nanoseconds }`)
   - `options.statics` **admin.firestore** Firestore statics (i.e. `admin.firestore`). This should only be needed during testing due to @firebase/testing not containing statics
 
 ##### Examples
@@ -493,6 +496,50 @@ const fakeProject = {
   // createdAt: firebase.firestore.Timestamp.fromDate(new Date())
 };
 cy.callFirestore('set', 'projects/ABC123', fakeProject);
+```
+
+_FieldValue Sentinels_
+
+`serverTimestamp`, `deleteField`, `increment`, `arrayUnion` and `arrayRemove` from the Firebase JS SDK (modular or compat) are converted to their firebase-admin equivalents on the Node side:
+
+```javascript
+import { arrayUnion, increment, serverTimestamp } from 'firebase/firestore';
+
+cy.callFirestore('update', 'projects/ABC123', {
+  viewCount: increment(1),
+  tags: arrayUnion('featured'),
+  updatedAt: serverTimestamp(),
+});
+```
+
+_Count And Aggregate_
+
+```javascript
+cy.callFirestore('count', 'orders', { where: ['status', '==', 'paid'] }).should(
+  'equal',
+  2,
+);
+
+cy.callFirestore('aggregate', 'orders', {
+  where: ['status', '==', 'paid'],
+  aggregate: { total: ['sum', 'price'], average: ['average', 'price'] },
+}).should('deep.equal', { total: 30, average: 15 });
+```
+
+_Delete Including Subcollections_
+
+```javascript
+cy.callFirestore('delete', 'projects/ABC123', { recursive: true });
+```
+
+_Get With Readable Timestamps_
+
+```javascript
+cy.callFirestore('get', 'projects/ABC123', { timestampFormat: 'iso' }).then(
+  (project) => {
+    expect(new Date(project.createdAt)).to.be.lessThan(new Date());
+  },
+);
 ```
 
 _Batched Writes_
