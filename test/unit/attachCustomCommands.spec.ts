@@ -378,6 +378,38 @@ describe('attachCustomCommands', () => {
       // Original operations are not modified
       expect(operations[0]).toEqual({ action: 'add', data: { name: 'a' } });
     });
+
+    it.each(['count', 'aggregate'])(
+      'calls task with %s action (setting third argument as options)',
+      async (action) => {
+        const options = {
+          where: ['status', '==', 'paid'],
+          aggregate: { total: ['sum', 'price'] },
+        };
+        await loadedCustomCommands.callFirestore(action, 'orders', options);
+        expect(taskSpy).toHaveBeenCalledWith('callFirestore', {
+          action,
+          path: 'orders',
+          options,
+        });
+      },
+    );
+
+    it('calls task with create action including meta data if withMeta is set to true', async () => {
+      const options = { withMeta: true };
+      await loadedCustomCommands.callFirestore(
+        'create',
+        'projects/a',
+        { name: 'a' },
+        options,
+      );
+      expect(taskSpy).toHaveBeenCalledWith('callFirestore', {
+        action: 'create',
+        path: 'projects/a',
+        data: { name: 'a', createdBy: testUserId, createdAt: 'TIMESTAMP' },
+        options,
+      });
+    });
   });
 
   describe('cy.callRtdb', () => {

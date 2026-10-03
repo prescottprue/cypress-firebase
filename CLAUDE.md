@@ -16,7 +16,7 @@ yarn format             # biome format --write
 yarn test               # starts firestore+database emulators, runs all unit tests
 yarn test:base          # run tests WITHOUT starting emulators (expects them running)
 yarn emulators          # start emulators standalone (for use with test:base / test:watch)
-yarn size               # build + size-limit check (10kb budget per export)
+yarn size               # build + size-limit check (11kb budget per export)
 ```
 
 Run a single test file (only `tasks.spec.ts` needs emulators running, e.g. via `yarn emulators` in another terminal):
@@ -45,7 +45,7 @@ The two sides are linked by `taskSettingKeys` in `src/tasks.ts` — an ordered m
 
 - `adminInstance` is intentionally typed `any` and accessed through the legacy namespaced API shape (`admin.firestore()`, `admin.auth()`) so the same code works across firebase-admin versions. firebase-admin v14+ removed that API, so `plugin.ts` detects modular modules via `isModularAdmin` and wraps them with `adaptModularAdmin` (both in `firebase-utils.ts`) to recreate the legacy shape; the adapter lazily `require`s `firebase-admin/*` subpaths. Types are imported from `firebase-admin/*` subpaths as type-only imports.
 - The package is consumed in both browser and Node contexts; `package.json`'s `browser` field stubs `fs`/`os`/`path` and the `firebase-admin/*` subpaths used by the adapter. Don't add runtime dependencies (it's advertised as 0-dependency) or Node-only imports to browser-side code paths.
-- `size-limit` enforces a 10kb budget on each of the two exports (`attachCustomCommands`, `plugin`).
+- `size-limit` enforces an 11kb budget on each of the two exports (`attachCustomCommands`, `plugin`).
 - Biome handles lint + format (single quotes, spaces). `console` calls are errors; intentional logging uses `// biome-ignore lint/suspicious/noConsole: Intentional logging`.
 - Public API surface is only what `src/index.ts` exports: `attachCustomCommands` and `plugin` (plus types).
 
