@@ -337,6 +337,47 @@ describe('attachCustomCommands', () => {
         options,
       });
     });
+
+    it('calls task with batch action (setting third argument as operations)', async () => {
+      const operations = [
+        { action: 'set', path: 'a', data: { name: 'a' } },
+        { action: 'delete', path: 'b' },
+      ];
+      await loadedCustomCommands.callFirestore('batch', 'projects', operations);
+      expect(taskSpy).toHaveBeenCalledWith('callFirestore', {
+        action: 'batch',
+        path: 'projects',
+        data: operations,
+      });
+    });
+
+    it('calls task with batch action including meta data on each write if withMeta is set to true', async () => {
+      const operations = [
+        { action: 'add', data: { name: 'a' } },
+        { action: 'update', path: 'b', data: { name: 'b' } },
+        { action: 'delete', path: 'c' },
+      ];
+      const options = { withMeta: true };
+      await loadedCustomCommands.callFirestore(
+        'batch',
+        'projects',
+        operations,
+        options,
+      );
+      const meta = { createdBy: testUserId, createdAt: 'TIMESTAMP' };
+      expect(taskSpy).toHaveBeenCalledWith('callFirestore', {
+        action: 'batch',
+        path: 'projects',
+        data: [
+          { action: 'add', data: { name: 'a', ...meta } },
+          { action: 'update', path: 'b', data: { name: 'b', ...meta } },
+          { action: 'delete', path: 'c' },
+        ],
+        options,
+      });
+      // Original operations are not modified
+      expect(operations[0]).toEqual({ action: 'add', data: { name: 'a' } });
+    });
   });
 
   describe('cy.callRtdb', () => {

@@ -6,6 +6,7 @@ import type {
   CallFirestoreOptions,
   CallRtdbOptions,
   FirestoreAction,
+  FirestoreBatchOperation,
   FirestoreStatics,
   FixtureData,
   RTDBAction,
@@ -228,6 +229,75 @@ export async function callRtdb(
 }
 
 /**
+ * Run writes as Firestore batched writes, committing in chunks so large seeds
+ * do not exceed the transaction size limit. All operations are validated
+ * before any chunk is committed.
+ * @param db - Firestore instance
+ * @param basePath - Path prepended to each operation's path
+ * @param operations - Writes to run
+ * @param firestoreStatics - Statics used to convert timestamps and GeoPoints
+ * @param batchSize - Number of writes per commit
+ * @returns Promise which resolves with null once all batches are committed
+ */
+async function runFirestoreBatch(
+  db: firestore.Firestore,
+  basePath: string,
+  operations: FirestoreBatchOperation[],
+  firestoreStatics: FirestoreStatics,
+  batchSize: number,
+): Promise<null> {
+  if (!Array.isArray(operations)) {
+    throw new Error(
+      'You must provide an array of operations to run batch in firestore.',
+    );
+  }
+  const batches: firestore.WriteBatch[] = [];
+  operations.forEach((operation, index) => {
+    if (index % batchSize === 0) {
+      batches.push(db.batch());
+    }
+    const batch = batches[batches.length - 1];
+    const { action, data } = operation || ({} as FirestoreBatchOperation);
+    const opPath = [basePath, operation && operation.path]
+      .filter(Boolean)
+      .join('/')
+      .replace(/^\/+|\/+$/g, '');
+    if (!opPath) {
+      throw new Error(`Batch operation ${index} is missing a path.`);
+    }
+    if (action === 'delete') {
+      batch.delete(db.doc(opPath));
+      return;
+    }
+    if (!['set', 'add', 'update'].includes(action)) {
+      throw new Error(
+        `Batch operation ${index} has unsupported action "${action}". Use set, add, update or delete.`,
+      );
+    }
+    if (!data) {
+      throw new Error(
+        `You must define data to run ${action} in batch operation ${index}.`,
+      );
+    }
+    const dataToSet = getDataWithTimestampsAndGeoPoints(data, firestoreStatics);
+    if (action === 'add') {
+      batch.set(db.collection(opPath).doc(), dataToSet);
+    } else if (action === 'update') {
+      batch.update(db.doc(opPath), dataToSet);
+    } else if (operation.options && operation.options.merge) {
+      batch.set(db.doc(opPath), dataToSet, { merge: true });
+    } else {
+      batch.set(db.doc(opPath), dataToSet);
+    }
+  });
+  // Commit sequentially to avoid overwhelming the backend
+  for (const batch of batches) {
+    await batch.commit();
+  }
+  return null;
+}
+
+/**
  * @param adminInstance - firebase-admin instance
  * @param action - Action to run
  * @param actionPath - Path to collection or document within Firestore
@@ -240,9 +310,20 @@ export async function callFirestore(
   action: FirestoreAction,
   actionPath: string,
   options?: CallFirestoreOptions,
-  data?: FixtureData,
+  data?: FixtureData | FirestoreBatchOperation[],
 ): Promise<any> {
   try {
+    if (action === 'batch') {
+      return await runFirestoreBatch(
+        adminInstance.firestore(),
+        actionPath,
+        data as FirestoreBatchOperation[],
+        (options && options.statics) ||
+          (adminInstance.firestore as FirestoreStatics),
+        (options && options.batchSize) || 500,
+      );
+    }
+
     if (action === 'get') {
       const snap = await (
         slashPathToFirestoreRef(

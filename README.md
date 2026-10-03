@@ -441,13 +441,13 @@ level.
 
 ##### Parameters
 
-- `action` **[string][mdn-string]** The action type to call with (set, push, update, delete)
-- `actionPath` **[string][mdn-string]** Path within Firestore that action should be applied
-- `dataOrOptions` **[string][mdn-string]|[object][mdn-object]** Data for write actions or options for get action
+- `action` **[string][mdn-string]** The action type to call with (get, set, add, update, delete, batch)
+- `actionPath` **[string][mdn-string]** Path within Firestore that action should be applied (for `batch`, a base path prepended to each operation's path - use `''` for full paths)
+- `dataOrOptions` **[string][mdn-string]|[object][mdn-object]|[array][mdn-array]** Data for write actions, an array of operations for `batch`, or options for get/delete actions
 - `options` **[object][mdn-object]** Options
   - `options.withMeta` **[boolean][mdn-boolean]** Whether or not to include `createdAt` and `createdBy`
   - `options.merge` **[boolean][mdn-boolean]** Merge data during set
-  - `options.batchSize` **[number][mdn-number]** Size of batch to use while deleting
+  - `options.batchSize` **[number][mdn-number]** Size of batch to use while deleting, or number of writes per commit for `batch` (default 500)
   - `options.where` **[array][mdn-array]** Filter documents by the specified field and the value should satisfy
   * the relation constraint provided
   - `options.orderBy` **[string][mdn-string]|[array][mdn-array]** Order documents
@@ -493,6 +493,28 @@ const fakeProject = {
   // createdAt: firebase.firestore.Timestamp.fromDate(new Date())
 };
 cy.callFirestore('set', 'projects/ABC123', fakeProject);
+```
+
+_Batched Writes_
+
+Seed many documents in one command. Operations are sent to the Node side in a single task and written with Firestore [batched writes](https://firebase.google.com/docs/firestore/manage-data/transactions#batched-writes), committed in chunks of `options.batchSize` (default 500). Each chunk is atomic, but the full set of writes is only atomic when it fits in one chunk. Lower `batchSize` if a commit exceeds Firestore's transaction size limit.
+
+```javascript
+cy.fixture('projects.json').then((projects) => {
+  cy.callFirestore(
+    'batch',
+    'projects',
+    projects.map((project) => ({ action: 'add', data: project })),
+  );
+});
+
+// Mixed writes using full paths (each operation can be set, add, update or delete)
+cy.callFirestore('batch', '', [
+  { action: 'set', path: 'projects/a', data: { name: 'A' } },
+  { action: 'set', path: 'projects/b', data: { name: 'B' }, options: { merge: true } },
+  { action: 'update', path: 'projects/c', data: { name: 'C' } },
+  { action: 'delete', path: 'projects/d' },
+]);
 ```
 
 _Full_

@@ -702,6 +702,126 @@ describe('tasks', () => {
         expect(result.data()).toBeUndefined();
       });
     });
+
+    describe('batch action', () => {
+      afterEach(async () => {
+        await tasks.callFirestore(adminApp, 'delete', PROJECTS_COLLECTION);
+      });
+
+      it('runs set, add, update and delete writes relative to the base path', async () => {
+        await projectsFirestoreRef.doc('toUpdate').set({ name: 'old' });
+        await projectsFirestoreRef.doc('toDelete').set(testProject);
+        const result = await tasks.callFirestore(
+          adminApp,
+          'batch',
+          PROJECTS_COLLECTION,
+          undefined,
+          [
+            { action: 'set', path: PROJECT_ID, data: testProject },
+            { action: 'add', data: { name: 'added' } },
+            { action: 'update', path: 'toUpdate', data: { name: 'new' } },
+            { action: 'delete', path: 'toDelete' },
+          ],
+        );
+        expect(result).toBeNull();
+        expect((await projectFirestoreRef.get()).data()).toEqual(testProject);
+        expect(
+          (await projectsFirestoreRef.doc('toUpdate').get()).data(),
+        ).toEqual({ name: 'new' });
+        expect((await projectsFirestoreRef.doc('toDelete').get()).exists).toBe(
+          false,
+        );
+        const added = await projectsFirestoreRef
+          .where('name', '==', 'added')
+          .get();
+        expect(added.size).toBe(1);
+      });
+
+      it('supports full paths with an empty base path and set with merge', async () => {
+        await projectFirestoreRef.set({ name: 'project 1', other: 'value' });
+        await tasks.callFirestore(adminApp, 'batch', '', undefined, [
+          {
+            action: 'set',
+            path: PROJECT_PATH,
+            data: { name: 'merged' },
+            options: { merge: true },
+          },
+        ]);
+        expect((await projectFirestoreRef.get()).data()).toEqual({
+          name: 'merged',
+          other: 'value',
+        });
+      });
+
+      it('commits more writes than batchSize across multiple batches', async () => {
+        const operations = Array.from({ length: 12 }, (_, i) => ({
+          action: 'set' as const,
+          path: `doc-${i}`,
+          data: { index: i },
+        }));
+        const batchSpy = vi.spyOn(adminApp.firestore(), 'batch');
+        await tasks.callFirestore(
+          adminApp,
+          'batch',
+          PROJECTS_COLLECTION,
+          { batchSize: 5 },
+          operations,
+        );
+        expect(batchSpy).toHaveBeenCalledTimes(3);
+        batchSpy.mockRestore();
+        expect((await projectsFirestoreRef.get()).size).toBe(12);
+      });
+
+      it('converts timestamps within batch data', async () => {
+        await tasks.callFirestore(
+          adminApp,
+          'batch',
+          PROJECTS_COLLECTION,
+          undefined,
+          [
+            {
+              action: 'set',
+              path: PROJECT_ID,
+              data: { createdAt: { seconds: 0, nanoseconds: 0 } },
+            },
+          ],
+        );
+        const data = (await projectFirestoreRef.get()).data();
+        expect(data?.createdAt).toBeInstanceOf(adminApp.firestore.Timestamp);
+      });
+
+      it('throws without writing anything if an operation is invalid', async () => {
+        await expect(
+          tasks.callFirestore(
+            adminApp,
+            'batch',
+            PROJECTS_COLLECTION,
+            undefined,
+            [
+              { action: 'set', path: PROJECT_ID, data: testProject },
+              { action: 'set', path: 'missingData' },
+            ],
+          ),
+        ).rejects.toThrow(
+          'You must define data to run set in batch operation 1',
+        );
+        expect((await projectFirestoreRef.get()).exists).toBe(false);
+      });
+
+      it('throws if operations is not an array', async () => {
+        await expect(
+          tasks.callFirestore(
+            adminApp,
+            'batch',
+            PROJECTS_COLLECTION,
+            undefined,
+            {
+              some: 'data',
+            },
+          ),
+        ).rejects.toThrow('You must provide an array of operations');
+      });
+    });
   });
 
   describe('callRtdb', () => {
