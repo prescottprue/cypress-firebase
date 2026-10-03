@@ -174,6 +174,36 @@ describe('attachCustomCommands', () => {
       });
       expect(signInWithCustomToken).toHaveBeenCalledTimes(1);
     });
+
+    describe('with invalid custom token error', () => {
+      const tokenWithAlg = (alg: string) =>
+        `${Buffer.from(JSON.stringify({ alg, typ: 'JWT' })).toString('base64url')}.e30.`;
+      const invalidTokenError = Object.assign(
+        new Error('Firebase: The custom token format is incorrect.'),
+        { code: 'auth/invalid-custom-token' },
+      );
+
+      beforeEach(() => {
+        onAuthStateChanged = vi.fn();
+        signInWithCustomToken = vi.fn(() => Promise.reject(invalidTokenError));
+      });
+
+      it('explains emulator mismatch if token is unsigned (from Auth emulator)', async () => {
+        taskSpy.mockImplementation(() => Promise.resolve(tokenWithAlg('none')));
+        await expect(loadedCustomCommands.login('123ABC')).rejects.toThrow(
+          /not connected to the Auth emulator/,
+        );
+      });
+
+      it('rejects with original error if token is signed', async () => {
+        taskSpy.mockImplementation(() =>
+          Promise.resolve(tokenWithAlg('RS256')),
+        );
+        await expect(loadedCustomCommands.login('123ABC')).rejects.toBe(
+          invalidTokenError,
+        );
+      });
+    });
   });
 
   describe('cy.loginWithEmailAndPassword', () => {
