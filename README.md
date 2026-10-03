@@ -530,18 +530,18 @@ describe('Test firestore', () => {
 
 Use any of the [firebase admin auth methods](https://firebase.google.com/docs/reference/admin/node/firebase-admin.auth.baseauth#methods):
 
-- `authCreateAuthUser`
-- `authImportAuthUsers`
-- `authListAuthUsers`
-- `authGetAuthUser`
-- `authGetAuthUserByEmail`
-- `authGetAuthUserByPhoneNumber`
-- `authGetAuthUserByProviderUid`
-- `authGetAuthUsers`
-- `authUpdateAuthUser`
-- `authSetAuthUserCustomClaims`
-- `authDeleteAuthUser`
-- `authDeleteAuthUsers`
+- `authCreateUser`
+- `authImportUsers`
+- `authListUsers`
+- `authGetUser`
+- `authGetUserByEmail`
+- `authGetUserByPhoneNumber`
+- `authGetUserByProviderUid`
+- `authGetUsers`
+- `authUpdateUser`
+- `authSetCustomUserClaims`
+- `authDeleteUser`
+- `authDeleteUsers`
 - `authCreateCustomToken`
 - `authCreateSessionCookie`
 - `authVerifyIdToken`
@@ -550,10 +550,10 @@ Use any of the [firebase admin auth methods](https://firebase.google.com/docs/re
 - `authGeneratePasswordResetLink`
 - `authGenerateSignInWithEmailLink`
 - `authGenerateVerifyAndChangeEmailLink`
-- `authGreateProviderConfig`
+- `authCreateProviderConfig`
 - `authGetProviderConfig`
 - `authListProviderConfigs`
-- `authUpdateProviderCondig`
+- `authUpdateProviderConfig`
 - `authDeleteProviderConfig`
 
 ##### Parameters
@@ -570,6 +570,9 @@ const email = 'some@user.com';
 cy.authCreateUser({ uid });
 cy.authUpdateUser(uid, { displayName: 'Test User', email });
 cy.authSetCustomUserClaims(uid, { role: 'admin' });
+cy.authGetUser(uid).then((user) => {
+  console.log(user?.email); // some@user.com
+});
 cy.authGetUserByEmail(email).then((user) => {
   console.log(user?.displayName); // Test User
   console.log(user?.customClaims?.['role']); // admin
@@ -897,7 +900,7 @@ const options = {
     logout: 'newNameForLogout',
     callRtdb: 'newNameForCallRtdb',
     callFirestore: 'newNameForCallFirestore',
-    getAuthUser: 'newNameForGetAuthUser',
+    authGetUser: 'newNameForAuthGetUser',
   },
 };
 attachCustomCommands({ Cypress, cy, firebase }, options);
