@@ -18,6 +18,11 @@ env:
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # create release tags + GitHub releases
+      issues: write # semantic-release issue comments
+      pull-requests: write # semantic-release PR comments
+      id-token: write # OIDC token for npm trusted publishing
     steps:
       - name: Checkout code
         uses: actions/checkout@v7
@@ -47,11 +52,6 @@ jobs:
         with:
           path: ~/.cache/firebase/emulators
           key: ${{ runner.os }}-${{ matrix.node-version }}-firebase-${{ steps.cache-settings.outputs.firebase-tools }}
-
-      - name: Configure package manager
-        run: |
-          npm config set '//registry.npmjs.org/:_authToken' ${{ secrets.NPM_TOKEN }}
-          yarn config set npmAuthToken ${{ secrets.NPM_TOKEN }}
 
       - name: Install Dependencies
         run: yarn install --immutable
