@@ -1873,47 +1873,47 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@size-limit/file@npm:14.0.1":
-  version: 14.0.1
-  resolution: "@size-limit/file@npm:14.0.1"
+"@size-limit/file@npm:14.1.0":
+  version: 14.1.0
+  resolution: "@size-limit/file@npm:14.1.0"
   peerDependencies:
-    size-limit: 14.0.1
-  checksum: 10c0/1ca446413da62ef7e324c6b4ff8d13e3be02fb5d7925b574d3101c22869ea79da7a34b440b5f8ad8a722bf645bda5b86672418cfb1ad3ff1ec4100c08c44e45f
+    size-limit: 14.1.0
+  checksum: 10c0/efdb8723626b0f6223ff45b8151fb21860733f5c7fbd2f766e5c06b1756995df4991d087731bfbbb0f04f3f77b576a2948f9bf351fe60601a59d5996bc271864
   languageName: node
   linkType: hard
 
-"@size-limit/preset-small-lib@npm:14.0.1":
-  version: 14.0.1
-  resolution: "@size-limit/preset-small-lib@npm:14.0.1"
+"@size-limit/preset-small-lib@npm:14.1.0":
+  version: 14.1.0
+  resolution: "@size-limit/preset-small-lib@npm:14.1.0"
   dependencies:
-    "@size-limit/file": "npm:14.0.1"
-    "@size-limit/rolldown": "npm:14.0.1"
-    size-limit: "npm:14.0.1"
+    "@size-limit/file": "npm:14.1.0"
+    "@size-limit/rolldown": "npm:14.1.0"
+    size-limit: "npm:14.1.0"
   peerDependencies:
-    size-limit: 14.0.1
-  checksum: 10c0/5da6e3734b494baa07b78ef22b107f2150fdfc06c8b8e5e8074a69d2e7169b6ee5b7aeb6e8d0f97fb792d2d96a6293e2d7fc632ba695eb738017d41f672d0adf
+    size-limit: 14.1.0
+  checksum: 10c0/dbfbe58f690f0e959f6b0fe2193eb5d7df032074504a18dfdc446c653aaac40b7706cc0101ac150710084ae101240e85611fc2f7156fde49566dae1f89842082
   languageName: node
   linkType: hard
 
-"@size-limit/rolldown@npm:14.0.1":
-  version: 14.0.1
-  resolution: "@size-limit/rolldown@npm:14.0.1"
+"@size-limit/rolldown@npm:14.1.0":
+  version: 14.1.0
+  resolution: "@size-limit/rolldown@npm:14.1.0"
   dependencies:
-    rolldown: "npm:^1.2.10"
+    rolldown: "npm:^1.2.11"
   peerDependencies:
-    size-limit: 14.0.1
-  checksum: 10c0/c367b029082508110941ed9a36844496041febae6e27e377e119c4713b05f6c2f0f1bfbe67f0ebf1bc7aca2cb7149d5a5dba835a3597d9a09f5763d0049f5ccc
+    size-limit: 14.1.0
+  checksum: 10c0/6fce2d6c031d036043b547a18baec924d9ff4da8dfdf76846d3cf412f025b0441054ce383131934ce066e0cb38b3b44d0d4f8455864910e06808d5927860e5e8
   languageName: node
   linkType: hard
 
-"@size-limit/webpack@npm:14.0.1":
-  version: 14.0.1
-  resolution: "@size-limit/webpack@npm:14.0.1"
+"@size-limit/webpack@npm:14.1.0":
+  version: 14.1.0
+  resolution: "@size-limit/webpack@npm:14.1.0"
   dependencies:
     webpack: "npm:^5.111.1"
   peerDependencies:
-    size-limit: 14.0.1
-  checksum: 10c0/8bc4c19602224baf83f7e576f23069c6b9f9d48457f8e559f909bd7d9a58a6b26c2501ddb73b61e51b1e6535e7701b05df73ccc5885c49584823e5f9f2934788
+    size-limit: 14.1.0
+  checksum: 10c0/34b70f3c125afc0e4ee08bd46819fb31e11971e32deaacdf77584f265d9cd17b6cd4e17a90f839ab18805eccd35d9b590c62ecb009a3e29803331e9906cae864
   languageName: node
   linkType: hard
 
@@ -3783,8 +3783,8 @@ __metadata:
     "@commitlint/cli": "npm:21.2.3"
     "@commitlint/config-conventional": "npm:21.2.3"
     "@firebase/rules-unit-testing": "npm:5.0.2"
-    "@size-limit/preset-small-lib": "npm:14.0.1"
-    "@size-limit/webpack": "npm:14.0.1"
+    "@size-limit/preset-small-lib": "npm:14.1.0"
+    "@size-limit/webpack": "npm:14.1.0"
     "@types/node": "npm:24.19.0"
     "@vitest/coverage-v8": "npm:5.0.2"
     cypress: "npm:16.1.0"
@@ -3794,7 +3794,7 @@ __metadata:
     husky: "npm:9.1.7"
     lint-staged: "npm:17.6.0"
     rimraf: "npm:6.1.3"
-    size-limit: "npm:14.0.1"
+    size-limit: "npm:14.1.0"
     typescript: "npm:7.0.2"
     vite: "npm:8.3.2"
     vitest: "npm:5.0.2"
@@ -7913,7 +7913,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"rolldown@npm:^1.2.10, rolldown@npm:~1.2.11":
+"rolldown@npm:^1.2.11, rolldown@npm:~1.2.11":
   version: 1.2.12
   resolution: "rolldown@npm:1.2.12"
   dependencies:
@@ -8212,15 +8212,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"size-limit@npm:14.0.1":
-  version: 14.0.1
-  resolution: "size-limit@npm:14.0.1"
+"size-limit@npm:14.1.0":
+  version: 14.1.0
+  resolution: "size-limit@npm:14.1.0"
   dependencies:
     lilconfig: "npm:^3.1.3"
     nanospinner: "npm:^1.2.2"
   bin:
     size-limit: bin.js
-  checksum: 10c0/bbfda00366aabe89bb302ec280496a316a215487cddbe87218e85bf0839577f3b22585b451f23d8812999d8c40011fd14e5394a8e8c89f25e515d7712792463d
+  checksum: 10c0/013aca9d61e6b825898bb31df03c558fb251ef745913a3ab6545f34506d0c1bb9b6b2b83f7ead89306722133bde39fb287dc1b670d5bb0dfcbc49cdbe6f96e5c
   languageName: node
   linkType: hard
 
