@@ -2,7 +2,10 @@ import {
   initializeTestEnvironment,
   type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
+import compat from 'firebase/compat/app';
 import * as admin from 'firebase-admin';
+import 'firebase/compat/firestore';
+import { arrayRemove, arrayUnion, increment } from 'firebase/firestore';
 import {
   afterAll,
   afterEach,
@@ -569,6 +572,122 @@ describe('tasks', () => {
         );
       });
 
+      describe('with FieldValue sentinels', () => {
+        // cy.task stringifies and parses data, so sentinels arrive as plain objects
+        const stringify = (val: any) => JSON.parse(JSON.stringify(val));
+
+        it('supports increment', async () => {
+          await projectFirestoreRef.set({ count: 1, other: 10 });
+          await tasks.callFirestore(
+            adminApp,
+            'update',
+            PROJECT_PATH,
+            { statics: adminApp.firestore },
+            {
+              count: stringify(increment(2)),
+              other: stringify(increment(-3.5)),
+            },
+          );
+          const resultSnap = await projectFirestoreRef.get();
+          expect(resultSnap.data()).toEqual({ count: 3, other: 6.5 });
+        });
+
+        it('supports arrayUnion and arrayRemove', async () => {
+          await projectFirestoreRef.set({
+            tags: ['a', 'b'],
+            removeFrom: ['x', 'y', 'z'],
+          });
+          await tasks.callFirestore(
+            adminApp,
+            'update',
+            PROJECT_PATH,
+            { statics: adminApp.firestore },
+            {
+              tags: stringify(arrayUnion('b', 'c')),
+              removeFrom: stringify(arrayRemove('x', 'z')),
+            },
+          );
+          const resultSnap = await projectFirestoreRef.get();
+          expect(resultSnap.data()).toEqual({
+            tags: ['a', 'b', 'c'],
+            removeFrom: ['y'],
+          });
+        });
+
+        it('converts timestamps within arrayUnion elements', async () => {
+          await projectFirestoreRef.set({ dates: [] });
+          await tasks.callFirestore(
+            adminApp,
+            'update',
+            PROJECT_PATH,
+            { statics: adminApp.firestore },
+            {
+              dates: stringify(
+                arrayUnion({ at: { seconds: 1589651645, nanoseconds: 0 } }),
+              ),
+            },
+          );
+          const resultSnap = await projectFirestoreRef.get();
+          const [first] = resultSnap.data()?.dates ?? [];
+          expect(first.at).toBeInstanceOf(adminApp.firestore.Timestamp);
+          expect(first.at.seconds).toBe(1589651645);
+        });
+
+        it('supports minified operand property names (browser bundle)', async () => {
+          await projectFirestoreRef.set({ count: 1, tags: ['a'] });
+          await tasks.callFirestore(
+            adminApp,
+            'update',
+            PROJECT_PATH,
+            { statics: adminApp.firestore },
+            {
+              count: { _methodName: 'increment', ur: 4 },
+              tags: { _methodName: 'arrayUnion', ar: ['b'] },
+            },
+          );
+          const resultSnap = await projectFirestoreRef.get();
+          expect(resultSnap.data()).toEqual({ count: 5, tags: ['a', 'b'] });
+        });
+
+        it('supports compat SDK sentinels', async () => {
+          await projectFirestoreRef.set({ count: 1, tags: ['a'], gone: true });
+          await tasks.callFirestore(
+            adminApp,
+            'set',
+            PROJECT_PATH,
+            { statics: adminApp.firestore, merge: true },
+            {
+              count: stringify(compat.firestore.FieldValue.increment(2)),
+              tags: stringify(compat.firestore.FieldValue.arrayUnion('b')),
+              gone: stringify(compat.firestore.FieldValue.delete()),
+              nested: {
+                tags: stringify(compat.firestore.FieldValue.arrayUnion('n')),
+              },
+            },
+          );
+          const resultSnap = await projectFirestoreRef.get();
+          expect(resultSnap.data()).toEqual({
+            count: 3,
+            tags: ['a', 'b'],
+            nested: { tags: ['n'] },
+          });
+        });
+
+        it('throws a clear error when the operand is missing', async () => {
+          await expect(
+            tasks.callFirestore(
+              adminApp,
+              'set',
+              PROJECT_PATH,
+              { statics: adminApp.firestore },
+              { count: { _methodName: 'increment' } },
+            ),
+          ).rejects.toThrow(
+            'Unable to find the value passed to FieldValue "increment".',
+          );
+        });
+      });
+
       describe('with timestamps', () => {
         const correctTimestamp = {
           _seconds: 1589651645,
@@ -700,6 +819,275 @@ describe('tasks', () => {
         const result = await projectFirestoreRef.get();
         // Confirm project is deleted
         expect(result.data()).toBeUndefined();
+      });
+    });
+
+    describe('delete action with recursive option', () => {
+      const RECURSIVE_COLLECTION = 'recursive-delete';
+      const recursiveRef = adminApp
+        .firestore()
+        .collection(RECURSIVE_COLLECTION);
+      afterEach(async () => {
+        await adminApp.firestore().recursiveDelete(recursiveRef);
+      });
+
+      it('leaves subcollections when deleting a document by default', async () => {
+        await recursiveRef.doc('a').set({ name: 'a' });
+        await recursiveRef.doc('a').collection('sub').doc('x').set({ n: 1 });
+        await tasks.callFirestore(
+          adminApp,
+          'delete',
+          `${RECURSIVE_COLLECTION}/a`,
+        );
+        const subSnap = await recursiveRef.doc('a').collection('sub').get();
+        expect(subSnap.size).toBe(1);
+      });
+
+      it('deletes a document and its subcollections', async () => {
+        await recursiveRef.doc('a').set({ name: 'a' });
+        await recursiveRef.doc('a').collection('sub').doc('x').set({ n: 1 });
+        await recursiveRef.doc('b').set({ name: 'b' });
+        await tasks.callFirestore(
+          adminApp,
+          'delete',
+          `${RECURSIVE_COLLECTION}/a`,
+          { recursive: true },
+        );
+        const subSnap = await recursiveRef.doc('a').collection('sub').get();
+        expect(subSnap.size).toBe(0);
+        expect((await recursiveRef.doc('a').get()).exists).toBe(false);
+        expect((await recursiveRef.doc('b').get()).exists).toBe(true);
+      });
+
+      it('deletes a collection and its subcollections', async () => {
+        await recursiveRef.doc('a').set({ name: 'a' });
+        await recursiveRef.doc('a').collection('sub').doc('x').set({ n: 1 });
+        await tasks.callFirestore(adminApp, 'delete', RECURSIVE_COLLECTION, {
+          recursive: true,
+        });
+        expect((await recursiveRef.get()).size).toBe(0);
+        const subSnap = await recursiveRef.doc('a').collection('sub').get();
+        expect(subSnap.size).toBe(0);
+      });
+
+      it('deletes only documents matching a query and their subcollections', async () => {
+        await recursiveRef.doc('a').set({ name: 'a', remove: true });
+        await recursiveRef.doc('a').collection('sub').doc('x').set({ n: 1 });
+        await recursiveRef.doc('b').set({ name: 'b', remove: false });
+        await recursiveRef.doc('b').collection('sub').doc('y').set({ n: 2 });
+        await tasks.callFirestore(adminApp, 'delete', RECURSIVE_COLLECTION, {
+          recursive: true,
+          where: ['remove', '==', true],
+        });
+        expect((await recursiveRef.doc('a').get()).exists).toBe(false);
+        expect((await recursiveRef.doc('a').collection('sub').get()).size).toBe(
+          0,
+        );
+        expect((await recursiveRef.doc('b').get()).exists).toBe(true);
+        expect((await recursiveRef.doc('b').collection('sub').get()).size).toBe(
+          1,
+        );
+      });
+    });
+
+    describe('create action', () => {
+      const createPath = 'create-action/doc';
+      afterEach(async () => {
+        await adminApp.firestore().doc(createPath).delete();
+      });
+
+      it('creates a document which does not exist', async () => {
+        await tasks.callFirestore(
+          adminApp,
+          'create',
+          createPath,
+          {},
+          {
+            name: 'created',
+            at: { seconds: 1589651645, nanoseconds: 0 },
+          },
+        );
+        const snap = await adminApp.firestore().doc(createPath).get();
+        expect(snap.get('name')).toBe('created');
+        expect(snap.get('at')).toBeInstanceOf(adminApp.firestore.Timestamp);
+      });
+
+      it('fails if the document already exists', async () => {
+        await adminApp.firestore().doc(createPath).set({ name: 'existing' });
+        await expect(
+          tasks.callFirestore(
+            adminApp,
+            'create',
+            createPath,
+            {},
+            {
+              name: 'created',
+            },
+          ),
+        ).rejects.toThrow(/already exists/i);
+        const snap = await adminApp.firestore().doc(createPath).get();
+        expect(snap.get('name')).toBe('existing');
+      });
+
+      it('throws for a collection path', async () => {
+        await expect(
+          tasks.callFirestore(
+            adminApp,
+            'create',
+            'create-action',
+            {},
+            {
+              name: 'created',
+            },
+          ),
+        ).rejects.toThrow('The create action requires a document path.');
+      });
+    });
+
+    describe('count and aggregate actions', () => {
+      const ORDERS_COLLECTION = 'aggregate-orders';
+      const ordersRef = adminApp.firestore().collection(ORDERS_COLLECTION);
+      beforeEach(async () => {
+        await ordersRef.doc('a').set({ price: 10, status: 'paid' });
+        await ordersRef.doc('b').set({ price: 20, status: 'paid' });
+        await ordersRef.doc('c').set({ price: 5, status: 'open' });
+      });
+      afterEach(async () => {
+        await adminApp.firestore().recursiveDelete(ordersRef);
+      });
+
+      it('counts documents in a collection', async () => {
+        const result = await tasks.callFirestore(
+          adminApp,
+          'count',
+          ORDERS_COLLECTION,
+        );
+        expect(result).toBe(3);
+      });
+
+      it('counts documents matching a query', async () => {
+        const result = await tasks.callFirestore(
+          adminApp,
+          'count',
+          ORDERS_COLLECTION,
+          { where: ['status', '==', 'paid'] },
+        );
+        expect(result).toBe(2);
+      });
+
+      it('returns 0 for an empty collection', async () => {
+        const result = await tasks.callFirestore(
+          adminApp,
+          'count',
+          'aggregate-empty',
+        );
+        expect(result).toBe(0);
+      });
+
+      it('runs count, sum and average aggregations', async () => {
+        const result = await tasks.callFirestore(
+          adminApp,
+          'aggregate',
+          ORDERS_COLLECTION,
+          {
+            where: ['status', '==', 'paid'],
+            aggregate: {
+              count: ['count'],
+              total: ['sum', 'price'],
+              average: ['average', 'price'],
+            },
+          },
+        );
+        expect(result).toEqual({ count: 2, total: 30, average: 15 });
+      });
+
+      it('throws when aggregations are missing', async () => {
+        await expect(
+          tasks.callFirestore(adminApp, 'aggregate', ORDERS_COLLECTION),
+        ).rejects.toThrow('You must provide options.aggregate');
+      });
+
+      it('throws for an unsupported aggregation', async () => {
+        await expect(
+          tasks.callFirestore(adminApp, 'aggregate', ORDERS_COLLECTION, {
+            aggregate: { max: ['max', 'price'] as any },
+          }),
+        ).rejects.toThrow('Unsupported aggregate type "max"');
+      });
+
+      it('throws for a document path', async () => {
+        await expect(
+          tasks.callFirestore(adminApp, 'count', `${ORDERS_COLLECTION}/a`),
+        ).rejects.toThrow('The count action requires a collection path');
+      });
+    });
+
+    describe('get action with timestampFormat option', () => {
+      const timestampPath = 'timestamp-format/doc';
+      const seconds = 1589651645;
+      const nanoseconds = 434000000;
+      beforeEach(async () => {
+        const at = new adminApp.firestore.Timestamp(seconds, nanoseconds);
+        await adminApp
+          .firestore()
+          .doc(timestampPath)
+          .set({
+            at,
+            nested: { at, list: [at] },
+            geo: new adminApp.firestore.GeoPoint(1, 2),
+            name: 'x',
+          });
+      });
+      afterEach(async () => {
+        await adminApp.firestore().doc(timestampPath).delete();
+      });
+
+      it('returns Timestamps unchanged by default', async () => {
+        const result = await tasks.callFirestore(
+          adminApp,
+          'get',
+          timestampPath,
+        );
+        expect(result.at).toBeInstanceOf(adminApp.firestore.Timestamp);
+      });
+
+      it('returns Timestamps as { seconds, nanoseconds } objects', async () => {
+        const result = await tasks.callFirestore(
+          adminApp,
+          'get',
+          timestampPath,
+          {
+            timestampFormat: 'object',
+          },
+        );
+        const expected = { seconds, nanoseconds };
+        expect(result.at).toEqual(expected);
+        expect(result.nested).toEqual({ at: expected, list: [expected] });
+        expect(result.geo).toBeInstanceOf(adminApp.firestore.GeoPoint);
+        expect(result.name).toBe('x');
+      });
+
+      it('returns Timestamps as ISO strings', async () => {
+        const result = await tasks.callFirestore(
+          adminApp,
+          'get',
+          timestampPath,
+          {
+            timestampFormat: 'iso',
+          },
+        );
+        expect(result.at).toBe('2020-05-16T17:54:05.434Z');
+      });
+
+      it('returns Timestamps as epoch milliseconds in collection results', async () => {
+        const result = await tasks.callFirestore(
+          adminApp,
+          'get',
+          'timestamp-format',
+          { timestampFormat: 'millis' },
+        );
+        expect(result[0]).toHaveProperty('at', seconds * 1000 + 434);
+        expect(result[0]).toHaveProperty('id', 'doc');
       });
     });
 

@@ -23,7 +23,18 @@ export type FirestoreAction =
   | 'set'
   | 'update'
   | 'delete'
-  | 'batch';
+  | 'batch'
+  | 'create'
+  | 'count'
+  | 'aggregate';
+
+/**
+ * Aggregation for the callFirestore "aggregate" action, i.e. ['count'],
+ * ['sum', 'price'] or ['average', 'price']
+ */
+export type FirestoreAggregateSpec =
+  | ['count']
+  | ['sum' | 'average', string | firestore.FieldPath];
 
 /**
  * Data from loaded fixture
@@ -108,6 +119,23 @@ export interface CallFirestoreOptions {
    * Limit to last n number of documents
    */
   limitToLast?: number;
+  /**
+   * Also delete subcollections when deleting a document or collection
+   * (uses Firestore's recursiveDelete). Defaults to false.
+   */
+  recursive?: boolean;
+  /**
+   * Aggregations to run with the "aggregate" action, keyed by the alias
+   * used in the result, i.e. { total: ['sum', 'price'] }
+   */
+  aggregate?: Record<string, FirestoreAggregateSpec>;
+  /**
+   * Format of Timestamps returned by the "get" action. By default they are
+   * returned as Firestore serializes them ({ _seconds, _nanoseconds }).
+   * "object" returns { seconds, nanoseconds } (which can be written back),
+   * "iso" returns an ISO 8601 string and "millis" returns epoch milliseconds.
+   */
+  timestampFormat?: 'object' | 'iso' | 'millis';
   /**
    * Firestore statics (i.e. admin.firestore). This should only be needed during
    * testing due to @firebase/testing not containing statics
@@ -280,6 +308,51 @@ declare global {
         data: firestore.PartialWithFieldValue<T>,
         options?: CallFirestoreOptions,
       ): Chainable;
+      /**
+       * Create a document in Firestore, failing if the document already exists.
+       * @param action This call will create a document
+       * @param writePath The path of the document to create
+       * @param data The data of the new document
+       * @param options Options to be used when calling Firestore
+       * @example <caption>Create Document</caption>
+       * cy.callFirestore('create', 'projects/test-project', { some: 'data' })
+       */
+      callFirestore<T = firestore.DocumentData>(
+        action: 'create',
+        writePath: string,
+        data: firestore.WithFieldValue<T>,
+        options?: CallFirestoreOptions,
+      ): Chainable;
+      /**
+       * Count the documents in a collection or query.
+       * @param action This call will count documents
+       * @param countPath The path of the collection to count
+       * @param options Options to be used when calling Firestore (i.e. where)
+       * @example <caption>Count Documents Matching A Query</caption>
+       * cy.callFirestore('count', 'projects', { where: ['owner', '==', 'abc'] })
+       *   .should('equal', 2)
+       */
+      callFirestore(
+        action: 'count',
+        countPath: string,
+        options?: CallFirestoreOptions,
+      ): Chainable<number>;
+      /**
+       * Run aggregations (count, sum, average) on a collection or query.
+       * @param action This call will run aggregations
+       * @param aggregatePath The path of the collection to aggregate
+       * @param options Options to be used when calling Firestore, with aggregations in options.aggregate
+       * @example <caption>Sum And Average</caption>
+       * cy.callFirestore('aggregate', 'orders', {
+       *   aggregate: { total: ['sum', 'price'], average: ['average', 'price'] },
+       * }).should('deep.equal', { total: 30, average: 15 })
+       */
+      callFirestore(
+        action: 'aggregate',
+        aggregatePath: string,
+        options: CallFirestoreOptions &
+          Required<Pick<CallFirestoreOptions, 'aggregate'>>,
+      ): Chainable<Record<string, number | null>>;
       /**
        * Update an existing document in Firestore. Authentication is through serviceAccount.json or SERVICE_ACCOUNT
        * environment variable.
@@ -1115,7 +1188,7 @@ export default function attachCustomCommands(
           return dataToWrite;
         };
         // Add data only for write actions
-        if (['set', 'update', 'add'].includes(action)) {
+        if (['set', 'update', 'add', 'create'].includes(action)) {
           taskSettings.data = withMetaIfEnabled(dataOrOptions);
         }
         if (action === 'batch') {
@@ -1127,8 +1200,8 @@ export default function attachCustomCommands(
               )
             : dataOrOptions;
         }
-        // Use third argument as options for get and delete actions
-        if (action === 'get' || action === 'delete') {
+        // Use third argument as options for read and delete actions
+        if (['get', 'delete', 'count', 'aggregate'].includes(action)) {
           taskSettings.options = dataOrOptions;
         } else if (options) {
           // Attach options if they exist

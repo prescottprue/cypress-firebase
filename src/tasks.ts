@@ -69,6 +69,46 @@ function getAuth(
 }
 
 /**
+ * Get a client SDK FieldValue sentinel (serverTimestamp, increment, etc.) from
+ * a value which has been stringified and parsed back by cy.task
+ * @param dataVal - Value of data
+ * @returns Sentinel object with a string _methodName, or undefined if value is not a sentinel
+ */
+function getFieldValueSentinel(dataVal: any): Record<string, any> | undefined {
+  // Compat SDK (firebase/compat) wraps the sentinel as { _delegate: sentinel }
+  const sentinel =
+    dataVal && dataVal._delegate && dataVal._delegate._methodName
+      ? dataVal._delegate
+      : dataVal;
+  return sentinel && typeof sentinel._methodName === 'string'
+    ? sentinel
+    : undefined;
+}
+
+/**
+ * Get the operand of a FieldValue sentinel (such as the amount for increment).
+ * The client SDK minifies the name of the property holding the operand (and it
+ * changes between versions), so it is found by type instead of by name.
+ * @param sentinel - Stringified FieldValue sentinel
+ * @param isOperand - Check for whether a property value is the operand
+ * @returns Operand of the sentinel
+ */
+function getSentinelOperand(
+  sentinel: Record<string, any>,
+  isOperand: (val: any) => boolean,
+): any {
+  const operandKey = Object.keys(sentinel).find(
+    (key) => key !== '_methodName' && isOperand(sentinel[key]),
+  );
+  if (!operandKey) {
+    throw new Error(
+      `Unable to find the value passed to FieldValue "${sentinel._methodName}".`,
+    );
+  }
+  return sentinel[operandKey];
+}
+
+/**
  * Convert unique data types which have been stringified and parsed back
  * into their original type.
  * @param dataVal - Value of data
@@ -79,17 +119,30 @@ export function convertValueToTimestampOrGeoPointIfPossible(
   dataVal: any,
   firestoreStatics: FirestoreStatics,
 ): firestore.FieldValue {
-  if (
-    (dataVal && dataVal._methodName === 'serverTimestamp') ||
-    (dataVal && dataVal._methodName === 'FieldValue.serverTimestamp') // v8 and earlier
-  ) {
+  const sentinel = getFieldValueSentinel(dataVal);
+  // Strip "FieldValue." prefix used by v8 and earlier (and the compat SDK)
+  const methodName: string | undefined =
+    sentinel && sentinel._methodName.replace(/^FieldValue\./, '');
+  if (methodName === 'serverTimestamp') {
     return firestoreStatics.FieldValue.serverTimestamp();
   }
-  if (
-    (dataVal && dataVal._methodName === 'deleteField') ||
-    (dataVal && dataVal._methodName === 'FieldValue.delete') // v8 and earlier
-  ) {
+  if (methodName === 'deleteField' || methodName === 'delete') {
     return firestoreStatics.FieldValue.delete();
+  }
+  if (methodName === 'increment') {
+    return firestoreStatics.FieldValue.increment(
+      getSentinelOperand(
+        sentinel as Record<string, any>,
+        (val) => typeof val === 'number',
+      ),
+    );
+  }
+  if (methodName === 'arrayUnion' || methodName === 'arrayRemove') {
+    const elements = getSentinelOperand(
+      sentinel as Record<string, any>,
+      Array.isArray,
+    ).map((element: any) => convertArrayItem(element, firestoreStatics));
+    return firestoreStatics.FieldValue[methodName](...elements);
   }
   if (
     typeof dataVal !== 'undefined' &&
@@ -112,6 +165,25 @@ export function convertValueToTimestampOrGeoPointIfPossible(
 }
 
 /**
+ * Convert an item within an array (or array FieldValue) into its original type
+ * @param dataItem - Item within array
+ * @param firestoreStatics - Statics from Firestore object
+ * @returns Item with timestamps and GeoPoints converted
+ */
+function convertArrayItem(
+  dataItem: any,
+  firestoreStatics: FirestoreStatics,
+): any {
+  const result = convertValueToTimestampOrGeoPointIfPossible(
+    dataItem,
+    firestoreStatics,
+  );
+  return result && result.constructor === Object
+    ? getDataWithTimestampsAndGeoPoints(result, firestoreStatics)
+    : result;
+}
+
+/**
  * @param data - Data to be set in firestore
  * @param firestoreStatics - Statics from Firestore object
  * @returns Data to be set in firestore with timestamp
@@ -130,7 +202,7 @@ function getDataWithTimestampsAndGeoPoints(
       typeof currData === 'object' &&
       currData !== null &&
       !Array.isArray(currData) &&
-      !currData._methodName &&
+      !getFieldValueSentinel(currData) &&
       // Check types instead of truthiness so 0 values (e.g. epoch 0 or the equator) are still converted
       !(
         typeof currData.seconds === 'number' &&
@@ -151,16 +223,7 @@ function getDataWithTimestampsAndGeoPoints(
       };
     }
     const value = Array.isArray(currData)
-      ? currData.map((dataItem) => {
-          const result = convertValueToTimestampOrGeoPointIfPossible(
-            dataItem,
-            firestoreStatics,
-          );
-
-          return result.constructor === Object
-            ? getDataWithTimestampsAndGeoPoints(result, firestoreStatics)
-            : result;
-        })
+      ? currData.map((dataItem) => convertArrayItem(dataItem, firestoreStatics))
       : convertValueToTimestampOrGeoPointIfPossible(currData, firestoreStatics);
 
     return {
@@ -298,6 +361,109 @@ async function runFirestoreBatch(
 }
 
 /**
+ * Convert Timestamps within data read from Firestore into the requested format
+ * @param data - Data read from Firestore
+ * @param format - Format to convert Timestamps into
+ * @returns Data with Timestamps converted
+ */
+function formatTimestamps(
+  data: any,
+  format: NonNullable<CallFirestoreOptions['timestampFormat']>,
+): any {
+  if (Array.isArray(data)) {
+    return data.map((item) => formatTimestamps(item, format));
+  }
+  if (!data || typeof data !== 'object') {
+    return data;
+  }
+  if (typeof data.toMillis === 'function' && typeof data.seconds === 'number') {
+    if (format === 'iso') {
+      return data.toDate().toISOString();
+    }
+    if (format === 'millis') {
+      return data.toMillis();
+    }
+    return { seconds: data.seconds, nanoseconds: data.nanoseconds };
+  }
+  // Only walk plain objects (leaving GeoPoints, references, etc. as is)
+  if (data.constructor !== Object) {
+    return data;
+  }
+  return Object.fromEntries(
+    Object.entries(data).map(([key, val]) => [
+      key,
+      formatTimestamps(val, format),
+    ]),
+  );
+}
+
+/**
+ * Run aggregations (count, sum, average) on a collection or query
+ * @param query - Collection or query to aggregate
+ * @param aggregateSpecs - Aggregations keyed by alias
+ * @param firestoreStatics - Statics used to create AggregateFields
+ * @returns Promise which resolves with aggregation results keyed by alias
+ */
+async function runFirestoreAggregate(
+  query: firestore.Query,
+  aggregateSpecs: CallFirestoreOptions['aggregate'],
+  firestoreStatics: any,
+): Promise<Record<string, number | null>> {
+  if (!aggregateSpecs || !Object.keys(aggregateSpecs).length) {
+    throw new Error(
+      'You must provide options.aggregate to run aggregate in firestore.',
+    );
+  }
+  const { AggregateField } = firestoreStatics;
+  if (!AggregateField || typeof query.aggregate !== 'function') {
+    throw new Error('The aggregate action requires firebase-admin v12+.');
+  }
+  const aggregateFields = Object.fromEntries(
+    Object.entries(aggregateSpecs).map(([alias, [type, field]]) => {
+      if (!['count', 'sum', 'average'].includes(type)) {
+        throw new Error(
+          `Unsupported aggregate type "${type}". Use count, sum or average.`,
+        );
+      }
+      return [alias, AggregateField[type](field)];
+    }),
+  );
+  const snap = await query.aggregate(aggregateFields).get();
+  return snap.data() as Record<string, number | null>;
+}
+
+/**
+ * Delete a document or collection along with all of its subcollections. When
+ * query options (where, limit, etc.) are used, only matching documents (and
+ * their subcollections) are deleted.
+ * @param db - Firestore instance
+ * @param ref - Document, collection or query to delete
+ * @returns Promise which resolves once everything is deleted
+ */
+async function recursiveDeleteFirestore(
+  db: firestore.Firestore,
+  ref:
+    | firestore.DocumentReference
+    | firestore.CollectionReference
+    | firestore.Query,
+): Promise<void> {
+  // Documents (no where) and collections (have doc) can be deleted directly,
+  // queries are deleted doc by doc
+  if (
+    typeof (ref as any).where !== 'function' ||
+    typeof (ref as any).doc === 'function'
+  ) {
+    return db.recursiveDelete(
+      ref as firestore.DocumentReference | firestore.CollectionReference,
+    );
+  }
+  const snap = await (ref as firestore.Query).get();
+  await Promise.all(
+    snap.docs.map((docSnap) => db.recursiveDelete(docSnap.ref)),
+  );
+}
+
+/**
  * @param adminInstance - firebase-admin instance
  * @param action - Action to run
  * @param actionPath - Path to collection or document within Firestore
@@ -333,6 +499,9 @@ export async function callFirestore(
         ) as any
       ).get();
 
+      const timestampFormat = options && options.timestampFormat;
+      const formatData = (data: any) =>
+        timestampFormat ? formatTimestamps(data, timestampFormat) : data;
       if (
         snap &&
         snap.docs &&
@@ -340,13 +509,44 @@ export async function callFirestore(
         typeof snap.docs.map === 'function'
       ) {
         return snap.docs.map((docSnap: firestore.DocumentSnapshot) => ({
-          ...docSnap.data(),
+          ...formatData(docSnap.data()),
           id: docSnap.id,
         }));
       }
       // Falling back to null in the case of falsey value prevents Cypress error with message:
       // "You must return a promise, a value, or null to indicate that the task was handled."
-      return (snap && typeof snap.data === 'function' && snap.data()) || null;
+      return (
+        (snap && typeof snap.data === 'function' && formatData(snap.data())) ||
+        null
+      );
+    }
+
+    if (action === 'count' || action === 'aggregate') {
+      if (isDocPath(actionPath)) {
+        throw new Error(`The ${action} action requires a collection path.`);
+      }
+      const query = slashPathToFirestoreRef(
+        adminInstance.firestore,
+        actionPath,
+        options,
+      ) as firestore.Query;
+      if (action === 'count') {
+        const countSnap = await query.count().get();
+        return countSnap.data().count;
+      }
+      return await runFirestoreAggregate(
+        query,
+        options && options.aggregate,
+        (options && options.statics) || adminInstance.firestore,
+      );
+    }
+
+    if (action === 'delete' && options && options.recursive) {
+      await recursiveDeleteFirestore(
+        adminInstance.firestore(),
+        slashPathToFirestoreRef(adminInstance.firestore, actionPath, options),
+      );
+      return null;
     }
 
     if (action === 'delete') {
@@ -399,7 +599,10 @@ export async function callFirestore(
             : (undefined as any),
         );
     }
-    // "update" and "add" action
+    if (action === 'create' && !isDocPath(actionPath)) {
+      throw new Error('The create action requires a document path.');
+    }
+    // "update", "add" and "create" action
     return (
       slashPathToFirestoreRef(
         adminInstance.firestore,
