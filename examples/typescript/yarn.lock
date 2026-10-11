@@ -7305,12 +7305,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cypress-firebase@npm:4.4.0":
-  version: 4.4.0
-  resolution: "cypress-firebase@npm:4.4.0"
+"cypress-firebase@npm:4.5.0":
+  version: 4.5.0
+  resolution: "cypress-firebase@npm:4.5.0"
   peerDependencies:
     firebase-admin: ">=11.0.0"
-  checksum: 10c0/659bcd203cd3d71e8dff0a1677c63cb27ea18d166e671cdf8c6edf6addb7845a081a5829f713457e10308a42e3e4c6276d3eed77333889b21e326caaf115b30b
+  checksum: 10c0/06ec6c5543cc034508b0acf6b0d6accfe2c18106cfc8054ec1637dbd9c3613ffc2987a93f80d9a429e2a8740e88a3f6a0425f43006262ad73902b5caa778ca86
   languageName: node
   linkType: hard
 
@@ -17990,7 +17990,7 @@ __metadata:
     "@types/react-dom": "npm:19.3.0"
     cross-env: "npm:10.1.0"
     cypress: "npm:16.1.1"
-    cypress-firebase: "npm:4.4.0"
+    cypress-firebase: "npm:4.5.0"
     eslint-plugin-chai-friendly: "npm:0.8.0"
     eslint-plugin-cypress: "npm:7.0.2"
     firebase: "npm:12.19.0"

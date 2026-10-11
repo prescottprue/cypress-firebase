@@ -29,7 +29,7 @@
     "@types/react-dom": "19.3.0",
     "cross-env": "10.1.0",
     "cypress": "16.1.1",
-    "cypress-firebase": "4.4.0",
+    "cypress-firebase": "4.5.0",
     "eslint-plugin-chai-friendly": "0.8.0",
     "eslint-plugin-cypress": "7.0.2",
     "firebase-admin": "14.5.0",
