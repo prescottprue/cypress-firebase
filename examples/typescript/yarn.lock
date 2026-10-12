@@ -18000,7 +18000,7 @@ __metadata:
     react-dom: "npm:19.3.0"
     react-scripts: "npm:5.0.1"
     typescript: "npm:7.0.2"
-    web-vitals: "npm:6.2.2"
+    web-vitals: "npm:6.2.3"
   languageName: unknown
   linkType: soft
 
@@ -18378,10 +18378,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-vitals@npm:6.2.2":
-  version: 6.2.2
-  resolution: "web-vitals@npm:6.2.2"
-  checksum: 10c0/dda70c450470680decfe6cb4e04550b28843e697b1ed7634e51fb1e14b2c4056daffa66b593ab3f8134a8f214c885a4913353b34836273f72d73036a561a12dc
+"web-vitals@npm:6.2.3":
+  version: 6.2.3
+  resolution: "web-vitals@npm:6.2.3"
+  checksum: 10c0/d7db74ab8503f069db0f697b1b1318670062616a1b46464abde98dc599ffbf71c0080f39bfe739ed122da12f6980fe882d471e86a78fedad61a4bfa1abffa32c
   languageName: node
   linkType: hard
 
