@@ -29,7 +29,7 @@
     "@biomejs/biome": "2.5.14",
     "@commitlint/cli": "21.2.3",
     "@commitlint/config-conventional": "21.2.3",
-    "@firebase/rules-unit-testing": "5.0.2",
+    "@firebase/rules-unit-testing": "6.0.0",
     "@size-limit/preset-small-lib": "14.2.0",
     "@size-limit/webpack": "14.2.0",
     "@types/node": "24.19.1",
