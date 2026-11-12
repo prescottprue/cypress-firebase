@@ -43,7 +43,7 @@
     "rimraf": "6.1.4",
     "size-limit": "14.3.0",
     "typescript": "7.0.2",
-    "vite": "8.3.5",
+    "vite": "8.3.6",
     "vitest": "5.1.0"
   },
   "keywords": [
