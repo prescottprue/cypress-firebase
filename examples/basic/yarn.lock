@@ -6990,7 +6990,7 @@ __metadata:
     eslint-plugin-cypress: "npm:7.0.3"
     firebase: "npm:^12.0.0"
     firebase-admin: "npm:14.5.0"
-    firebase-tools: "npm:15.34.2"
+    firebase-tools: "npm:15.35.0"
     lodash: "npm:^4.17.21"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
@@ -8880,9 +8880,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-tools@npm:15.34.2":
-  version: 15.34.2
-  resolution: "firebase-tools@npm:15.34.2"
+"firebase-tools@npm:15.35.0":
+  version: 15.35.0
+  resolution: "firebase-tools@npm:15.35.0"
   dependencies:
     "@electric-sql/pglite": "npm:^0.3.3"
     "@electric-sql/pglite-tools": "npm:^0.2.8"
@@ -8923,7 +8923,6 @@ __metadata:
     lsofi: "npm:^2.0.0"
     marked: "npm:^13.0.2"
     marked-terminal: "npm:^7.0.0"
-    mime: "npm:^2.5.2"
     minimatch: "npm:^3.0.4"
     morgan: "npm:^1.10.0"
     node-fetch: "npm:^2.6.7"
@@ -8953,7 +8952,7 @@ __metadata:
     zod: "npm:^4.0.0"
   bin:
     firebase: lib/bin/firebase.js
-  checksum: 10c0/879eb1583a3c4cbe3636c9c9cd0bc6586d4f2bcdc9b77190e2b4b718cfa8dbf31f4a81f2a0f338e2eb202dae5e66080d457957343765a4e3d425dd0d6ef7915b
+  checksum: 10c0/98c53d35597df41914032e2b0041f1c502790b5fcb1e95fb3be7d8f5accafb0714aaa905670660f52d1fce729c7331890424b85af95d99272826c9fc0cb362e1
   languageName: node
   linkType: hard
 
@@ -12442,15 +12441,6 @@ __metadata:
   bin:
     mime: cli.js
   checksum: 10c0/b92cd0adc44888c7135a185bfd0dddc42c32606401c72896a842ae15da71eb88858f17669af41e498b463cd7eb998f7b48939a25b08374c7924a9c8a6f8a81b0
-  languageName: node
-  linkType: hard
-
-"mime@npm:^2.5.2":
-  version: 2.6.0
-  resolution: "mime@npm:2.6.0"
-  bin:
-    mime: cli.js
-  checksum: 10c0/a7f2589900d9c16e3bdf7672d16a6274df903da958c1643c9c45771f0478f3846dcb1097f31eb9178452570271361e2149310931ec705c037210fc69639c8e6c
   languageName: node
   linkType: hard
 
