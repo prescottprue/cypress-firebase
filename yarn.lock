@@ -3849,7 +3849,7 @@ __metadata:
     "@vitest/coverage-v8": "npm:5.1.0"
     cypress: "npm:16.3.0"
     firebase: "npm:12.19.0"
-    firebase-admin: "npm:14.5.0"
+    firebase-admin: "npm:14.5.1"
     firebase-tools: "npm:15.35.0"
     husky: "npm:9.1.7"
     lint-staged: "npm:17.6.0"
@@ -4668,9 +4668,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"firebase-admin@npm:14.5.0":
-  version: 14.5.0
-  resolution: "firebase-admin@npm:14.5.0"
+"firebase-admin@npm:14.5.1":
+  version: 14.5.1
+  resolution: "firebase-admin@npm:14.5.1"
   dependencies:
     "@fastify/busboy": "npm:^3.0.0"
     "@firebase/database-compat": "npm:^2.1.4"
@@ -4686,7 +4686,7 @@ __metadata:
       optional: true
     "@google-cloud/storage":
       optional: true
-  checksum: 10c0/1fe458a42ed0e12ec62cb04432d3e8b204efe2e9b562f940e4058b946744d673ec47536299e8b55397e5a1ce56cd22496a28668c56a8ddf45931fcfa388728b0
+  checksum: 10c0/05517b547907d90716393c8f2b24d2689172767aaedc2a596ba43d5078816d386741bcc165a76882ae6822b61b05203199aa4d0e376770b3464814edab0b7976
   languageName: node
   linkType: hard
 
