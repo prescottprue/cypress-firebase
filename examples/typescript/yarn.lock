@@ -8304,9 +8304,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-cypress@npm:7.0.4":
-  version: 7.0.4
-  resolution: "eslint-plugin-cypress@npm:7.0.4"
+"eslint-plugin-cypress@npm:7.0.5":
+  version: 7.0.5
+  resolution: "eslint-plugin-cypress@npm:7.0.5"
   dependencies:
     globals: "npm:^17.14.0"
   peerDependencies:
@@ -8315,7 +8315,7 @@ __metadata:
   peerDependenciesMeta:
     "@typescript-eslint/parser":
       optional: true
-  checksum: 10c0/03f8fc2a85b39c66d06781153ceb43e567a7a85a41769551534752c5f7ed593a90f69e5c1ff999203562da84cd9b0fb716b90cabfe3a37886a9a3f26ade3801e
+  checksum: 10c0/aa13ba2463ecebf1db332038f7ec3cabacf5c7e7b3ea4ccbcd8358355dcbd340d30b73886599fa983b8c354951378b45e246ddb3b7ce60372255f95eb375e0c3
   languageName: node
   linkType: hard
 
@@ -17875,7 +17875,7 @@ __metadata:
     cypress: "npm:16.3.0"
     cypress-firebase: "npm:4.6.0"
     eslint-plugin-chai-friendly: "npm:0.8.0"
-    eslint-plugin-cypress: "npm:7.0.4"
+    eslint-plugin-cypress: "npm:7.0.5"
     firebase: "npm:12.19.0"
     firebase-admin: "npm:14.5.1"
     firebase-tools: "npm:15.36.0"
