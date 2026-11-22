@@ -39,7 +39,7 @@
     "firebase-admin": "14.5.1",
     "firebase-tools": "15.36.0",
     "husky": "9.1.7",
-    "lint-staged": "17.6.0",
+    "lint-staged": "17.6.1",
     "rimraf": "6.1.4",
     "size-limit": "14.3.0",
     "typescript": "7.0.2",
